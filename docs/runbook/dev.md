@@ -16,8 +16,9 @@ make lint
 - Dev-only handles: `window.__hearth.db` exposes the database wrapper in the browser console.
 - `?profile=<name>` opens a separate local database (OPFS directory `.hearth-<name>`). Handy for
   a sandbox; the default profile is what users get.
-- Only one tab may hold a profile's database (OPFS access handles are exclusive). A second tab
-  hands over: the newest tab takes the database and the old one shows a "reload to use it here" notice.
+- Only one tab may hold a profile's database (OPFS access handles are exclusive). The newest tab
+  always wins: it asks the owner to hand over and, if there is no answer within 1.5 s, steals the
+  Web Lock. The old tab shows a "use it here instead" notice.
 - Vite serves `Cross-Origin-Opener-Policy`/`Embedder-Policy` headers; in production
   `frontend/public/_headers` does the same on Cloudflare Pages.
 

@@ -19,6 +19,9 @@ export class Database {
 
   private static instance: Promise<Database> | null = null
 
+  /** How long a new tab waits for the owner to hand over before stealing the lock. */
+  static readonly TAKEOVER_GRACE_MS = 1500
+
   /**
    * Singleton: React StrictMode runs effects twice in dev, and the OPFS VFS allows one connection.
    * `onTakenOver` fires if a newer tab claims the database; this instance is dead from then on.
@@ -38,19 +41,46 @@ export class Database {
     const profile = Database.profile()
     const name = `hearth-db-${profile}`
     // One tab owns the database at a time: the OPFS SAH pool needs exclusive handles. The newest
-    // tab wins: it asks the current owner to let go over a BroadcastChannel, then waits for the
-    // Web Lock, which the browser also releases when the owning tab closes.
+    // tab always wins (WhatsApp Web style): it asks the current owner to let go over a
+    // BroadcastChannel and waits briefly for the Web Lock; if the owner does not answer — a tab
+    // running older code, or a parked page — it steals the lock. The browser also releases the
+    // lock when the owning tab closes.
     const channel = new BroadcastChannel(name)
     channel.postMessage('takeover')
     let release = () => {}
-    await new Promise<void>((resolve) => {
-      navigator.locks.request(name, () => {
-        resolve()
-        return new Promise<void>((r) => {
-          release = r
-        })
+    let lost = () => {} // called when a newer tab steals our lock
+    const hold = (lock: Lock | null) => {
+      if (!lock) return
+      return new Promise<void>((r) => {
+        release = r
       })
+    }
+    let stealing = false
+    const acquired = await new Promise<boolean>((resolve) => {
+      const timer = setTimeout(() => resolve(false), Database.TAKEOVER_GRACE_MS)
+      navigator.locks
+        .request(name, (lock) => {
+          clearTimeout(timer)
+          resolve(true)
+          return hold(lock)
+        })
+        // Rejects when a newer tab steals from us — or when we steal ourselves (then ignore).
+        .catch(() => !stealing && lost())
     })
+    if (!acquired) {
+      stealing = true
+      await new Promise<void>((resolve) => {
+        navigator.locks
+          .request(name, { steal: true }, (lock) => {
+            resolve()
+            return hold(lock)
+          })
+          .catch(() => lost())
+      })
+      // The previous owner learns of the steal asynchronously; let it terminate its worker
+      // before we ask OPFS for the same access handles.
+      await new Promise((r) => setTimeout(r, 300))
+    }
     const worker = new Worker(new URL('./db.worker.ts', import.meta.url), { type: 'module' })
     const db = new Database(worker, false)
     let ready: Database | undefined // assigned after the open handshake; shutdown may run before
@@ -63,11 +93,12 @@ export class Database {
     // The OPFS SAH pool holds exclusive sync access handles; a page parked in the back-forward
     // cache would otherwise keep them and block the next load from opening the database.
     window.addEventListener('pagehide', shutdown)
-    channel.onmessage = (ev) => {
-      if (ev.data !== 'takeover') return
+    const takenOver = () => {
       shutdown()
       onTakenOver?.()
     }
+    channel.onmessage = (ev) => ev.data === 'takeover' && takenOver()
+    lost = takenOver
     worker.onmessage = (ev) => db.onMessage(ev.data)
     const { persistent, reason } = (await db.send({ op: 'open', profile })) as {
       persistent: boolean

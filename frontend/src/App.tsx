@@ -70,9 +70,7 @@ export function App() {
   if (!state)
     return (
       <main>
-        <p className="muted">
-          Opening local database… (if Hearth is open in another tab, it is handing over)
-        </p>
+        <p className="muted">Opening local database…</p>
       </main>
     )
   if (!consented)
