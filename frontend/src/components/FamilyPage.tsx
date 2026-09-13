@@ -2,13 +2,15 @@ import { useState } from 'react'
 import { useApp } from '../app/context'
 import { type FamilyCall, familyAt } from '../db/repo'
 import { searchKb } from '../kb/kb'
+import { InheritanceTree } from './InheritanceTree'
 
 /** The `family_all` view: one rsid across everyone, plus kb search to find rsids by drug/condition. */
 export function FamilyPage() {
-  const { db, kb, persons } = useApp()
+  const { db, kb, persons, relationships } = useApp()
   const [q, setQ] = useState('')
   const [rows, setRows] = useState<FamilyCall[] | null>(null)
   const hits = searchKb(kb, q).slice(0, 12)
+  const entry = rows ? kb.entries.find((e) => e.rsid === q) : undefined
 
   const lookup = async (rsid: string) => {
     setQ(rsid)
@@ -51,7 +53,21 @@ export function FamilyPage() {
       </div>
       {rows && (
         <div className="card">
-          <h2>{q}</h2>
+          <h2>
+            {q}
+            {entry && (
+              <span className="muted">
+                {' '}
+                · {entry.gene} — {entry.name}
+              </span>
+            )}
+          </h2>
+          {rows.length > 0 && relationships.length > 0 && (
+            <>
+              <h3>Who inherited what</h3>
+              <InheritanceTree calls={rows} entry={entry} />
+            </>
+          )}
           {rows.length === 0 ? (
             <p className="muted">Not genotyped in any imported file.</p>
           ) : (
