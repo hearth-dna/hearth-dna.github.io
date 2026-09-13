@@ -476,7 +476,7 @@ hearth/
 │   ├── decisions/0001-…                         # ADRs, sentio style
 │   ├── runbook/first-deploy.md  kb-release.md
 │   └── testing/
-└── .github/workflows/  ci.yml  tests.yml  deploy-backend.yml  deploy-frontend.yml  deploy-landing.yml  publish-kb.yml
+└── .github/workflows/  ci.yml (tests + change-aware deploys, one runner)  publish-kb.yml
 ```
 
 ### 12.2 What is copied verbatim from sentio, what changes
@@ -491,7 +491,7 @@ hearth/
 | `terraform/cloudflare.tf` + Worker | as-is | add `cloudflare-r2.tf` for the kb bucket and a custom domain `kb.<domain>` |
 | `terraform/cloudflare-pages.tf` | frontend + landing projects | same two projects, names `hearth-frontend`, `hearth-landing` |
 | `terraform/email.tf` | Mailgun + Email Routing | keep, gated, for `contact@<domain>` (privacy contact) |
-| `.github/workflows/*` | WIF auth, path filters, tests gate | add `publish-kb.yml`: builds `kb.db` on a tag and uploads to R2 with wrangler |
+| `.github/workflows/*` | WIF auth, path filters, tests gate | one `ci.yml` job (free-tier minutes: tests once, deploy steps gated by `git diff`, no Dependabot version PRs); add `publish-kb.yml`: builds `kb.db` on a tag and uploads to R2 with wrangler |
 | `Makefile` | android/ios/backend/frontend/landing/setup/i18n | drop mobile targets; add `kb-build`, `kb-publish`, `dump-roundtrip` (test) |
 | `scripts/bootstrap.sh` | 14 idempotent steps | drop OAuth steps; add R2 bucket + token step |
 | `frontend/` stack | React 19, Vite, Biome, Vitest, `fflate` | same, plus `@sqlite.org/sqlite-wasm`, `vite-plugin-pwa`, `pdfjs-dist`, `tesseract.js` |

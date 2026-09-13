@@ -43,7 +43,8 @@ database-size ceiling that sets Cloud Run's memory limit.
 Group resources by provider/feature, matching the existing flat layout. Use descriptive lowercase
 snake_case names for variables, locals, outputs, and resources. Prefer variables over hardcoded
 project/region/image values. Keep `environments/*.tfvars.example` sanitized and committed; keep real
-`.tfvars` out of git.
+`.tfvars` out of git. The repo is open-source ready: no real project numbers, account IDs, zone IDs,
+domains, emails or bucket names in `.tf`, `.md` or example files — placeholders only.
 
 ## Testing Guidelines
 
@@ -53,8 +54,8 @@ for changes that create, replace, or delete resources.
 ## Security & Configuration Tips
 
 Terraform can modify production infrastructure. Never commit state files or real `.tfvars`. Treat IAM
-and storage-bucket resources as high-impact; confirm the target project (`hearth-production-503017`)
-before applying. There is no database and no bucket holding personal data: the helper is stateless by design (ADR 0001).
+and storage-bucket resources as high-impact; confirm the target project (`project_id` in your local
+`environments/production.tfvars`) before applying. There is no database and no bucket holding personal data: the helper is stateless by design (ADR 0001).
 
 Secrets are created out of band with `gcloud secrets create` and only read here — never add a variable
 that carries secret material, and never put one in `environments/*.tfvars`. The state bucket must stay
