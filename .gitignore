@@ -1,0 +1,45 @@
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Node.js (frontend/)
+node_modules/
+frontend/dist/
+frontend/dev-dist/
+/package.json
+/package-lock.json
+
+# Go (backend/)
+backend/bin/
+backend/*.test
+backend/*.out
+
+# Terraform
+terraform/.terraform/
+terraform/*.tfstate
+terraform/*.tfstate.*
+terraform/**/*.tfvars
+!terraform/**/*.tfvars.example
+
+# make dev / dev-stop — pidfiles + logs for the background dev servers
+.dev/
+
+# Knowledge-base build output (kb/build_kb.py); the committed source is kb/reviewed/
+kb/out/
+
+# Database files (local backend)
+*.db
+*.db-wal
+*.db-shm
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+__pycache__/
+*.pyc
+
+# Claude Code session data
+.claude/projects/
+.claude/settings.local.json

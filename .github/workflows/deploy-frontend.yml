@@ -1,0 +1,50 @@
+name: Deploy frontend
+
+# Ships frontend/ (the PWA on app.<domain>) to Cloudflare Pages on merge to main. Terraform owns
+# the Pages project and its custom domain (terraform/cloudflare-pages.tf); this only uploads.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'frontend/**'
+      - 'kb/**'
+      - '.github/workflows/deploy-frontend.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-frontend
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: '24'
+  PAGES_PROJECT: hearth-frontend # must match terraform/cloudflare-pages.tf and the Makefile
+
+jobs:
+  tests:
+    uses: ./.github/workflows/tests.yml
+
+  deploy:
+    name: Build and deploy
+    needs: tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: python3 kb/build_kb.py
+      - working-directory: frontend
+        run: npm ci && npm run build
+      - name: Deploy to Cloudflare Pages
+        working-directory: frontend
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        # --branch=main is load-bearing: Pages serves the custom domain only from production-branch deployments.
+        run: npx --yes wrangler@4 pages deploy dist --project-name="$PAGES_PROJECT" --branch=main

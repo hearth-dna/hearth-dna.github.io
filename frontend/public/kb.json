@@ -1,0 +1,997 @@
+{
+ "version": "2026.09.13",
+ "entries": [
+  {
+   "rsid": "rs1057910",
+   "gene": "CYP2C9",
+   "name": "CYP2C9*3",
+   "risk_allele": "C",
+   "orientation": "forward",
+   "evidence": "A",
+   "summary": "Strongly reduced-function allele; larger effect than *2 on warfarin dose requirement.",
+   "genotypes": {
+    "AA": {
+     "label": "*1/*1",
+     "magnitude": 0
+    },
+    "AC": {
+     "label": "*1/*3 intermediate",
+     "magnitude": 2.5
+    },
+    "CC": {
+     "label": "*3/*3 poor",
+     "magnitude": 3.5
+    }
+   },
+   "sources": [
+    "https://cpicpgx.org/guidelines/guideline-for-warfarin-and-cyp2c9-and-vkorc1/"
+   ],
+   "drugs": [
+    "warfarin",
+    "phenytoin",
+    "celecoxib"
+   ],
+   "topic": "pharmacogenomics",
+   "generated_by": "human"
+  },
+  {
+   "rsid": "rs1061170",
+   "gene": "CFH",
+   "name": "CFH Y402H",
+   "risk_allele": "C",
+   "orientation": "forward",
+   "evidence": "A",
+   "summary": "C allele is the main common risk factor for age-related macular degeneration (~2.5x heterozygous, ~6x homozygous). Smoking multiplies the risk.",
+   "genotypes": {
+    "TT": {
+     "label": "typical AMD risk",
+     "magnitude": 0
+    },
+    "CT": {
+     "label": "~2.5x AMD risk",
+     "magnitude": 2.5
+    },
+    "CC": {
+     "label": "~6x AMD risk",
+     "magnitude": 3.5
+    }
+   },
+   "sources": [
+    "https://www.ncbi.nlm.nih.gov/snp/rs1061170"
+   ],
+   "conditions": [
+    "age-related macular degeneration"
+   ],
+   "topic": "metabolism_and_traits",
+   "generated_by": "human"
+  },
+  {
+   "rsid": "rs10757278",
+   "gene": "CDKN2B-AS1 (9p21)",
+   "name": "9p21 CAD locus",
+   "risk_allele": "G",
+   "orientation": "forward",
+   "evidence": "A",
+   "summary": "Most replicated common coronary artery disease variant. GG ~1.5–1.9x CAD risk vs AA; effect independent of lipids.",
+   "genotypes": {
+    "AA": {
+     "label": "typical CAD risk",
+     "magnitude": 0
+    },
+    "AG": {
+     "label": "~1.3x CAD risk",
+     "magnitude": 2
+    },
+    "GG": {
+     "label": "~1.6x CAD risk",
+     "magnitude": 2.5
+    }
+   },
+   "sources": [
+    "https://www.ebi.ac.uk/gwas/variants/rs10757278"
+   ],
+   "conditions": [
+    "coronary artery disease",
+    "myocardial infarction"
+   ],
+   "topic": "cardiometabolic",
+   "generated_by": "human"
+  },
+  {
+   "rsid": "rs10993994",
+   "gene": "MSMB",
+   "name": "MSMB rs10993994",
+   "risk_allele": "T",
+   "orientation": "forward",
+   "evidence": "B",
+   "summary": "T allele raises prostate cancer risk ~1.25x per allele and lowers PSA-independent MSMB expression.",
+   "genotypes": {
+    "CC": {
+     "label": "typical",
+     "magnitude": 0
+    },
+    "CT": {
+     "label": "~1.25x prostate cancer risk",
+     "magnitude": 1.5
+    },
+    "TT": {
+     "label": "~1.6x prostate cancer risk",
+     "magnitude": 2
+    }
+   },
+   "sources": [
+    "https://www.ebi.ac.uk/gwas/variants/rs10993994"
+   ],
+   "conditions": [
+    "prostate cancer"
+   ],
+   "topic": "metabolism_and_traits",
+   "generated_by": "human"
+  },
+  {
+   "rsid": "rs12248560",
+   "gene": "CYP2C19",
+   "name": "CYP2C19*17",
+   "risk_allele": "T",
+   "orientation": "forward",
+   "evidence": "A",
+   "summary": "Increased-function promoter variant. Rapid/ultrarapid metabolism of CYP2C19 substrates; lower SSRI exposure, PPIs may need higher dose.",
+   "genotypes": {
+    "CC": {
+     "label": "*1/*1",
+     "magnitude": 0
+    },
+    "CT": {
+     "label": "*1/*17 rapid metaboliser",
+     "magnitude": 2
+    },
+    "TT": {
+     "label": "*17/*17 ultrarapid metaboliser",
+     "magnitude": 2.5
+    }
+   },
+   "sources": [
+    "https://cpicpgx.org/guidelines/guideline-for-selective-serotonin-reuptake-inhibitors-and-cyp2d6-and-cyp2c19/",
+    "https://www.pharmgkb.org/variant/PA166154051"
+   ],
+   "drugs": [
+    "escitalopram",
+    "sertraline",
+    "omeprazole",
+    "clopidogrel"
+   ],
+   "topic": "pharmacogenomics",
+   "generated_by": "human"
+  },
+  {
+   "rsid": "rs1229984",
+   "gene": "ADH1B",
+   "name": "ADH1B*2 (Arg48His)",
+   "risk_allele": "T",
+   "orientation": "forward",
+   "evidence": "A",
+   "summary": "T allele = fast alcohol-to-acetaldehyde conversion, flushing, strong protection against alcohol dependence.",
+   "genotypes": {
+    "CC": {
+     "label": "typical alcohol metabolism",
+     "magnitude": 0
+    },
+    "CT": {
+     "label": "fast ADH1B, flushing likely, lower dependence risk",
+     "magnitude": 1.5
+    },
+    "TT": {
+     "label": "very fast ADH1B",
+     "magnitude": 2
+    }
+   },
+   "sources": [
+    "https://www.ncbi.nlm.nih.gov/snp/rs1229984"
+   ],
+   "conditions": [
+    "alcohol use disorder"
+   ],
+   "topic": "metabolism_and_traits",
+   "generated_by": "human"
+  },
+  {
+   "rsid": "rs1333049",
+   "gene": "CDKN2B-AS1 (9p21)",
+   "name": "9p21 rs1333049",
+   "risk_allele": "C",
+   "orientation": "forward",
+   "evidence": "A",
+   "summary": "Second tag SNP of the 9p21 CAD locus, in strong LD with rs10757278.",
+   "genotypes": {
+    "GG": {
+     "label": "typical",
+     "magnitude": 0
+    },
+    "CG": {
+     "label": "~1.3x CAD risk",
+     "magnitude": 1.5
+    },
+    "CC": {
+     "label": "~1.6x CAD risk",
+     "magnitude": 2
+    }
+   },
+   "sources": [
+    "https://www.ebi.ac.uk/gwas/variants/rs1333049"
+   ],
+   "conditions": [
+    "coronary artery disease"
+   ],
+   "topic": "cardiometabolic",
+   "generated_by": "human"
+  },
+  {
+   "rsid": "rs1799853",
+   "gene": "CYP2C9",
+   "name": "CYP2C9*2",
+   "risk_allele": "T",
+   "orientation": "forward",
+   "evidence": "A",
+   "summary": "Reduced-function allele. Slower clearance of warfarin, phenytoin, some NSAIDs.",
+   "genotypes": {
+    "CC": {
+     "label": "*1/*1",
+     "magnitude": 0
+    },
+    "CT": {
+     "label": "*1/*2 intermediate",
+     "magnitude": 2
+    },
+    "TT": {
+     "label": "*2/*2 poor",
+     "magnitude": 3
+    }
+   },
+   "sources": [
+    "https://cpicpgx.org/guidelines/guideline-for-warfarin-and-cyp2c9-and-vkorc1/"
+   ],
+   "drugs": [
+    "warfarin",
+    "phenytoin",
+    "celecoxib",
+    "ibuprofen"
+   ],
+   "topic": "pharmacogenomics",
+   "generated_by": "human"
+  },
+  {
+   "rsid": "rs1799945",
+   "gene": "HFE",
+   "name": "HFE H63D",
+   "risk_allele": "G",
+   "orientation": "forward",
+   "evidence": "B",
+   "summary": "Milder haemochromatosis variant; matters mainly as compound heterozygote with C282Y.",
+   "genotypes": {
+    "CC": {
+     "label": "no H63D",
+     "magnitude": 0
+    },
+    "CG": {
+     "label": "H63D carrier",
+     "magnitude": 1
+    },
+    "GG": {
+     "label": "H63D homozygous: mild iron loading possible",
+     "magnitude": 2
+    }
+   },
+   "sources": [
+    "https://www.ncbi.nlm.nih.gov/snp/rs1799945"
+   ],
+   "conditions": [
+    "hereditary haemochromatosis"
+   ],
+   "topic": "metabolism_and_traits",
+   "generated_by": "human"
+  },
+  {
+   "rsid": "rs1800462",
+   "gene": "TPMT",
+   "name": "TPMT*2",
+   "risk_allele": "G",
+   "orientation": "forward",
+   "evidence": "A",
+   "summary": "Loss-of-function allele; thiopurine (azathioprine, mercaptopurine) myelosuppression risk.",
+   "genotypes": {
+    "CC": {
+     "label": "normal",
+     "magnitude": 0
+    },
+    "CG": {
+     "label": "intermediate: reduce thiopurine dose",
+     "magnitude": 3
+    },
+    "GG": {
+     "label": "poor: avoid or drastically reduce",
+     "magnitude": 4
+    }
+   },
+   "sources": [
+    "https://cpicpgx.org/guidelines/guideline-for-thiopurines-and-tpmt/"
+   ],
+   "drugs": [
+    "azathioprine",
+    "mercaptopurine",
+    "thioguanine"
+   ],
+   "topic": "pharmacogenomics",
+   "generated_by": "human"
+  },
+  {
+   "rsid": "rs1800562",
+   "gene": "HFE",
+   "name": "HFE C282Y",
+   "risk_allele": "A",
+   "orientation": "forward",
+   "evidence": "A",
+   "summary": "Main hereditary haemochromatosis variant. AA (C282Y homozygous) = high iron-overload risk; check ferritin/transferrin saturation. Carriers are usually unaffected.",
+   "genotypes": {
+    "GG": {
+     "label": "no C282Y",
+     "magnitude": 0
+    },
+    "AG": {
+     "label": "C282Y carrier",
+     "magnitude": 1.5
+    },
+    "AA": {
+     "label": "C282Y homozygous: haemochromatosis risk",
+     "magnitude": 4
+    }
+   },
+   "sources": [
+    "https://www.ncbi.nlm.nih.gov/snp/rs1800562"
+   ],
+   "conditions": [
+    "hereditary haemochromatosis"
+   ],
+   "topic": "metabolism_and_traits",
+   "generated_by": "human"
+  },
+  {
+   "rsid": "rs1801133",
+   "gene": "MTHFR",
+   "name": "MTHFR C677T",
+   "risk_allele": "A",
+   "orientation": "forward",
+   "evidence": "B",
+   "summary": "TT (here AA on forward strand) reduces enzyme activity ~70%, raises homocysteine when folate is low. Clinical impact is small with adequate folate; not a reason for high-dose supplements.",
+   "genotypes": {
+    "GG": {
+     "label": "CC normal activity",
+     "magnitude": 0
+    },
+    "AG": {
+     "label": "CT ~65% activity",
+     "magnitude": 1
+    },
+    "AA": {
+     "label": "TT ~30% activity; watch folate/B12",
+     "magnitude": 2
+    }
+   },
+   "sources": [
+    "https://www.ncbi.nlm.nih.gov/snp/rs1801133",
+    "https://medlineplus.gov/genetics/gene/mthfr/"
+   ],
+   "conditions": [
+    "hyperhomocysteinaemia"
+   ],
+   "topic": "metabolism_and_traits",
+   "generated_by": "human"
+  },
+  {
+   "rsid": "rs1801280",
+   "gene": "NAT2",
+   "name": "NAT2*5 (rs1801280)",
+   "risk_allele": "C",
+   "orientation": "forward",
+   "evidence": "B",
+   "summary": "Slow-acetylator allele. Affects isoniazid, hydralazine, sulfasalazine toxicity.",
+   "genotypes": {
+    "TT": {
+     "label": "no *5",
+     "magnitude": 0
+    },
+    "CT": {
+     "label": "one slow allele",
+     "magnitude": 1
+    },
+    "CC": {
+     "label": "two slow alleles: slow acetylator likely",
+     "magnitude": 2
+    }
+   },
+   "sources": [
+    "https://www.pharmgkb.org/gene/PA18"
+   ],
+   "drugs": [
+    "isoniazid",
+    "hydralazine",
+    "sulfasalazine"
+   ],
+   "topic": "pharmacogenomics",
+   "generated_by": "human"
+  },
+  {
+   "rsid": "rs1801282",
+   "gene": "PPARG",
+   "name": "PPARG Pro12Ala",
+   "risk_allele": "C",
+   "orientation": "forward",
+   "evidence": "B",
+   "summary": "The common C (Pro) allele carries slightly higher T2D risk; G (Ala) is mildly protective and linked to better insulin sensitivity.",
+   "genotypes": {
+    "CC": {
+     "label": "Pro/Pro, typical",
+     "magnitude": 0.5
+    },
+    "CG": {
+     "label": "Pro/Ala, slightly lower T2D risk",
+     "magnitude": 0
+    },
+    "GG": {
+     "label": "Ala/Ala, lower T2D risk",
+     "magnitude": 0
+    }
+   },
+   "sources": [
+    "https://www.ncbi.nlm.nih.gov/snp/rs1801282"
+   ],
+   "conditions": [
+    "type 2 diabetes"
+   ],
+   "topic": "cardiometabolic",
+   "generated_by": "human"
+  },
+  {
+   "rsid": "rs1805007",
+   "gene": "MC1R",
+   "name": "MC1R R151C",
+   "risk_allele": "T",
+   "orientation": "forward",
+   "evidence": "A",
+   "summary": "Red-hair/fair-skin allele; raises melanoma risk ~2x per allele independent of pigmentation.",
+   "genotypes": {
+    "CC": {
+     "label": "no R151C",
+     "magnitude": 0
+    },
+    "CT": {
+     "label": "carrier: sun protection, ~2x melanoma risk",
+     "magnitude": 2
+    },
+    "TT": {
+     "label": "homozygous: red hair likely, ~4x melanoma risk",
+     "magnitude": 3
+    }
+   },
+   "sources": [
+    "https://www.ncbi.nlm.nih.gov/snp/rs1805007"
+   ],
+   "conditions": [
+    "melanoma",
+    "red hair"
+   ],
+   "topic": "metabolism_and_traits",
+   "generated_by": "human"
+  },
+  {
+   "rsid": "rs2187668",
+   "gene": "HLA-DQA1 (DQ2.5 tag)",
+   "name": "HLA-DQ2.5 tag",
+   "risk_allele": "T",
+   "orientation": "forward",
+   "evidence": "A",
+   "summary": "Tags HLA-DQ2.5, present in ~90% of coeliac disease patients. Absence nearly rules coeliac disease out; presence alone is common (~25% of Europeans).",
+   "genotypes": {
+    "CC": {
+     "label": "DQ2.5 absent (by this tag)",
+     "magnitude": 0
+    },
+    "CT": {
+     "label": "one DQ2.5 haplotype: coeliac possible",
+     "magnitude": 1.5
+    },
+    "TT": {
+     "label": "two DQ2.5 haplotypes: higher coeliac risk",
+     "magnitude": 2.5
+    }
+   },
+   "sources": [
+    "https://www.ncbi.nlm.nih.gov/snp/rs2187668"
+   ],
+   "conditions": [
+    "coeliac disease"
+   ],
+   "topic": "metabolism_and_traits",
+   "generated_by": "human"
+  },
+  {
+   "rsid": "rs3892097",
+   "gene": "CYP2D6",
+   "name": "CYP2D6*4",
+   "risk_allele": "A",
+   "orientation": "forward",
+   "evidence": "A",
+   "summary": "Most common null allele of CYP2D6 in Europeans. Affects codeine, tramadol, tamoxifen, many antidepressants and antipsychotics. Star-allele calling from arrays is incomplete.",
+   "genotypes": {
+    "GG": {
+     "label": "no *4 allele",
+     "magnitude": 0
+    },
+    "AG": {
+     "label": "one *4 allele: intermediate metaboliser likely",
+     "magnitude": 2
+    },
+    "AA": {
+     "label": "*4/*4: poor metaboliser",
+     "magnitude": 3.5
+    }
+   },
+   "sources": [
+    "https://cpicpgx.org/guidelines/guideline-for-codeine-and-cyp2d6/",
+    "https://www.pharmgkb.org/gene/PA128"
+   ],
+   "drugs": [
+    "codeine",
+    "tramadol",
+    "tamoxifen",
+    "metoprolol",
+    "amitriptyline",
+    "paroxetine"
+   ],
+   "topic": "pharmacogenomics",
+   "generated_by": "human"
+  },
+  {
+   "rsid": "rs3918290",
+   "gene": "DPYD",
+   "name": "DPYD*2A",
+   "risk_allele": "T",
+   "orientation": "forward",
+   "evidence": "A",
+   "summary": "Splice variant abolishing DPD activity. Carriers are at serious risk of fluoropyrimidine (5-FU, capecitabine) toxicity; CPIC recommends dose reduction or avoidance.",
+   "genotypes": {
+    "CC": {
+     "label": "normal",
+     "magnitude": 0
+    },
+    "CT": {
+     "label": "carrier: reduce fluoropyrimidine dose ≥50%",
+     "magnitude": 4
+    },
+    "TT": {
+     "label": "avoid fluoropyrimidines",
+     "magnitude": 4.5
+    }
+   },
+   "sources": [
+    "https://cpicpgx.org/guidelines/guideline-for-fluoropyrimidines-and-dpyd/"
+   ],
+   "drugs": [
+    "fluorouracil",
+    "capecitabine"
+   ],
+   "topic": "pharmacogenomics",
+   "generated_by": "human"
+  },
+  {
+   "rsid": "rs4149056",
+   "gene": "SLCO1B1",
+   "name": "SLCO1B1*5 (c.521T>C)",
+   "risk_allele": "C",
+   "orientation": "forward",
+   "evidence": "A",
+   "summary": "Reduced hepatic uptake of statins; higher simvastatin exposure and myopathy risk.",
+   "genotypes": {
+    "TT": {
+     "label": "normal function",
+     "magnitude": 0
+    },
+    "CT": {
+     "label": "decreased function: avoid high-dose simvastatin",
+     "magnitude": 2.5
+    },
+    "CC": {
+     "label": "poor function: prefer alternative statin",
+     "magnitude": 3.5
+    }
+   },
+   "sources": [
+    "https://cpicpgx.org/guidelines/cpic-guideline-for-statins/"
+   ],
+   "drugs": [
+    "statins",
+    "simvastatin",
+    "atorvastatin",
+    "rosuvastatin"
+   ],
+   "topic": "pharmacogenomics",
+   "generated_by": "human"
+  },
+  {
+   "rsid": "rs4244285",
+   "gene": "CYP2C19",
+   "name": "CYP2C19*2",
+   "risk_allele": "A",
+   "orientation": "forward",
+   "evidence": "A",
+   "summary": "Loss-of-function allele. Carriers metabolise clopidogrel, some PPIs and several SSRIs more slowly.",
+   "genotypes": {
+    "GG": {
+     "label": "*1/*1 normal metaboliser",
+     "magnitude": 0
+    },
+    "AG": {
+     "label": "*1/*2 intermediate metaboliser",
+     "magnitude": 2
+    },
+    "AA": {
+     "label": "*2/*2 poor metaboliser",
+     "magnitude": 3
+    }
+   },
+   "sources": [
+    "https://cpicpgx.org/guidelines/guideline-for-clopidogrel-and-cyp2c19/",
+    "https://www.pharmgkb.org/variant/PA166154053"
+   ],
+   "drugs": [
+    "clopidogrel",
+    "omeprazole",
+    "citalopram",
+    "escitalopram",
+    "voriconazole"
+   ],
+   "topic": "pharmacogenomics",
+   "generated_by": "human"
+  },
+  {
+   "rsid": "rs429358",
+   "gene": "APOE",
+   "name": "APOE rs429358 (ε4 determinant)",
+   "risk_allele": "C",
+   "orientation": "forward",
+   "evidence": "A",
+   "summary": "C allele defines APOE ε4 (with rs7412 T = ε2). ε4 raises late-onset Alzheimer's and cardiovascular risk; one copy ~3x, two copies ~10x AD odds. Not on AncestryDNA/MyHeritage chips.",
+   "genotypes": {
+    "TT": {
+     "label": "no ε4",
+     "magnitude": 0
+    },
+    "CT": {
+     "label": "one ε4 copy",
+     "magnitude": 3
+    },
+    "CC": {
+     "label": "two ε4 copies",
+     "magnitude": 4
+    }
+   },
+   "sources": [
+    "https://www.ncbi.nlm.nih.gov/snp/rs429358",
+    "https://www.alzforum.org/"
+   ],
+   "conditions": [
+    "Alzheimer's disease",
+    "hyperlipidaemia"
+   ],
+   "topic": "cardiometabolic",
+   "generated_by": "human"
+  },
+  {
+   "rsid": "rs4680",
+   "gene": "COMT",
+   "name": "COMT Val158Met",
+   "risk_allele": "A",
+   "orientation": "forward",
+   "evidence": "B",
+   "summary": "Met (A) allele = slower dopamine clearance in prefrontal cortex ('worrier': better memory, more stress sensitivity); Val (G) = 'warrior'. Effects are small and context dependent.",
+   "genotypes": {
+    "GG": {
+     "label": "Val/Val",
+     "magnitude": 1
+    },
+    "AG": {
+     "label": "Val/Met",
+     "magnitude": 0.5
+    },
+    "AA": {
+     "label": "Met/Met",
+     "magnitude": 1
+    }
+   },
+   "sources": [
+    "https://www.ncbi.nlm.nih.gov/snp/rs4680"
+   ],
+   "conditions": [
+    "stress sensitivity",
+    "pain sensitivity"
+   ],
+   "topic": "metabolism_and_traits",
+   "generated_by": "human"
+  },
+  {
+   "rsid": "rs4988235",
+   "gene": "MCM6 (LCT)",
+   "name": "Lactase persistence -13910C>T",
+   "risk_allele": "G",
+   "orientation": "forward",
+   "evidence": "A",
+   "summary": "A allele (T on the minus strand) keeps lactase active in adults. GG on forward strand = lactase non-persistence, lactose intolerance likely in adulthood.",
+   "genotypes": {
+    "AA": {
+     "label": "lactase persistent",
+     "magnitude": 0
+    },
+    "AG": {
+     "label": "lactase persistent (one copy suffices)",
+     "magnitude": 0
+    },
+    "GG": {
+     "label": "lactase non-persistent: lactose intolerance likely",
+     "magnitude": 2
+    }
+   },
+   "sources": [
+    "https://www.ncbi.nlm.nih.gov/snp/rs4988235"
+   ],
+   "conditions": [
+    "lactose intolerance"
+   ],
+   "topic": "metabolism_and_traits",
+   "generated_by": "human"
+  },
+  {
+   "rsid": "rs662799",
+   "gene": "APOA5",
+   "name": "APOA5 -1131T>C",
+   "risk_allele": "G",
+   "orientation": "forward",
+   "evidence": "B",
+   "summary": "G (minor) allele raises triglycerides and modestly raises CAD risk; interacts with dietary fat.",
+   "genotypes": {
+    "AA": {
+     "label": "typical triglycerides",
+     "magnitude": 0
+    },
+    "AG": {
+     "label": "higher triglycerides likely",
+     "magnitude": 1.5
+    },
+    "GG": {
+     "label": "markedly higher triglycerides likely",
+     "magnitude": 2.5
+    }
+   },
+   "sources": [
+    "https://www.ncbi.nlm.nih.gov/snp/rs662799"
+   ],
+   "conditions": [
+    "hypertriglyceridaemia",
+    "coronary artery disease"
+   ],
+   "topic": "cardiometabolic",
+   "generated_by": "human"
+  },
+  {
+   "rsid": "rs671",
+   "gene": "ALDH2",
+   "name": "ALDH2*2",
+   "risk_allele": "A",
+   "orientation": "forward",
+   "evidence": "A",
+   "summary": "A allele inactivates ALDH2: alcohol flush, higher oesophageal cancer risk with drinking. Rare outside East Asia.",
+   "genotypes": {
+    "GG": {
+     "label": "active ALDH2",
+     "magnitude": 0
+    },
+    "AG": {
+     "label": "reduced ALDH2: flush, limit alcohol",
+     "magnitude": 3
+    },
+    "AA": {
+     "label": "inactive ALDH2: avoid alcohol",
+     "magnitude": 4
+    }
+   },
+   "sources": [
+    "https://www.ncbi.nlm.nih.gov/snp/rs671"
+   ],
+   "conditions": [
+    "alcohol flush reaction",
+    "oesophageal cancer"
+   ],
+   "topic": "metabolism_and_traits",
+   "generated_by": "human"
+  },
+  {
+   "rsid": "rs7412",
+   "gene": "APOE",
+   "name": "APOE rs7412 (ε2 determinant)",
+   "risk_allele": "T",
+   "orientation": "forward",
+   "evidence": "A",
+   "summary": "T allele defines APOE ε2 (protective for AD, but ε2/ε2 predisposes to type III hyperlipoproteinaemia). Read together with rs429358.",
+   "genotypes": {
+    "CC": {
+     "label": "no ε2",
+     "magnitude": 0
+    },
+    "CT": {
+     "label": "one ε2 copy",
+     "magnitude": 1
+    },
+    "TT": {
+     "label": "ε2/ε2",
+     "magnitude": 2
+    }
+   },
+   "sources": [
+    "https://www.ncbi.nlm.nih.gov/snp/rs7412"
+   ],
+   "conditions": [
+    "Alzheimer's disease",
+    "type III hyperlipoproteinaemia"
+   ],
+   "topic": "cardiometabolic",
+   "generated_by": "human"
+  },
+  {
+   "rsid": "rs762551",
+   "gene": "CYP1A2",
+   "name": "CYP1A2*1F",
+   "risk_allele": "C",
+   "orientation": "forward",
+   "evidence": "C",
+   "summary": "AA genotype = fast caffeine metabolism; C carriers slower. Weak evidence for cardiovascular interaction with high coffee intake.",
+   "genotypes": {
+    "AA": {
+     "label": "fast caffeine metaboliser",
+     "magnitude": 0.5
+    },
+    "AC": {
+     "label": "slower caffeine metabolism",
+     "magnitude": 1
+    },
+    "CC": {
+     "label": "slow caffeine metaboliser",
+     "magnitude": 1.5
+    }
+   },
+   "sources": [
+    "https://www.pharmgkb.org/variant/PA166153743"
+   ],
+   "drugs": [
+    "caffeine",
+    "clozapine",
+    "olanzapine"
+   ],
+   "topic": "pharmacogenomics",
+   "generated_by": "human"
+  },
+  {
+   "rsid": "rs7903146",
+   "gene": "TCF7L2",
+   "name": "TCF7L2 rs7903146",
+   "risk_allele": "T",
+   "orientation": "forward",
+   "evidence": "A",
+   "summary": "Strongest common type 2 diabetes risk variant. Each T allele raises T2D odds ~1.4x; TT ~2x. Modifiable through weight, diet and activity.",
+   "genotypes": {
+    "CC": {
+     "label": "typical T2D risk",
+     "magnitude": 0
+    },
+    "CT": {
+     "label": "~1.4x T2D risk",
+     "magnitude": 2
+    },
+    "TT": {
+     "label": "~2x T2D risk",
+     "magnitude": 3
+    }
+   },
+   "sources": [
+    "https://www.ncbi.nlm.nih.gov/snp/rs7903146",
+    "https://www.ebi.ac.uk/gwas/variants/rs7903146"
+   ],
+   "conditions": [
+    "type 2 diabetes"
+   ],
+   "topic": "cardiometabolic",
+   "generated_by": "human"
+  },
+  {
+   "rsid": "rs965513",
+   "gene": "FOXE1",
+   "name": "FOXE1 rs965513",
+   "risk_allele": "A",
+   "orientation": "forward",
+   "evidence": "B",
+   "summary": "A allele raises thyroid cancer risk (~1.7x per allele) and is linked to hypothyroidism/TSH levels.",
+   "genotypes": {
+    "GG": {
+     "label": "typical",
+     "magnitude": 0
+    },
+    "AG": {
+     "label": "~1.7x thyroid cancer risk",
+     "magnitude": 1.5
+    },
+    "AA": {
+     "label": "~2.9x thyroid cancer risk",
+     "magnitude": 2.5
+    }
+   },
+   "sources": [
+    "https://www.ebi.ac.uk/gwas/variants/rs965513"
+   ],
+   "conditions": [
+    "thyroid cancer",
+    "hypothyroidism"
+   ],
+   "topic": "metabolism_and_traits",
+   "generated_by": "human"
+  },
+  {
+   "rsid": "rs9923231",
+   "gene": "VKORC1",
+   "name": "VKORC1 -1639G>A",
+   "risk_allele": "T",
+   "orientation": "forward",
+   "evidence": "A",
+   "summary": "Promoter variant lowering VKORC1 expression; strongest common predictor of warfarin sensitivity.",
+   "genotypes": {
+    "CC": {
+     "label": "GG: normal warfarin sensitivity",
+     "magnitude": 0
+    },
+    "CT": {
+     "label": "GA: increased sensitivity, lower dose",
+     "magnitude": 2
+    },
+    "TT": {
+     "label": "AA: high sensitivity, low dose",
+     "magnitude": 3
+    }
+   },
+   "sources": [
+    "https://cpicpgx.org/guidelines/guideline-for-warfarin-and-cyp2c9-and-vkorc1/"
+   ],
+   "drugs": [
+    "warfarin",
+    "acenocoumarol"
+   ],
+   "topic": "pharmacogenomics",
+   "generated_by": "human"
+  }
+ ],
+ "topics": [
+  {
+   "id": "cardiometabolic",
+   "category": "clinical"
+  },
+  {
+   "id": "metabolism_and_traits",
+   "category": "lifestyle"
+  },
+  {
+   "id": "pharmacogenomics",
+   "category": "clinical"
+  }
+ ],
+ "licences": [
+  "dbSNP, ClinVar, GWAS Catalog: public domain / open",
+  "CPIC guidelines: CC BY-SA 4.0",
+  "Reviewed entries: curated in the family_dna repository"
+ ],
+ "sha256": "c2ce88f2d8f392cb17554b322d8490c3ff9ceb60c7b9a52d5c7dd26c5bac674a"
+}

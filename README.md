@@ -1,0 +1,35 @@
+# Hearth
+
+Local-first family genome browser. A PWA that stores a whole family's raw DNA files, pedigree,
+medical documents and notes **in the browser only**, answers questions against a bundled
+knowledge base, and lets you build a context pack to paste into any chat assistant you already
+trust. No account, no server-side copy of your data.
+
+Design: [`docs/design.md`](docs/design.md) (the full proposal, ported from the `family_dna` repo).
+
+## Repository layout
+
+```
+hearth/
+├── frontend/      React + TypeScript + Vite PWA; SQLite WASM on OPFS; all analysis runs here
+├── backend/       Go helper service (optional; stateless; /health, /v1/ask BYOK passthrough)
+├── kb/            knowledge-base source (reviewed SNP entries) and build script → frontend/public/kb.json
+├── landing/       static marketing / privacy / terms pages (Cloudflare Pages, apex)
+├── terraform/     GCP + Cloudflare infra (ported from ../sentio; not yet added)
+├── scripts/       dev helpers
+└── docs/          architecture, decisions (ADRs), runbooks
+```
+
+## Getting started
+
+```bash
+make help              # every command with a one-line description
+make frontend-install  # npm install
+make dev               # backend + Vite dev server in the background, opens the app
+make dev-stop
+make test              # Go + Vitest
+```
+
+Supported raw-data formats: AncestryDNA, 23andMe, MyHeritage, FamilyTreeDNA, LivingDNA,
+Genotek VCF, and any generic "rsid chromosome position genotype" text file. Compressed `.zip` /
+`.gz` uploads are unpacked in the browser.

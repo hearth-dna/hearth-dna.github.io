@@ -1,0 +1,2 @@
+# SPA fallback: Pages serves real files first, then the app shell for every route.
+/* /index.html 200

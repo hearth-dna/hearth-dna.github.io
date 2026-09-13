@@ -1,0 +1,17 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`buildContextPack > pseudonymises by default and is deterministic 1`] = `
+"# Context for a health question (generated locally by Hearth; informational, not medical advice)
+
+## Person A, male, about 40
+- CYP2C19 rs4244285 (CYP2C19*2): A/G — *1/*2 intermediate metaboliser [evidence A]
+
+## Evidence notes (from the local knowledge base)
+- CYP2C19*2: Loss-of-function allele. Sources: https://cpicpgx.org/x
+
+## Question
+Clopidogrel?
+
+## Instructions for the assistant
+Answer plainly. Say what is uncertain. This is not a request for diagnosis or treatment; end with what to ask a qualified clinician. The context was assembled locally by me from consumer genotyping data and may contain errors."
+`;
