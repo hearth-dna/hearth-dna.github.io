@@ -15,6 +15,8 @@ export class Database {
   private constructor(
     private readonly worker: Worker,
     readonly persistent: boolean,
+    /** Why the database is not persistent ('' when it is). */
+    readonly reason = '',
   ) {}
 
   private static instance: Promise<Database> | null = null
@@ -105,7 +107,7 @@ export class Database {
       reason: string
     }
     if (!persistent) console.warn('[hearth db] not persistent —', reason)
-    ready = new Database(worker, persistent)
+    ready = new Database(worker, persistent, reason)
     // Re-point the worker at the final instance's pending map.
     worker.onmessage = (ev) => ready.onMessage(ev.data)
     await ready.exec('PRAGMA foreign_keys = ON')

@@ -1,10 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useApp } from '../app/context'
 import { grantConsent, hasConsent } from '../consent/consent'
-import { importCalls } from '../db/repo'
-import { parseRawText } from '../import/parseFile'
-import { detectProvider } from '../import/providers'
-import { fileToText, sha256Hex } from '../import/unpack'
+import { importGenomeFile } from '../import/importFile'
 import { PROVIDER_LABELS, type Provider } from '../types'
 import { ConsentForm } from './ConsentForm'
 
@@ -31,38 +28,15 @@ export function ImportDialog({ personId, onClose }: { personId: string; onClose:
 
   const run = async (file: File) => {
     try {
-      setStage({ s: 'working', msg: 'Unpacking…', pct: 0 })
-      const { text, innerName } = await fileToText(file)
-      const sha256 = await sha256Hex(text)
-      setStage({
-        s: 'working',
-        msg: `Parsing ${innerName} (${PROVIDER_LABELS[forced || detectProvider(text)]})…`,
-        pct: 0,
-      })
-      const r = await parseRawText(
-        text,
-        (d, t) => setStage({ s: 'working', msg: 'Parsing…', pct: (d / t) * 50 }),
-        forced || undefined,
-      )
-      if (r.calls.length === 0) throw new Error('no genotype rows recognised — pick the provider manually')
-      setStage({ s: 'working', msg: `Storing ${r.calls.length.toLocaleString()} calls…`, pct: 50 })
-      await importCalls(
+      const summary = await importGenomeFile(
         db,
         personId,
-        { provider: r.provider, build: r.build, sha256, originalName: file.name },
-        r.calls,
-        (n) =>
-          setStage({
-            s: 'working',
-            msg: `Storing ${n.toLocaleString()} / ${r.calls.length.toLocaleString()}…`,
-            pct: 50 + (n / r.calls.length) * 50,
-          }),
+        file,
+        (p) => setStage({ s: 'working', ...p }),
+        forced || undefined,
       )
       await refresh()
-      setStage({
-        s: 'done',
-        msg: `${r.calls.length.toLocaleString()} calls imported from ${PROVIDER_LABELS[r.provider]} (build ${r.build}); ${r.skipped.toLocaleString()} no-calls skipped.`,
-      })
+      setStage({ s: 'done', msg: `${summary}.` })
     } catch (e) {
       setStage({ s: 'error', msg: String(e) })
     }

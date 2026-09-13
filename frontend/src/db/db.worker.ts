@@ -26,6 +26,9 @@ type Res =
   | { id: number; ok: false; error: string }
   | { id: number; progress: number }
 
+const OPFS_ATTEMPTS = 10
+const OPFS_RETRY_MS = 300
+
 let sqlite3: Sqlite3Static
 let db: Sqlite3Db
 let persistent = false
@@ -35,18 +38,25 @@ async function open(profile: string): Promise<{ persistent: boolean; reason: str
   sqlite3 = await sqlite3InitModule()
   // The SAH-pool VFS needs no helper worker or cross-origin isolation, unlike the default "opfs"
   // VFS, and is the faster of the two. It allows one connection per VFS name — db.ts opens once.
-  try {
-    const pool = await sqlite3.installOpfsSAHPoolVfs({
-      name: `hearth-${profile}`,
-      directory: `.hearth-${profile}`,
-    })
-    db = new pool.OpfsSAHPoolDb('/hearth.sqlite3')
-    persistent = true
-    db.exec('PRAGMA cache_size = -65536; PRAGMA temp_store = MEMORY; PRAGMA journal_mode = MEMORY')
-  } catch (e) {
-    reason = `OPFS unavailable: ${e instanceof Error ? e.message : String(e)}`
-    db = new sqlite3.oo1.DB(':memory:', 'c')
+  // The access handles are exclusive; a tab that just handed over releases them asynchronously,
+  // so retry for a few seconds before concluding OPFS is really unavailable.
+  for (let attempt = 0; attempt < OPFS_ATTEMPTS; attempt++) {
+    try {
+      const pool = await sqlite3.installOpfsSAHPoolVfs({
+        name: `hearth-${profile}`,
+        directory: `.hearth-${profile}`,
+      })
+      db = new pool.OpfsSAHPoolDb('/hearth.sqlite3')
+      persistent = true
+      db.exec('PRAGMA cache_size = -65536; PRAGMA temp_store = MEMORY; PRAGMA journal_mode = MEMORY')
+      return { persistent, reason: '' }
+    } catch (e) {
+      reason = e instanceof Error ? e.message : String(e)
+      await new Promise((r) => setTimeout(r, OPFS_RETRY_MS))
+    }
   }
+  // Memory is a last resort the UI must surface: nothing survives a reload. db.ts reports it.
+  db = new sqlite3.oo1.DB(':memory:', 'c')
   return { persistent, reason }
 }
 

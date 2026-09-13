@@ -1,13 +1,32 @@
 import { useState } from 'react'
 import { useApp } from '../app/context'
-import { addPerson, deletePerson, setParent, unsetParent } from '../db/repo'
+import { addPerson, deletePerson, setParent, unsetParent, updatePerson } from '../db/repo'
 import { PROVIDER_LABELS, type Sex } from '../types'
+import { BatchImportDialog } from './BatchImportDialog'
 import { ImportDialog } from './ImportDialog'
 
 export function PeoplePage({ onOpen }: { onOpen: (id: string) => void }) {
   const { db, persons, counts, relationships, refresh } = useApp()
   const [form, setForm] = useState({ label: '', displayName: '', sex: 'unknown' as Sex, birthYear: '' })
   const [importFor, setImportFor] = useState<string | null>(null)
+  const [batch, setBatch] = useState(false)
+  const [editing, setEditing] = useState<string | null>(null)
+  const [edit, setEdit] = useState({ displayName: '', sex: 'unknown' as Sex, birthYear: '' })
+  const startEdit = (id: string) => {
+    const p = persons.find((x) => x.id === id)!
+    setEdit({ displayName: p.displayName, sex: p.sex, birthYear: p.birthYear ? String(p.birthYear) : '' })
+    setEditing(id)
+  }
+  const saveEdit = async () => {
+    if (!editing || !edit.displayName.trim()) return
+    await updatePerson(db, editing, {
+      displayName: edit.displayName.trim(),
+      sex: edit.sex,
+      birthYear: edit.birthYear ? Number(edit.birthYear) : null,
+    })
+    setEditing(null)
+    await refresh()
+  }
 
   const submit = async () => {
     if (!form.label.trim()) return
@@ -64,6 +83,9 @@ export function PeoplePage({ onOpen }: { onOpen: (id: string) => void }) {
           <button type="button" className="primary" onClick={submit}>
             Add
           </button>
+          <button type="button" onClick={() => setBatch(true)}>
+            Import several DNA files…
+          </button>
         </div>
       </div>
 
@@ -80,11 +102,47 @@ export function PeoplePage({ onOpen }: { onOpen: (id: string) => void }) {
             <h3>
               {p.displayName} <span className="muted">({p.label})</span>
             </h3>
-            <p className="muted">
-              {p.sex}
-              {p.birthYear ? ` · born ${p.birthYear}` : ''} ·{' '}
-              {counts[p.id] ? `${counts[p.id].toLocaleString()} SNPs` : 'no genotypes yet'}
-            </p>
+            {editing === p.id ? (
+              <div className="row">
+                <label className="field">
+                  Display name
+                  <input
+                    value={edit.displayName}
+                    onChange={(e) => setEdit({ ...edit, displayName: e.target.value })}
+                  />
+                </label>
+                <label className="field">
+                  Sex
+                  <select value={edit.sex} onChange={(e) => setEdit({ ...edit, sex: e.target.value as Sex })}>
+                    <option value="unknown">unknown</option>
+                    <option value="male">male</option>
+                    <option value="female">female</option>
+                  </select>
+                </label>
+                <label className="field">
+                  Birth year
+                  <input
+                    value={edit.birthYear}
+                    onChange={(e) => setEdit({ ...edit, birthYear: e.target.value })}
+                  />
+                </label>
+                <button type="button" className="primary" onClick={saveEdit}>
+                  Save
+                </button>
+                <button type="button" onClick={() => setEditing(null)}>
+                  Cancel
+                </button>
+              </div>
+            ) : (
+              <p className="muted">
+                {p.sex}
+                {p.birthYear ? ` · born ${p.birthYear}` : ''} ·{' '}
+                {counts[p.id] ? `${counts[p.id].toLocaleString()} SNPs` : 'no genotypes yet'}{' '}
+                <button type="button" className="small" onClick={() => startEdit(p.id)}>
+                  edit
+                </button>
+              </p>
+            )}
             <p className="muted">
               Parents:{' '}
               {parentsOf(p.id).length === 0
@@ -148,6 +206,7 @@ export function PeoplePage({ onOpen }: { onOpen: (id: string) => void }) {
         ))}
       </div>
       {importFor && <ImportDialog personId={importFor} onClose={() => setImportFor(null)} />}
+      {batch && <BatchImportDialog onClose={() => setBatch(false)} />}
     </div>
   )
 }

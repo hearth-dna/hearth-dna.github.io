@@ -13,7 +13,7 @@ make frontend-install / frontend-run / frontend-test / frontend-build / frontend
 | Dir | What |
 |---|---|
 | `src/db/` | `db.worker.ts` owns the one SQLite connection (OPFS SAH-pool VFS, memory fallback); `db.ts` is the main-thread handle (singleton, Web Lock per profile, `pagehide` terminates the worker); `schema.ts`; `repo.ts` = every query the UI uses |
-| `src/import/` | `providers.ts` (detection + one line parser per provider), `unpack.ts` (zip/gz/sha256), `parseFile.ts` |
+| `src/import/` | `providers.ts` (detection + one line parser per provider), `unpack.ts` (zip/gz/sha256), `parseFile.ts`, `importFile.ts` (unpack→parse→store pipeline shared by `ImportDialog` and `BatchImportDialog`, which creates one person per file named after it) |
 | `src/kb/` | loads `public/kb.json`, computes findings, text search |
 | `src/family/` | Mendelian check reference implementation (the SQL version is in `repo.ts`); `inheritance.ts` phases a child's alleles to parents and lays out the pedigree for `InheritanceTree.tsx` |
 | `src/ask/` | `retrieve.ts` (question → kb rsids), `contextPack.ts` (deterministic pack), `prompts.ts` |
@@ -47,6 +47,10 @@ gitignored local files, never committed. Backend origin comes from the Vite prox
   the next step — insert ~10 s, index rebuild the rest).
 
 ## Gotchas
+
+- The worker falls back to a memory database only after ~3 s of OPFS retries, and `App.tsx` then
+  blocks on a "Storage is not available" screen until the user explicitly continues; a red banner
+  stays up for the session. Never make memory mode silent again — that is how a user lost an import.
 
 - OPFS SAH pool allows one connection per VFS name. `?profile=x` selects another directory.
 - React StrictMode double-runs effects in dev; `Database.open()` is a singleton for that reason.

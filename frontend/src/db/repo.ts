@@ -34,6 +34,19 @@ export async function addPerson(
   return person
 }
 
+export async function updatePerson(
+  db: Database,
+  id: string,
+  p: { displayName: string; sex: Sex; birthYear: number | null },
+): Promise<void> {
+  await db.exec('UPDATE person SET display_name=?, sex=?, birth_year=? WHERE id=?', [
+    p.displayName,
+    p.sex,
+    p.birthYear,
+    id,
+  ])
+}
+
 export async function deletePerson(db: Database, id: string): Promise<void> {
   await db.exec('DELETE FROM person WHERE id = ?', [id])
 }
