@@ -7,6 +7,7 @@ function fakeDb() {
   const log: [string, unknown[] | undefined][] = []
   const db = {
     exec: async (sql: string, bind?: unknown[]) => void log.push([sql, bind]),
+    one: async () => undefined, // no consent in force unless a test overrides it
   } as unknown as Database
   return { db, log }
 }
@@ -47,6 +48,16 @@ describe('first_launch consent mirror', () => {
     expect(m.size).toBe(0)
     expect(await hasConsent(db, 'first_launch')).toBe(false)
     expect(await hasConsent(db, 'tier3_byok')).toBe(false)
+  })
+})
+
+describe('grantConsent', () => {
+  it('does not insert when a record is already in force', async () => {
+    fakeStorage()
+    const { db, log } = fakeDb()
+    ;(db as { one?: unknown }).one = async () => ({ ok: 1 })
+    await grantConsent(db, 'import_genome', 'p1')
+    expect(log).toEqual([])
   })
 })
 

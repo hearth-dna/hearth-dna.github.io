@@ -112,6 +112,10 @@ export class Database {
     await ready.exec(SCHEMA_SQL)
     // Revoking a consent deletes it; rows stamped by the old flag-only revoke are dead weight.
     await ready.exec('DELETE FROM consent WHERE revoked_at IS NOT NULL')
+    // Duplicates from before grantConsent was idempotent: keep the earliest record of each.
+    await ready.exec(
+      'DELETE FROM consent WHERE id NOT IN (SELECT MIN(id) FROM consent GROUP BY kind, version, subject)',
+    )
     // Additive column migrations: CREATE TABLE IF NOT EXISTS leaves existing tables untouched.
     await ready.exec("ALTER TABLE health_log ADD COLUMN source TEXT NOT NULL DEFAULT ''").catch(() => {})
     await ready.exec('INSERT OR IGNORE INTO meta(key, value) VALUES (?, ?)', [

@@ -46,7 +46,9 @@ export async function hasConsent(db: Database, kind: ConsentKind, subject = ''):
   return true
 }
 
+/** Idempotent: one record per kind/version/subject, so a repeat grant never yields duplicates. */
 export async function grantConsent(db: Database, kind: ConsentKind, subject = ''): Promise<void> {
+  if (await hasConsent(db, kind, subject)) return
   const grantedAt = now()
   await insertConsent(db, kind, subject, grantedAt)
   if (kind === 'first_launch') setLocalGrantedAt(grantedAt)
