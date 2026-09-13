@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useApp } from '../app/context'
 import { listSourceFiles, mendelianSql, personCallsFor } from '../db/repo'
 import { computeFindings, type Finding } from '../kb/kb'
+import { DEFAULT_DIR, type FindingSortKey, type SortDir, sortFindings } from '../kb/sortFindings'
 import { PROVIDER_LABELS, type SourceFile } from '../types'
 
 export function PersonPage({ id, onBack }: { id: string; onBack: () => void }) {
@@ -9,6 +10,7 @@ export function PersonPage({ id, onBack }: { id: string; onBack: () => void }) {
   const person = persons.find((p) => p.id === id)!
   const [findings, setFindings] = useState<Finding[] | null>(null)
   const [files, setFiles] = useState<SourceFile[]>([])
+  const [sort, setSort] = useState<{ key: FindingSortKey; dir: SortDir }>({ key: 'magnitude', dir: 'desc' })
   const [mendel, setMendel] = useState<
     { label: string; compared: number; violations: number; rate: number }[]
   >([])
@@ -39,6 +41,19 @@ export function PersonPage({ id, onBack }: { id: string; onBack: () => void }) {
   }, [db, kb, id, persons, relationships])
 
   const magClass = (m: number) => (m >= 3 ? 'mag hi' : m >= 2 ? 'mag mid' : 'mag')
+  const sorted = findings && sortFindings(findings, sort.key, sort.dir)
+  const toggleSort = (key: FindingSortKey) =>
+    setSort((s) =>
+      s.key === key ? { key, dir: s.dir === 'asc' ? 'desc' : 'asc' } : { key, dir: DEFAULT_DIR[key] },
+    )
+  const SortTh = ({ k, children }: { k: FindingSortKey; children: string }) => (
+    <th aria-sort={sort.key === k ? (sort.dir === 'asc' ? 'ascending' : 'descending') : undefined}>
+      <button type="button" className="sort" onClick={() => toggleSort(k)}>
+        {children}
+        <span className="muted"> {sort.key === k ? (sort.dir === 'asc' ? '▲' : '▼') : '⇅'}</span>
+      </button>
+    </th>
+  )
 
   return (
     <div>
@@ -96,15 +111,15 @@ export function PersonPage({ id, onBack }: { id: string; onBack: () => void }) {
             <table>
               <thead>
                 <tr>
-                  <th>Gene / marker</th>
-                  <th>Genotype</th>
-                  <th>Meaning</th>
-                  <th>Evidence</th>
-                  <th>Impact</th>
+                  <SortTh k="gene">Gene / marker</SortTh>
+                  <SortTh k="riskCopies">Genotype</SortTh>
+                  <SortTh k="topic">Meaning</SortTh>
+                  <SortTh k="evidence">Evidence</SortTh>
+                  <SortTh k="magnitude">Impact</SortTh>
                 </tr>
               </thead>
               <tbody>
-                {findings.map((f) => (
+                {sorted?.map((f) => (
                   <tr key={f.entry.rsid}>
                     <td>
                       <strong>{f.entry.gene}</strong>
