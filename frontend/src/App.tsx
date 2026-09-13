@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { AppContext, type AppState } from './app/context'
 import { AskPage } from './components/AskPage'
 import { ConsentGate } from './components/ConsentGate'
+import { EraseDialog } from './components/EraseDialog'
 import { FamilyPage } from './components/FamilyPage'
 import { PeoplePage } from './components/PeoplePage'
 import { PersonPage } from './components/PersonPage'
@@ -23,6 +24,7 @@ export function App() {
   const [error, setError] = useState<string | null>(null)
   const [consented, setConsented] = useState(false)
   const [page, setPage] = useState<Page>({ name: 'people' })
+  const [erasing, setErasing] = useState(false)
 
   useEffect(() => {
     let db: Database
@@ -85,7 +87,11 @@ export function App() {
           {state.persons.length} people · kb {state.kb.version} ·{' '}
           {state.db.persistent ? 'stored on this device' : 'memory only — export before closing'}
         </span>
+        <button type="button" className="danger small" onClick={() => setErasing(true)}>
+          Erase data
+        </button>
       </header>
+      {erasing && <EraseDialog onClose={() => setErasing(false)} />}
       <main>
         {page.name === 'people' && <PeoplePage onOpen={(id) => setPage({ name: 'person', id })} />}
         {page.name === 'person' && <PersonPage id={page.id} onBack={() => setPage({ name: 'people' })} />}

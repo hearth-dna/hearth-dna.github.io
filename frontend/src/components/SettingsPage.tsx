@@ -3,21 +3,20 @@ import { APP_VERSION, useApp } from '../app/context'
 import { listConsents, revokeConsent, revokeDeletesData } from '../consent/consent'
 import { CONSENTS } from '../consent/kinds'
 import {
-  eraseEverything,
   getMeta,
   importCalls,
   listSharing,
-  listSourceFiles,
   META_GEMINI_KEY,
   META_GEMINI_MODEL,
   newId,
-  personCalls,
   setMeta,
   setParent,
 } from '../db/repo'
 import { GEMINI_DEFAULT_MODEL } from '../egress/egress'
-import { buildDump, type DumpV1, deserialiseDump, expandDump, serialiseDump } from '../export/dump'
+import { type DumpV1, deserialiseDump, expandDump } from '../export/dump'
+import { exportDumpFile } from '../export/exportDump'
 import type { Person } from '../types'
+import { EraseDialog } from './EraseDialog'
 
 export function SettingsPage() {
   const { db, persons, relationships, refresh } = useApp()
@@ -28,6 +27,7 @@ export function SettingsPage() {
   const [geminiKey, setGeminiKey] = useState('')
   const [geminiModel, setGeminiModel] = useState(GEMINI_DEFAULT_MODEL)
   const [keyStored, setKeyStored] = useState(false)
+  const [erasing, setErasing] = useState(false)
   const reload = async () => {
     setConsents(await listConsents(db))
     setSharing(await listSharing(db))
@@ -41,32 +41,7 @@ export function SettingsPage() {
 
   const exportDump = async () => {
     setMsg('Building dump…')
-    const callsByPerson: Record<
-      string,
-      ReturnType<typeof personCalls> extends Promise<infer T> ? T : never
-    > = {}
-    for (const p of persons) callsByPerson[p.id] = await personCalls(db, p.id)
-    const dump = buildDump({
-      appVersion: APP_VERSION,
-      persons,
-      relationships,
-      sourceFiles: await listSourceFiles(db),
-      callsByPerson,
-      consents,
-      sharingLog: sharing,
-      healthLog: await db.query('SELECT * FROM health_log'),
-      notes: await db.query('SELECT * FROM note'),
-      chats: await db.query('SELECT * FROM chat'),
-    })
-    const bytes = await serialiseDump(dump, pass || undefined)
-    const name = `hearth-dump-${new Date().toISOString().slice(0, 10)}.json.gz${pass ? '.enc' : ''}`
-    const url = URL.createObjectURL(new Blob([bytes as BlobPart], { type: 'application/octet-stream' }))
-    const a = Object.assign(document.createElement('a'), { href: url, download: name })
-    a.click()
-    URL.revokeObjectURL(url)
-    setMsg(
-      `Exported ${name} (${(bytes.length / 1024 / 1024).toFixed(1)} MB)${pass ? ', encrypted' : ' — plaintext genetic data, keep it safe'}`,
-    )
+    setMsg(await exportDumpFile(db, APP_VERSION, persons, relationships, pass))
   }
 
   const importDump = async (file: File) => {
@@ -303,20 +278,10 @@ export function SettingsPage() {
           Deletes all people, genotypes, consents, notes and logs from this browser. There is nothing to
           recover afterwards unless you exported a dump.
         </p>
-        <button
-          type="button"
-          className="danger"
-          onClick={async () => {
-            if (confirm('Erase all Hearth data on this device?')) {
-              await eraseEverything(db)
-              await refresh()
-              await reload()
-              setMsg('Erased.')
-            }
-          }}
-        >
+        <button type="button" className="danger" onClick={() => setErasing(true)}>
           Erase all data
         </button>
+        {erasing && <EraseDialog onClose={() => setErasing(false)} />}
       </div>
       <p className="muted">
         Hearth {APP_VERSION} · storage:{' '}
