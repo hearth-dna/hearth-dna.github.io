@@ -18,18 +18,21 @@ name: CI
 # key exists anywhere. `--branch=main` on Pages is load-bearing: custom domains serve only
 # production-branch deployments.
 
+# DISABLED until the first production deployment: no automatic runs, to keep the free-tier
+# minutes untouched while nothing is deployed. Manual "Run workflow" still works. To re-enable,
+# uncomment the push and pull_request triggers below.
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
-    paths-ignore:
-      - 'docs/**'
-      - 'terraform/**'
-      - 'scripts/**'
-      - '**.md'
-      - '.env.example'
-      - '.gitignore'
+  # push:
+  #   branches: [main]
+  # pull_request:
+  #   branches: [main]
+  #   paths-ignore:
+  #     - 'docs/**'
+  #     - 'terraform/**'
+  #     - 'scripts/**'
+  #     - '**.md'
+  #     - '.env.example'
+  #     - '.gitignore'
   workflow_dispatch:
     inputs:
       deploy:
