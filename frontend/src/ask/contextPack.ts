@@ -1,5 +1,5 @@
 import type { Finding } from '../kb/kb'
-import type { Person } from '../types'
+import { HEALTH_KIND_LABELS, type HealthEntry, type Person } from '../types'
 import { ASSISTANT_INSTRUCTIONS, type PromptTemplate } from './prompts'
 
 /**
@@ -10,6 +10,8 @@ import { ASSISTANT_INSTRUCTIONS, type PromptTemplate } from './prompts'
 export interface PackPerson {
   person: Person
   findings: Finding[]
+  /** Health-log entries the user chose to include, newest first. */
+  health?: HealthEntry[]
   notes?: string[]
 }
 
@@ -51,6 +53,13 @@ export function buildContextPack(o: PackOptions): string {
         `- ${e.gene} ${e.rsid} (${e.name}): ${f.call.a1}/${f.call.a2} — ${status} [evidence ${e.evidence}]`,
       )
     }
+    if (pp.health?.length) {
+      lines.push("### Health log (from the person's documents, dated)")
+      for (const h of pp.health) {
+        const body = h.body.trim().replace(/\n/g, '\n  ')
+        lines.push(`- ${h.date} · ${HEALTH_KIND_LABELS[h.kind]} · ${h.title}${body ? `\n  ${body}` : ''}`)
+      }
+    }
     for (const n of pp.notes ?? []) lines.push(`- Note: ${n}`)
     lines.push('')
   })
@@ -78,6 +87,10 @@ export function buildContextPack(o: PackOptions): string {
 }
 
 /** What the sharing log records: counts only, never the payload twice. */
-export function packStats(pack: string): { chars: number; genotypes: number } {
-  return { chars: pack.length, genotypes: (pack.match(/^- \w+ rs\d+/gm) ?? []).length }
+export function packStats(pack: string): { chars: number; genotypes: number; healthEntries: number } {
+  return {
+    chars: pack.length,
+    genotypes: (pack.match(/^- \w+ rs\d+/gm) ?? []).length,
+    healthEntries: (pack.match(/^- \d{4}-\d{2}-\d{2} · /gm) ?? []).length,
+  }
 }

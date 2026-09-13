@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { sendContext } from './egress'
+import { readDocumentWithGemini, sendContext } from './egress'
 
 function walk(dir: string, out: string[] = []): string[] {
   for (const name of readdirSync(dir)) {
@@ -32,5 +32,13 @@ describe('egress gateway', () => {
     await expect(sendContext({ kind: 'helper' }, '# ctx', 'q', { confirmedAt: '' })).rejects.toThrow(
       /confirmation/,
     )
+    await expect(readDocumentWithGemini({ byokKey: 'k' }, [], 'p', {}, { confirmedAt: '' })).rejects.toThrow(
+      /confirmation/,
+    )
+  })
+  it('refuses a direct provider call without a key', async () => {
+    await expect(
+      readDocumentWithGemini({ byokKey: '' }, [], 'p', {}, { confirmedAt: 'now' }),
+    ).rejects.toThrow(/API key/)
   })
 })

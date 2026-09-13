@@ -9,6 +9,7 @@ export type ConsentKind =
   | 'import_minor'
   | 'import_document'
   | 'tier3_byok'
+  | 'read_document_byok'
   | 'helper_backend'
 
 export interface ConsentText {
@@ -63,6 +64,16 @@ export const CONSENTS: Record<ConsentKind, ConsentText> = {
       "The previewed context pack will be sent directly from this browser to the provider I configure, under that provider's terms and privacy policy.",
       'My API key is stored only in this browser.',
       'I will still confirm every individual request before it is sent.',
+    ],
+  },
+  read_document_byok: {
+    kind: 'read_document_byok',
+    version: 1,
+    title: 'Reading documents with my own API key',
+    statements: [
+      "Each document I choose (the image or PDF itself) will be sent directly from this browser to the provider I configure, under that provider's terms and privacy policy.",
+      'My API key is stored only in this browser. On a free-tier key the provider may use what I send to improve its models; a paid key is needed to prevent that.',
+      'I will confirm every individual document before it is sent, and review the transcription before it is saved.',
     ],
   },
   helper_backend: {

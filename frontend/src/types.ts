@@ -38,6 +38,30 @@ export interface Person {
   createdAt: string
 }
 
+/** One dated entry in a person's health log: a lab report, diagnosis, medication or letter, as text. */
+export type HealthKind = 'lab' | 'imaging' | 'diagnosis' | 'medication' | 'letter' | 'other'
+
+export const HEALTH_KIND_LABELS: Record<HealthKind, string> = {
+  lab: 'Lab result',
+  imaging: 'Imaging report',
+  diagnosis: 'Diagnosis',
+  medication: 'Medication',
+  letter: 'Doctor letter',
+  other: 'Other',
+}
+
+export interface HealthEntry {
+  id: string
+  personId: string
+  date: string // YYYY-MM-DD, the document's date, not the import date
+  kind: HealthKind
+  title: string
+  body: string
+  /** '' when typed by hand; 'gemini:<model>:<sha256 of the file>' when transcribed by a model. */
+  source: string
+  createdAt: string
+}
+
 export interface SourceFile {
   id: string
   personId: string

@@ -19,6 +19,8 @@ export interface DumpV1 {
   /** personId → string of 2 chars per snp_index entry ("AG", "--" = absent) */
   genotypes: Record<string, string>
   consents: unknown[]
+  /** Absent in dumps written before the health log existed. */
+  health_log?: unknown[]
   notes: unknown[]
   chats: unknown[]
   sharing_log: unknown[]
@@ -31,6 +33,7 @@ export interface DumpInput {
   sourceFiles: SourceFile[]
   callsByPerson: Record<string, Call[]>
   consents?: unknown[]
+  healthLog?: unknown[]
   notes?: unknown[]
   chats?: unknown[]
   sharingLog?: unknown[]
@@ -68,6 +71,7 @@ export function buildDump(input: DumpInput): DumpV1 {
     snp_index: { rsids, chromosomes, positions },
     genotypes,
     consents: input.consents ?? [],
+    health_log: input.healthLog ?? [],
     notes: input.notes ?? [],
     chats: input.chats ?? [],
     sharing_log: input.sharingLog ?? [],

@@ -1,4 +1,4 @@
-import type { Call, Person, Provider, Sex, SourceFile } from '../types'
+import type { Call, HealthEntry, HealthKind, Person, Provider, Sex, SourceFile } from '../types'
 import type { Database, Row } from './db'
 
 export function newId(): string {
@@ -219,7 +219,65 @@ export async function personCalls(db: Database, personId: string): Promise<Call[
   }))
 }
 
+// ---- health log ----------------------------------------------------------------------------
+
+export async function listHealthLog(db: Database, personId: string): Promise<HealthEntry[]> {
+  const rows = await db.query(
+    'SELECT * FROM health_log WHERE person_id=? ORDER BY date DESC, created_at DESC',
+    [personId],
+  )
+  return rows.map((r) => ({
+    id: r.id as string,
+    personId: r.person_id as string,
+    date: r.date as string,
+    kind: r.kind as HealthKind,
+    title: r.title as string,
+    body: r.body as string,
+    source: r.source as string,
+    createdAt: r.created_at as string,
+  }))
+}
+
+export async function addHealthEntry(
+  db: Database,
+  e: { personId: string; date: string; kind: HealthKind; title: string; body: string; source?: string },
+): Promise<HealthEntry> {
+  const entry: HealthEntry = { id: newId(), createdAt: now(), source: '', ...e }
+  await db.exec(
+    'INSERT INTO health_log(id,person_id,date,kind,title,body,source,created_at) VALUES (?,?,?,?,?,?,?,?)',
+    [
+      entry.id,
+      entry.personId,
+      entry.date,
+      entry.kind,
+      entry.title,
+      entry.body,
+      entry.source,
+      entry.createdAt,
+    ],
+  )
+  return entry
+}
+
+export async function deleteHealthEntry(db: Database, id: string): Promise<void> {
+  await db.exec('DELETE FROM health_log WHERE id=?', [id])
+}
+
 // ---- consent / sharing log / meta -----------------------------------------------------------
+
+/** Keys the user's own provider credentials live under. Never exported in a dump. */
+export const META_GEMINI_KEY = 'gemini_api_key'
+export const META_GEMINI_MODEL = 'gemini_model'
+
+export async function getMeta(db: Database, key: string): Promise<string | null> {
+  const row = await db.one('SELECT value FROM meta WHERE key=?', [key])
+  return (row?.value as string | undefined) ?? null
+}
+
+export async function setMeta(db: Database, key: string, value: string | null): Promise<void> {
+  if (value === null || value === '') await db.exec('DELETE FROM meta WHERE key=?', [key])
+  else await db.exec('INSERT OR REPLACE INTO meta(key,value) VALUES (?,?)', [key, value])
+}
 
 export async function eraseEverything(db: Database): Promise<void> {
   for (const t of [
@@ -227,6 +285,7 @@ export async function eraseEverything(db: Database): Promise<void> {
     'chat',
     'note',
     'consent',
+    'health_log',
     'genotype',
     'source_file',
     'relationship',
@@ -234,6 +293,7 @@ export async function eraseEverything(db: Database): Promise<void> {
   ]) {
     await db.exec(`DELETE FROM ${t}`)
   }
+  await db.exec("DELETE FROM meta WHERE key != 'schema_version'")
 }
 
 export async function logSharing(

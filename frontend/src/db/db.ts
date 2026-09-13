@@ -62,6 +62,10 @@ export class Database {
     worker.onmessage = (ev) => ready.onMessage(ev.data)
     await ready.exec('PRAGMA foreign_keys = ON')
     await ready.exec(SCHEMA_SQL)
+    // Revoking a consent deletes it; rows stamped by the old flag-only revoke are dead weight.
+    await ready.exec('DELETE FROM consent WHERE revoked_at IS NOT NULL')
+    // Additive column migrations: CREATE TABLE IF NOT EXISTS leaves existing tables untouched.
+    await ready.exec("ALTER TABLE health_log ADD COLUMN source TEXT NOT NULL DEFAULT ''").catch(() => {})
     await ready.exec('INSERT OR IGNORE INTO meta(key, value) VALUES (?, ?)', [
       'schema_version',
       String(SCHEMA_VERSION),

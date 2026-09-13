@@ -17,6 +17,54 @@ export interface ConfirmedSend {
 }
 
 const ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages'
+const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models'
+export const GEMINI_DEFAULT_MODEL = 'gemini-2.5-flash'
+
+export interface DocumentPart {
+  mime: string
+  /** base64 without the data: prefix */
+  data: string
+}
+
+/**
+ * Sends the pages of one medical document straight to Gemini with the user's own key and returns
+ * the model's JSON text. Tier 3 (design §6.3/§6.4): browser → provider, nothing via our backend.
+ */
+export async function readDocumentWithGemini(
+  target: { byokKey: string; model?: string },
+  parts: DocumentPart[],
+  prompt: string,
+  responseSchema: object,
+  confirmed: ConfirmedSend,
+): Promise<{ text: string; model: string }> {
+  if (!confirmed?.confirmedAt) throw new Error('refusing to send without an explicit confirmation')
+  if (!target.byokKey) throw new Error('an API key is required for a direct provider call')
+  const model = target.model || GEMINI_DEFAULT_MODEL
+  const res = await fetch(`${GEMINI_URL}/${encodeURIComponent(model)}:generateContent`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', 'x-goog-api-key': target.byokKey },
+    body: JSON.stringify({
+      contents: [
+        {
+          role: 'user',
+          parts: [
+            ...parts.map((p) => ({ inlineData: { mimeType: p.mime, data: p.data } })),
+            { text: prompt },
+          ],
+        },
+      ],
+      generationConfig: { temperature: 0, responseMimeType: 'application/json', responseSchema },
+    }),
+  })
+  if (!res.ok) throw new Error(`provider returned ${res.status}`)
+  const body = (await res.json()) as {
+    modelVersion?: string
+    candidates?: { content?: { parts?: { text?: string }[] } }[]
+  }
+  const text = (body.candidates?.[0]?.content?.parts ?? []).map((p) => p.text ?? '').join('')
+  if (!text) throw new Error('provider returned no text')
+  return { text, model: body.modelVersion ?? model }
+}
 
 export async function fetchOwnAsset(path: string): Promise<Response> {
   if (!path.startsWith('/')) throw new Error('own-origin assets only')

@@ -4,6 +4,7 @@ import { listSourceFiles, mendelianSql, personCallsFor } from '../db/repo'
 import { computeFindings, type Finding } from '../kb/kb'
 import { DEFAULT_DIR, type FindingSortKey, type SortDir, sortFindings } from '../kb/sortFindings'
 import { PROVIDER_LABELS, type SourceFile } from '../types'
+import { HealthLog } from './HealthLog'
 
 export function PersonPage({ id, onBack }: { id: string; onBack: () => void }) {
   const { db, kb, persons, relationships } = useApp()
@@ -96,6 +97,7 @@ export function PersonPage({ id, onBack }: { id: string; onBack: () => void }) {
           </>
         )}
       </div>
+      <HealthLog person={person} />
       <div className="card">
         <h2>Findings from the knowledge base</h2>
         <p className="muted">

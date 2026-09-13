@@ -3,8 +3,9 @@ import { useApp } from '../app/context'
 import { buildContextPack, packStats } from '../ask/contextPack'
 import { PROMPTS } from '../ask/prompts'
 import { retrieveForQuestion } from '../ask/retrieve'
-import { logSharing, newId, now, personCallsFor } from '../db/repo'
+import { listHealthLog, logSharing, newId, now, personCallsFor } from '../db/repo'
 import { computeFindings, type Finding } from '../kb/kb'
+import { HEALTH_KIND_LABELS, type HealthEntry } from '../types'
 
 /**
  * Ask, tiers 0 and 2 (docs/design.md §6.3): local retrieval builds a context pack; the user
@@ -16,6 +17,7 @@ export function AskPage() {
   const [question, setQuestion] = useState('')
   const [selected, setSelected] = useState<string[]>([])
   const [findingsBy, setFindingsBy] = useState<Record<string, Finding[]>>({})
+  const [healthBy, setHealthBy] = useState<Record<string, HealthEntry[]>>({})
   const [excluded, setExcluded] = useState<Set<string>>(new Set())
   const [realNames, setRealNames] = useState(false)
   const [templateId, setTemplateId] = useState(PROMPTS[0].id)
@@ -25,7 +27,8 @@ export function AskPage() {
   useEffect(() => {
     ;(async () => {
       const out: Record<string, Finding[]> = {}
-      for (const id of selected)
+      const health: Record<string, HealthEntry[]> = {}
+      for (const id of selected) {
         if (!findingsBy[id])
           out[id] = computeFindings(
             kb,
@@ -35,9 +38,12 @@ export function AskPage() {
               kb.entries.map((e) => e.rsid),
             ),
           )
+        if (!healthBy[id]) health[id] = await listHealthLog(db, id)
+      }
       if (Object.keys(out).length) setFindingsBy((prev) => ({ ...prev, ...out }))
+      if (Object.keys(health).length) setHealthBy((prev) => ({ ...prev, ...health }))
     })()
-  }, [selected, db, kb, findingsBy])
+  }, [selected, db, kb, findingsBy, healthBy])
 
   // Retrieval: kb entries whose gene/marker/drug/condition names appear in the question; fall
   // back to all findings with magnitude ≥ 2 when the question matches nothing specific.
@@ -54,7 +60,9 @@ export function AskPage() {
         ? all.filter((f) => relevantRsids.has(f.entry.rsid))
         : all.filter((f) => (f.match?.magnitude ?? 0) >= 2)
     ).filter((f) => !excluded.has(`${id}:${f.entry.rsid}`))
-    return { person, findings }
+    // The whole health log is offered; entries are removed per item like genotypes.
+    const health = (healthBy[id] ?? []).filter((h) => !excluded.has(`${id}:${h.id}`))
+    return { person, findings, health }
   })
   const template = PROMPTS.find((p) => p.id === templateId)
   const pack = buildContextPack({ question, people, realNames, template })
@@ -123,9 +131,9 @@ export function AskPage() {
 
       <div className="card">
         <h2>
-          Included genotypes{' '}
+          Included genotypes and health log{' '}
           <span className="muted">
-            ({stats.genotypes} across {people.length} people)
+            ({stats.genotypes} genotypes, {stats.healthEntries} health entries across {people.length} people)
           </span>
         </h2>
         {relevantRsids.size === 0 && question.trim() && (
@@ -139,9 +147,24 @@ export function AskPage() {
             Reword the question or switch real names on.
           </p>
         )}
-        {people.map(({ person, findings }) => (
+        {people.map(({ person, findings, health }) => (
           <div key={person.id}>
             <h3>{person.displayName}</h3>
+            {health.length > 0 && (
+              <ul>
+                {health.map((h) => (
+                  <li key={h.id}>
+                    {h.date} · {HEALTH_KIND_LABELS[h.kind]} · {h.title}{' '}
+                    <button
+                      type="button"
+                      onClick={() => setExcluded(new Set([...excluded, `${person.id}:${h.id}`]))}
+                    >
+                      remove
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
             {findings.length === 0 ? (
               <p className="muted">nothing selected</p>
             ) : (
@@ -209,8 +232,8 @@ export function AskPage() {
           </p>
           <ul>
             <li>
-              {stats.genotypes} genotypes for {people.length} {people.length === 1 ? 'person' : 'people'},{' '}
-              {realNames ? 'with real names' : 'pseudonymised'}
+              {stats.genotypes} genotypes and {stats.healthEntries} health-log entries for {people.length}{' '}
+              {people.length === 1 ? 'person' : 'people'}, {realNames ? 'with real names' : 'pseudonymised'}
             </li>
             <li>Recorded in the sharing log (Settings) so you can audit what left this device</li>
           </ul>

@@ -62,6 +62,35 @@ describe('buildContextPack', () => {
     expect(pack).toContain('## Vova, male, 42')
     expect(pack).toContain(PROMPTS[2].text)
   })
+  it('lists health-log entries under the person with the body indented', () => {
+    const pack = buildContextPack({
+      question: 'Lipids?',
+      people: [
+        {
+          person: vova,
+          findings: [],
+          health: [
+            {
+              id: 'h1',
+              personId: 'p1',
+              date: '2026-05-01',
+              kind: 'lab',
+              title: 'Lipid panel',
+              body: 'LDL 4.1 mmol/L (ref < 3.0)\nHDL 1.2 mmol/L',
+              source: '',
+              createdAt: 't',
+            },
+          ],
+        },
+      ],
+      realNames: false,
+      now,
+    })
+    expect(pack).toContain(
+      "### Health log (from the person's documents, dated)\n- 2026-05-01 · Lab result · Lipid panel\n  LDL 4.1 mmol/L (ref < 3.0)\n  HDL 1.2 mmol/L",
+    )
+    expect(packStats(pack).healthEntries).toBe(1)
+  })
   it('counts genotypes for the sharing log', () => {
     const pack = buildContextPack({
       question: 'q',

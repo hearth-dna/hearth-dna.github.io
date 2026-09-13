@@ -223,6 +223,16 @@ evidence grade, what it would change, what it would not, what to ask a clinician
 kb fields at tier 0, so the user gets a decision frame even without any LLM.
 
 ### 6.4 Medical documents — processed locally, never stored remotely
+- **Shipped first (health log):** a per-person `health_log(id, person_id, date, kind, title, body)`
+  of dated text entries — lab result, diagnosis, medication, doctor letter — typed or pasted from
+  the paper. Gated by the `import_document` consent; part of the dump; offered entry-by-entry to
+  the Ask context pack under "Health log". The steps below build on it.
+- **Shipped second (BYOK document reader):** "Read a document" sends the photo/scan/PDF straight
+  from the browser to Gemini with the user's own key (`egress.readDocumentWithGemini`, consent
+  `read_document_byok`, confirmed per document, metadata-only row in the sharing log) and returns
+  a transcription-only JSON draft the user reviews in the health-log form. The key lives in `meta`,
+  is never dumped, and is deleted by "Erase all data" or by revoking the consent. Free-tier keys
+  are flagged: Google may train on the input.
 - Accept PDF, images, plain text. `pdf.js` extracts the text layer; `Tesseract.js` OCRs scans; both in
   a worker. Originals stored as blobs in OPFS, referenced from `document`.
 - Structured extraction into `observation` rows (lab values with units and reference ranges,
@@ -576,8 +586,11 @@ revocable. Everything below is a design requirement, not a nice-to-have.
 | Enabling encrypted sync | Ciphertext leaves the device; passphrase loss = data loss | informational |
 | Export unencrypted dump | Warning that the file is plaintext genetic data | informational |
 
-Consent records live in a local `consent(kind, version, granted_at, revoked_at)` table, are part of
-the dump, and every consent has a one-tap "revoke" in Settings that also disables the feature.
+Consent records live in a local `consent(kind, version, subject, granted_at)` table, are part of
+the dump, and every consent has a one-tap "revoke" in Settings. Revoking is deletion: the record is
+removed and so is everything it covered — for a genome consent, that person's genotypes and source
+files (the person, notes and pedigree stay); for the first-launch consent, the app returns to the
+gate. No "revoked" rows are kept.
 
 ### 13.2 Data-handling rules enforced in code
 

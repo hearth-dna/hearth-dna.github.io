@@ -15,11 +15,13 @@ make frontend-install / frontend-run / frontend-test / frontend-build / frontend
 | `src/db/` | `db.worker.ts` owns the one SQLite connection (OPFS SAH-pool VFS, memory fallback); `db.ts` is the main-thread handle (singleton, Web Lock per profile, `pagehide` terminates the worker); `schema.ts`; `repo.ts` = every query the UI uses |
 | `src/import/` | `providers.ts` (detection + one line parser per provider), `unpack.ts` (zip/gz/sha256), `parseFile.ts` |
 | `src/kb/` | loads `public/kb.json`, computes findings, text search |
-| `src/family/` | Mendelian check reference implementation (the SQL version is in `repo.ts`) |
+| `src/family/` | Mendelian check reference implementation (the SQL version is in `repo.ts`); `inheritance.ts` phases a child's alleles to parents and lays out the pedigree for `InheritanceTree.tsx` |
 | `src/ask/` | `retrieve.ts` (question → kb rsids), `contextPack.ts` (deterministic pack), `prompts.ts` |
 | `src/export/` | dump v1: compact genotype strings, gzip, AES-GCM |
-| `src/consent/` | consent texts (`kinds.ts`) and records |
-| `src/egress/` | **the only module that may call `fetch`** — `egress.test.ts` enforces it |
+| `src/consent/` | consent texts (`kinds.ts`) and records; revoke = delete the record and what it covered |
+| `src/components/HealthLog.tsx` | per-person dated text entries (labs, diagnoses, meds, letters) in `health_log`; gated by `import_document`; offered to the Ask pack |
+| `src/egress/` | **the only module that may call `fetch`** — `egress.test.ts` enforces it; `readDocumentWithGemini` is the tier 3 BYOK document reader |
+| `src/documents/` | `draft.ts`: transcription prompt, Gemini response schema, JSON → health-log draft |
 | `src/components/` | one file per page plus `ConsentForm`, `ImportDialog` |
 
 ## Rules that tests enforce

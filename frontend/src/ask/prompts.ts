@@ -2,7 +2,7 @@
 export interface PromptTemplate {
   id: string
   title: string
-  needs: ('genotypes' | 'family' | 'notes')[]
+  needs: ('genotypes' | 'family' | 'notes' | 'health')[]
   text: string
 }
 
@@ -30,6 +30,12 @@ export const PROMPTS: PromptTemplate[] = [
     title: 'Compare two family members on this topic',
     needs: ['genotypes', 'family'],
     text: 'Compare the family members in the context above on the topic in my question. Where a child carries a variant, say which parent it most likely came from given the genotypes shown. Keep it factual.',
+  },
+  {
+    id: 'labs',
+    title: 'Interpret my lab results with my genetics',
+    needs: ['genotypes', 'health'],
+    text: 'Read the dated health-log entries above together with the genotypes. Point out values outside their reference ranges, any trend across dates, and where a genotype plausibly explains or modifies a value. Say plainly when there is no link. Do not diagnose.',
   },
   {
     id: 'second-opinion',

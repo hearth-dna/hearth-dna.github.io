@@ -26,7 +26,12 @@ CREATE TABLE IF NOT EXISTS genotype (
 CREATE INDEX IF NOT EXISTS genotype_rsid ON genotype(rsid);
 CREATE TABLE IF NOT EXISTS consent (
   id INTEGER PRIMARY KEY, kind TEXT NOT NULL, version INTEGER NOT NULL, subject TEXT NOT NULL DEFAULT '',
-  granted_at TEXT NOT NULL, revoked_at TEXT
+  granted_at TEXT NOT NULL, revoked_at TEXT -- legacy, always NULL: revoking deletes the row
+);
+CREATE TABLE IF NOT EXISTS health_log (
+  id TEXT PRIMARY KEY, person_id TEXT NOT NULL REFERENCES person(id) ON DELETE CASCADE,
+  date TEXT NOT NULL, kind TEXT NOT NULL, title TEXT NOT NULL, body TEXT NOT NULL,
+  source TEXT NOT NULL DEFAULT '', created_at TEXT NOT NULL
 );
 CREATE TABLE IF NOT EXISTS note (
   id TEXT PRIMARY KEY, person_id TEXT, topic TEXT NOT NULL, markdown TEXT NOT NULL, updated_at TEXT NOT NULL

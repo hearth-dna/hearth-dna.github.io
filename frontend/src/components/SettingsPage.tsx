@@ -1,16 +1,21 @@
 import { useEffect, useState } from 'react'
 import { APP_VERSION, useApp } from '../app/context'
-import { listConsents, revokeConsent } from '../consent/consent'
+import { listConsents, revokeConsent, revokeDeletesData } from '../consent/consent'
 import { CONSENTS } from '../consent/kinds'
 import {
   eraseEverything,
+  getMeta,
   importCalls,
   listSharing,
   listSourceFiles,
+  META_GEMINI_KEY,
+  META_GEMINI_MODEL,
   newId,
   personCalls,
+  setMeta,
   setParent,
 } from '../db/repo'
+import { GEMINI_DEFAULT_MODEL } from '../egress/egress'
 import { buildDump, type DumpV1, deserialiseDump, expandDump, serialiseDump } from '../export/dump'
 import type { Person } from '../types'
 
@@ -20,9 +25,14 @@ export function SettingsPage() {
   const [msg, setMsg] = useState<string | null>(null)
   const [consents, setConsents] = useState<Awaited<ReturnType<typeof listConsents>>>([])
   const [sharing, setSharing] = useState<Awaited<ReturnType<typeof listSharing>>>([])
+  const [geminiKey, setGeminiKey] = useState('')
+  const [geminiModel, setGeminiModel] = useState(GEMINI_DEFAULT_MODEL)
+  const [keyStored, setKeyStored] = useState(false)
   const reload = async () => {
     setConsents(await listConsents(db))
     setSharing(await listSharing(db))
+    setKeyStored((await getMeta(db, META_GEMINI_KEY)) !== null)
+    setGeminiModel((await getMeta(db, META_GEMINI_MODEL)) || GEMINI_DEFAULT_MODEL)
   }
   // biome-ignore lint/correctness/useExhaustiveDependencies: reload is stable per db
   useEffect(() => {
@@ -44,6 +54,7 @@ export function SettingsPage() {
       callsByPerson,
       consents,
       sharingLog: sharing,
+      healthLog: await db.query('SELECT * FROM health_log'),
       notes: await db.query('SELECT * FROM note'),
       chats: await db.query('SELECT * FROM chat'),
     })
@@ -65,9 +76,11 @@ export function SettingsPage() {
       const dump: DumpV1 = await deserialiseDump(bytes, pass || undefined)
       const calls = expandDump(dump)
       const existing = new Set(persons.map((p) => p.id))
+      const added = new Set<string>()
       let n = 0
       for (const p of dump.persons as Person[]) {
         if (existing.has(p.id)) continue
+        added.add(p.id)
         await db.exec(
           'INSERT INTO person(id,label,display_name,sex,birth_year,notes,created_at) VALUES (?,?,?,?,?,?,?)',
           [p.id, p.label, p.displayName, p.sex, p.birthYear, p.notes, p.createdAt],
@@ -87,19 +100,26 @@ export function SettingsPage() {
         n++
       }
       for (const r of dump.relationships) await setParent(db, r.parentId, r.childId)
+      for (const h of (dump.health_log ?? []) as Record<string, unknown>[]) {
+        if (!added.has(h.person_id as string)) continue
+        await db.exec(
+          'INSERT INTO health_log(id,person_id,date,kind,title,body,source,created_at) VALUES (?,?,?,?,?,?,?,?)',
+          [h.id, h.person_id, h.date, h.kind, h.title, h.body, h.source ?? '', h.created_at],
+        )
+      }
       for (const c of dump.consents as {
         kind: string
         version: number
         subject: string
         grantedAt: string
-        revokedAt: string | null
+        revokedAt?: string | null
       }[]) {
-        await db.exec('INSERT INTO consent(kind,version,subject,granted_at,revoked_at) VALUES (?,?,?,?,?)', [
+        if (c.revokedAt) continue // dumps from before revoke-is-delete
+        await db.exec('INSERT INTO consent(kind,version,subject,granted_at) VALUES (?,?,?,?)', [
           c.kind,
           c.version,
           c.subject,
           c.grantedAt,
-          c.revokedAt,
         ])
       }
       await refresh()
@@ -141,6 +161,66 @@ export function SettingsPage() {
       </div>
 
       <div className="card">
+        <h2>Document reading (your own Gemini key)</h2>
+        <p className="muted">
+          Optional. Lets "Read a document" on a person's health log send a photo, scan or PDF straight from
+          this browser to Google Gemini for transcription. The key is stored only in this browser's database
+          and is never part of a dump. Nothing is sent until you confirm each document.
+        </p>
+        <p className="notice">
+          On Google's free tier, content you send may be used to improve their models. Use a key from a paid
+          project if that matters to you.
+        </p>
+        <div className="row">
+          <label className="field">
+            API key {keyStored && <span className="ok">(stored)</span>}
+            <input
+              type="password"
+              autoComplete="off"
+              value={geminiKey}
+              placeholder={keyStored ? '•••••••• (enter a new key to replace)' : 'AIza…'}
+              onChange={(e) => setGeminiKey(e.target.value)}
+            />
+          </label>
+          <label className="field">
+            Model
+            <input value={geminiModel} onChange={(e) => setGeminiModel(e.target.value)} />
+          </label>
+          <button
+            type="button"
+            className="primary"
+            disabled={!geminiKey.trim() && !keyStored}
+            onClick={async () => {
+              if (geminiKey.trim()) await setMeta(db, META_GEMINI_KEY, geminiKey.trim())
+              await setMeta(
+                db,
+                META_GEMINI_MODEL,
+                geminiModel.trim() === GEMINI_DEFAULT_MODEL ? null : geminiModel.trim(),
+              )
+              setGeminiKey('')
+              await reload()
+              setMsg('Gemini settings saved.')
+            }}
+          >
+            Save
+          </button>
+          {keyStored && (
+            <button
+              type="button"
+              className="danger"
+              onClick={async () => {
+                await setMeta(db, META_GEMINI_KEY, null)
+                await reload()
+                setMsg('Gemini key removed.')
+              }}
+            >
+              Remove key
+            </button>
+          )}
+        </div>
+      </div>
+
+      <div className="card">
         <h2>Consents</h2>
         {consents.length === 0 ? (
           <p className="muted">none recorded</p>
@@ -151,7 +231,7 @@ export function SettingsPage() {
                 <th>Consent</th>
                 <th>Subject</th>
                 <th>Granted</th>
-                <th>Status</th>
+                <th />
               </tr>
             </thead>
             <tbody>
@@ -163,19 +243,26 @@ export function SettingsPage() {
                   <td>{persons.find((p) => p.id === c.subject)?.displayName ?? (c.subject || '—')}</td>
                   <td>{c.grantedAt.slice(0, 16).replace('T', ' ')}</td>
                   <td>
-                    {c.revokedAt ? (
-                      <span className="muted">revoked</span>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={async () => {
-                          await revokeConsent(db, c.kind, c.subject)
-                          await reload()
-                        }}
-                      >
-                        revoke
-                      </button>
-                    )}
+                    <button
+                      type="button"
+                      className="danger"
+                      onClick={async () => {
+                        const who = persons.find((p) => p.id === c.subject)?.displayName ?? c.subject
+                        const what = c.kind === 'import_document' ? 'health log' : 'genome'
+                        if (
+                          revokeDeletesData(c.kind) &&
+                          !confirm(`Revoke and delete ${who}'s ${what}? This cannot be undone.`)
+                        )
+                          return
+                        await revokeConsent(db, c.kind, c.subject)
+                        // Withdrawing the first-launch consent puts the app back behind the gate.
+                        if (c.kind === 'first_launch') return location.reload()
+                        await refresh()
+                        await reload()
+                      }}
+                    >
+                      revoke
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -187,7 +274,8 @@ export function SettingsPage() {
       <div className="card">
         <h2>Sharing log</h2>
         <p className="muted">
-          Every context pack copied out of Hearth, with the exact text. Nothing else has ever left this
+          Every context pack copied out of Hearth, with the exact text, and every document sent to a provider
+          with your key (file names and hashes; the file itself is not kept). Nothing else has ever left this
           device.
         </p>
         {sharing.length === 0 ? (
