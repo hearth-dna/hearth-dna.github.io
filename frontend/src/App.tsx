@@ -22,6 +22,7 @@ type Page =
 export function App() {
   const [state, setState] = useState<AppState | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [takenOver, setTakenOver] = useState(false)
   const [consented, setConsented] = useState(false)
   const [page, setPage] = useState<Page>({ name: 'people' })
   const [erasing, setErasing] = useState(false)
@@ -39,7 +40,7 @@ export function App() {
     }
     ;(async () => {
       try {
-        ;[db, kb] = await Promise.all([Database.open(), loadKb()])
+        ;[db, kb] = await Promise.all([Database.open(() => setTakenOver(true)), loadKb()])
         if (import.meta.env.DEV) (window as unknown as { __hearth: unknown }).__hearth = { db }
         setConsented(await hasConsent(db, 'first_launch'))
         await refresh()
@@ -49,6 +50,17 @@ export function App() {
     })()
   }, [])
 
+  if (takenOver)
+    return (
+      <main>
+        <div className="card notice">
+          <p>Hearth was opened in another tab, which now owns the local database.</p>
+          <button type="button" className="primary" onClick={() => location.reload()}>
+            Use it here instead
+          </button>
+        </div>
+      </main>
+    )
   if (error)
     return (
       <main>
@@ -58,7 +70,9 @@ export function App() {
   if (!state)
     return (
       <main>
-        <p className="muted">Opening local database…</p>
+        <p className="muted">
+          Opening local database… (if Hearth is open in another tab, it is handing over)
+        </p>
       </main>
     )
   if (!consented)

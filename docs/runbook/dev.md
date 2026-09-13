@@ -17,7 +17,7 @@ make lint
 - `?profile=<name>` opens a separate local database (OPFS directory `.hearth-<name>`). Handy for
   a sandbox; the default profile is what users get.
 - Only one tab may hold a profile's database (OPFS access handles are exclusive). A second tab
-  gets a clear "already open in another tab" error instead of silently running in memory.
+  hands over: the newest tab takes the database and the old one shows a "reload to use it here" notice.
 - Vite serves `Cross-Origin-Opener-Policy`/`Embedder-Policy` headers; in production
   `frontend/public/_headers` does the same on Cloudflare Pages.
 
