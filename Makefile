@@ -16,7 +16,7 @@ help: ## Show this help message
 PORT ?= $(or $(shell grep -s '^PORT=' .env | cut -d= -f2-),8080)
 LLM_API_KEY ?= $(shell grep -s '^LLM_API_KEY=' .env | cut -d= -f2-)
 EDGE_SHARED_SECRET ?= $(shell grep -s '^EDGE_SHARED_SECRET=' .env | cut -d= -f2-)
-WEB_ORIGINS ?= $(or $(shell grep -s '^WEB_ORIGINS=' .env | cut -d= -f2-),http://localhost:5173)
+WEB_ORIGINS ?= $(or $(shell grep -s '^WEB_ORIGINS=' .env | cut -d= -f2-),http://localhost:5180)
 
 test: backend-test frontend-test ## Run every test suite (Go + Vitest)
 
@@ -99,7 +99,9 @@ BACKEND_PID_FILE := $(DEV_DIR)/backend.pid
 FRONTEND_PID_FILE := $(DEV_DIR)/frontend.pid
 BACKEND_LOG := $(DEV_DIR)/backend.log
 FRONTEND_LOG := $(DEV_DIR)/frontend.log
-FRONTEND_PORT ?= 5173
+# 5180, not Vite's 5173: ../sentio is a PWA on localhost:5173 and its service worker would serve
+# sentio's cached shell instead of Hearth. Service-worker scope is per origin, so use a distinct port.
+FRONTEND_PORT ?= 5180
 FRONTEND_URL := http://localhost:$(FRONTEND_PORT)
 
 define stop_service
