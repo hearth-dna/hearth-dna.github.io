@@ -1,6 +1,6 @@
 .PHONY: help dev dev-stop dev-status test lint \
 	backend-build backend-test backend-run backend-lint backend-image backend-deploy \
-	frontend-install frontend-run frontend-build frontend-test frontend-lint frontend-deploy \
+	frontend-install frontend-run frontend-build frontend-build-archive frontend-test frontend-lint frontend-deploy \
 	kb-build landing-deploy
 
 .DEFAULT_GOAL := help
@@ -65,8 +65,11 @@ frontend-install: ## Install frontend npm dependencies
 frontend-run: ## Run the PWA locally (Vite dev server, foreground)
 	cd $(FRONTEND_DIR) && npm run dev
 
-frontend-build: ## Type-check and build the production bundle (frontend/dist/)
+frontend-build: ## Type-check and build the production bundle (frontend/dist/, archive template included)
 	cd $(FRONTEND_DIR) && npm run build
+
+frontend-build-archive: ## Build only the single-file portable archive template (frontend/dist-archive/)
+	cd $(FRONTEND_DIR) && npm run build:archive
 
 frontend-test: ## Run frontend unit tests (Vitest)
 	cd $(FRONTEND_DIR) && npm run test

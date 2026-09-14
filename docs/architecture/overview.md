@@ -1,6 +1,6 @@
 # Architecture overview
 
-See `../design.md` for the full proposal. One screen:
+See `../design.md` for the full proposal; `storage/` for backups, portable archives and dump v2. One screen:
 
 ```
 Browser (PWA)                                   Static hosting          Optional helper

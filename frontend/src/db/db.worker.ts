@@ -5,9 +5,13 @@ import sqlite3InitModule, { type Database as Sqlite3Db, type Sqlite3Static } fro
  * Dedicated SQLite worker. Owns the one connection to user.db (OPFS when available, memory
  * otherwise). Bulk inserts use a prepared statement inside a single transaction, which is what
  * makes a 700k-row genome import take seconds rather than minutes.
+ *
+ * It also owns a small file cache next to the database (OPFS directory, or a Map in memory) that
+ * holds the original genome files so a backup does not have to re-serialise millions of rows
+ * (docs/architecture/storage/dump-v2.md).
  */
 type Req =
-  | { id: number; op: 'open'; profile: string }
+  | { id: number; op: 'open'; profile: string; memory?: boolean; wasmUrl?: string }
   | { id: number; op: 'exec'; sql: string; bind?: unknown[] }
   | { id: number; op: 'query'; sql: string; bind?: unknown[] }
   | {
@@ -20,6 +24,11 @@ type Req =
       before?: string
       after?: string
     }
+  | { id: number; op: 'file-put'; name: string; bytes: Uint8Array }
+  | { id: number; op: 'file-get'; name: string }
+  | { id: number; op: 'file-delete'; name: string }
+  | { id: number; op: 'file-list' }
+  | { id: number; op: 'genome-text'; personId: string }
 
 type Res =
   | { id: number; ok: true; result?: unknown }
@@ -33,9 +42,27 @@ let sqlite3: Sqlite3Static
 let db: Sqlite3Db
 let persistent = false
 let reason = ''
+let filesDir: FileSystemDirectoryHandle | null = null
+const memoryFiles = new Map<string, Uint8Array>()
 
-async function open(profile: string): Promise<{ persistent: boolean; reason: string }> {
-  sqlite3 = await sqlite3InitModule()
+async function open(req: { profile: string; memory?: boolean; wasmUrl?: string }) {
+  const { profile, memory, wasmUrl } = req
+  // The portable archive inlines sqlite3.wasm as a data: URL and hands the bytes straight to the
+  // Emscripten loader (fetching from inside a blob worker on a file:// page never resolves); the
+  // hosted build lets sqlite-wasm find the file next to its own module.
+  const init = sqlite3InitModule as unknown as (o?: object) => Promise<Sqlite3Static>
+  sqlite3 = await init(
+    wasmUrl
+      ? {
+          locateFile: () => wasmUrl,
+          wasmBinary: wasmUrl.startsWith('data:') ? dataUrlBytes(wasmUrl) : undefined,
+        }
+      : undefined,
+  )
+  if (memory) {
+    db = new sqlite3.oo1.DB(':memory:', 'c')
+    return { persistent: false, reason: 'memory requested' }
+  }
   // The SAH-pool VFS needs no helper worker or cross-origin isolation, unlike the default "opfs"
   // VFS, and is the faster of the two. It allows one connection per VFS name — db.ts opens once.
   // The access handles are exclusive; a tab that just handed over releases them asynchronously,
@@ -49,6 +76,8 @@ async function open(profile: string): Promise<{ persistent: boolean; reason: str
       db = new pool.OpfsSAHPoolDb('/hearth.sqlite3')
       persistent = true
       db.exec('PRAGMA cache_size = -65536; PRAGMA temp_store = MEMORY; PRAGMA journal_mode = MEMORY')
+      const root = await navigator.storage.getDirectory()
+      filesDir = await root.getDirectoryHandle(`hearth-${profile}-files`, { create: true })
       return { persistent, reason: '' }
     } catch (e) {
       reason = e instanceof Error ? e.message : String(e)
@@ -60,6 +89,92 @@ async function open(profile: string): Promise<{ persistent: boolean; reason: str
   return { persistent, reason }
 }
 
+function dataUrlBytes(url: string): Uint8Array {
+  const bin = atob(url.slice(url.indexOf(',') + 1))
+  const out = new Uint8Array(bin.length)
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i)
+  return out
+}
+
+// ---- file cache -----------------------------------------------------------------------------
+
+const safeName = (name: string) => {
+  if (!/^[a-z0-9._-]{1,120}$/i.test(name)) throw new Error(`bad file name ${name}`)
+  return name
+}
+
+async function filePut(name: string, bytes: Uint8Array): Promise<void> {
+  safeName(name)
+  if (!filesDir) {
+    memoryFiles.set(name, bytes)
+    return
+  }
+  const handle = await filesDir.getFileHandle(name, { create: true })
+  const access = await handle.createSyncAccessHandle()
+  try {
+    access.truncate(0)
+    access.write(bytes, { at: 0 })
+    access.flush()
+  } finally {
+    access.close()
+  }
+}
+
+async function fileGet(name: string): Promise<Uint8Array | null> {
+  safeName(name)
+  if (!filesDir) return memoryFiles.get(name) ?? null
+  try {
+    const handle = await filesDir.getFileHandle(name)
+    return new Uint8Array(await (await handle.getFile()).arrayBuffer())
+  } catch {
+    return null
+  }
+}
+
+async function fileDelete(name: string): Promise<void> {
+  safeName(name)
+  if (!filesDir) {
+    memoryFiles.delete(name)
+    return
+  }
+  await filesDir.removeEntry(name).catch(() => {})
+}
+
+async function fileList(): Promise<string[]> {
+  if (!filesDir) return [...memoryFiles.keys()]
+  const names: string[] = []
+  for await (const name of filesDir.keys()) names.push(name)
+  return names
+}
+
+/**
+ * A person's genotypes as generic provider text, built here so millions of rows never cross to
+ * the main thread. Used when the original file was not cached (data imported before dump v2).
+ */
+function genomeText(personId: string): string {
+  const lines = ['# Hearth export: rsid chromosome position genotype (forward strand)']
+  const stmt = db.prepare(
+    'SELECT rsid, chromosome, position, a1 || a2 FROM genotype WHERE person_id = ? ORDER BY chromosome, position',
+  )
+  try {
+    stmt.bind([personId])
+    while (stmt.step()) {
+      const r = stmt.get([]) as [string, string, number, string]
+      lines.push(`${r[0]}\t${r[1]}\t${r[2]}\t${r[3]}`)
+    }
+  } finally {
+    stmt.finalize()
+  }
+  return `${lines.join('\n')}\n`
+}
+
+// ---- SQL ------------------------------------------------------------------------------------
+
+/** Every user-data write bumps meta.generation, which backups use to tell snapshots apart. */
+const isWrite = (sql: string) => /^\s*(INSERT|UPDATE|DELETE|REPLACE)\b/i.test(sql) && !/\bmeta\b/i.test(sql)
+const BUMP =
+  "INSERT INTO meta(key, value) VALUES ('generation', '1') ON CONFLICT(key) DO UPDATE SET value = CAST(value AS INTEGER) + 1"
+
 function literal(v: unknown): string {
   if (v === null || v === undefined) return 'NULL'
   if (typeof v === 'number') return Number.isFinite(v) ? String(v) : 'NULL'
@@ -70,12 +185,23 @@ function literal(v: unknown): string {
 function handle(req: Req): unknown {
   switch (req.op) {
     case 'open':
-      return open(req.profile)
+      return open(req)
     case 'exec':
       db.exec({ sql: req.sql, bind: req.bind as never })
+      if (isWrite(req.sql)) db.exec(BUMP)
       return undefined
     case 'query':
       return db.exec({ sql: req.sql, bind: req.bind as never, rowMode: 'object', returnValue: 'resultRows' })
+    case 'file-put':
+      return filePut(req.name, req.bytes)
+    case 'file-get':
+      return fileGet(req.name)
+    case 'file-delete':
+      return fileDelete(req.name)
+    case 'file-list':
+      return fileList()
+    case 'genome-text':
+      return genomeText(req.personId)
     case 'bulk': {
       // Sorting by the primary-key columns turns random B-tree inserts into appends; with the
       // rsid index dropped for the duration (see repo.importCalls) a 700k-row genome lands in
@@ -113,6 +239,7 @@ function handle(req: Req): unknown {
           if (end % every < BATCH || end === rows.length)
             postMessage({ id: req.id, progress: end } satisfies Res)
         }
+        db.exec(BUMP)
         db.exec('COMMIT')
       } catch (e) {
         db.exec('ROLLBACK')

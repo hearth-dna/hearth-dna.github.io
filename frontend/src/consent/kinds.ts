@@ -11,6 +11,7 @@ export type ConsentKind =
   | 'tier3_byok'
   | 'read_document_byok'
   | 'helper_backend'
+  | 'backup_folder'
 
 export interface ConsentText {
   kind: ConsentKind
@@ -83,6 +84,16 @@ export const CONSENTS: Record<ConsentKind, ConsentText> = {
     statements: [
       'The previewed context pack will be processed in memory by the Hearth helper service in the EU and forwarded to the model provider. It is not stored, and no identifier links it to me.',
       'This is explicit consent under GDPR Article 9(2)(a) for that transient processing. I can withdraw it at any time by turning the feature off.',
+    ],
+  },
+  backup_folder: {
+    kind: 'backup_folder',
+    version: 1,
+    title: 'Backing up to a folder',
+    statements: [
+      'Hearth will write a copy of everything, including genetic data, to the folder I choose on this computer, a USB stick, or a folder another program syncs to a cloud drive.',
+      'Whoever can read that folder can read the backup unless I set a passphrase. Losing the passphrase means losing the backup.',
+      'Nothing is sent anywhere by Hearth itself; any syncing is done by the software I installed, under its terms.',
     ],
   },
 }

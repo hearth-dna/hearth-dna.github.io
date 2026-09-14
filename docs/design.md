@@ -223,10 +223,13 @@ evidence grade, what it would change, what it would not, what to ask a clinician
 kb fields at tier 0, so the user gets a decision frame even without any LLM.
 
 ### 6.4 Medical documents — processed locally, never stored remotely
-- **Shipped first (health log):** a per-person `health_log(id, person_id, date, kind, title, body)`
-  of dated text entries — lab result, diagnosis, medication, doctor letter — typed or pasted from
-  the paper. Gated by the `import_document` consent; part of the dump; offered entry-by-entry to
-  the Ask context pack under "Health log". The steps below build on it.
+- **Shipped first (health log):** a per-person `health_log(id, person_id, date, kind, title, body,
+  body_part, severity, tags)` of dated text entries — lab result, diagnosis, medication, doctor
+  letter, or a self-reported **symptom** ("pain in both hands", body part `hands`, severity 6/10,
+  tags `arthritis`) — typed or pasted from the paper. Body part and tags (conditions, diseases,
+  free labels) apply to any kind and drive the log's filters (kind, body part, tag, text search).
+  Gated by the `import_document` consent; part of the dump; offered entry-by-entry to the Ask
+  context pack under "Health log". The steps below build on it.
 - **Shipped second (BYOK document reader):** "Read a document" sends the photo/scan/PDF straight
   from the browser to Gemini with the user's own key (`egress.readDocumentWithGemini`, consent
   `read_document_byok`, confirmed per document, metadata-only row in the sharing log) and returns
@@ -265,6 +268,8 @@ kb fields at tier 0, so the user gets a decision frame even without any LLM.
   plain `.sqlite` export for people who prefer SQL.
 - Import restores everything, migrates old `version`s, and re-runs findings against the current kb.
 - Expected size for this family: 7 genomes ≈ 5 MB gzipped plus documents.
+- Backups to a USB stick or synced cloud folder, a single-file portable archive, and the dump v2
+  container that carries them are designed in `architecture/storage/` (ADR 0004).
 
 ### 6.6 PWA specifics
 - Service worker precaches the app shell and `kb.db`; runtime cache for nothing else.

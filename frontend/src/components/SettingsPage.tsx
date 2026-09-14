@@ -2,24 +2,17 @@ import { useEffect, useState } from 'react'
 import { APP_VERSION, useApp } from '../app/context'
 import { listConsents, revokeConsent, revokeDeletesData } from '../consent/consent'
 import { CONSENTS } from '../consent/kinds'
-import {
-  getMeta,
-  importCalls,
-  listSharing,
-  META_GEMINI_KEY,
-  META_GEMINI_MODEL,
-  newId,
-  setMeta,
-  setParent,
-} from '../db/repo'
+import { getMeta, listSharing, META_GEMINI_KEY, META_GEMINI_MODEL, newId, setMeta } from '../db/repo'
 import { GEMINI_DEFAULT_MODEL } from '../egress/egress'
-import { type DumpV1, deserialiseDump, expandDump } from '../export/dump'
 import { exportDumpFile } from '../export/exportDump'
-import type { Person } from '../types'
+import { restoreBytes } from '../export/restore'
+import { ArchiveCard } from './ArchiveCard'
+import { BackupCard } from './BackupCard'
 import { EraseDialog } from './EraseDialog'
+import { GeminiKeySteps } from './GeminiKeySteps'
 
 export function SettingsPage() {
-  const { db, persons, relationships, refresh } = useApp()
+  const { db, persons, refresh } = useApp()
   const [pass, setPass] = useState('')
   const [msg, setMsg] = useState<string | null>(null)
   const [consents, setConsents] = useState<Awaited<ReturnType<typeof listConsents>>>([])
@@ -41,65 +34,19 @@ export function SettingsPage() {
 
   const exportDump = async () => {
     setMsg('Building dump…')
-    setMsg(await exportDumpFile(db, APP_VERSION, persons, relationships, pass))
+    setMsg(await exportDumpFile(db, APP_VERSION, pass))
   }
 
   const importDump = async (file: File) => {
     try {
       setMsg('Reading dump…')
       const bytes = new Uint8Array(await file.arrayBuffer())
-      const dump: DumpV1 = await deserialiseDump(bytes, pass || undefined)
-      const calls = expandDump(dump)
-      const existing = new Set(persons.map((p) => p.id))
-      const added = new Set<string>()
-      let n = 0
-      for (const p of dump.persons as Person[]) {
-        if (existing.has(p.id)) continue
-        added.add(p.id)
-        await db.exec(
-          'INSERT INTO person(id,label,display_name,sex,birth_year,notes,created_at) VALUES (?,?,?,?,?,?,?)',
-          [p.id, p.label, p.displayName, p.sex, p.birthYear, p.notes, p.createdAt],
-        )
-        const sf = dump.source_files.find((s) => s.personId === p.id)
-        await importCalls(
-          db,
-          p.id,
-          {
-            provider: sf?.provider ?? 'generic',
-            build: sf?.build ?? '37',
-            sha256: sf?.sha256 ?? '',
-            originalName: sf?.originalName ?? file.name,
-          },
-          calls[p.id] ?? [],
-        )
-        n++
-      }
-      for (const r of dump.relationships) await setParent(db, r.parentId, r.childId)
-      for (const h of (dump.health_log ?? []) as Record<string, unknown>[]) {
-        if (!added.has(h.person_id as string)) continue
-        await db.exec(
-          'INSERT INTO health_log(id,person_id,date,kind,title,body,source,created_at) VALUES (?,?,?,?,?,?,?,?)',
-          [h.id, h.person_id, h.date, h.kind, h.title, h.body, h.source ?? '', h.created_at],
-        )
-      }
-      for (const c of dump.consents as {
-        kind: string
-        version: number
-        subject: string
-        grantedAt: string
-        revokedAt?: string | null
-      }[]) {
-        if (c.revokedAt) continue // dumps from before revoke-is-delete
-        await db.exec('INSERT INTO consent(kind,version,subject,granted_at) VALUES (?,?,?,?)', [
-          c.kind,
-          c.version,
-          c.subject,
-          c.grantedAt,
-        ])
-      }
+      const r = await restoreBytes(db, bytes, pass || undefined, setMsg)
       await refresh()
       await reload()
-      setMsg(`Imported ${n} people from dump v${dump.version} (${dump.exported_at}).`)
+      setMsg(
+        `Imported ${r.people} new people and ${r.genomes} genomes from dump v${r.version} (${r.exportedAt}); people already here were left unchanged.`,
+      )
     } catch (e) {
       setMsg(`Import failed: ${e}`)
     }
@@ -111,8 +58,9 @@ export function SettingsPage() {
       <div className="card">
         <h2>Full dump</h2>
         <p className="muted">
-          Everything: people, pedigree, genotypes, consents, notes, chats, sharing log. Gzipped JSON; add a
-          passphrase to encrypt with AES-GCM. This file is the only backup — Hearth keeps no copy anywhere.
+          Everything: people, pedigree, the original genome files, consents, health log, notes, chats, sharing
+          log. One .hearth file; add a passphrase to encrypt it with AES-GCM. Hearth keeps no copy anywhere.
+          Import accepts .hearth files, older .json.gz dumps and portable .html archives.
         </p>
         <div className="row">
           <label className="field">
@@ -127,13 +75,16 @@ export function SettingsPage() {
             <input
               type="file"
               hidden
-              accept=".gz,.enc,.json"
+              accept=".hearth,.enc,.gz,.json,.html"
               onChange={(e) => e.target.files?.[0] && importDump(e.target.files[0])}
             />
           </label>
         </div>
         {msg && <p>{msg}</p>}
       </div>
+
+      <BackupCard />
+      <ArchiveCard />
 
       <div className="card">
         <h2>Document reading (your own Gemini key)</h2>
@@ -146,6 +97,7 @@ export function SettingsPage() {
           On Google's free tier, content you send may be used to improve their models. Use a key from a paid
           project if that matters to you.
         </p>
+        <GeminiKeySteps open={!keyStored} />
         <div className="row">
           <label className="field">
             API key {keyStored && <span className="ok">(stored)</span>}

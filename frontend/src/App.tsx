@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
-import { AppContext, type AppState } from './app/context'
+import { APP_VERSION, AppContext, type AppState } from './app/context'
+import { archivePayload, openArchiveDb } from './archive/mode'
+import { backups } from './backup/scheduler'
 import { AskPage } from './components/AskPage'
 import { ConsentGate } from './components/ConsentGate'
 import { EraseDialog } from './components/EraseDialog'
@@ -10,6 +12,8 @@ import { SettingsPage } from './components/SettingsPage'
 import { hasConsent } from './consent/consent'
 import { Database } from './db/db'
 import { genotypeCounts, listPersons, listRelationships } from './db/repo'
+import { readHeader } from './export/container'
+import { restoreBytes } from './export/restore'
 import { type Kb, loadKb } from './kb/kb'
 
 type Page =
@@ -27,7 +31,13 @@ export function App() {
   const [consented, setConsented] = useState(false)
   const [page, setPage] = useState<Page>({ name: 'people' })
   const [erasing, setErasing] = useState(false)
+  // Archive mode: the embedded payload waits here until the user supplies its passphrase.
+  const [locked, setLocked] = useState<{ bytes: Uint8Array; load: (pass?: string) => Promise<void> } | null>(
+    null,
+  )
+  const archive = archivePayload()
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: the payload is fixed for the page's life
   useEffect(() => {
     let db: Database
     let kb: Kb
@@ -41,10 +51,25 @@ export function App() {
     }
     ;(async () => {
       try {
-        ;[db, kb] = await Promise.all([Database.open(() => setTakenOver(true)), loadKb()])
+        ;[db, kb] = await Promise.all([
+          archive ? openArchiveDb() : Database.open({ onTakenOver: () => setTakenOver(true) }),
+          loadKb(),
+        ])
         if (import.meta.env.DEV) (window as unknown as { __hearth: unknown }).__hearth = { db }
-        setConsented(await hasConsent(db, 'first_launch'))
-        await refresh()
+        if (archive) {
+          const load = async (pass?: string) => {
+            await restoreBytes(db, archive, pass)
+            setLocked(null)
+            setConsented(await hasConsent(db, 'first_launch'))
+            await refresh()
+          }
+          if (readHeader(archive)?.encrypted) setLocked({ bytes: archive, load })
+          else await load()
+        } else {
+          await backups.start(db, APP_VERSION)
+          setConsented(await hasConsent(db, 'first_launch'))
+          await refresh()
+        }
       } catch (e) {
         setError(String(e))
       }
@@ -68,13 +93,14 @@ export function App() {
         <div className="card danger">Could not start: {error}</div>
       </main>
     )
+  if (locked) return <ArchiveGate onUnlock={locked.load} />
   if (!state)
     return (
       <main>
-        <p className="muted">Opening local database…</p>
+        <p className="muted">{archive ? 'Opening archive…' : 'Opening local database…'}</p>
       </main>
     )
-  if (!state.db.persistent && !memoryOk)
+  if (!state.db.persistent && !memoryOk && !archive)
     return (
       <main>
         <div className="card">
@@ -120,14 +146,24 @@ export function App() {
         </nav>
         <span className="status">
           {state.persons.length} people · kb {state.kb.version} ·{' '}
-          {state.db.persistent ? 'stored on this device' : 'memory only — export before closing'}
+          {archive
+            ? 'archive, in memory'
+            : state.db.persistent
+              ? 'stored on this device'
+              : 'memory only — export before closing'}
         </span>
         <button type="button" className="danger small" onClick={() => setErasing(true)}>
           Erase data
         </button>
       </header>
       {erasing && <EraseDialog onClose={() => setErasing(false)} />}
-      {!state.db.persistent && (
+      {archive && (
+        <div className="banner">
+          Archive opened in memory. Nothing is stored in this browser; changes are kept only if you save a new
+          archive from Settings.
+        </div>
+      )}
+      {!state.db.persistent && !archive && (
         <div className="banner danger">
           Not saving: this session runs in memory and everything disappears on reload. Export a dump from
           Settings before closing.
@@ -141,5 +177,46 @@ export function App() {
         {page.name === 'settings' && <SettingsPage />}
       </main>
     </AppContext.Provider>
+  )
+}
+
+/** Passphrase prompt shown before anything else when an archive's payload is encrypted. */
+function ArchiveGate({ onUnlock }: { onUnlock: (pass: string) => Promise<void> }) {
+  const [pass, setPass] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [busy, setBusy] = useState(false)
+  const submit = async () => {
+    setBusy(true)
+    setError(null)
+    try {
+      await onUnlock(pass)
+    } catch {
+      setError('Wrong passphrase.')
+      setBusy(false)
+    }
+  }
+  return (
+    <main>
+      <div className="card">
+        <h2 style={{ marginTop: 0 }}>This archive is encrypted</h2>
+        <p className="muted">Enter the passphrase it was saved with. Nothing is stored in this browser.</p>
+        <div className="row">
+          <label className="field">
+            Passphrase
+            <input
+              type="password"
+              value={pass}
+              disabled={busy}
+              onChange={(e) => setPass(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && submit()}
+            />
+          </label>
+          <button type="button" className="primary" onClick={submit} disabled={busy || !pass}>
+            {busy ? 'Opening…' : 'Open'}
+          </button>
+        </div>
+        {error && <p className="danger">{error}</p>}
+      </div>
+    </main>
   )
 }

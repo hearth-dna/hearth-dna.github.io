@@ -4,8 +4,9 @@ import { buildContextPack, packStats } from '../ask/contextPack'
 import { PROMPTS } from '../ask/prompts'
 import { retrieveForQuestion } from '../ask/retrieve'
 import { listHealthLog, logSharing, newId, now, personCallsFor } from '../db/repo'
+import { describeEntry } from '../health/log'
 import { computeFindings, type Finding } from '../kb/kb'
-import { HEALTH_KIND_LABELS, type HealthEntry } from '../types'
+import type { HealthEntry } from '../types'
 
 /**
  * Ask, tiers 0 and 2 (docs/design.md §6.3): local retrieval builds a context pack; the user
@@ -154,7 +155,7 @@ export function AskPage() {
               <ul>
                 {health.map((h) => (
                   <li key={h.id}>
-                    {h.date} · {HEALTH_KIND_LABELS[h.kind]} · {h.title}{' '}
+                    {describeEntry(h)}{' '}
                     <button
                       type="button"
                       onClick={() => setExcluded(new Set([...excluded, `${person.id}:${h.id}`]))}

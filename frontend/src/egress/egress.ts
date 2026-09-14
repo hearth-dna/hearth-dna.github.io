@@ -18,7 +18,7 @@ export interface ConfirmedSend {
 
 const ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages'
 const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models'
-export const GEMINI_DEFAULT_MODEL = 'gemini-2.5-flash'
+export const GEMINI_DEFAULT_MODEL = 'gemini-3.8-flash'
 
 export interface DocumentPart {
   mime: string

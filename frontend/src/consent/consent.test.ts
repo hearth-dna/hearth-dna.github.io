@@ -7,6 +7,9 @@ function fakeDb() {
   const log: [string, unknown[] | undefined][] = []
   const db = {
     exec: async (sql: string, bind?: unknown[]) => void log.push([sql, bind]),
+    query: async () => [],
+    fileList: async () => [],
+    fileDelete: async () => {},
     one: async () => undefined, // no consent in force unless a test overrides it
   } as unknown as Database
   return { db, log }

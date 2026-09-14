@@ -1,3 +1,4 @@
+import { formatTags, parseTags } from '../health/log'
 import type { Call, HealthEntry, HealthKind, Person, Provider, Sex, SourceFile } from '../types'
 import type { Database, Row } from './db'
 
@@ -49,6 +50,7 @@ export async function updatePerson(
 
 export async function deletePerson(db: Database, id: string): Promise<void> {
   await db.exec('DELETE FROM person WHERE id = ?', [id])
+  await pruneGenomeBlobs(db)
 }
 
 function rowToPerson(r: Row): Person {
@@ -86,6 +88,18 @@ export async function importCalls(
   onProgress?: (n: number) => void,
 ): Promise<SourceFile> {
   const sf: SourceFile = { id: newId(), personId, rowCount: calls.length, importedAt: now(), ...meta }
+  await storeCalls(db, personId, calls, onProgress)
+  await insertSourceFile(db, sf)
+  return sf
+}
+
+/** Genotype rows only; the source_file row is the caller's business (restores keep the original). */
+export async function storeCalls(
+  db: Database,
+  personId: string,
+  calls: Call[],
+  onProgress?: (n: number) => void,
+): Promise<void> {
   await db.bulkInsert(
     'genotype',
     ['person_id', 'rsid', 'chromosome', 'position', 'a1', 'a2'],
@@ -97,11 +111,24 @@ export async function importCalls(
       after: 'CREATE INDEX IF NOT EXISTS genotype_rsid ON genotype(rsid)',
     },
   )
+}
+
+export async function insertSourceFile(db: Database, sf: SourceFile): Promise<void> {
   await db.exec(
-    'INSERT INTO source_file(id,person_id,provider,build,sha256,original_name,row_count,imported_at) VALUES (?,?,?,?,?,?,?,?)',
+    'INSERT OR IGNORE INTO source_file(id,person_id,provider,build,sha256,original_name,row_count,imported_at) VALUES (?,?,?,?,?,?,?,?)',
     [sf.id, sf.personId, sf.provider, sf.build, sf.sha256, sf.originalName, sf.rowCount, sf.importedAt],
   )
-  return sf
+}
+
+/** Where the gzipped original of a source file is cached next to the database (dump v2). */
+export const genomeBlobName = (sha256OfText: string) => `genome-${sha256OfText}.gz`
+
+/** Drops cached originals no source_file row refers to any more (after delete, revoke, erase). */
+export async function pruneGenomeBlobs(db: Database): Promise<void> {
+  const keep = new Set((await listSourceFiles(db)).map((s) => genomeBlobName(s.sha256)))
+  for (const name of await db.fileList()) {
+    if (name.startsWith('genome-') && !keep.has(name)) await db.fileDelete(name)
+  }
 }
 
 export async function listSourceFiles(db: Database): Promise<SourceFile[]> {
@@ -247,17 +274,40 @@ export async function listHealthLog(db: Database, personId: string): Promise<Hea
     title: r.title as string,
     body: r.body as string,
     source: r.source as string,
+    bodyPart: r.body_part as string,
+    severity: (r.severity as number | null) ?? null,
+    tags: parseTags(r.tags as string),
     createdAt: r.created_at as string,
   }))
 }
 
 export async function addHealthEntry(
   db: Database,
-  e: { personId: string; date: string; kind: HealthKind; title: string; body: string; source?: string },
+  e: {
+    personId: string
+    date: string
+    kind: HealthKind
+    title: string
+    body: string
+    source?: string
+    bodyPart?: string
+    severity?: number | null
+    tags?: string[]
+  },
 ): Promise<HealthEntry> {
-  const entry: HealthEntry = { id: newId(), createdAt: now(), source: '', ...e }
+  const entry: HealthEntry = {
+    id: newId(),
+    createdAt: now(),
+    source: '',
+    bodyPart: '',
+    severity: null,
+    tags: [],
+    ...e,
+  }
+  entry.bodyPart = entry.bodyPart.trim().toLowerCase()
+  entry.tags = parseTags(formatTags(entry.tags))
   await db.exec(
-    'INSERT INTO health_log(id,person_id,date,kind,title,body,source,created_at) VALUES (?,?,?,?,?,?,?,?)',
+    'INSERT INTO health_log(id,person_id,date,kind,title,body,source,body_part,severity,tags,created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)',
     [
       entry.id,
       entry.personId,
@@ -266,6 +316,9 @@ export async function addHealthEntry(
       entry.title,
       entry.body,
       entry.source,
+      entry.bodyPart,
+      entry.severity,
+      formatTags(entry.tags),
       entry.createdAt,
     ],
   )
@@ -306,7 +359,8 @@ export async function eraseEverything(db: Database): Promise<void> {
   ]) {
     await db.exec(`DELETE FROM ${t}`)
   }
-  await db.exec("DELETE FROM meta WHERE key != 'schema_version'")
+  await db.exec("DELETE FROM meta WHERE key NOT IN ('schema_version', 'device')")
+  await pruneGenomeBlobs(db)
 }
 
 export async function logSharing(

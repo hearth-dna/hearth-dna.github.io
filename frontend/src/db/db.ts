@@ -8,9 +8,21 @@ export type Row = Record<string, unknown>
 
 type Pending = { resolve: (v: unknown) => void; reject: (e: Error) => void; onProgress?: (n: number) => void }
 
+export interface OpenOptions {
+  /** Fires if a newer tab claims the database; this instance is dead from then on. */
+  onTakenOver?: () => void
+  /** Memory only, no lock, no OPFS: the portable archive. */
+  memory?: boolean
+  /** Where sqlite3.wasm lives when the worker cannot find it next to itself (inline worker). */
+  wasmUrl?: string
+  /** A worker constructor other than the bundled module worker (the archive inlines it). */
+  worker?: () => Worker
+}
+
 export class Database {
   private nextId = 1
   private readonly pending = new Map<number, Pending>()
+  private readonly listeners = new Set<() => void>()
 
   private constructor(
     private readonly worker: Worker,
@@ -24,12 +36,9 @@ export class Database {
   /** How long a new tab waits for the owner to hand over before stealing the lock. */
   static readonly TAKEOVER_GRACE_MS = 1500
 
-  /**
-   * Singleton: React StrictMode runs effects twice in dev, and the OPFS VFS allows one connection.
-   * `onTakenOver` fires if a newer tab claims the database; this instance is dead from then on.
-   */
-  static open(onTakenOver?: () => void): Promise<Database> {
-    Database.instance ??= Database.openOnce(onTakenOver)
+  /** Singleton: React StrictMode runs effects twice in dev, and the OPFS VFS allows one connection. */
+  static open(opts: OpenOptions = {}): Promise<Database> {
+    Database.instance ??= Database.openOnce(opts)
     return Database.instance
   }
 
@@ -39,51 +48,56 @@ export class Database {
     return /^[a-z0-9_-]{1,32}$/i.test(p) ? p : 'default'
   }
 
-  private static async openOnce(onTakenOver?: () => void): Promise<Database> {
+  private static async openOnce(opts: OpenOptions): Promise<Database> {
     const profile = Database.profile()
     const name = `hearth-db-${profile}`
-    // One tab owns the database at a time: the OPFS SAH pool needs exclusive handles. The newest
-    // tab always wins (WhatsApp Web style): it asks the current owner to let go over a
-    // BroadcastChannel and waits briefly for the Web Lock; if the owner does not answer — a tab
-    // running older code, or a parked page — it steals the lock. The browser also releases the
-    // lock when the owning tab closes.
-    const channel = new BroadcastChannel(name)
-    channel.postMessage('takeover')
     let release = () => {}
+    let channel: BroadcastChannel | null = null
     let lost = () => {} // called when a newer tab steals our lock
-    const hold = (lock: Lock | null) => {
-      if (!lock) return
-      return new Promise<void>((r) => {
-        release = r
-      })
-    }
-    let stealing = false
-    const acquired = await new Promise<boolean>((resolve) => {
-      const timer = setTimeout(() => resolve(false), Database.TAKEOVER_GRACE_MS)
-      navigator.locks
-        .request(name, (lock) => {
-          clearTimeout(timer)
-          resolve(true)
-          return hold(lock)
+    if (!opts.memory) {
+      // One tab owns the database at a time: the OPFS SAH pool needs exclusive handles. The newest
+      // tab always wins (WhatsApp Web style): it asks the current owner to let go over a
+      // BroadcastChannel and waits briefly for the Web Lock; if the owner does not answer — a tab
+      // running older code, or a parked page — it steals the lock. The browser also releases the
+      // lock when the owning tab closes.
+      channel = new BroadcastChannel(name)
+      channel.postMessage('takeover')
+      const hold = (lock: Lock | null) => {
+        if (!lock) return
+        return new Promise<void>((r) => {
+          release = r
         })
-        // Rejects when a newer tab steals from us — or when we steal ourselves (then ignore).
-        .catch(() => !stealing && lost())
-    })
-    if (!acquired) {
-      stealing = true
-      await new Promise<void>((resolve) => {
+      }
+      let stealing = false
+      const acquired = await new Promise<boolean>((resolve) => {
+        const timer = setTimeout(() => resolve(false), Database.TAKEOVER_GRACE_MS)
         navigator.locks
-          .request(name, { steal: true }, (lock) => {
-            resolve()
+          .request(name, (lock) => {
+            clearTimeout(timer)
+            resolve(true)
             return hold(lock)
           })
-          .catch(() => lost())
+          // Rejects when a newer tab steals from us — or when we steal ourselves (then ignore).
+          .catch(() => !stealing && lost())
       })
-      // The previous owner learns of the steal asynchronously; let it terminate its worker
-      // before we ask OPFS for the same access handles.
-      await new Promise((r) => setTimeout(r, 300))
+      if (!acquired) {
+        stealing = true
+        await new Promise<void>((resolve) => {
+          navigator.locks
+            .request(name, { steal: true }, (lock) => {
+              resolve()
+              return hold(lock)
+            })
+            .catch(() => lost())
+        })
+        // The previous owner learns of the steal asynchronously; let it terminate its worker
+        // before we ask OPFS for the same access handles.
+        await new Promise((r) => setTimeout(r, 300))
+      }
     }
-    const worker = new Worker(new URL('./db.worker.ts', import.meta.url), { type: 'module' })
+    const worker = opts.worker
+      ? opts.worker()
+      : new Worker(new URL('./db.worker.ts', import.meta.url), { type: 'module' })
     const db = new Database(worker, false)
     let ready: Database | undefined // assigned after the open handshake; shutdown may run before
     const shutdown = () => {
@@ -97,16 +111,18 @@ export class Database {
     window.addEventListener('pagehide', shutdown)
     const takenOver = () => {
       shutdown()
-      onTakenOver?.()
+      opts.onTakenOver?.()
     }
-    channel.onmessage = (ev) => ev.data === 'takeover' && takenOver()
+    if (channel) channel.onmessage = (ev) => ev.data === 'takeover' && takenOver()
     lost = takenOver
     worker.onmessage = (ev) => db.onMessage(ev.data)
-    const { persistent, reason } = (await db.send({ op: 'open', profile })) as {
-      persistent: boolean
-      reason: string
-    }
-    if (!persistent) console.warn('[hearth db] not persistent —', reason)
+    const { persistent, reason } = (await db.send({
+      op: 'open',
+      profile,
+      memory: opts.memory,
+      wasmUrl: opts.wasmUrl,
+    })) as { persistent: boolean; reason: string }
+    if (!persistent && !opts.memory) console.warn('[hearth db] not persistent —', reason)
     ready = new Database(worker, persistent, reason)
     // Re-point the worker at the final instance's pending map.
     worker.onmessage = (ev) => ready.onMessage(ev.data)
@@ -119,11 +135,21 @@ export class Database {
       'DELETE FROM consent WHERE id NOT IN (SELECT MIN(id) FROM consent GROUP BY kind, version, subject)',
     )
     // Additive column migrations: CREATE TABLE IF NOT EXISTS leaves existing tables untouched.
-    await ready.exec("ALTER TABLE health_log ADD COLUMN source TEXT NOT NULL DEFAULT ''").catch(() => {})
+    for (const col of [
+      "source TEXT NOT NULL DEFAULT ''",
+      "body_part TEXT NOT NULL DEFAULT ''",
+      'severity INTEGER',
+      "tags TEXT NOT NULL DEFAULT ''",
+    ]) {
+      await ready.exec(`ALTER TABLE health_log ADD COLUMN ${col}`).catch(() => {})
+    }
     await ready.exec('INSERT OR IGNORE INTO meta(key, value) VALUES (?, ?)', [
       'schema_version',
       String(SCHEMA_VERSION),
     ])
+    // Identifies this browser profile in backup headers (random, not derived from hardware).
+    await ready.exec('INSERT OR IGNORE INTO meta(key, value) VALUES (?, ?)', ['device', crypto.randomUUID()])
+    await ready.exec('INSERT OR IGNORE INTO meta(key, value) VALUES (?, ?)', ['generation', '0'])
     return ready
   }
 
@@ -152,8 +178,19 @@ export class Database {
     })
   }
 
+  /** Called after every write to user data (the worker bumps meta.generation at the same time). */
+  onChange(listener: () => void): () => void {
+    this.listeners.add(listener)
+    return () => this.listeners.delete(listener)
+  }
+
+  private changed() {
+    for (const l of this.listeners) l()
+  }
+
   async exec(sql: string, bind?: unknown[]): Promise<void> {
     await this.send({ op: 'exec', sql, bind })
+    if (/^\s*(INSERT|UPDATE|DELETE|REPLACE)\b/i.test(sql) && !/\bmeta\b/i.test(sql)) this.changed()
   }
 
   async query<T extends Row = Row>(sql: string, bind?: unknown[]): Promise<T[]> {
@@ -178,5 +215,29 @@ export class Database {
       opts.onProgress,
     )
     opts.onProgress?.(rows.length)
+    this.changed()
+  }
+
+  // ---- file cache next to the database (original genome files, see dump-v2.md) ---------------
+
+  async filePut(name: string, bytes: Uint8Array): Promise<void> {
+    await this.send({ op: 'file-put', name, bytes })
+  }
+
+  async fileGet(name: string): Promise<Uint8Array | null> {
+    return (await this.send({ op: 'file-get', name })) as Uint8Array | null
+  }
+
+  async fileDelete(name: string): Promise<void> {
+    await this.send({ op: 'file-delete', name })
+  }
+
+  async fileList(): Promise<string[]> {
+    return (await this.send({ op: 'file-list' })) as string[]
+  }
+
+  /** A person's genotypes as generic provider text, built inside the worker. */
+  async genomeText(personId: string): Promise<string> {
+    return (await this.send({ op: 'genome-text', personId })) as string
   }
 }

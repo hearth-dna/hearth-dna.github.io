@@ -27,6 +27,8 @@ export interface Kb {
 }
 
 export async function loadKb(): Promise<Kb> {
+  // The archive build bundles the knowledge base; file:// pages cannot fetch a sibling file.
+  if (__HEARTH_ARCHIVE__) return (await import('../../public/kb.json')).default as unknown as Kb
   const res = await fetchOwnAsset('/kb.json')
   if (!res.ok) throw new Error('kb.json missing — run make kb-build')
   return (await res.json()) as Kb

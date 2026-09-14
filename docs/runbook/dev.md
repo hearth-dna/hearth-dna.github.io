@@ -33,3 +33,15 @@ test, upload a `.zip`/`.gz` (the raw `.txt` files are 16–27 MB; gzip them firs
 A 677k-row AncestryDNA file takes ~45 s end to end on a laptop: ~15 s unzip + parse + hash on the
 main thread, ~10 s literal-SQL insert in the SQLite worker, the rest rebuilding the rsid index.
 `docs/decisions/0002-sqlite-wasm-on-opfs.md` records what was measured and why binds were dropped.
+
+## Backups and the portable archive
+
+- `make frontend-build` builds the single-file archive template first (`frontend/dist-archive/archive.html`,
+  copied to `frontend/public/hearth-archive.html`, both gitignored) and then the hosted bundle. In
+  `make dev` the template is absent, so *Download portable archive* reports that until you build once.
+- To try an archive from `file://`: export one from Settings and double-click it, or splice a dump into
+  the template by hand (`archive/payload.ts` `splicePayload`). Chrome opens it directly; the worker is a
+  classic Blob worker because Chrome refuses module workers from `blob:` on `file://` pages.
+- The backup folder needs a Chromium browser and a real click on *Choose folder…*; use a temporary
+  folder, then *Back up now*, and check `hearth-backup.hearth` plus `README.txt` appear. `?profile=x`
+  changes the file name to `hearth-backup-x.hearth`.

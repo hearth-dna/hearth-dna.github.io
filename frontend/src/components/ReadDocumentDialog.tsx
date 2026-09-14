@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useApp } from '../app/context'
 import { grantConsent, hasConsent } from '../consent/consent'
-import { getMeta, logSharing, META_GEMINI_KEY, META_GEMINI_MODEL } from '../db/repo'
+import { getMeta, logSharing, META_GEMINI_KEY, META_GEMINI_MODEL, setMeta } from '../db/repo'
 import {
   DOCUMENT_HINTS,
   DOCUMENT_SCHEMA,
@@ -14,6 +14,7 @@ import { type DocumentPart, GEMINI_DEFAULT_MODEL, readDocumentWithGemini } from 
 import { sha256Hex } from '../import/unpack'
 import { HEALTH_KIND_LABELS, type Person } from '../types'
 import { ConsentForm } from './ConsentForm'
+import { GeminiKeySteps } from './GeminiKeySteps'
 
 const ACCEPT = 'image/jpeg,image/png,image/webp,image/heic,application/pdf'
 const MAX_BYTES = 15 * 1024 * 1024 // Gemini inline limit is 20 MB per request; keep headroom for base64
@@ -54,6 +55,7 @@ export function ReadDocumentDialog({
   const [files, setFiles] = useState<File[]>([])
   const [hint, setHint] = useState<DocumentHint>('auto')
   const [key, setKey] = useState<string | null>(null)
+  const [newKey, setNewKey] = useState('')
   const [model, setModel] = useState(GEMINI_DEFAULT_MODEL)
   const [consented, setConsented] = useState(false)
   const [stage, setStage] = useState<Stage>({ s: 'pick' })
@@ -107,9 +109,40 @@ export function ReadDocumentDialog({
     <dialog ref={ref} onClose={onClose}>
       <h2 style={{ marginTop: 0 }}>Read a document for {person.displayName}</h2>
       {key === null ? (
-        <p className="notice">
-          No Gemini API key is stored. Add one under Settings → Document reading, then come back.
-        </p>
+        <div>
+          <p className="notice">
+            To read a photo, scan or PDF, Hearth sends it from this browser to Google Gemini using a key that
+            belongs to you. You need to add that key once.
+          </p>
+          <GeminiKeySteps open />
+          <div className="row">
+            <label className="field">
+              API key
+              <input
+                type="password"
+                autoComplete="off"
+                placeholder="AIza…"
+                value={newKey}
+                onChange={(e) => setNewKey(e.target.value)}
+              />
+            </label>
+            <button
+              type="button"
+              className="primary"
+              disabled={!newKey.trim()}
+              onClick={async () => {
+                await setMeta(db, META_GEMINI_KEY, newKey.trim())
+                setKey(newKey.trim())
+                setNewKey('')
+              }}
+            >
+              Save
+            </button>
+            <button type="button" onClick={() => ref.current?.close()}>
+              Cancel
+            </button>
+          </div>
+        </div>
       ) : stage.s === 'consent' ? (
         <ConsentForm
           kind="read_document_byok"

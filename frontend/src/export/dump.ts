@@ -111,7 +111,7 @@ export async function gunzipBytes(bytes: Uint8Array): Promise<string> {
 const ENC_MAGIC = new TextEncoder().encode('HRTH1') // 5 bytes, then 16 salt, 12 nonce, ciphertext
 const PBKDF2_ITERATIONS = 600_000
 
-async function deriveKey(passphrase: string, salt: Uint8Array): Promise<CryptoKey> {
+export async function deriveKey(passphrase: string, salt: Uint8Array): Promise<CryptoKey> {
   const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(passphrase), 'PBKDF2', false, [
     'deriveKey',
   ])

@@ -1,5 +1,5 @@
 import { Database } from '../db/db'
-import { META_GEMINI_KEY, now, setMeta } from '../db/repo'
+import { META_GEMINI_KEY, now, pruneGenomeBlobs, setMeta } from '../db/repo'
 import { CONSENTS, type ConsentKind } from './kinds'
 
 /**
@@ -76,6 +76,7 @@ export async function revokeConsent(db: Database, kind: ConsentKind, subject = '
     await db.exec("DELETE FROM consent WHERE kind IN ('import_genome','import_minor') AND subject=?", [
       subject,
     ])
+    await pruneGenomeBlobs(db)
     return
   }
   await db.exec('DELETE FROM consent WHERE kind=? AND subject=?', [kind, subject])

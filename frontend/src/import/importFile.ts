@@ -1,5 +1,6 @@
+import { gzipSync, strToU8 } from 'fflate'
 import type { Database } from '../db/db'
-import { importCalls } from '../db/repo'
+import { genomeBlobName, importCalls } from '../db/repo'
 import { PROVIDER_LABELS, type Provider } from '../types'
 import { parseRawText } from './parseFile'
 import { detectProvider } from './providers'
@@ -36,6 +37,8 @@ export async function importGenomeFile(
         pct: 50 + (n / r.calls.length) * 50,
       }),
   )
+  // The original text is kept, gzipped, so backups ship it instead of re-serialising every row.
+  await db.filePut(genomeBlobName(sha256), gzipSync(strToU8(text)))
   return `${r.calls.length.toLocaleString()} calls from ${PROVIDER_LABELS[r.provider]} (build ${r.build}); ${r.skipped.toLocaleString()} no-calls skipped`
 }
 

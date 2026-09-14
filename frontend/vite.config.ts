@@ -29,6 +29,7 @@ export default defineConfig({
       },
     }),
   ],
+  define: { __HEARTH_ARCHIVE__: 'false' },
   optimizeDeps: { exclude: ['@sqlite.org/sqlite-wasm'] },
   server: {
     // OPFS + SharedArrayBuffer need cross-origin isolation. public/_headers sets the same in prod.

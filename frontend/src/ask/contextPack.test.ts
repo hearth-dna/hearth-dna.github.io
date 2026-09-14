@@ -78,6 +78,22 @@ describe('buildContextPack', () => {
               title: 'Lipid panel',
               body: 'LDL 4.1 mmol/L (ref < 3.0)\nHDL 1.2 mmol/L',
               source: '',
+              bodyPart: '',
+              severity: null,
+              tags: [],
+              createdAt: 't',
+            },
+            {
+              id: 'h2',
+              personId: 'p1',
+              date: '2026-04-20',
+              kind: 'symptom',
+              title: 'Aching hands in the morning',
+              body: '',
+              source: '',
+              bodyPart: 'hands',
+              severity: 5,
+              tags: ['arthritis'],
               createdAt: 't',
             },
           ],
@@ -87,9 +103,9 @@ describe('buildContextPack', () => {
       now,
     })
     expect(pack).toContain(
-      "### Health log (from the person's documents, dated)\n- 2026-05-01 · Lab result · Lipid panel\n  LDL 4.1 mmol/L (ref < 3.0)\n  HDL 1.2 mmol/L",
+      "### Health log (the person's documents and self-reported symptoms, dated)\n- 2026-05-01 · Lab result · Lipid panel\n  LDL 4.1 mmol/L (ref < 3.0)\n  HDL 1.2 mmol/L\n- 2026-04-20 · Symptom · Aching hands in the morning (hands; severity 5/10; arthritis)",
     )
-    expect(packStats(pack).healthEntries).toBe(1)
+    expect(packStats(pack).healthEntries).toBe(2)
   })
   it('counts genotypes for the sharing log', () => {
     const pack = buildContextPack({

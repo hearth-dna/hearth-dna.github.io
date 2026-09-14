@@ -6,7 +6,10 @@
 # Node.js (frontend/)
 node_modules/
 frontend/dist/
+frontend/dist-archive/
 frontend/dev-dist/
+# Built by `npm run build:archive`, served as a static asset of the main build
+frontend/public/hearth-archive.html
 /package.json
 /package-lock.json
 

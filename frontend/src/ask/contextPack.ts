@@ -1,5 +1,6 @@
+import { describeEntry } from '../health/log'
 import type { Finding } from '../kb/kb'
-import { HEALTH_KIND_LABELS, type HealthEntry, type Person } from '../types'
+import type { HealthEntry, Person } from '../types'
 import { ASSISTANT_INSTRUCTIONS, type PromptTemplate } from './prompts'
 
 /**
@@ -54,10 +55,10 @@ export function buildContextPack(o: PackOptions): string {
       )
     }
     if (pp.health?.length) {
-      lines.push("### Health log (from the person's documents, dated)")
+      lines.push("### Health log (the person's documents and self-reported symptoms, dated)")
       for (const h of pp.health) {
         const body = h.body.trim().replace(/\n/g, '\n  ')
-        lines.push(`- ${h.date} · ${HEALTH_KIND_LABELS[h.kind]} · ${h.title}${body ? `\n  ${body}` : ''}`)
+        lines.push(`- ${describeEntry(h)}${body ? `\n  ${body}` : ''}`)
       }
     }
     for (const n of pp.notes ?? []) lines.push(`- Note: ${n}`)

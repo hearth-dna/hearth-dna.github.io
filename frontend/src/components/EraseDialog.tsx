@@ -6,7 +6,7 @@ import { exportDumpFile } from '../export/exportDump'
 
 /** Erase-everything confirmation that offers a dump export first; erasing reloads to the gate. */
 export function EraseDialog({ onClose }: { onClose: () => void }) {
-  const { db, persons, relationships } = useApp()
+  const { db, persons } = useApp()
   const ref = useRef<HTMLDialogElement>(null)
   const [pass, setPass] = useState('')
   const [msg, setMsg] = useState<string | null>(null)
@@ -18,7 +18,7 @@ export function EraseDialog({ onClose }: { onClose: () => void }) {
   const exportFirst = async () => {
     setBusy(true)
     try {
-      setMsg(await exportDumpFile(db, APP_VERSION, persons, relationships, pass))
+      setMsg(await exportDumpFile(db, APP_VERSION, pass))
     } catch (e) {
       setMsg(`Export failed: ${e}`)
     } finally {
