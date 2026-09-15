@@ -140,6 +140,9 @@ export class Database {
       "body_part TEXT NOT NULL DEFAULT ''",
       'severity INTEGER',
       "tags TEXT NOT NULL DEFAULT ''",
+      'value REAL',
+      'value2 REAL',
+      "unit TEXT NOT NULL DEFAULT ''",
     ]) {
       await ready.exec(`ALTER TABLE health_log ADD COLUMN ${col}`).catch(() => {})
     }

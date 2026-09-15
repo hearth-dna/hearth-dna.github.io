@@ -277,6 +277,9 @@ export async function listHealthLog(db: Database, personId: string): Promise<Hea
     bodyPart: r.body_part as string,
     severity: (r.severity as number | null) ?? null,
     tags: parseTags(r.tags as string),
+    value: (r.value as number | null) ?? null,
+    value2: (r.value2 as number | null) ?? null,
+    unit: (r.unit as string) ?? '',
     createdAt: r.created_at as string,
   }))
 }
@@ -293,6 +296,9 @@ export async function addHealthEntry(
     bodyPart?: string
     severity?: number | null
     tags?: string[]
+    value?: number | null
+    value2?: number | null
+    unit?: string
   },
 ): Promise<HealthEntry> {
   const entry: HealthEntry = {
@@ -302,12 +308,16 @@ export async function addHealthEntry(
     bodyPart: '',
     severity: null,
     tags: [],
+    value: null,
+    value2: null,
+    unit: '',
     ...e,
   }
   entry.bodyPart = entry.bodyPart.trim().toLowerCase()
   entry.tags = parseTags(formatTags(entry.tags))
+  entry.unit = entry.unit.trim()
   await db.exec(
-    'INSERT INTO health_log(id,person_id,date,kind,title,body,source,body_part,severity,tags,created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)',
+    'INSERT INTO health_log(id,person_id,date,kind,title,body,source,body_part,severity,tags,value,value2,unit,created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
     [
       entry.id,
       entry.personId,
@@ -319,6 +329,9 @@ export async function addHealthEntry(
       entry.bodyPart,
       entry.severity,
       formatTags(entry.tags),
+      entry.value,
+      entry.value2,
+      entry.unit,
       entry.createdAt,
     ],
   )

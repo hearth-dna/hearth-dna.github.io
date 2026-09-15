@@ -224,10 +224,14 @@ kb fields at tier 0, so the user gets a decision frame even without any LLM.
 
 ### 6.4 Medical documents — processed locally, never stored remotely
 - **Shipped first (health log):** a per-person `health_log(id, person_id, date, kind, title, body,
-  body_part, severity, tags)` of dated text entries — lab result, diagnosis, medication, doctor
-  letter, or a self-reported **symptom** ("pain in both hands", body part `hands`, severity 6/10,
-  tags `arthritis`) — typed or pasted from the paper. Body part and tags (conditions, diseases,
-  free labels) apply to any kind and drive the log's filters (kind, body part, tag, text search).
+  body_part, severity, tags, value, value2, unit)` of dated entries — lab result, diagnosis,
+  medication, doctor letter, a self-reported **symptom** ("pain in both hands", body part `hands`,
+  severity 6/10, tags `arthritis`), or a home **measurement** stored as numbers (`value`, a second
+  `value2` for pairs like blood pressure, and `unit`: 37.8 °C, 120/80 mmHg, 71.5 kg) — typed or
+  pasted from the paper. A preset list (`health/presets.ts`: common measurements, symptoms such as
+  nosebleed or headache, events such as vaccination) prefills the form; custom entries stay free
+  text. Body part and tags (conditions, diseases, free labels) apply to any kind and drive the
+  log's filters (kind, body part, tag, text search).
   Gated by the `import_document` consent; part of the dump; offered entry-by-entry to the Ask
   context pack under "Health log". The steps below build on it.
 - **Shipped second (BYOK document reader):** "Read a document" sends the photo/scan/PDF straight

@@ -40,12 +40,22 @@ export interface Person {
 
 /**
  * One dated entry in a person's health log: a lab report, diagnosis, medication or letter as text,
- * or a symptom the person noticed themselves ("pain in both hands since morning").
+ * a symptom the person noticed themselves ("pain in both hands since morning"), or a measurement
+ * they took at home (temperature 37.8 °C, blood pressure 120/80 mmHg).
  */
-export type HealthKind = 'symptom' | 'lab' | 'imaging' | 'diagnosis' | 'medication' | 'letter' | 'other'
+export type HealthKind =
+  | 'symptom'
+  | 'measurement'
+  | 'lab'
+  | 'imaging'
+  | 'diagnosis'
+  | 'medication'
+  | 'letter'
+  | 'other'
 
 export const HEALTH_KIND_LABELS: Record<HealthKind, string> = {
   symptom: 'Symptom',
+  measurement: 'Measurement',
   lab: 'Lab result',
   imaging: 'Imaging report',
   diagnosis: 'Diagnosis',
@@ -102,6 +112,12 @@ export interface HealthEntry {
   severity: number | null
   /** Conditions, diseases or free labels this entry relates to, e.g. ['arthritis', 'flare']. */
   tags: string[]
+  /** Measured number (temperature, weight, systolic pressure…); null for text-only entries. */
+  value: number | null
+  /** Second number of a pair, e.g. diastolic pressure; null otherwise. */
+  value2: number | null
+  /** Unit of `value`, e.g. '°C', 'mmHg'; '' when there is no value. */
+  unit: string
   createdAt: string
 }
 

@@ -85,6 +85,9 @@ const HEALTH_COLS = [
   'body_part',
   'severity',
   'tags',
+  'value',
+  'value2',
+  'unit',
   'created_at',
 ]
 const PERSON_COLS = ['id', 'label', 'display_name', 'sex', 'birth_year', 'notes', 'created_at']
@@ -92,7 +95,16 @@ const NOTE_COLS = ['id', 'person_id', 'topic', 'markdown', 'updated_at']
 const CHAT_COLS = ['id', 'person_ids', 'question', 'context_pack', 'answer', 'tier', 'created_at']
 
 function withDefaults(rows: Rows): Rows {
-  return rows.map((h) => ({ source: '', body_part: '', severity: null, tags: '', ...h }))
+  return rows.map((h) => ({
+    source: '',
+    body_part: '',
+    severity: null,
+    tags: '',
+    value: null,
+    value2: null,
+    unit: '',
+    ...h,
+  }))
 }
 
 async function restoreContainer(db: Database, c: Container, onProgress: Progress): Promise<RestoreResult> {

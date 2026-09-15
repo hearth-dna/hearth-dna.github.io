@@ -32,7 +32,8 @@ CREATE TABLE IF NOT EXISTS health_log (
   id TEXT PRIMARY KEY, person_id TEXT NOT NULL REFERENCES person(id) ON DELETE CASCADE,
   date TEXT NOT NULL, kind TEXT NOT NULL, title TEXT NOT NULL, body TEXT NOT NULL,
   source TEXT NOT NULL DEFAULT '', body_part TEXT NOT NULL DEFAULT '', severity INTEGER,
-  tags TEXT NOT NULL DEFAULT '', created_at TEXT NOT NULL
+  tags TEXT NOT NULL DEFAULT '', value REAL, value2 REAL, unit TEXT NOT NULL DEFAULT '',
+  created_at TEXT NOT NULL
 );
 CREATE TABLE IF NOT EXISTS note (
   id TEXT PRIMARY KEY, person_id TEXT, topic TEXT NOT NULL, markdown TEXT NOT NULL, updated_at TEXT NOT NULL
