@@ -43,16 +43,26 @@ export async function openArchiveDb(): Promise<Database> {
   return Database.open({ memory: true, worker: makeWorker, wasmUrl })
 }
 
+/** What was written: the file name and its size in MB (one decimal), for the status line. */
+export interface ArchiveFile {
+  name: string
+  mb: string
+}
+
 export const archiveFileName = (passphrase?: string) =>
   `hearth-${new Date().toISOString().slice(0, 10)}${passphrase ? '' : '-plaintext'}.html`
 
 /** In archive mode: this page's own HTML with the current data spliced in. */
-export async function saveArchive(db: Database, appVersion: string, passphrase?: string): Promise<string> {
+export async function saveArchive(
+  db: Database,
+  appVersion: string,
+  passphrase?: string,
+): Promise<ArchiveFile> {
   const bytes = await snapshotBytes(db, appVersion, passphrase)
   const html = splicePayload(pristine, encodePayload(bytes))
   const name = archiveFileName(passphrase)
   downloadBytes(new TextEncoder().encode(html), name, 'text/html')
-  return `Saved ${name} (${(html.length / 1024 / 1024).toFixed(1)} MB).`
+  return { name, mb: (html.length / 1024 / 1024).toFixed(1) }
 }
 
 /** In the hosted app: the built template (a static asset) with the current data spliced in. */
@@ -60,7 +70,7 @@ export async function downloadArchive(
   db: Database,
   appVersion: string,
   passphrase?: string,
-): Promise<string> {
+): Promise<ArchiveFile> {
   const res = await fetchOwnAsset('/hearth-archive.html')
   if (!res.ok) throw new Error('the archive template is not part of this build (make frontend-build)')
   const template = await res.text()
@@ -68,5 +78,5 @@ export async function downloadArchive(
   const html = splicePayload(template, encodePayload(bytes))
   const name = archiveFileName(passphrase)
   downloadBytes(new TextEncoder().encode(html), name, 'text/html')
-  return `Downloaded ${name} (${(html.length / 1024 / 1024).toFixed(1)} MB). Double-click it in any desktop browser.`
+  return { name, mb: (html.length / 1024 / 1024).toFixed(1) }
 }

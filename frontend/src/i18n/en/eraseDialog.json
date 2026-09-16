@@ -1,0 +1,10 @@
+{
+  "eraseDialog.title": "Erase all data on this device?",
+  "eraseDialog.intro": "This deletes all people, genotypes, consents, notes and logs from this browser. Hearth keeps no copy anywhere, so there is nothing to recover afterwards.",
+  "eraseDialog.exportFirst": "<b>Export first.</b> Save a dump to your files now; you can import it later from Settings & export to get everything back, on this device or another.",
+  "eraseDialog.passphrase": "Passphrase (optional, encrypts the dump)",
+  "eraseDialog.exportDump": "Export dump",
+  "eraseDialog.exportFailed": "Export failed: {error}",
+  "eraseDialog.eraseFailed": "Erase failed: {error}",
+  "eraseDialog.eraseEverything": "Erase everything"
+}

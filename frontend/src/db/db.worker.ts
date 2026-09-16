@@ -28,7 +28,7 @@ type Req =
   | { id: number; op: 'file-get'; name: string }
   | { id: number; op: 'file-delete'; name: string }
   | { id: number; op: 'file-list' }
-  | { id: number; op: 'genome-text'; personId: string }
+  | { id: number; op: 'genome-gz'; personId: string }
 
 type Res =
   | { id: number; ok: true; result?: unknown }
@@ -148,9 +148,15 @@ async function fileList(): Promise<string[]> {
 }
 
 /**
- * A person's genotypes as generic provider text, built here so millions of rows never cross to
- * the main thread. Used when the original file was not cached (data imported before dump v2).
+ * A person's genotypes as gzipped generic provider text, built and compressed here so millions
+ * of rows never cross to the main thread. Used when the original file was not cached (data
+ * imported before dump v2).
  */
+async function genomeGz(personId: string): Promise<Uint8Array> {
+  const stream = new Blob([genomeText(personId)]).stream().pipeThrough(new CompressionStream('gzip'))
+  return new Uint8Array(await new Response(stream).arrayBuffer())
+}
+
 function genomeText(personId: string): string {
   const lines = ['# Hearth export: rsid chromosome position genotype (forward strand)']
   const stmt = db.prepare(
@@ -200,8 +206,8 @@ function handle(req: Req): unknown {
       return fileDelete(req.name)
     case 'file-list':
       return fileList()
-    case 'genome-text':
-      return genomeText(req.personId)
+    case 'genome-gz':
+      return genomeGz(req.personId)
     case 'bulk': {
       // Sorting by the primary-key columns turns random B-tree inserts into appends; with the
       // rsid index dropped for the duration (see repo.importCalls) a 700k-row genome lands in

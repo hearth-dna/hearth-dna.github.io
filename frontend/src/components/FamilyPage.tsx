@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import { useApp } from '../app/context'
 import { type FamilyCall, familyAt } from '../db/repo'
+import { useT } from '../i18n/context'
 import { searchKb } from '../kb/kb'
 import { InheritanceTree } from './InheritanceTree'
 
 /** The `family_all` view: one rsid across everyone, plus kb search to find rsids by drug/condition. */
 export function FamilyPage() {
   const { db, kb, persons, relationships } = useApp()
+  const t = useT()
   const [q, setQ] = useState('')
   const [rows, setRows] = useState<FamilyCall[] | null>(null)
   const hits = searchKb(kb, q).slice(0, 12)
@@ -19,13 +21,13 @@ export function FamilyPage() {
 
   return (
     <div>
-      <h1>Family lookup</h1>
+      <h1>{t('familyPage.title')}</h1>
       <div className="card">
         <div className="row">
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="rs7903146, or a gene, drug or condition"
+            placeholder={t('familyPage.searchPlaceholder')}
             style={{ flex: 1, minWidth: '16rem' }}
             onKeyDown={(e) => e.key === 'Enter' && /^rs\d+$/i.test(q.trim()) && lookup(q.trim())}
           />
@@ -35,7 +37,7 @@ export function FamilyPage() {
             disabled={!/^rs\d+$/i.test(q.trim())}
             onClick={() => lookup(q.trim())}
           >
-            Look up
+            {t('familyPage.lookUp')}
           </button>
         </div>
         {hits.length > 0 && !/^rs\d+$/i.test(q.trim()) && (
@@ -64,20 +66,20 @@ export function FamilyPage() {
           </h2>
           {rows.length > 0 && relationships.length > 0 && (
             <>
-              <h3>Who inherited what</h3>
+              <h3>{t('familyPage.whoInherited')}</h3>
               <InheritanceTree calls={rows} entry={entry} />
             </>
           )}
           {rows.length === 0 ? (
-            <p className="muted">Not genotyped in any imported file.</p>
+            <p className="muted">{t('familyPage.notGenotyped')}</p>
           ) : (
             <table>
               <thead>
                 <tr>
-                  <th>Person</th>
-                  <th>Chr</th>
-                  <th>Position</th>
-                  <th>Genotype</th>
+                  <th>{t('familyPage.person')}</th>
+                  <th>{t('familyPage.chr')}</th>
+                  <th>{t('familyPage.position')}</th>
+                  <th>{t('familyPage.genotype')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -88,7 +90,9 @@ export function FamilyPage() {
                       <td>{p.displayName}</td>
                       <td>{r?.chromosome ?? '–'}</td>
                       <td>{r?.position ?? '–'}</td>
-                      <td>{r ? `${r.a1}/${r.a2}` : <span className="muted">not on chip</span>}</td>
+                      <td>
+                        {r ? `${r.a1}/${r.a2}` : <span className="muted">{t('familyPage.notOnChip')}</span>}
+                      </td>
                     </tr>
                   )
                 })}

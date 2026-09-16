@@ -6,6 +6,8 @@ import { getMeta, listSharing, META_GEMINI_KEY, META_GEMINI_MODEL, newId, setMet
 import { GEMINI_DEFAULT_MODEL } from '../egress/egress'
 import { exportDumpFile } from '../export/exportDump'
 import { restoreBytes } from '../export/restore'
+import { LANGUAGES, useI18n } from '../i18n/context'
+import { isLanguage } from '../i18n/languages'
 import { ArchiveCard } from './ArchiveCard'
 import { BackupCard } from './BackupCard'
 import { EraseDialog } from './EraseDialog'
@@ -13,6 +15,7 @@ import { GeminiKeySteps } from './GeminiKeySteps'
 
 export function SettingsPage() {
   const { db, persons, refresh } = useApp()
+  const { t, lang, setLang } = useI18n()
   const [pass, setPass] = useState('')
   const [msg, setMsg] = useState<string | null>(null)
   const [consents, setConsents] = useState<Awaited<ReturnType<typeof listConsents>>>([])
@@ -33,45 +36,52 @@ export function SettingsPage() {
   }, [db])
 
   const exportDump = async () => {
-    setMsg('Building dump…')
-    setMsg(await exportDumpFile(db, APP_VERSION, pass))
+    setMsg(t('settingsPage.buildingDump'))
+    const r = await exportDumpFile(db, APP_VERSION, pass)
+    setMsg(t(r.encrypted ? 'exportDump.encrypted' : 'exportDump.plaintext', { name: r.name, mb: r.mb }))
   }
 
   const importDump = async (file: File) => {
     try {
-      setMsg('Reading dump…')
+      setMsg(t('settingsPage.readingDump'))
       const bytes = new Uint8Array(await file.arrayBuffer())
-      const r = await restoreBytes(db, bytes, pass || undefined, setMsg)
+      const r = await restoreBytes(db, bytes, pass || undefined, (key, params) => setMsg(t(key, params)))
       await refresh()
       await reload()
-      setMsg(
-        `Imported ${r.people} new people and ${r.genomes} genomes from dump v${r.version} (${r.exportedAt}); people already here were left unchanged.`,
-      )
+      setMsg(t('settingsPage.imported', { ...r }))
     } catch (e) {
-      setMsg(`Import failed: ${e}`)
+      setMsg(t('settingsPage.importFailed', { error: String(e) }))
     }
   }
 
   return (
     <div>
-      <h1>Settings & export</h1>
+      <h1>{t('settingsPage.title')}</h1>
       <div className="card">
-        <h2>Full dump</h2>
-        <p className="muted">
-          Everything: people, pedigree, the original genome files, consents, health log, notes, chats, sharing
-          log. One .hearth file; add a passphrase to encrypt it with AES-GCM. Hearth keeps no copy anywhere.
-          Import accepts .hearth files, older .json.gz dumps and portable .html archives.
-        </p>
+        <h2>{t('common.language')}</h2>
+        <select value={lang} onChange={(e) => isLanguage(e.target.value) && setLang(e.target.value)}>
+          {LANGUAGES.map((l) => (
+            <option key={l.code} value={l.code}>
+              {l.name}
+            </option>
+          ))}
+        </select>
+        <p className="muted">{t('settingsPage.languageNote')}</p>
+      </div>
+
+      <div className="card">
+        <h2>{t('settingsPage.fullDump')}</h2>
+        <p className="muted">{t('settingsPage.fullDumpIntro')}</p>
         <div className="row">
           <label className="field">
-            Passphrase (optional)
+            {t('settingsPage.passphrase')}
             <input type="password" value={pass} onChange={(e) => setPass(e.target.value)} />
           </label>
           <button type="button" className="primary" onClick={exportDump} disabled={persons.length === 0}>
-            Export dump
+            {t('settingsPage.exportDump')}
           </button>
           <label className="btn">
-            Import dump…{' '}
+            {t('settingsPage.importDump')}{' '}
             <input
               type="file"
               hidden
@@ -87,30 +97,23 @@ export function SettingsPage() {
       <ArchiveCard />
 
       <div className="card">
-        <h2>Document reading (your own Gemini key)</h2>
-        <p className="muted">
-          Optional. Lets "Read a document" on a person's health log send a photo, scan or PDF straight from
-          this browser to Google Gemini for transcription. The key is stored only in this browser's database
-          and is never part of a dump. Nothing is sent until you confirm each document.
-        </p>
-        <p className="notice">
-          On Google's free tier, content you send may be used to improve their models. Use a key from a paid
-          project if that matters to you.
-        </p>
+        <h2>{t('settingsPage.documentReading')}</h2>
+        <p className="muted">{t('settingsPage.documentReadingIntro')}</p>
+        <p className="notice">{t('settingsPage.freeTierNotice')}</p>
         <GeminiKeySteps open={!keyStored} />
         <div className="row">
           <label className="field">
-            API key {keyStored && <span className="ok">(stored)</span>}
+            {t('settingsPage.apiKey')} {keyStored && <span className="ok">{t('settingsPage.stored')}</span>}
             <input
               type="password"
               autoComplete="off"
               value={geminiKey}
-              placeholder={keyStored ? '•••••••• (enter a new key to replace)' : 'AIza…'}
+              placeholder={keyStored ? t('settingsPage.replaceKeyPlaceholder') : 'AIza…'}
               onChange={(e) => setGeminiKey(e.target.value)}
             />
           </label>
           <label className="field">
-            Model
+            {t('settingsPage.model')}
             <input value={geminiModel} onChange={(e) => setGeminiModel(e.target.value)} />
           </label>
           <button
@@ -126,10 +129,10 @@ export function SettingsPage() {
               )
               setGeminiKey('')
               await reload()
-              setMsg('Gemini settings saved.')
+              setMsg(t('settingsPage.geminiSaved'))
             }}
           >
-            Save
+            {t('common.save')}
           </button>
           {keyStored && (
             <button
@@ -138,26 +141,26 @@ export function SettingsPage() {
               onClick={async () => {
                 await setMeta(db, META_GEMINI_KEY, null)
                 await reload()
-                setMsg('Gemini key removed.')
+                setMsg(t('settingsPage.geminiRemoved'))
               }}
             >
-              Remove key
+              {t('settingsPage.removeKey')}
             </button>
           )}
         </div>
       </div>
 
       <div className="card">
-        <h2>Consents</h2>
+        <h2>{t('settingsPage.consents')}</h2>
         {consents.length === 0 ? (
-          <p className="muted">none recorded</p>
+          <p className="muted">{t('settingsPage.noneRecorded')}</p>
         ) : (
           <table>
             <thead>
               <tr>
-                <th>Consent</th>
-                <th>Subject</th>
-                <th>Granted</th>
+                <th>{t('settingsPage.consent')}</th>
+                <th>{t('settingsPage.subject')}</th>
+                <th>{t('settingsPage.granted')}</th>
                 <th />
               </tr>
             </thead>
@@ -165,7 +168,8 @@ export function SettingsPage() {
               {consents.map((c) => (
                 <tr key={`${c.kind}-${c.subject}-${c.grantedAt}`}>
                   <td>
-                    {CONSENTS[c.kind]?.title ?? c.kind} <span className="muted">v{c.version}</span>
+                    {CONSENTS[c.kind] ? t(CONSENTS[c.kind].title) : c.kind}{' '}
+                    <span className="muted">v{c.version}</span>
                   </td>
                   <td>{persons.find((p) => p.id === c.subject)?.displayName ?? (c.subject || '—')}</td>
                   <td>{c.grantedAt.slice(0, 16).replace('T', ' ')}</td>
@@ -175,10 +179,12 @@ export function SettingsPage() {
                       className="danger"
                       onClick={async () => {
                         const who = persons.find((p) => p.id === c.subject)?.displayName ?? c.subject
-                        const what = c.kind === 'import_document' ? 'health log' : 'genome'
+                        const what = t(
+                          c.kind === 'import_document' ? 'settingsPage.healthLog' : 'settingsPage.genome',
+                        )
                         if (
                           revokeDeletesData(c.kind) &&
-                          !confirm(`Revoke and delete ${who}'s ${what}? This cannot be undone.`)
+                          !confirm(t('settingsPage.revokeConfirm', { who, what }))
                         )
                           return
                         await revokeConsent(db, c.kind, c.subject)
@@ -188,7 +194,7 @@ export function SettingsPage() {
                         await reload()
                       }}
                     >
-                      revoke
+                      {t('settingsPage.revoke')}
                     </button>
                   </td>
                 </tr>
@@ -199,22 +205,22 @@ export function SettingsPage() {
       </div>
 
       <div className="card">
-        <h2>Sharing log</h2>
-        <p className="muted">
-          Every context pack copied out of Hearth, with the exact text, and every document sent to a provider
-          with your key (file names and hashes; the file itself is not kept). Nothing else has ever left this
-          device.
-        </p>
+        <h2>{t('settingsPage.sharingLog')}</h2>
+        <p className="muted">{t('settingsPage.sharingLogIntro')}</p>
         {sharing.length === 0 ? (
-          <p className="muted">empty</p>
+          <p className="muted">{t('common.empty')}</p>
         ) : (
           <ul>
             {sharing.map((s) => (
               <li key={s.id}>
                 <details>
                   <summary>
-                    {s.createdAt.slice(0, 16).replace('T', ' ')} · {s.kind} → {s.destination} ·{' '}
-                    {s.payload.length} chars
+                    {t('settingsPage.sharingSummary', {
+                      date: s.createdAt.slice(0, 16).replace('T', ' '),
+                      kind: s.kind,
+                      destination: s.destination,
+                      chars: s.payload.length,
+                    })}
                   </summary>
                   <pre className="pack">{s.payload}</pre>
                 </details>
@@ -225,20 +231,19 @@ export function SettingsPage() {
       </div>
 
       <div className="card">
-        <h2>Erase everything</h2>
-        <p className="muted">
-          Deletes all people, genotypes, consents, notes and logs from this browser. There is nothing to
-          recover afterwards unless you exported a dump.
-        </p>
+        <h2>{t('settingsPage.eraseEverything')}</h2>
+        <p className="muted">{t('settingsPage.eraseIntro')}</p>
         <button type="button" className="danger" onClick={() => setErasing(true)}>
-          Erase all data
+          {t('settingsPage.eraseAllData')}
         </button>
         {erasing && <EraseDialog onClose={() => setErasing(false)} />}
       </div>
       <p className="muted">
-        Hearth {APP_VERSION} · storage:{' '}
-        {db.persistent ? 'OPFS (persistent)' : 'memory (not persistent in this browser context)'} · id{' '}
-        {newId().slice(0, 8)}
+        {t('settingsPage.footer', {
+          version: APP_VERSION,
+          storage: t(db.persistent ? 'settingsPage.storageOpfs' : 'settingsPage.storageMemory'),
+          id: newId().slice(0, 8),
+        })}
       </p>
     </div>
   )

@@ -123,11 +123,19 @@ export async function insertSourceFile(db: Database, sf: SourceFile): Promise<vo
 /** Where the gzipped original of a source file is cached next to the database (dump v2). */
 export const genomeBlobName = (sha256OfText: string) => `genome-${sha256OfText}.gz`
 
-/** Drops cached originals no source_file row refers to any more (after delete, revoke, erase). */
+/**
+ * Where a rebuilt generic-format genome is cached for a person imported before the originals
+ * were kept. The row count is part of the name so a later import invalidates it.
+ */
+export const rebuiltBlobName = (personId: string, rows: number) => `generic-${personId}-${rows}.gz`
+
+/** Drops cached genome files nothing refers to any more (after delete, revoke, erase, re-import). */
 export async function pruneGenomeBlobs(db: Database): Promise<void> {
   const keep = new Set((await listSourceFiles(db)).map((s) => genomeBlobName(s.sha256)))
+  for (const [pid, n] of Object.entries(await genotypeCounts(db))) keep.add(rebuiltBlobName(pid, n))
   for (const name of await db.fileList()) {
-    if (name.startsWith('genome-') && !keep.has(name)) await db.fileDelete(name)
+    if ((name.startsWith('genome-') || name.startsWith('generic-')) && !keep.has(name))
+      await db.fileDelete(name)
   }
 }
 

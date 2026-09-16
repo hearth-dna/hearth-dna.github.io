@@ -1,0 +1,23 @@
+{
+  "personPage.back": "← People",
+  "personPage.sources": "Sources",
+  "personPage.none": "none",
+  "personPage.sourceLine": "{provider} · build {build} · {calls} calls · {name} · sha256 {sha}…",
+  "personPage.mendelTitle": "Mendelian consistency with parents",
+  "personPage.bothParents": "both parents (trio)",
+  "personPage.mendelLine": "{label}: {violations} / {compared} shared SNPs ({rate}%)",
+  "personPage.consistent": "consistent",
+  "personPage.borderline": "borderline",
+  "personPage.inconsistent": "inconsistent — likely unrelated or wrong file",
+  "personPage.findingsTitle": "Findings from the knowledge base",
+  "personPage.findingsIntro": "Informational only. Evidence: A = guideline/replicated, B = replicated association, C = preliminary. Strand: forward.",
+  "personPage.computing": "computing…",
+  "personPage.noMarkers": "No kb markers found in this file.",
+  "personPage.colGene": "Gene / marker",
+  "personPage.colGenotype": "Genotype",
+  "personPage.colMeaning": "Meaning",
+  "personPage.colEvidence": "Evidence",
+  "personPage.colImpact": "Impact",
+  "personPage.riskCopies": "{n} risk copies",
+  "personPage.genotypeNotDescribed": "genotype not described"
+}

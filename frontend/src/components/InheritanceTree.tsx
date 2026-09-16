@@ -1,6 +1,7 @@
 import { useApp } from '../app/context'
 import type { FamilyCall } from '../db/repo'
 import { alleleOrigins, layoutPedigree } from '../family/inheritance'
+import { rich, useT } from '../i18n/context'
 import type { KbEntry } from '../kb/kb'
 
 const W = 150
@@ -15,6 +16,7 @@ const GAP_Y = 90
  */
 export function InheritanceTree({ calls, entry }: { calls: FamilyCall[]; entry?: KbEntry }) {
   const { persons, relationships } = useApp()
+  const t = useT()
   const nodes = layoutPedigree(persons, relationships)
   const callOf = new Map(calls.map((c) => [c.personId, c]))
   const byId = new Map(nodes.map((n) => [n.person.id, n]))
@@ -57,7 +59,7 @@ export function InheritanceTree({ calls, entry }: { calls: FamilyCall[]; entry?:
         height={height}
         viewBox={`0 0 ${width} ${height}`}
         role="img"
-        aria-label="Inheritance tree"
+        aria-label={t('inheritanceTree.ariaLabel')}
         style={{ maxWidth: '100%', fontFamily: 'inherit', fontSize: 13 }}
       >
         {edges.map((e) =>
@@ -129,7 +131,7 @@ export function InheritanceTree({ calls, entry }: { calls: FamilyCall[]; entry?:
                     </tspan>
                   </>
                 ) : (
-                  'not typed'
+                  t('inheritanceTree.notTyped')
                 )}
               </text>
             </g>
@@ -137,12 +139,13 @@ export function InheritanceTree({ calls, entry }: { calls: FamilyCall[]; entry?:
         })}
       </svg>
       <p className="muted">
-        Letters on a line = allele that parent passed on. Dashed = both parents could have given either
-        allele. Red line = impossible under Mendelian inheritance (check the pedigree or file).
+        {t('inheritanceTree.legend')}
         {risk && (
           <>
             {' '}
-            Risk allele <strong className="danger">{risk}</strong>; box outline orange = one copy, red = two.
+            {rich(t('inheritanceTree.riskLegend', { allele: risk }), {
+              r: (c) => <strong className="danger">{c}</strong>,
+            })}
           </>
         )}
       </p>

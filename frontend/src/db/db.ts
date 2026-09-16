@@ -239,8 +239,8 @@ export class Database {
     return (await this.send({ op: 'file-list' })) as string[]
   }
 
-  /** A person's genotypes as generic provider text, built inside the worker. */
-  async genomeText(personId: string): Promise<string> {
-    return (await this.send({ op: 'genome-text', personId })) as string
+  /** A person's genotypes as gzipped generic provider text, built inside the worker. */
+  async genomeGz(personId: string): Promise<Uint8Array> {
+    return (await this.send({ op: 'genome-gz', personId })) as Uint8Array
   }
 }

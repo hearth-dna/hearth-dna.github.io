@@ -1,0 +1,8 @@
+{
+  "geminiKeySteps.summary": "How do I get a Gemini API key? (free, about two minutes)",
+  "geminiKeySteps.step1": "Open <a>aistudio.google.com/apikey</a> in a new tab and sign in with any Google account (the one you use for Gmail works).",
+  "geminiKeySteps.step2": "Click <b>Create API key</b>. If it asks you to pick or create a \"project\", accept the default and continue.",
+  "geminiKeySteps.step3": "A long code starting with <code>AIza</code> appears. Click <b>Copy</b> next to it.",
+  "geminiKeySteps.step4": "Come back here, paste the code into the <b>API key</b> field and click <b>Save</b>. Leave <b>Model</b> as it is.",
+  "geminiKeySteps.warning": "Treat the key like a password: anyone who has it can use Google's service on your account. It is stored only in this browser and never included in exports. You can delete it at any time from the same Google page."
+}

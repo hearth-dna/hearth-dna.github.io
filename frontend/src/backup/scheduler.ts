@@ -1,6 +1,6 @@
 import { Database } from '../db/db'
 import { getMeta } from '../db/repo'
-import { restoreBytes } from '../export/restore'
+import { type Progress, type RestoreResult, restoreBytes } from '../export/restore'
 import { snapshotBytes } from '../export/snapshot'
 import * as folder from './folder'
 import { baseName, conflictName, hasNewer, isForeign } from './naming'
@@ -16,7 +16,7 @@ export type Status =
   | { state: 'reconnect'; name: string }
   | { state: 'needs-passphrase'; name: string }
   | { state: 'ready'; name: string; pending: boolean; lastAt: string | null; newer: boolean }
-  | { state: 'writing'; name: string }
+  | { state: 'writing'; name: string; step: 'building' | 'writing' }
   | { state: 'conflict'; name: string; file: string }
   | { state: 'error'; name: string; message: string }
 
@@ -142,11 +142,12 @@ class Backups {
     const pass = this.passphrase()
     if (!this.plain && !pass) return this.set({ state: 'needs-passphrase', name })
     this.busy = true
-    this.set({ state: 'writing', name })
+    this.set({ state: 'writing', name, step: 'building' })
     try {
       const base = baseName(this.profile)
       const device = (await getMeta(this.db, 'device')) ?? ''
       const bytes = await snapshotBytes(this.db, this.appVersion, this.plain ? undefined : pass)
+      this.set({ state: 'writing', name, step: 'writing' })
       const current = await folder.currentHeader(this.saved.handle, base)
       if (!force && isForeign(current, device, this.saved.lastSeen)) {
         const file = conflictName(base, device, new Date().toISOString())
@@ -166,7 +167,7 @@ class Backups {
   }
 
   /** Loads the folder's current snapshot into this browser (union by id, see restore.ts). */
-  async loadFromFolder(onProgress: (m: string) => void): Promise<string> {
+  async loadFromFolder(onProgress: Progress): Promise<RestoreResult> {
     if (!this.saved) throw new Error('no folder chosen')
     const base = baseName(this.profile)
     const bytes = await folder.readCurrent(this.saved.handle, base)
@@ -182,7 +183,7 @@ class Backups {
     await folder.save(this.profile, this.saved)
     // The restore itself scheduled an autosave; that snapshot will carry the union.
     await this.refresh()
-    return `Loaded ${r.people} new people and ${r.genomes} genomes from ${this.name} (${r.exportedAt}).`
+    return r
   }
 }
 

@@ -1,0 +1,12 @@
+{
+  "familyPage.title": "Family lookup",
+  "familyPage.searchPlaceholder": "rs7903146, or a gene, drug or condition",
+  "familyPage.lookUp": "Look up",
+  "familyPage.whoInherited": "Who inherited what",
+  "familyPage.notGenotyped": "Not genotyped in any imported file.",
+  "familyPage.person": "Person",
+  "familyPage.chr": "Chr",
+  "familyPage.position": "Position",
+  "familyPage.genotype": "Genotype",
+  "familyPage.notOnChip": "not on chip"
+}

@@ -11,8 +11,9 @@ import {
   type HealthDraft,
 } from '../documents/draft'
 import { type DocumentPart, GEMINI_DEFAULT_MODEL, readDocumentWithGemini } from '../egress/egress'
+import { rich, useT } from '../i18n/context'
 import { sha256Hex } from '../import/unpack'
-import { HEALTH_KIND_LABELS, type Person } from '../types'
+import type { Person } from '../types'
 import { ConsentForm } from './ConsentForm'
 import { GeminiKeySteps } from './GeminiKeySteps'
 
@@ -51,6 +52,7 @@ export function ReadDocumentDialog({
   onClose: () => void
 }) {
   const { db } = useApp()
+  const t = useT()
   const ref = useRef<HTMLDialogElement>(null)
   const [files, setFiles] = useState<File[]>([])
   const [hint, setHint] = useState<DocumentHint>('auto')
@@ -107,17 +109,14 @@ export function ReadDocumentDialog({
 
   return (
     <dialog ref={ref} onClose={onClose}>
-      <h2 style={{ marginTop: 0 }}>Read a document for {person.displayName}</h2>
+      <h2 style={{ marginTop: 0 }}>{t('readDocumentDialog.title', { name: person.displayName })}</h2>
       {key === null ? (
         <div>
-          <p className="notice">
-            To read a photo, scan or PDF, Hearth sends it from this browser to Google Gemini using a key that
-            belongs to you. You need to add that key once.
-          </p>
+          <p className="notice">{t('readDocumentDialog.keyNotice')}</p>
           <GeminiKeySteps open />
           <div className="row">
             <label className="field">
-              API key
+              {t('readDocumentDialog.apiKey')}
               <input
                 type="password"
                 autoComplete="off"
@@ -136,10 +135,10 @@ export function ReadDocumentDialog({
                 setNewKey('')
               }}
             >
-              Save
+              {t('common.save')}
             </button>
             <button type="button" onClick={() => ref.current?.close()}>
-              Cancel
+              {t('common.cancel')}
             </button>
           </div>
         </div>
@@ -155,34 +154,28 @@ export function ReadDocumentDialog({
         />
       ) : stage.s === 'confirm' || stage.s === 'sending' ? (
         <div>
-          <p>
-            These files will leave this device and go to <strong>Google Gemini ({model})</strong> with your
-            key. The reply is shown for review before anything is saved.
-          </p>
+          <p>{rich(t('readDocumentDialog.confirmIntro', { model }))}</p>
           <ul>
             {files.map((f) => (
               <li key={f.name}>
-                {f.name} · {(f.size / 1024).toFixed(0)} KB
+                {t('readDocumentDialog.fileLine', { name: f.name, kb: (f.size / 1024).toFixed(0) })}
               </li>
             ))}
           </ul>
           <div className="row">
             <button type="button" className="primary" disabled={stage.s === 'sending'} onClick={send}>
-              {stage.s === 'sending' ? 'Sending…' : 'I have checked the files — send'}
+              {stage.s === 'sending' ? t('readDocumentDialog.sending') : t('readDocumentDialog.send')}
             </button>
             <button type="button" disabled={stage.s === 'sending'} onClick={() => setStage({ s: 'pick' })}>
-              Back
+              {t('readDocumentDialog.back')}
             </button>
           </div>
         </div>
       ) : (
         <div>
-          <p className="muted">
-            Photos or scans (JPEG, PNG, WebP, HEIC) or a PDF. Cover the patient name if you can; the model is
-            told to leave identifiers out, but what you send is what the provider sees.
-          </p>
+          <p className="muted">{t('readDocumentDialog.pickIntro')}</p>
           <label className="field">
-            Pages
+            {t('readDocumentDialog.pages')}
             <input
               type="file"
               accept={ACCEPT}
@@ -191,22 +184,26 @@ export function ReadDocumentDialog({
             />
           </label>
           <label className="field" style={{ marginTop: '0.6rem' }}>
-            What is it
+            {t('readDocumentDialog.whatIsIt')}
             <select value={hint} onChange={(e) => setHint(e.target.value as DocumentHint)}>
               {DOCUMENT_HINTS.map((h) => (
                 <option key={h} value={h}>
-                  {h === 'auto' ? 'Let the model decide' : HEALTH_KIND_LABELS[h]}
+                  {t(`readDocumentDialog.hint.${h}`)}
                 </option>
               ))}
             </select>
           </label>
           {tooBig && (
             <p className="danger">
-              {(totalBytes / 1024 / 1024).toFixed(1)} MB selected; the limit is {MAX_BYTES / 1024 / 1024} MB
-              per document. Split it or downscale the photos.
+              {t('readDocumentDialog.tooBig', {
+                mb: (totalBytes / 1024 / 1024).toFixed(1),
+                max: MAX_BYTES / 1024 / 1024,
+              })}
             </p>
           )}
-          {stage.s === 'error' && <p className="danger">Failed: {stage.message}</p>}
+          {stage.s === 'error' && (
+            <p className="danger">{t('readDocumentDialog.failed', { message: stage.message })}</p>
+          )}
           <div className="row" style={{ marginTop: '0.8rem' }}>
             <button
               type="button"
@@ -214,10 +211,10 @@ export function ReadDocumentDialog({
               disabled={files.length === 0 || tooBig}
               onClick={() => setStage(consented ? { s: 'confirm' } : { s: 'consent' })}
             >
-              Continue…
+              {t('readDocumentDialog.continue')}
             </button>
             <button type="button" onClick={() => ref.current?.close()}>
-              Cancel
+              {t('common.cancel')}
             </button>
           </div>
         </div>
@@ -225,7 +222,7 @@ export function ReadDocumentDialog({
       {key === null && (
         <div className="row" style={{ marginTop: '0.8rem' }}>
           <button type="button" onClick={() => ref.current?.close()}>
-            Close
+            {t('common.close')}
           </button>
         </div>
       )}

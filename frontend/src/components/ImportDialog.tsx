@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useApp } from '../app/context'
 import { grantConsent, hasConsent } from '../consent/consent'
+import { useT } from '../i18n/context'
 import { importGenomeFile } from '../import/importFile'
 import { PROVIDER_LABELS, type Provider } from '../types'
 import { ConsentForm } from './ConsentForm'
@@ -13,6 +14,7 @@ type Stage =
   | { s: 'error'; msg: string }
 
 export function ImportDialog({ personId, onClose }: { personId: string; onClose: () => void }) {
+  const t = useT()
   const { db, persons, refresh } = useApp()
   const person = persons.find((p) => p.id === personId)!
   const isMinor = person.birthYear !== null && new Date().getFullYear() - person.birthYear < 18
@@ -33,6 +35,7 @@ export function ImportDialog({ personId, onClose }: { personId: string; onClose:
         personId,
         file,
         (p) => setStage({ s: 'working', ...p }),
+        t,
         forced || undefined,
       )
       await refresh()
@@ -44,17 +47,15 @@ export function ImportDialog({ personId, onClose }: { personId: string; onClose:
 
   return (
     <dialog ref={ref} onClose={onClose}>
-      <h2 style={{ marginTop: 0 }}>Import DNA for {person.displayName}</h2>
+      <h2 style={{ marginTop: 0 }}>{t('importDialog.title', { name: person.displayName })}</h2>
       {stage.s === 'consent' && (
         <div>
           {isMinor && (
             <div className="notice">
-              <strong>This person is under 18.</strong>
+              <strong>{t('importDialog.under18')}</strong>
               <label className="check">
                 <input type="checkbox" checked={minorOk} onChange={(e) => setMinorOk(e.target.checked)} />
-                <span>
-                  I am this child's parent or legal guardian and will delete this data on their request.
-                </span>
+                <span>{t('importDialog.guardianStatement')}</span>
               </label>
             </div>
           )}
@@ -72,14 +73,11 @@ export function ImportDialog({ personId, onClose }: { personId: string; onClose:
       )}
       {stage.s === 'pick' && (
         <div>
-          <p className="muted">
-            Accepted: raw text/CSV/VCF, or a .zip / .gz containing one. Everything is parsed here in the
-            browser.
-          </p>
+          <p className="muted">{t('importDialog.accepted')}</p>
           <label className="field">
-            Provider
+            {t('importDialog.provider')}
             <select value={forced} onChange={(e) => setForced(e.target.value as Provider | '')}>
-              <option value="">auto-detect</option>
+              <option value="">{t('importDialog.autoDetect')}</option>
               {(Object.keys(PROVIDER_LABELS) as Provider[]).map((p) => (
                 <option key={p} value={p}>
                   {PROVIDER_LABELS[p]}
@@ -95,7 +93,7 @@ export function ImportDialog({ personId, onClose }: { personId: string; onClose:
             />
           </p>
           <button type="button" onClick={() => ref.current?.close()}>
-            Cancel
+            {t('common.cancel')}
           </button>
         </div>
       )}
@@ -109,7 +107,7 @@ export function ImportDialog({ personId, onClose }: { personId: string; onClose:
         <div>
           <p className="ok">{stage.msg}</p>
           <button type="button" className="primary" onClick={() => ref.current?.close()}>
-            Close
+            {t('common.close')}
           </button>
         </div>
       )}
@@ -117,7 +115,7 @@ export function ImportDialog({ personId, onClose }: { personId: string; onClose:
         <div>
           <p className="danger">{stage.msg}</p>
           <button type="button" onClick={() => setStage({ s: 'pick' })}>
-            Try again
+            {t('importDialog.tryAgain')}
           </button>
         </div>
       )}

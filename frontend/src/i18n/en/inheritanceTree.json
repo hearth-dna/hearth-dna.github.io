@@ -1,0 +1,6 @@
+{
+  "inheritanceTree.ariaLabel": "Inheritance tree",
+  "inheritanceTree.notTyped": "not typed",
+  "inheritanceTree.legend": "Letters on a line = allele that parent passed on. Dashed = both parents could have given either allele. Red line = impossible under Mendelian inheritance (check the pedigree or file).",
+  "inheritanceTree.riskLegend": "Risk allele <r>{allele}</r>; box outline orange = one copy, red = two."
+}

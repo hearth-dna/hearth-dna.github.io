@@ -1,0 +1,8 @@
+{
+  "prompt.explain.title": "Explain this finding",
+  "prompt.doctor.title": "Prepare questions for my doctor",
+  "prompt.medication.title": "Is this medication affected by my genetics?",
+  "prompt.compare.title": "Compare two family members on this topic",
+  "prompt.labs.title": "Interpret my lab results with my genetics",
+  "prompt.second-opinion.title": "Second opinion on a report"
+}

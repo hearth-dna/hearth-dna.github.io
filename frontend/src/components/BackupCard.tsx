@@ -3,7 +3,11 @@ import { useApp } from '../app/context'
 import { isArchive } from '../archive/mode'
 import { backups, type Status } from '../backup/scheduler'
 import { grantConsent, hasConsent, revokeConsent } from '../consent/consent'
+import { rich, useT } from '../i18n/context'
 import { ConsentForm } from './ConsentForm'
+
+/** Local wall-clock time of an ISO timestamp. */
+const clock = (iso: string) => new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 
 function useBackupStatus(): Status {
   const [s, setS] = useState<Status>(backups.status)
@@ -14,10 +18,27 @@ function useBackupStatus(): Status {
 /** Settings card for the backup folder (docs/architecture/storage/backup-folder.md). */
 export function BackupCard() {
   const { db, refresh } = useApp()
+  const t = useT()
   const status = useBackupStatus()
   const [consenting, setConsenting] = useState(false)
   const [pass, setPass] = useState(backups.passphrase())
   const [msg, setMsg] = useState<string | null>(null)
+  const [busy, setBusy] = useState<string | null>(null)
+  const writing = status.state === 'writing'
+  const working = writing || busy !== null
+  // Only these states can actually write; elsewhere the notice above the buttons says what to do.
+  const canBackUp =
+    !working && (status.state === 'ready' || status.state === 'conflict' || status.state === 'error')
+
+  // A finished autosave should be visible too, not only one started from the button.
+  const [wasWriting, setWasWriting] = useState(false)
+  useEffect(() => {
+    if (writing) setWasWriting(true)
+    else if (wasWriting && status.state === 'ready') {
+      setWasWriting(false)
+      setMsg(t('backupCard.done', { name: status.name, time: status.lastAt ? clock(status.lastAt) : '' }))
+    }
+  }, [writing, wasWriting, status, t])
 
   if (isArchive()) return null
 
@@ -31,32 +52,42 @@ export function BackupCard() {
     }
   }
 
-  const run = async (f: () => Promise<string | undefined>) => {
+  const run = async (f: () => Promise<string | undefined>, label?: string) => {
+    setBusy(label ?? null)
+    if (label) setMsg(null)
     try {
       setMsg((await f()) ?? null)
     } catch (e) {
       setMsg(String(e))
+    } finally {
+      setBusy(null)
     }
   }
 
+  const loadFromFolder = async () => {
+    const r = await backups.loadFromFolder((key, params) => setBusy(t(key, params)))
+    await refresh()
+    return t('backupCard.loaded', { ...r, name: backups.name })
+  }
+  const load = () => run(loadFromFolder, t('backupCard.loading', { name: backups.name }))
+  const backUp = (force = false) => {
+    setMsg(null)
+    return run(() => backups.backupNow(force).then(() => undefined))
+  }
+
+  const activity = writing
+    ? t(status.step === 'building' ? 'backupCard.building' : 'backupCard.writingFile', { name: status.name })
+    : busy
+
   return (
     <div className="card">
-      <h2>Backup folder</h2>
-      <p className="muted">
-        Hearth writes a snapshot of everything to a folder you choose — on a USB stick, or a folder that
-        Google Drive, Dropbox, OneDrive or similar keeps in sync — after every change, and can load it back on
-        another computer. Nothing is sent by Hearth itself.
-      </p>
-      {status.state === 'unsupported' && (
-        <p className="notice">
-          Your browser cannot write to a folder on its own (Chrome, Edge and other Chromium browsers can). Use
-          Export dump and Import dump above instead.
-        </p>
-      )}
+      <h2>{t('backupCard.title')}</h2>
+      <p className="muted">{t('backupCard.intro')}</p>
+      {status.state === 'unsupported' && <p className="notice">{t('backupCard.unsupported')}</p>}
       {consenting && (
         <ConsentForm
           kind="backup_folder"
-          confirmLabel="Choose folder…"
+          confirmLabel={t('backupCard.chooseFolder')}
           onCancel={() => setConsenting(false)}
           onConfirm={async () => {
             await grantConsent(db, 'backup_folder')
@@ -67,22 +98,28 @@ export function BackupCard() {
       )}
       {status.state === 'none' && !consenting && (
         <button type="button" className="primary" onClick={choose}>
-          Choose folder…
+          {t('backupCard.chooseFolder')}
         </button>
       )}
       {status.state !== 'none' && status.state !== 'unsupported' && (
         <div>
           <p>
-            Folder: <strong>{status.name}</strong>
+            {rich(t('backupCard.folder', { name: status.name }))}
             {status.state === 'ready' && status.lastAt && (
-              <span className="muted"> · last backup {status.lastAt.slice(11, 19)}</span>
+              <span className="muted">{t('backupCard.lastBackup', { time: clock(status.lastAt) })}</span>
             )}
-            {status.state === 'ready' && status.pending && <span className="muted"> · backup pending…</span>}
-            {status.state === 'writing' && <span className="muted"> · writing…</span>}
+            {status.state === 'ready' && status.pending && (
+              <span className="muted">{t('backupCard.pending')}</span>
+            )}
           </p>
+          {activity && (
+            <p className="activity" role="status" aria-live="polite">
+              <span className="spinner" aria-hidden="true" /> {activity}
+            </p>
+          )}
           <div className="row">
             <label className="field">
-              Passphrase {backups.plain ? '(not used)' : '(required)'}
+              {t(backups.plain ? 'backupCard.passphraseNotUsed' : 'backupCard.passphraseRequired')}
               <input
                 type="password"
                 value={pass}
@@ -99,112 +136,72 @@ export function BackupCard() {
                 checked={backups.plain}
                 onChange={(e) => void backups.setPlain(e.target.checked)}
               />
-              <span>Store unencrypted (plaintext genetic data in the folder)</span>
+              <span>{t('backupCard.storeUnencrypted')}</span>
             </label>
           </div>
           {status.state === 'reconnect' && (
             <p className="notice">
-              The browser needs your permission again to use this folder.{' '}
+              {t('backupCard.reconnectNotice')}{' '}
               <button
                 type="button"
                 className="primary"
                 onClick={() => run(() => backups.reconnect().then(() => undefined))}
               >
-                Reconnect folder
+                {t('backupCard.reconnectFolder')}
               </button>
             </p>
           )}
-          {status.state === 'needs-passphrase' && (
-            <p className="notice">Enter the passphrase (or tick unencrypted) to resume backups.</p>
-          )}
+          {status.state === 'needs-passphrase' && <p className="notice">{t('backupCard.needsPassphrase')}</p>}
           {status.state === 'conflict' && (
             <div className="notice">
-              Another computer saved a newer backup to this folder since you last loaded it. Yours was written
-              as <code>{status.file}</code> instead. Load theirs first, or keep yours and overwrite.
+              {rich(t('backupCard.conflict', { file: status.file }))}
               <div className="row">
-                <button
-                  type="button"
-                  onClick={() =>
-                    run(() =>
-                      backups
-                        .loadFromFolder(setMsg)
-                        .then(refresh)
-                        .then(() => undefined),
-                    )
-                  }
-                >
-                  Load theirs
+                <button type="button" disabled={working} onClick={load}>
+                  {t('backupCard.loadTheirs')}
                 </button>
-                <button
-                  type="button"
-                  className="danger"
-                  onClick={() => run(() => backups.backupNow(true).then(() => undefined))}
-                >
-                  Keep mine, overwrite
+                <button type="button" className="danger" disabled={working} onClick={() => backUp(true)}>
+                  {t('backupCard.keepMine')}
                 </button>
               </div>
             </div>
           )}
-          {status.state === 'error' && <p className="danger">Backup failed: {status.message}</p>}
+          {status.state === 'error' && (
+            <p className="danger">{t('backupCard.failed', { message: status.message })}</p>
+          )}
           {status.state === 'ready' && status.newer && (
             <p className="notice">
-              The folder holds a backup from another computer that is newer than what is here.{' '}
-              <button
-                type="button"
-                className="primary"
-                onClick={() =>
-                  run(async () => {
-                    const m = await backups.loadFromFolder(setMsg)
-                    await refresh()
-                    return m
-                  })
-                }
-              >
-                Load from folder
+              {t('backupCard.newerNotice')}{' '}
+              <button type="button" className="primary" disabled={working} onClick={load}>
+                {t('backupCard.loadFromFolder')}
               </button>
             </p>
           )}
           <div className="row">
-            <button
-              type="button"
-              className="primary"
-              disabled={status.state === 'writing'}
-              onClick={() => run(() => backups.backupNow().then(() => undefined))}
-            >
-              Back up now
+            <button type="button" className="primary" disabled={!canBackUp} onClick={() => backUp()}>
+              {t('backupCard.backUpNow')}
             </button>
             {status.state === 'ready' && !status.newer && (
-              <button
-                type="button"
-                onClick={() =>
-                  run(async () => {
-                    const m = await backups.loadFromFolder(setMsg)
-                    await refresh()
-                    return m
-                  })
-                }
-              >
-                Load from folder
+              <button type="button" disabled={working} onClick={load}>
+                {t('backupCard.loadFromFolder')}
               </button>
             )}
-            <button type="button" onClick={choose}>
-              Change folder…
+            <button type="button" disabled={working} onClick={choose}>
+              {t('backupCard.changeFolder')}
             </button>
             <button
               type="button"
               className="danger"
+              disabled={working}
               onClick={() =>
                 run(async () => {
-                  const del = confirm('Also delete the backup files in the folder? (Cancel keeps them.)')
+                  const del = confirm(t('backupCard.forgetConfirm'))
                   const n = await backups.forget(del)
                   await revokeConsent(db, 'backup_folder')
-                  return del
-                    ? `Folder forgotten; ${n} backup files deleted.`
-                    : 'Folder forgotten; files kept.'
+                  return del ? t('backupCard.forgottenDeleted', { n }) : t('backupCard.forgottenKept')
                 })
               }
             >
-              Forget folder
+              {t('backupCard.forgetFolder')}
             </button>
           </div>
         </div>

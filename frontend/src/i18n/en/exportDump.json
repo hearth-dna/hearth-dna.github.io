@@ -1,0 +1,4 @@
+{
+  "exportDump.encrypted": "Exported {name} ({mb} MB), encrypted",
+  "exportDump.plaintext": "Exported {name} ({mb} MB) — plaintext genetic data, keep it safe"
+}

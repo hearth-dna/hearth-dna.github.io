@@ -1,0 +1,6 @@
+{
+  "consentGate.title": "Hearth — a local-first family genome browser",
+  "consentGate.intro": "Your DNA files, family tree and notes are stored <b>only in this browser</b>. There is no account and no server-side copy. To move data between devices, export a dump from Settings.",
+  "consentGate.start": "Start",
+  "consentGate.recordFailed": "Could not record consent: {error}"
+}

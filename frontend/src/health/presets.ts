@@ -101,10 +101,10 @@ export const EVENT_PRESETS: HealthPreset[] = [
   { id: 'fainting', title: 'Fainting', kind: 'symptom', bodyPart: 'head' },
 ]
 
-export const PRESET_GROUPS: { label: string; presets: HealthPreset[] }[] = [
-  { label: 'Measurements', presets: MEASUREMENT_PRESETS },
-  { label: 'Symptoms', presets: SYMPTOM_PRESETS },
-  { label: 'Events', presets: EVENT_PRESETS },
+export const PRESET_GROUPS: { label: string; labelKey: string; presets: HealthPreset[] }[] = [
+  { label: 'Measurements', labelKey: 'preset.group.measurements', presets: MEASUREMENT_PRESETS },
+  { label: 'Symptoms', labelKey: 'preset.group.symptoms', presets: SYMPTOM_PRESETS },
+  { label: 'Events', labelKey: 'preset.group.events', presets: EVENT_PRESETS },
 ]
 
 export function findPreset(id: string): HealthPreset | undefined {

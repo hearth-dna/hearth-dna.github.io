@@ -46,3 +46,7 @@ __pycache__/
 # Claude Code session data
 .claude/projects/
 .claude/settings.local.json
+
+# Local test folders for the backup-folder and portable-archive features (real genetic data)
+/backup/
+/standalone/

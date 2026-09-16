@@ -1,0 +1,22 @@
+{
+  "readDocumentDialog.title": "Read a document for {name}",
+  "readDocumentDialog.keyNotice": "To read a photo, scan or PDF, Hearth sends it from this browser to Google Gemini using a key that belongs to you. You need to add that key once.",
+  "readDocumentDialog.apiKey": "API key",
+  "readDocumentDialog.confirmIntro": "These files will leave this device and go to <b>Google Gemini ({model})</b> with your key. The reply is shown for review before anything is saved.",
+  "readDocumentDialog.fileLine": "{name} · {kb} KB",
+  "readDocumentDialog.sending": "Sending…",
+  "readDocumentDialog.send": "I have checked the files — send",
+  "readDocumentDialog.back": "Back",
+  "readDocumentDialog.pickIntro": "Photos or scans (JPEG, PNG, WebP, HEIC) or a PDF. Cover the patient name if you can; the model is told to leave identifiers out, but what you send is what the provider sees.",
+  "readDocumentDialog.pages": "Pages",
+  "readDocumentDialog.whatIsIt": "What is it",
+  "readDocumentDialog.hint.auto": "Let the model decide",
+  "readDocumentDialog.hint.lab": "Lab result",
+  "readDocumentDialog.hint.imaging": "Imaging report",
+  "readDocumentDialog.hint.letter": "Doctor letter",
+  "readDocumentDialog.hint.medication": "Medication",
+  "readDocumentDialog.hint.diagnosis": "Diagnosis",
+  "readDocumentDialog.tooBig": "{mb} MB selected; the limit is {max} MB per document. Split it or downscale the photos.",
+  "readDocumentDialog.failed": "Failed: {message}",
+  "readDocumentDialog.continue": "Continue…"
+}

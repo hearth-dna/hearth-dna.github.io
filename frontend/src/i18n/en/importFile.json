@@ -1,0 +1,9 @@
+{
+  "importFile.unpacking": "Unpacking…",
+  "importFile.parsingFile": "Parsing {name} ({provider})…",
+  "importFile.parsing": "Parsing…",
+  "importFile.noRows": "no genotype rows recognised — pick the provider manually",
+  "importFile.storing": "Storing {n} calls…",
+  "importFile.storingProgress": "Storing {n} / {total}…",
+  "importFile.summary": "{n} calls from {provider} (build {build}); {skipped} no-calls skipped"
+}

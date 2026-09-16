@@ -1,24 +1,26 @@
 import { useState } from 'react'
 import { CONSENTS, type ConsentKind } from '../consent/kinds'
+import { useT } from '../i18n/context'
 
 /** One checkbox per statement; the confirm button enables only when all are ticked (design §13.1). */
 export function ConsentForm({
   kind,
   onConfirm,
   onCancel,
-  confirmLabel = 'I confirm',
+  confirmLabel,
 }: {
   kind: ConsentKind
   onConfirm: () => void
   onCancel?: () => void
   confirmLabel?: string
 }) {
+  const t = useT()
   const c = CONSENTS[kind]
   const [ticked, setTicked] = useState<boolean[]>(c.statements.map(() => false))
   const all = ticked.every(Boolean)
   return (
     <div>
-      <h2>{c.title}</h2>
+      <h2>{t(c.title)}</h2>
       {c.statements.map((s, i) => (
         <label className="check" key={s}>
           <input
@@ -26,21 +28,19 @@ export function ConsentForm({
             checked={ticked[i]}
             onChange={(e) => setTicked(ticked.map((t, j) => (j === i ? e.target.checked : t)))}
           />
-          <span>{s}</span>
+          <span>{t(s)}</span>
         </label>
       ))}
       <div className="row" style={{ marginTop: '0.8rem' }}>
         <button type="button" className="primary" disabled={!all} onClick={onConfirm}>
-          {confirmLabel}
+          {confirmLabel ?? t('consentForm.confirm')}
         </button>
         {onCancel && (
           <button type="button" onClick={onCancel}>
-            Cancel
+            {t('common.cancel')}
           </button>
         )}
-        <span className="muted">
-          Recorded locally with a timestamp (text v{c.version}). Revocable in Settings.
-        </span>
+        <span className="muted">{t('consentForm.recorded', { version: c.version })}</span>
       </div>
     </div>
   )

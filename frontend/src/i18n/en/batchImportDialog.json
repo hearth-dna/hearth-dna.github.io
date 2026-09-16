@@ -1,0 +1,12 @@
+{
+  "batchImportDialog.title": "Import several DNA files",
+  "batchImportDialog.intro": "One new person per file, named after the file. Afterwards, rename each person and set parents on the People page. Accepted: raw text/CSV/VCF, or .zip / .gz containing one.",
+  "batchImportDialog.provider": "Provider (for all files)",
+  "batchImportDialog.autoDetectPerFile": "auto-detect per file",
+  "batchImportDialog.fileToPerson": "{file} → <b>{name}</b>",
+  "batchImportDialog.continue": "Continue…",
+  "batchImportDialog.consentNote": "This applies to every file in the batch and is recorded for each person created.",
+  "batchImportDialog.creatingPerson": "Creating person…",
+  "batchImportDialog.queued": "queued",
+  "batchImportDialog.importing": "Importing…"
+}

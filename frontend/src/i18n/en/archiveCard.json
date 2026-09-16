@@ -1,0 +1,13 @@
+{
+  "archiveCard.building": "Building archive…",
+  "archiveCard.failed": "Failed: {error}",
+  "archiveCard.saved": "Saved {name} ({mb} MB).",
+  "archiveCard.downloaded": "Downloaded {name} ({mb} MB). Double-click it in any desktop browser.",
+  "archiveCard.title": "Portable archive",
+  "archiveCard.introArchive": "This page is a portable archive running in memory. Changes you make here are kept only if you save a new archive file.",
+  "archiveCard.introHosted": "One .html file that contains Hearth itself and all your data. Double-click it in any desktop browser — on a USB stick, on another computer, years from now — and browse everything without installing anything. Import it here to bring the data back.",
+  "archiveCard.passphrase": "Passphrase (recommended)",
+  "archiveCard.saveArchive": "Save archive…",
+  "archiveCard.downloadArchive": "Download portable archive",
+  "archiveCard.plaintextWarning": "Without a passphrase the file contains plaintext genetic data and is named accordingly."
+}

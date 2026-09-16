@@ -11,6 +11,7 @@ import {
   parseTags,
 } from '../health/log'
 import { findPreset, type HealthPreset, PRESET_GROUPS } from '../health/presets'
+import { useT } from '../i18n/context'
 import { BODY_PARTS, HEALTH_KIND_LABELS, type HealthEntry, type HealthKind, type Person } from '../types'
 import { ConsentForm } from './ConsentForm'
 import { ReadDocumentDialog } from './ReadDocumentDialog'
@@ -29,6 +30,7 @@ const KINDS = Object.keys(HEALTH_KIND_LABELS) as HealthKind[]
  */
 export function HealthLog({ person }: { person: Person }) {
   const { db } = useApp()
+  const t = useT()
   const [entries, setEntries] = useState<HealthEntry[]>([])
   const [consented, setConsented] = useState<boolean | null>(null)
   const [adding, setAdding] = useState(false)
@@ -106,33 +108,29 @@ export function HealthLog({ person }: { person: Person }) {
 
   return (
     <div className="card">
-      <h2>Health log</h2>
-      <p className="muted">
-        How you feel (a symptom, where and how bad), numbers you measure at home (temperature, blood pressure,
-        weight) and dated text from lab results, diagnoses, medications and doctor letters. It stays on this
-        device and can be included in an Ask context pack.
-      </p>
+      <h2>{t('healthLog.title')}</h2>
+      <p className="muted">{t('healthLog.intro')}</p>
       {entries.length > 0 && (
         <div className="row filters">
           <select
-            aria-label="Kind"
+            aria-label={t('healthLog.filterKind')}
             value={filter.kind}
             onChange={(e) => setFilter({ ...filter, kind: e.target.value as HealthKind | '' })}
           >
-            <option value="">any kind</option>
+            <option value="">{t('healthLog.anyKind')}</option>
             {KINDS.map((k) => (
               <option key={k} value={k}>
-                {HEALTH_KIND_LABELS[k]}
+                {t(`kind.${k}`)}
               </option>
             ))}
           </select>
           <select
-            aria-label="Body part"
+            aria-label={t('healthLog.filterBodyPart')}
             value={filter.bodyPart}
             disabled={bodyParts.length === 0}
             onChange={(e) => setFilter({ ...filter, bodyPart: e.target.value })}
           >
-            <option value="">any body part</option>
+            <option value="">{t('healthLog.anyBodyPart')}</option>
             {bodyParts.map((b) => (
               <option key={b} value={b}>
                 {b}
@@ -140,38 +138,36 @@ export function HealthLog({ person }: { person: Person }) {
             ))}
           </select>
           <select
-            aria-label="Tag"
+            aria-label={t('healthLog.filterTag')}
             value={filter.tag}
             disabled={tags.length === 0}
             onChange={(e) => setFilter({ ...filter, tag: e.target.value })}
           >
-            <option value="">any tag</option>
-            {tags.map((t) => (
-              <option key={t} value={t}>
-                {t}
+            <option value="">{t('healthLog.anyTag')}</option>
+            {tags.map((tag) => (
+              <option key={tag} value={tag}>
+                {tag}
               </option>
             ))}
           </select>
           <input
             type="search"
-            placeholder="search text"
+            placeholder={t('healthLog.searchText')}
             value={filter.text}
             onChange={(e) => setFilter({ ...filter, text: e.target.value })}
           />
           {filtering && (
             <button type="button" className="small" onClick={() => setFilter(NO_FILTER)}>
-              clear
+              {t('common.clear')}
             </button>
           )}
-          <span className="muted">
-            {shown.length} of {entries.length}
-          </span>
+          <span className="muted">{t('healthLog.shownOf', { n: shown.length, m: entries.length })}</span>
         </div>
       )}
       {entries.length === 0 ? (
-        <p className="muted">empty</p>
+        <p className="muted">{t('common.empty')}</p>
       ) : shown.length === 0 ? (
-        <p className="muted">nothing matches</p>
+        <p className="muted">{t('healthLog.nothingMatches')}</p>
       ) : (
         <ul>
           {shown.map((e) => (
@@ -179,23 +175,23 @@ export function HealthLog({ person }: { person: Person }) {
               {describeEntry(e)}{' '}
               {e.source && (
                 <span className="badge" title={e.source}>
-                  transcribed by {e.source.split(':')[0]}
+                  {t('healthLog.transcribedBy', { model: e.source.split(':')[0] })}
                 </span>
               )}
               <button
                 type="button"
                 onClick={async () => {
-                  if (confirm(`Delete "${e.title}" (${e.date})?`)) {
+                  if (confirm(t('healthLog.confirmDelete', { title: e.title, date: e.date }))) {
                     await deleteHealthEntry(db, e.id)
                     await reload()
                   }
                 }}
               >
-                delete
+                {t('common.delete')}
               </button>
               {e.body && (
                 <details>
-                  <summary className="muted">text</summary>
+                  <summary className="muted">{t('healthLog.text')}</summary>
                   <pre className="pack">{e.body}</pre>
                 </details>
               )}
@@ -206,10 +202,10 @@ export function HealthLog({ person }: { person: Person }) {
       {!adding ? (
         <div className="row">
           <button type="button" disabled={consented === null} onClick={() => setAdding(true)}>
-            Add entry…
+            {t('healthLog.addEntry')}
           </button>
           <button type="button" disabled={consented === null} onClick={() => setReading(true)}>
-            Read a document…
+            {t('healthLog.readDocument')}
           </button>
         </div>
       ) : !consented ? (
@@ -225,14 +221,14 @@ export function HealthLog({ person }: { person: Person }) {
         <div>
           <div className="row">
             <label className="field">
-              Start from
+              {t('healthLog.startFrom')}
               <select value={form.preset} onChange={(e) => applyPreset(e.target.value)}>
-                <option value="">custom entry</option>
+                <option value="">{t('healthLog.customEntry')}</option>
                 {PRESET_GROUPS.map((g) => (
-                  <optgroup key={g.label} label={g.label}>
+                  <optgroup key={g.label} label={t(g.labelKey)}>
                     {g.presets.map((p) => (
                       <option key={p.id} value={p.id}>
-                        {p.title}
+                        {t(`preset.${p.id}`)}
                       </option>
                     ))}
                   </optgroup>
@@ -240,7 +236,7 @@ export function HealthLog({ person }: { person: Person }) {
               </select>
             </label>
             <label className="field">
-              Date
+              {t('healthLog.date')}
               <input
                 type="date"
                 value={form.date}
@@ -248,28 +244,28 @@ export function HealthLog({ person }: { person: Person }) {
               />
             </label>
             <label className="field">
-              Kind
+              {t('healthLog.kind')}
               <select
                 value={form.kind}
                 onChange={(e) => setForm({ ...form, kind: e.target.value as HealthKind })}
               >
                 {KINDS.map((k) => (
                   <option key={k} value={k}>
-                    {HEALTH_KIND_LABELS[k]}
+                    {t(`kind.${k}`)}
                   </option>
                 ))}
               </select>
             </label>
             <label className="field" style={{ flex: 1 }}>
-              Title
+              {t('healthLog.titleField')}
               <input
                 value={form.title}
                 placeholder={
                   form.kind === 'symptom'
-                    ? 'e.g. Aching in both hands since morning'
+                    ? t('healthLog.titlePlaceholderSymptom')
                     : measuring
-                      ? 'e.g. Waist circumference'
-                      : 'e.g. Lipid panel, city lab'
+                      ? t('healthLog.titlePlaceholderMeasurement')
+                      : t('healthLog.titlePlaceholderOther')
                 }
                 onChange={(e) => setForm({ ...form, title: e.target.value })}
               />
@@ -278,7 +274,7 @@ export function HealthLog({ person }: { person: Person }) {
           {measuring && (
             <div className="row" style={{ marginTop: '0.6rem' }}>
               <label className="field">
-                {pair ? `Value (${pair[0]})` : 'Value'}
+                {pair ? t('healthLog.valueOf', { label: t(`preset.pair.${pair[0]}`) }) : t('healthLog.value')}
                 <input
                   type="number"
                   inputMode="decimal"
@@ -289,7 +285,7 @@ export function HealthLog({ person }: { person: Person }) {
               </label>
               {pair && (
                 <label className="field">
-                  Value ({pair[1]})
+                  {t('healthLog.valueOf', { label: t(`preset.pair.${pair[1]}`) })}
                   <input
                     type="number"
                     inputMode="decimal"
@@ -300,10 +296,10 @@ export function HealthLog({ person }: { person: Person }) {
                 </label>
               )}
               <label className="field">
-                Unit
+                {t('healthLog.unit')}
                 <input
                   value={form.unit}
-                  placeholder="e.g. cm"
+                  placeholder={t('healthLog.unitPlaceholder')}
                   onChange={(e) => setForm({ ...form, unit: e.target.value })}
                 />
               </label>
@@ -311,71 +307,67 @@ export function HealthLog({ person }: { person: Person }) {
           )}
           <div className="row" style={{ marginTop: '0.6rem' }}>
             <label className="field">
-              Body part
+              {t('healthLog.bodyPart')}
               <input
                 list="body-parts"
                 value={form.bodyPart}
-                placeholder="e.g. hands"
+                placeholder={t('healthLog.bodyPartPlaceholder')}
                 onChange={(e) => setForm({ ...form, bodyPart: e.target.value })}
               />
               <datalist id="body-parts">
                 {BODY_PARTS.map((b) => (
-                  <option key={b} value={b} />
+                  <option key={b} value={b} label={t(`bodyPart.${b}`)} />
                 ))}
               </datalist>
             </label>
             <label className="field">
-              {measuring ? 'How it felt' : 'Severity'}
+              {measuring ? t('healthLog.howItFelt') : t('healthLog.severity')}
               <select value={form.severity} onChange={(e) => setForm({ ...form, severity: e.target.value })}>
-                <option value="">not rated</option>
+                <option value="">{t('healthLog.notRated')}</option>
                 {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
                   <option key={n} value={n}>
-                    {n} / 10
+                    {t('healthLog.outOfTen', { n })}
                   </option>
                 ))}
               </select>
             </label>
             <label className="field" style={{ flex: 1 }}>
-              Tags (conditions, diseases; comma-separated)
+              {t('healthLog.tags')}
               <input
                 list="health-tags"
                 value={form.tags}
-                placeholder="e.g. arthritis, flare"
+                placeholder={t('healthLog.tagsPlaceholder')}
                 onChange={(e) => setForm({ ...form, tags: e.target.value })}
               />
               <datalist id="health-tags">
-                {tags.map((t) => (
-                  <option key={t} value={t} />
+                {tags.map((tag) => (
+                  <option key={tag} value={tag} />
                 ))}
               </datalist>
             </label>
           </div>
           <label className="field" style={{ marginTop: '0.6rem' }}>
             {form.kind === 'symptom'
-              ? 'Details (when it started, what makes it better or worse, what you took)'
+              ? t('healthLog.detailsSymptom')
               : measuring
-                ? 'Details (time of day, before or after a meal, which arm, what device)'
-                : 'Text (paste the relevant values or wording from the paper)'}
+                ? t('healthLog.detailsMeasurement')
+                : t('healthLog.detailsOther')}
             <textarea
               value={form.body}
               placeholder={
                 form.kind === 'symptom'
-                  ? 'Started after waking up, both hands stiff for about an hour, better after warm water.'
+                  ? t('healthLog.bodyPlaceholderSymptom')
                   : measuring
-                    ? 'Morning, seated, left arm, after five minutes of rest.'
-                    : 'LDL 4.1 mmol/L (ref < 3.0)\nHDL 1.2 mmol/L (ref > 1.0)'
+                    ? t('healthLog.bodyPlaceholderMeasurement')
+                    : t('healthLog.bodyPlaceholderOther')
               }
               onChange={(e) => setForm({ ...form, body: e.target.value })}
             />
           </label>
-          {form.source && (
-            <p className="muted">
-              Transcribed by a model from your document; check every number against the paper before saving.
-            </p>
-          )}
+          {form.source && <p className="muted">{t('healthLog.transcribedNotice')}</p>}
           <div className="row" style={{ marginTop: '0.6rem' }}>
             <button type="button" className="primary" disabled={!valid} onClick={save}>
-              Save entry
+              {t('healthLog.saveEntry')}
             </button>
             <button
               type="button"
@@ -384,7 +376,7 @@ export function HealthLog({ person }: { person: Person }) {
                 setAdding(false)
               }}
             >
-              Cancel
+              {t('common.cancel')}
             </button>
           </div>
         </div>

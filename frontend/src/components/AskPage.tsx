@@ -5,6 +5,7 @@ import { PROMPTS } from '../ask/prompts'
 import { retrieveForQuestion } from '../ask/retrieve'
 import { listHealthLog, logSharing, newId, now, personCallsFor } from '../db/repo'
 import { describeEntry } from '../health/log'
+import { rich, useT } from '../i18n/context'
 import { computeFindings, type Finding } from '../kb/kb'
 import type { HealthEntry } from '../types'
 
@@ -15,6 +16,7 @@ import type { HealthEntry } from '../types'
  */
 export function AskPage() {
   const { db, kb, persons } = useApp()
+  const t = useT()
   const [question, setQuestion] = useState('')
   const [selected, setSelected] = useState<string[]>([])
   const [findingsBy, setFindingsBy] = useState<Record<string, Finding[]>>({})
@@ -82,23 +84,19 @@ export function AskPage() {
 
   return (
     <div>
-      <h1>Ask</h1>
-      <p className="muted">
-        Build a context pack from the family's genotypes, then paste it into ChatGPT, Claude, Gemini or any
-        assistant you already use. Hearth sends nothing itself. Names are replaced by labels unless you switch
-        them on.
-      </p>
+      <h1>{t('askPage.title')}</h1>
+      <p className="muted">{t('askPage.intro')}</p>
       <div className="card">
         <label className="field">
-          Your question
+          {t('askPage.question')}
           <textarea
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
-            placeholder="e.g. Should Vova worry about clopidogrel? · Who inherited the TCF7L2 diabetes variant? · Is simvastatin a good choice for Polina?"
+            placeholder={t('askPage.questionPlaceholder')}
           />
         </label>
         <div className="row" style={{ marginTop: '0.6rem' }}>
-          <span>People:</span>
+          <span>{t('askPage.people')}</span>
           {persons.map((p) => (
             <label className="check" key={p.id} style={{ margin: 0 }}>
               <input
@@ -114,39 +112,36 @@ export function AskPage() {
         </div>
         <div className="row" style={{ marginTop: '0.6rem' }}>
           <label className="field">
-            Prompt template
+            {t('askPage.promptTemplate')}
             <select value={templateId} onChange={(e) => setTemplateId(e.target.value)}>
               {PROMPTS.map((p) => (
                 <option key={p.id} value={p.id}>
-                  {p.title}
+                  {t(p.titleKey)}
                 </option>
               ))}
             </select>
           </label>
           <label className="check" style={{ margin: 0 }}>
             <input type="checkbox" checked={realNames} onChange={(e) => setRealNames(e.target.checked)} />
-            <span>include real names and exact ages</span>
+            <span>{t('askPage.realNames')}</span>
           </label>
         </div>
       </div>
 
       <div className="card">
         <h2>
-          Included genotypes and health log{' '}
+          {t('askPage.includedHeading')}{' '}
           <span className="muted">
-            ({stats.genotypes} genotypes, {stats.healthEntries} health entries across {people.length} people)
+            {t('askPage.includedStats', {
+              genotypes: stats.genotypes,
+              healthEntries: stats.healthEntries,
+              people: people.length,
+            })}
           </span>
         </h2>
-        {relevantRsids.size === 0 && question.trim() && (
-          <p className="muted">
-            No knowledge-base entry matches a word in the question; showing markers with impact ≥ 2 instead.
-          </p>
-        )}
+        {relevantRsids.size === 0 && question.trim() && <p className="muted">{t('askPage.noMatch')}</p>}
         {!realNames && namesInQuestion.length > 0 && (
-          <p className="warn">
-            Your question mentions {namesInQuestion.join(', ')} by name; the pack labels people as Person A/B.
-            Reword the question or switch real names on.
-          </p>
+          <p className="warn">{t('askPage.namesWarning', { names: namesInQuestion.join(', ') })}</p>
         )}
         {people.map(({ person, findings, health }) => (
           <div key={person.id}>
@@ -160,24 +155,25 @@ export function AskPage() {
                       type="button"
                       onClick={() => setExcluded(new Set([...excluded, `${person.id}:${h.id}`]))}
                     >
-                      remove
+                      {t('askPage.remove')}
                     </button>
                   </li>
                 ))}
               </ul>
             )}
             {findings.length === 0 ? (
-              <p className="muted">nothing selected</p>
+              <p className="muted">{t('askPage.nothingSelected')}</p>
             ) : (
               <ul>
                 {findings.map((f) => (
                   <li key={f.entry.rsid}>
-                    {f.entry.gene} {f.entry.rsid} {f.call.a1}/{f.call.a2} — {f.match?.label ?? 'undescribed'}{' '}
+                    {f.entry.gene} {f.entry.rsid} {f.call.a1}/{f.call.a2} —{' '}
+                    {f.match?.label ?? t('askPage.undescribed')}{' '}
                     <button
                       type="button"
                       onClick={() => setExcluded(new Set([...excluded, `${person.id}:${f.entry.rsid}`]))}
                     >
-                      remove
+                      {t('askPage.remove')}
                     </button>
                   </li>
                 ))}
@@ -187,13 +183,13 @@ export function AskPage() {
         ))}
         {excluded.size > 0 && (
           <button type="button" onClick={() => setExcluded(new Set())}>
-            restore removed ({excluded.size})
+            {t('askPage.restoreRemoved', { n: excluded.size })}
           </button>
         )}
       </div>
 
       <div className="card">
-        <h2>Preview — exactly what will be copied ({stats.chars.toLocaleString()} characters)</h2>
+        <h2>{t('askPage.previewHeading', { chars: stats.chars.toLocaleString() })}</h2>
         <pre className="pack">{pack}</pre>
         <div className="row">
           <button
@@ -202,48 +198,53 @@ export function AskPage() {
             disabled={selected.length === 0}
             onClick={() => setConfirmOpen(true)}
           >
-            Copy context pack…
+            {t('askPage.copyButton')}
           </button>
-          {copied && <span className="ok">Copied for {copied}. Now paste it into the assistant.</span>}
+          {copied && <span className="ok">{t('askPage.copied', { destination: copied })}</span>}
         </div>
         <p className="muted">
-          Open the assistant yourself:{' '}
-          <a href="https://chatgpt.com" target="_blank" rel="noreferrer">
-            ChatGPT
-          </a>{' '}
-          ·{' '}
-          <a href="https://claude.ai" target="_blank" rel="noreferrer">
-            Claude
-          </a>{' '}
-          ·{' '}
-          <a href="https://gemini.google.com" target="_blank" rel="noreferrer">
-            Gemini
-          </a>
-          . These links carry no data. Consumer chat accounts may use conversations for training unless you
-          turn that off in the provider's settings; consider doing so before pasting health information.
+          {rich(t('askPage.openAssistant'), {
+            chatgpt: (c) => (
+              <a href="https://chatgpt.com" target="_blank" rel="noreferrer">
+                {c}
+              </a>
+            ),
+            claude: (c) => (
+              <a href="https://claude.ai" target="_blank" rel="noreferrer">
+                {c}
+              </a>
+            ),
+            gemini: (c) => (
+              <a href="https://gemini.google.com" target="_blank" rel="noreferrer">
+                {c}
+              </a>
+            ),
+          })}
         </p>
       </div>
 
       {confirmOpen && (
         <dialog open>
-          <h2 style={{ marginTop: 0 }}>Before you copy</h2>
-          <p>
-            The text in the preview will be placed on your clipboard. Once pasted into a third-party service
-            it is governed by <em>their</em> terms and privacy policy, not Hearth's.
-          </p>
+          <h2 style={{ marginTop: 0 }}>{t('askPage.confirmTitle')}</h2>
+          <p>{rich(t('askPage.confirmBody'))}</p>
           <ul>
             <li>
-              {stats.genotypes} genotypes and {stats.healthEntries} health-log entries for {people.length}{' '}
-              {people.length === 1 ? 'person' : 'people'}, {realNames ? 'with real names' : 'pseudonymised'}
+              {t('askPage.confirmCounts', {
+                genotypes: stats.genotypes,
+                healthEntries: stats.healthEntries,
+                people: people.length,
+                peopleWord: people.length === 1 ? t('askPage.person') : t('askPage.peopleWord'),
+                naming: realNames ? t('askPage.withRealNames') : t('askPage.pseudonymised'),
+              })}
             </li>
-            <li>Recorded in the sharing log (Settings) so you can audit what left this device</li>
+            <li>{t('askPage.confirmLogged')}</li>
           </ul>
           <div className="row">
             <button type="button" className="primary" onClick={() => copy('clipboard')}>
-              I have checked the preview — copy
+              {t('askPage.confirmCopy')}
             </button>
             <button type="button" onClick={() => setConfirmOpen(false)}>
-              Cancel
+              {t('common.cancel')}
             </button>
           </div>
         </dialog>

@@ -16,9 +16,13 @@ export const dumpFileName = (passphrase?: string) =>
  * Builds the full dump (v2 container) and hands it to the browser as a download. Shared by
  * Settings and the erase dialog, so "export before you erase" is the same file as a normal backup.
  */
-export async function exportDumpFile(db: Database, appVersion: string, passphrase?: string): Promise<string> {
+export async function exportDumpFile(
+  db: Database,
+  appVersion: string,
+  passphrase?: string,
+): Promise<{ name: string; mb: string; encrypted: boolean }> {
   const bytes = await snapshotBytes(db, appVersion, passphrase)
   const name = dumpFileName(passphrase)
   downloadBytes(bytes, name)
-  return `Exported ${name} (${(bytes.length / 1024 / 1024).toFixed(1)} MB)${passphrase ? ', encrypted' : ' — plaintext genetic data, keep it safe'}`
+  return { name, mb: (bytes.length / 1024 / 1024).toFixed(1), encrypted: Boolean(passphrase) }
 }

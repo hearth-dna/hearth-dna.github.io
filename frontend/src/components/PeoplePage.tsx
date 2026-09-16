@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import { useApp } from '../app/context'
 import { addPerson, deletePerson, setParent, unsetParent, updatePerson } from '../db/repo'
+import { useT } from '../i18n/context'
 import { PROVIDER_LABELS, type Sex } from '../types'
 import { BatchImportDialog } from './BatchImportDialog'
 import { ImportDialog } from './ImportDialog'
 
 export function PeoplePage({ onOpen }: { onOpen: (id: string) => void }) {
+  const t = useT()
   const { db, persons, counts, relationships, refresh } = useApp()
   const [form, setForm] = useState({ label: '', displayName: '', sex: 'unknown' as Sex, birthYear: '' })
   const [importFor, setImportFor] = useState<string | null>(null)
@@ -40,59 +42,66 @@ export function PeoplePage({ onOpen }: { onOpen: (id: string) => void }) {
     await refresh()
   }
   const parentsOf = (id: string) => relationships.filter((r) => r.childId === id).map((r) => r.parentId)
+  const sexLabel: Record<Sex, string> = {
+    unknown: t('peoplePage.sexUnknown'),
+    male: t('peoplePage.sexMale'),
+    female: t('peoplePage.sexFemale'),
+  }
+  const sexOptions = (Object.keys(sexLabel) as Sex[]).map((s) => (
+    <option key={s} value={s}>
+      {sexLabel[s]}
+    </option>
+  ))
 
   return (
     <div>
-      <h1>People</h1>
+      <h1>{t('peoplePage.title')}</h1>
       <div className="card">
-        <h2>Add a person</h2>
+        <h2>{t('peoplePage.addPerson')}</h2>
         <div className="row">
           <label className="field">
-            Short label
+            {t('peoplePage.shortLabel')}
             <input
               value={form.label}
               onChange={(e) => setForm({ ...form, label: e.target.value })}
-              placeholder="vova"
+              placeholder={t('peoplePage.shortLabelPlaceholder')}
             />
           </label>
           <label className="field">
-            Display name
+            {t('peoplePage.displayName')}
             <input
               value={form.displayName}
               onChange={(e) => setForm({ ...form, displayName: e.target.value })}
-              placeholder="Vova"
+              placeholder={t('peoplePage.displayNamePlaceholder')}
             />
           </label>
           <label className="field">
-            Sex
+            {t('peoplePage.sex')}
             <select value={form.sex} onChange={(e) => setForm({ ...form, sex: e.target.value as Sex })}>
-              <option value="unknown">unknown</option>
-              <option value="male">male</option>
-              <option value="female">female</option>
+              {sexOptions}
             </select>
           </label>
           <label className="field">
-            Birth year
+            {t('peoplePage.birthYear')}
             <input
               value={form.birthYear}
               onChange={(e) => setForm({ ...form, birthYear: e.target.value })}
-              placeholder="1984"
+              placeholder={t('peoplePage.birthYearPlaceholder')}
               style={{ width: '6rem' }}
             />
           </label>
           <button type="button" className="primary" onClick={submit}>
-            Add
+            {t('peoplePage.add')}
           </button>
           <button type="button" onClick={() => setBatch(true)}>
-            Import several DNA files…
+            {t('peoplePage.importSeveral')}
           </button>
         </div>
       </div>
 
       {persons.length === 0 && (
         <p className="muted">
-          No one yet. Add a person, then import their raw DNA file (
-          {Object.values(PROVIDER_LABELS).join(', ')}).
+          {t('peoplePage.noOneYet', { providers: Object.values(PROVIDER_LABELS).join(', ') })}
         </p>
       )}
 
@@ -105,51 +114,53 @@ export function PeoplePage({ onOpen }: { onOpen: (id: string) => void }) {
             {editing === p.id ? (
               <div className="row">
                 <label className="field">
-                  Display name
+                  {t('peoplePage.displayName')}
                   <input
                     value={edit.displayName}
                     onChange={(e) => setEdit({ ...edit, displayName: e.target.value })}
                   />
                 </label>
                 <label className="field">
-                  Sex
+                  {t('peoplePage.sex')}
                   <select value={edit.sex} onChange={(e) => setEdit({ ...edit, sex: e.target.value as Sex })}>
-                    <option value="unknown">unknown</option>
-                    <option value="male">male</option>
-                    <option value="female">female</option>
+                    {sexOptions}
                   </select>
                 </label>
                 <label className="field">
-                  Birth year
+                  {t('peoplePage.birthYear')}
                   <input
                     value={edit.birthYear}
                     onChange={(e) => setEdit({ ...edit, birthYear: e.target.value })}
                   />
                 </label>
                 <button type="button" className="primary" onClick={saveEdit}>
-                  Save
+                  {t('common.save')}
                 </button>
                 <button type="button" onClick={() => setEditing(null)}>
-                  Cancel
+                  {t('common.cancel')}
                 </button>
               </div>
             ) : (
               <p className="muted">
-                {p.sex}
-                {p.birthYear ? ` · born ${p.birthYear}` : ''} ·{' '}
-                {counts[p.id] ? `${counts[p.id].toLocaleString()} SNPs` : 'no genotypes yet'}{' '}
+                {sexLabel[p.sex]}
+                {p.birthYear ? ` · ${t('peoplePage.born', { year: p.birthYear })}` : ''} ·{' '}
+                {counts[p.id]
+                  ? t('peoplePage.snps', { n: counts[p.id].toLocaleString() })
+                  : t('peoplePage.noGenotypes')}{' '}
                 <button type="button" className="small" onClick={() => startEdit(p.id)}>
-                  edit
+                  {t('peoplePage.edit')}
                 </button>
               </p>
             )}
             <p className="muted">
-              Parents:{' '}
-              {parentsOf(p.id).length === 0
-                ? 'none set'
-                : parentsOf(p.id)
-                    .map((pid) => persons.find((x) => x.id === pid)?.displayName ?? '?')
-                    .join(', ')}
+              {t('peoplePage.parents', {
+                parents:
+                  parentsOf(p.id).length === 0
+                    ? t('peoplePage.noneSet')
+                    : parentsOf(p.id)
+                        .map((pid) => persons.find((x) => x.id === pid)?.displayName ?? '?')
+                        .join(', '),
+              })}
             </p>
             <div className="row">
               <select
@@ -160,7 +171,7 @@ export function PeoplePage({ onOpen }: { onOpen: (id: string) => void }) {
                   await refresh()
                 }}
               >
-                <option value="">+ parent…</option>
+                <option value="">{t('peoplePage.addParent')}</option>
                 {persons
                   .filter((x) => x.id !== p.id && !parentsOf(p.id).includes(x.id))
                   .map((x) => (
@@ -178,28 +189,30 @@ export function PeoplePage({ onOpen }: { onOpen: (id: string) => void }) {
                     await refresh()
                   }}
                 >
-                  − {persons.find((x) => x.id === pid)?.displayName}
+                  {t('peoplePage.removeParent', {
+                    name: persons.find((x) => x.id === pid)?.displayName ?? '',
+                  })}
                 </button>
               ))}
             </div>
             <div className="row" style={{ marginTop: '0.6rem' }}>
               <button type="button" className="primary" onClick={() => setImportFor(p.id)}>
-                Import DNA file
+                {t('peoplePage.importDna')}
               </button>
               <button type="button" onClick={() => onOpen(p.id)} disabled={!counts[p.id]}>
-                Report
+                {t('peoplePage.report')}
               </button>
               <button
                 type="button"
                 className="danger"
                 onClick={async () => {
-                  if (confirm(`Delete ${p.displayName} and all their data?`)) {
+                  if (confirm(t('peoplePage.confirmDelete', { name: p.displayName }))) {
                     await deletePerson(db, p.id)
                     await refresh()
                   }
                 }}
               >
-                Delete
+                {t('peoplePage.delete')}
               </button>
             </div>
           </div>

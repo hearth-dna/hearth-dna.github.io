@@ -55,7 +55,9 @@ identified by reading its first bytes too. `readHeader(bytes)` handles both with
 
 Genome blobs are cached in OPFS under a separate directory (`hearth-<profile>-files/`, file name
 `genome-<sha256 of the text>.gz`), written at import time and on restore, keyed by the sha256 the
-`source_file` row already stores. `pruneGenomeBlobs` drops orphans after delete, revoke and erase. Not a SQLite
+`source_file` row already stores. A person imported before that gets a generic-format file rebuilt and
+gzipped inside the worker once, cached as `generic-<person>-<rows>.gz` (the row count invalidates it
+after a new import). `pruneGenomeBlobs` drops orphans after delete, revoke, erase and import. Not a SQLite
 table, so ADR 0001's "no blob tables" spirit holds and the SAH pool directory stays untouched.
 When a person or source file is deleted the blob goes with it (same revoke path). If a blob is
 missing (imported before v2), the worker reconstructs a provider-style text from the genotype

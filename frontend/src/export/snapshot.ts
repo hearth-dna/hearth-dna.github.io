@@ -1,7 +1,14 @@
-import { gzipSync, strToU8 } from 'fflate'
 import { listConsents } from '../consent/consent'
 import { Database } from '../db/db'
-import { genomeBlobName, getMeta, listPersons, listRelationships, listSourceFiles } from '../db/repo'
+import {
+  genomeBlobName,
+  genotypeCounts,
+  getMeta,
+  listPersons,
+  listRelationships,
+  listSourceFiles,
+  rebuiltBlobName,
+} from '../db/repo'
 import { type Container, type GenomeEntry, genomePath, serialiseContainer, sha256 } from './container'
 
 /**
@@ -12,9 +19,7 @@ import { type Container, type GenomeEntry, genomePath, serialiseContainer, sha25
 export async function buildSnapshot(db: Database, appVersion: string): Promise<Container> {
   const persons = await listPersons(db)
   const sourceFiles = await listSourceFiles(db)
-  const withGenotypes = new Set(
-    (await db.query('SELECT DISTINCT person_id FROM genotype')).map((r) => r.person_id as string),
-  )
+  const counts = await genotypeCounts(db)
   const genomes: Record<string, Uint8Array> = {}
   const entries: GenomeEntry[] = []
   const add = async (bytes: Uint8Array, e: Omit<GenomeEntry, 'path' | 'sha256'>) => {
@@ -24,7 +29,8 @@ export async function buildSnapshot(db: Database, appVersion: string): Promise<C
     entries.push({ path, sha256: hash, ...e })
   }
   for (const p of persons) {
-    if (!withGenotypes.has(p.id)) continue
+    const rows = counts[p.id] ?? 0
+    if (rows === 0) continue
     const sfs = sourceFiles.filter((s) => s.personId === p.id)
     const cached = await Promise.all(sfs.map((s) => db.fileGet(genomeBlobName(s.sha256))))
     if (sfs.length > 0 && cached.every((c) => c !== null)) {
@@ -37,7 +43,15 @@ export async function buildSnapshot(db: Database, appVersion: string): Promise<C
           kind: 'original',
         })
     } else {
-      await add(gzipSync(strToU8(await db.genomeText(p.id))), {
+      // Rebuilt once in the worker and cached; the name carries the row count, so a later import
+      // for this person produces a fresh file and pruneGenomeBlobs drops the stale one.
+      const name = rebuiltBlobName(p.id, rows)
+      let bytes = await db.fileGet(name)
+      if (!bytes) {
+        bytes = await db.genomeGz(p.id)
+        await db.filePut(name, bytes)
+      }
+      await add(bytes, {
         person_id: p.id,
         source_file_id: null,
         provider: 'generic',

@@ -14,6 +14,7 @@ import { Database } from './db/db'
 import { genotypeCounts, listPersons, listRelationships } from './db/repo'
 import { readHeader } from './export/container'
 import { restoreBytes } from './export/restore'
+import { useT } from './i18n/context'
 import { type Kb, loadKb } from './kb/kb'
 
 type Page =
@@ -24,6 +25,7 @@ type Page =
   | { name: 'settings' }
 
 export function App() {
+  const t = useT()
   const [state, setState] = useState<AppState | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [takenOver, setTakenOver] = useState(false)
@@ -80,9 +82,9 @@ export function App() {
     return (
       <main>
         <div className="card notice">
-          <p>Hearth was opened in another tab, which now owns the local database.</p>
+          <p>{t('app.takenOver')}</p>
           <button type="button" className="primary" onClick={() => location.reload()}>
-            Use it here instead
+            {t('app.useHere')}
           </button>
         </div>
       </main>
@@ -90,33 +92,29 @@ export function App() {
   if (error)
     return (
       <main>
-        <div className="card danger">Could not start: {error}</div>
+        <div className="card danger">{t('app.startFailed', { error })}</div>
       </main>
     )
   if (locked) return <ArchiveGate onUnlock={locked.load} />
   if (!state)
     return (
       <main>
-        <p className="muted">{archive ? 'Opening archive…' : 'Opening local database…'}</p>
+        <p className="muted">{archive ? t('app.openingArchive') : t('app.openingDb')}</p>
       </main>
     )
   if (!state.db.persistent && !memoryOk && !archive)
     return (
       <main>
         <div className="card">
-          <h2 style={{ marginTop: 0 }}>Storage is not available</h2>
-          <p>
-            Hearth could not open its on-device database, so anything you import now would be lost on reload.
-            Usually another Hearth tab still holds the storage: close it and retry. Private windows and some
-            browsers do not offer persistent storage at all.
-          </p>
-          <p className="muted">Reason: {state.db.reason}</p>
+          <h2 style={{ marginTop: 0 }}>{t('app.storageTitle')}</h2>
+          <p>{t('app.storageIntro')}</p>
+          <p className="muted">{t('app.storageReason', { reason: state.db.reason })}</p>
           <div className="row">
             <button type="button" className="primary" onClick={() => location.reload()}>
-              Retry
+              {t('common.retry')}
             </button>
             <button type="button" className="danger" onClick={() => setMemoryOk(true)}>
-              Continue without saving
+              {t('app.continueWithoutSaving')}
             </button>
           </div>
         </div>
@@ -139,36 +137,29 @@ export function App() {
       <header className="top">
         <span className="brand">Hearth</span>
         <nav>
-          {nav({ name: 'people' }, 'People')}
-          {nav({ name: 'family' }, 'Family lookup')}
-          {nav({ name: 'ask' }, 'Ask')}
-          {nav({ name: 'settings' }, 'Settings & export')}
+          {nav({ name: 'people' }, t('app.navPeople'))}
+          {nav({ name: 'family' }, t('app.navFamily'))}
+          {nav({ name: 'ask' }, t('app.navAsk'))}
+          {nav({ name: 'settings' }, t('app.navSettings'))}
         </nav>
         <span className="status">
-          {state.persons.length} people · kb {state.kb.version} ·{' '}
-          {archive
-            ? 'archive, in memory'
-            : state.db.persistent
-              ? 'stored on this device'
-              : 'memory only — export before closing'}
+          {t('app.status', {
+            people: state.persons.length,
+            kb: state.kb.version,
+            storage: archive
+              ? t('app.storageArchive')
+              : state.db.persistent
+                ? t('app.storageDevice')
+                : t('app.storageMemory'),
+          })}
         </span>
         <button type="button" className="danger small" onClick={() => setErasing(true)}>
-          Erase data
+          {t('app.eraseData')}
         </button>
       </header>
       {erasing && <EraseDialog onClose={() => setErasing(false)} />}
-      {archive && (
-        <div className="banner">
-          Archive opened in memory. Nothing is stored in this browser; changes are kept only if you save a new
-          archive from Settings.
-        </div>
-      )}
-      {!state.db.persistent && !archive && (
-        <div className="banner danger">
-          Not saving: this session runs in memory and everything disappears on reload. Export a dump from
-          Settings before closing.
-        </div>
-      )}
+      {archive && <div className="banner">{t('app.archiveBanner')}</div>}
+      {!state.db.persistent && !archive && <div className="banner danger">{t('app.memoryBanner')}</div>}
       <main>
         {page.name === 'people' && <PeoplePage onOpen={(id) => setPage({ name: 'person', id })} />}
         {page.name === 'person' && <PersonPage id={page.id} onBack={() => setPage({ name: 'people' })} />}
@@ -182,6 +173,7 @@ export function App() {
 
 /** Passphrase prompt shown before anything else when an archive's payload is encrypted. */
 function ArchiveGate({ onUnlock }: { onUnlock: (pass: string) => Promise<void> }) {
+  const t = useT()
   const [pass, setPass] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
@@ -191,18 +183,18 @@ function ArchiveGate({ onUnlock }: { onUnlock: (pass: string) => Promise<void> }
     try {
       await onUnlock(pass)
     } catch {
-      setError('Wrong passphrase.')
+      setError(t('app.wrongPassphrase'))
       setBusy(false)
     }
   }
   return (
     <main>
       <div className="card">
-        <h2 style={{ marginTop: 0 }}>This archive is encrypted</h2>
-        <p className="muted">Enter the passphrase it was saved with. Nothing is stored in this browser.</p>
+        <h2 style={{ marginTop: 0 }}>{t('app.archiveEncrypted')}</h2>
+        <p className="muted">{t('app.archiveHint')}</p>
         <div className="row">
           <label className="field">
-            Passphrase
+            {t('app.passphrase')}
             <input
               type="password"
               value={pass}
@@ -212,7 +204,7 @@ function ArchiveGate({ onUnlock }: { onUnlock: (pass: string) => Promise<void> }
             />
           </label>
           <button type="button" className="primary" onClick={submit} disabled={busy || !pass}>
-            {busy ? 'Opening…' : 'Open'}
+            {busy ? t('app.opening') : t('app.open')}
           </button>
         </div>
         {error && <p className="danger">{error}</p>}

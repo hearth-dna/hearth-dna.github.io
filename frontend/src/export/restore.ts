@@ -14,7 +14,8 @@ import { type DumpV1, deserialiseDump, expandDump } from './dump'
  * none yet. Accepts dump v2 (zip or envelope), dump v1 (gzip or envelope) and a portable
  * archive (.html with the v2 payload embedded).
  */
-export type Progress = (msg: string) => void
+/** Progress callback: an i18n key (`src/i18n/en/restore.json`) plus its placeholders. */
+export type Progress = (key: string, params?: Record<string, string | number>) => void
 
 export interface RestoreResult {
   people: number
@@ -32,10 +33,10 @@ export async function restoreBytes(
   const b64 = looksLikeHtml(bytes) ? extractPayload(strFromU8(bytes)) : null
   if (b64) return restoreBytes(db, decodePayload(b64), passphrase, onProgress)
   if (readHeader(bytes)) {
-    onProgress('Opening dump…')
+    onProgress('restore.openingDump')
     return restoreContainer(db, await openContainer(bytes, passphrase), onProgress)
   }
-  onProgress('Opening dump…')
+  onProgress('restore.openingDump')
   return restoreV1(db, await deserialiseDump(bytes, passphrase), onProgress)
 }
 
@@ -140,9 +141,9 @@ async function restoreContainer(db: Database, c: Container, onProgress: Progress
   for (const g of c.manifest.genomes) {
     if (hadGenotypes.has(g.person_id)) continue
     const text = strFromU8(gunzipSync(c.genomes[g.path]))
-    onProgress(`Parsing genome ${genomes + 1} of ${c.manifest.genomes.length}…`)
+    onProgress('restore.parsingGenome', { n: genomes + 1, total: c.manifest.genomes.length })
     const r = await parseRawText(text, undefined, g.kind === 'original' ? g.provider : 'generic')
-    onProgress(`Storing ${r.calls.length.toLocaleString()} calls…`)
+    onProgress('restore.storingCalls', { n: r.calls.length.toLocaleString() })
     await storeCalls(db, g.person_id, r.calls)
     // Keep the original so this browser's own backups ship it too.
     if (g.kind === 'original') await db.filePut(genomeBlobName(await sha256Hex(text)), c.genomes[g.path])
@@ -169,7 +170,7 @@ async function restoreV1(db: Database, dump: DumpV1, onProgress: Progress): Prom
       [p.id, p.label, p.displayName, p.sex, p.birthYear, p.notes, p.createdAt],
     )
     const sf = dump.source_files.find((s) => s.personId === p.id)
-    onProgress(`Storing genotypes for ${p.displayName}…`)
+    onProgress('restore.storingGenotypes', { name: p.displayName })
     await importCalls(
       db,
       p.id,

@@ -1,0 +1,9 @@
+{
+  "importDialog.title": "Import DNA for {name}",
+  "importDialog.under18": "This person is under 18.",
+  "importDialog.guardianStatement": "I am this child's parent or legal guardian and will delete this data on their request.",
+  "importDialog.accepted": "Accepted: raw text/CSV/VCF, or a .zip / .gz containing one. Everything is parsed here in the browser.",
+  "importDialog.provider": "Provider",
+  "importDialog.autoDetect": "auto-detect",
+  "importDialog.tryAgain": "Try again"
+}

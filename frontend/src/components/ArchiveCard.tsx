@@ -1,45 +1,40 @@
 import { useState } from 'react'
 import { APP_VERSION, useApp } from '../app/context'
 import { downloadArchive, isArchive, saveArchive } from '../archive/mode'
+import { useT } from '../i18n/context'
 
 /** Settings card for the single-file portable archive (docs/architecture/storage/portable-archive.md). */
 export function ArchiveCard() {
   const { db, persons } = useApp()
+  const t = useT()
   const [pass, setPass] = useState('')
   const [msg, setMsg] = useState<string | null>(null)
   const archive = isArchive()
 
   const go = async () => {
-    setMsg('Building archive…')
+    setMsg(t('archiveCard.building'))
     try {
-      setMsg(await (archive ? saveArchive : downloadArchive)(db, APP_VERSION, pass || undefined))
+      const file = await (archive ? saveArchive : downloadArchive)(db, APP_VERSION, pass || undefined)
+      setMsg(t(archive ? 'archiveCard.saved' : 'archiveCard.downloaded', { ...file }))
     } catch (e) {
-      setMsg(`Failed: ${e}`)
+      setMsg(t('archiveCard.failed', { error: String(e) }))
     }
   }
 
   return (
     <div className="card">
-      <h2>Portable archive</h2>
-      <p className="muted">
-        {archive
-          ? 'This page is a portable archive running in memory. Changes you make here are kept only if you save a new archive file.'
-          : 'One .html file that contains Hearth itself and all your data. Double-click it in any desktop browser — on a USB stick, on another computer, years from now — and browse everything without installing anything. Import it here to bring the data back.'}
-      </p>
+      <h2>{t('archiveCard.title')}</h2>
+      <p className="muted">{t(archive ? 'archiveCard.introArchive' : 'archiveCard.introHosted')}</p>
       <div className="row">
         <label className="field">
-          Passphrase (recommended)
+          {t('archiveCard.passphrase')}
           <input type="password" value={pass} onChange={(e) => setPass(e.target.value)} />
         </label>
         <button type="button" className="primary" onClick={go} disabled={persons.length === 0}>
-          {archive ? 'Save archive…' : 'Download portable archive'}
+          {t(archive ? 'archiveCard.saveArchive' : 'archiveCard.downloadArchive')}
         </button>
       </div>
-      {!pass && (
-        <p className="muted">
-          Without a passphrase the file contains plaintext genetic data and is named accordingly.
-        </p>
-      )}
+      {!pass && <p className="muted">{t('archiveCard.plaintextWarning')}</p>}
       {msg && <p>{msg}</p>}
     </div>
   )

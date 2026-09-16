@@ -40,5 +40,5 @@ export default defineConfig({
     proxy: { '/api': { target: backendTarget, rewrite: (p) => p.replace(/^\/api/, '') } },
   },
   worker: { format: 'es' },
-  test: { environment: 'node', include: ['src/**/*.test.ts'] },
+  test: { environment: 'node', include: ['src/**/*.test.{ts,tsx}'] },
 })

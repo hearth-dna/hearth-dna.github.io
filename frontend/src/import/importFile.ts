@@ -1,6 +1,7 @@
 import { gzipSync, strToU8 } from 'fflate'
 import type { Database } from '../db/db'
-import { genomeBlobName, importCalls } from '../db/repo'
+import { genomeBlobName, importCalls, pruneGenomeBlobs } from '../db/repo'
+import type { Translate } from '../i18n/context'
 import { PROVIDER_LABELS, type Provider } from '../types'
 import { parseRawText } from './parseFile'
 import { detectProvider } from './providers'
@@ -17,15 +18,21 @@ export async function importGenomeFile(
   personId: string,
   file: File,
   onProgress: (p: ImportProgress) => void,
+  t: Translate,
   forced?: Provider,
 ): Promise<string> {
-  onProgress({ msg: 'Unpacking…', pct: 0 })
+  onProgress({ msg: t('importFile.unpacking'), pct: 0 })
   const { text, innerName } = await fileToText(file)
   const sha256 = await sha256Hex(text)
-  onProgress({ msg: `Parsing ${innerName} (${PROVIDER_LABELS[forced || detectProvider(text)]})…`, pct: 0 })
-  const r = await parseRawText(text, (d, t) => onProgress({ msg: 'Parsing…', pct: (d / t) * 50 }), forced)
-  if (r.calls.length === 0) throw new Error('no genotype rows recognised — pick the provider manually')
-  onProgress({ msg: `Storing ${r.calls.length.toLocaleString()} calls…`, pct: 50 })
+  const provider = PROVIDER_LABELS[forced || detectProvider(text)]
+  onProgress({ msg: t('importFile.parsingFile', { name: innerName, provider }), pct: 0 })
+  const r = await parseRawText(
+    text,
+    (d, n) => onProgress({ msg: t('importFile.parsing'), pct: (d / n) * 50 }),
+    forced,
+  )
+  if (r.calls.length === 0) throw new Error(t('importFile.noRows'))
+  onProgress({ msg: t('importFile.storing', { n: r.calls.length.toLocaleString() }), pct: 50 })
   await importCalls(
     db,
     personId,
@@ -33,13 +40,22 @@ export async function importGenomeFile(
     r.calls,
     (n) =>
       onProgress({
-        msg: `Storing ${n.toLocaleString()} / ${r.calls.length.toLocaleString()}…`,
+        msg: t('importFile.storingProgress', {
+          n: n.toLocaleString(),
+          total: r.calls.length.toLocaleString(),
+        }),
         pct: 50 + (n / r.calls.length) * 50,
       }),
   )
   // The original text is kept, gzipped, so backups ship it instead of re-serialising every row.
   await db.filePut(genomeBlobName(sha256), gzipSync(strToU8(text)))
-  return `${r.calls.length.toLocaleString()} calls from ${PROVIDER_LABELS[r.provider]} (build ${r.build}); ${r.skipped.toLocaleString()} no-calls skipped`
+  await pruneGenomeBlobs(db)
+  return t('importFile.summary', {
+    n: r.calls.length.toLocaleString(),
+    provider: PROVIDER_LABELS[r.provider],
+    build: r.build,
+    skipped: r.skipped.toLocaleString(),
+  })
 }
 
 /** "AncestryDNA (1).txt" → label "ancestrydna-1", display name "AncestryDNA (1)". */
