@@ -8,8 +8,10 @@ import {
   formatValue,
   isFiltering,
   NO_FILTER,
+  normTime,
   parseTags,
   sortHealthLog,
+  when,
 } from './log'
 import { findPreset, PRESET_GROUPS } from './presets'
 
@@ -17,6 +19,7 @@ const entry = (o: Partial<HealthEntry>): HealthEntry => ({
   id: 'x',
   personId: 'p',
   date: '2026-09-14',
+  time: '',
   kind: 'symptom',
   title: 'Pain',
   body: '',
@@ -168,5 +171,32 @@ describe('sortHealthLog', () => {
   it('does not mutate its input', () => {
     sortHealthLog(log, 'title', 'asc')
     expect(log.map((e) => e.id)).toEqual(['1', '2', '3', '4'])
+  })
+})
+
+describe('time of day', () => {
+  it('normalises HH:MM and rejects anything else', () => {
+    expect(normTime('8:05')).toBe('08:05')
+    expect(normTime('23:59')).toBe('23:59')
+    expect(normTime('07:30:12')).toBe('07:30')
+    expect(normTime('24:00')).toBe('')
+    expect(normTime('12:60')).toBe('')
+    expect(normTime('noon')).toBe('')
+    expect(normTime('')).toBe('')
+  })
+  it('shows the time after the date only when there is one', () => {
+    expect(when({ date: '2026-09-14', time: '06:45' })).toBe('2026-09-14 06:45')
+    expect(when({ date: '2026-09-14', time: '' })).toBe('2026-09-14')
+    expect(describeEntry(entry({ title: 'Temp', time: '21:10' }))).toMatch(/^2026-09-14 21:10 · /)
+    expect(describeEntry(entry({ title: 'Temp' }))).toMatch(/^2026-09-14 · /)
+  })
+  it('orders same-day entries by time, untimed ones first when ascending', () => {
+    const day = [
+      entry({ id: 'evening', time: '21:00', createdAt: '1' }),
+      entry({ id: 'untimed', time: '', createdAt: '2' }),
+      entry({ id: 'morning', time: '07:00', createdAt: '3' }),
+    ]
+    expect(sortHealthLog(day, 'date', 'desc').map((e) => e.id)).toEqual(['evening', 'morning', 'untimed'])
+    expect(sortHealthLog(day, 'date', 'asc').map((e) => e.id)).toEqual(['untimed', 'morning', 'evening'])
   })
 })

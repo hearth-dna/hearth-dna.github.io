@@ -104,6 +104,7 @@ describe('tables', () => {
       id: 'h',
       personId: '1',
       date: '2026-01-02',
+      time: '07:30',
       kind: 'symptom',
       title: 'Headache',
       body: 'mild',
@@ -120,6 +121,7 @@ describe('tables', () => {
     expect(t.rows[0]).toEqual([
       'Me',
       '2026-01-02',
+      '07:30',
       'symptom',
       'Headache',
       'head',

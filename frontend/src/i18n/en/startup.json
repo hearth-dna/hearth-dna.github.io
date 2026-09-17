@@ -1,0 +1,15 @@
+{
+  "startup.title": "Starting Hearth",
+  "startup.elapsed": "{time} so far",
+  "startup.almost": "Ready in {time}",
+  "startup.step.lock": "Checking that no other Hearth tab is using the database",
+  "startup.step.takeover": "Asking the other Hearth tab to let go of the database",
+  "startup.step.engine": "Loading the SQLite engine",
+  "startup.step.storage": "Opening on-device storage (attempt {attempt} of {of})",
+  "startup.step.schema": "Checking and updating the database structure",
+  "startup.step.kb": "Loading the knowledge base",
+  "startup.step.archive": "Unpacking the archive",
+  "startup.step.backup": "Checking the backup folder",
+  "startup.step.people": "Loading people and family links",
+  "startup.step.genotypes": "Counting genotypes for each person"
+}

@@ -50,8 +50,17 @@ SQLite the app keeps state, because a handle cannot be put in SQLite. On launch:
 show *Reconnect folder* which calls `requestPermission` (must run from a click).
 
 **Autosave.** `backup/scheduler.ts` subscribes to `Database.onChange`, debounces 5 s, then builds
-the container and writes. A backup pending when the tab closes is simply lost; the next change
-schedules a fresh one, and *Back up now* is always available.
+the container and writes. Only a write that changed rows counts, so startup cleanups do not. A
+switch in the card turns it off (`Saved.auto`, default on). Whether the folder is behind is known
+from `meta.generation` against the generation last written or loaded; when it is, and automatic
+sync is on, the next start or reconnect syncs without waiting for another edit.
+
+**Header Sync button.** `components/SyncButton.tsx` shows the state in a word and a colour:
+synced (with the time), syncing soon, not synced, syncing, newer copy on another computer,
+passphrase needed, reconnect, conflict, failed. A click syncs: a newer copy is loaded first (a
+union by id, so nothing here is lost), then this browser's state is written. States that need a
+decision open Settings. Folder reads time out after 10 s, so a stuck cloud mount shows "Sync
+failed" instead of blocking the app.
 
 **Cost.** A full backup of seven genomes is ~5 MB compressed. Building it today means pulling
 every genotype to the main thread; `dump-v2.md` moves genotype serialisation into the worker and

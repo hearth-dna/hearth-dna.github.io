@@ -68,9 +68,11 @@ describe('revokeConsent', () => {
   it('deletes the genome and both genome consents for the subject', async () => {
     const { db, log } = fakeDb()
     await revokeConsent(db, 'import_genome', 'p1')
-    expect(log.map(([sql]) => sql.split(' ')[2])).toEqual(['genotype', 'source_file', 'consent'])
-    expect(log.every(([, bind]) => bind?.[0] === 'p1')).toBe(true)
-    expect(log[2][0]).toContain("'import_genome','import_minor'")
+    // Cleanup afterwards re-reads genotype counts, which re-fills their cache in meta.
+    const deletes = log.filter(([sql]) => sql.startsWith('DELETE'))
+    expect(deletes.map(([sql]) => sql.split(' ')[2])).toEqual(['genotype', 'source_file', 'consent'])
+    expect(deletes.every(([, bind]) => bind?.[0] === 'p1')).toBe(true)
+    expect(deletes[2][0]).toContain("'import_genome','import_minor'")
   })
   it('deletes the health log with a document consent', async () => {
     const { db, log } = fakeDb()

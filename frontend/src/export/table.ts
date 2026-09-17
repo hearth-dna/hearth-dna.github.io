@@ -105,6 +105,7 @@ export function findingsTable(byPerson: { person: Person; findings: Finding[] }[
 export const HEALTH_HEADER = [
   'person',
   'date',
+  'time',
   'kind',
   'title',
   'body_part',
@@ -125,6 +126,7 @@ export function healthTable(byPerson: { person: Person; entries: HealthEntry[] }
       rows.push([
         person.displayName,
         e.date,
+        e.time,
         e.kind,
         e.title,
         e.bodyPart,

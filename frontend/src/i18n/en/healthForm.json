@@ -42,5 +42,8 @@
   "healthForm.bodyPlaceholder.diagnosis": "Confirmed by Dr. A, ICD-10 M06.9.",
   "healthForm.bodyPlaceholder.medication": "One tablet twice a day after meals, for five days.",
   "healthForm.bodyPlaceholder.letter": "Recommends blood tests in three months and daily stretching.",
-  "healthForm.bodyPlaceholder.other": "Anything you want to remember about this day."
+  "healthForm.bodyPlaceholder.other": "Anything you want to remember about this day.",
+  "healthForm.time": "Time",
+  "healthForm.now": "Now",
+  "healthForm.nowHint": "Set date and time to right now"
 }

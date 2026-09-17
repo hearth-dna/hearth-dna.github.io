@@ -15,12 +15,39 @@ export type Status =
   | { state: 'none' }
   | { state: 'reconnect'; name: string }
   | { state: 'needs-passphrase'; name: string }
-  | { state: 'ready'; name: string; pending: boolean; lastAt: string | null; newer: boolean }
-  | { state: 'writing'; name: string; step: 'building' | 'writing' }
+  | {
+      state: 'ready'
+      name: string
+      /** An automatic backup is scheduled. */
+      pending: boolean
+      /** This browser has changes the folder does not have yet. */
+      dirty: boolean
+      lastAt: string | null
+      newer: boolean
+    }
+  | { state: 'writing'; name: string; step: 'loading' | 'building' | 'writing' }
   | { state: 'conflict'; name: string; file: string }
   | { state: 'error'; name: string; message: string }
 
 const DEBOUNCE_MS = 5000
+/** A folder on a stuck network or cloud mount can hang every file call; never wait on it forever. */
+const FOLDER_TIMEOUT_MS = 10_000
+
+function withTimeout<T>(p: Promise<T>, ms: number, what: string): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(`${what} did not respond within ${ms / 1000} s`)), ms)
+    p.then(
+      (v) => {
+        clearTimeout(timer)
+        resolve(v)
+      },
+      (e) => {
+        clearTimeout(timer)
+        reject(e)
+      },
+    )
+  })
+}
 const PASS_KEY = (profile: string) => `hearth:${profile}:backup-pass`
 
 class Backups {
@@ -29,7 +56,6 @@ class Backups {
   private profile = 'default'
   private saved: folder.Saved | null = null
   private timer: ReturnType<typeof setTimeout> | null = null
-  private lastAt: string | null = null
   private newer = false
   private busy = false
   private readonly listeners = new Set<() => void>()
@@ -42,7 +68,8 @@ class Backups {
     if (!folder.supported()) return this.set({ state: 'unsupported' })
     this.saved = await folder.loadSaved(this.profile)
     db.onChange(() => this.request())
-    await this.refresh()
+    // Reading the folder can be slow (a cloud mount) or hang; startup must not wait for it.
+    void this.refresh()
   }
 
   subscribe(l: () => void): () => void {
@@ -61,6 +88,24 @@ class Backups {
 
   get plain(): boolean {
     return this.saved?.plain ?? false
+  }
+
+  get auto(): boolean {
+    return this.saved?.auto ?? true
+  }
+
+  async setAuto(auto: boolean): Promise<void> {
+    if (!this.saved) return
+    this.saved.auto = auto
+    await folder.save(this.profile, this.saved)
+    if (auto) this.request()
+    else this.cancelPending()
+    await this.refresh()
+  }
+
+  private cancelPending(): void {
+    if (this.timer) clearTimeout(this.timer)
+    this.timer = null
   }
 
   passphrase(): string {
@@ -94,15 +139,42 @@ class Backups {
       return this.set({ state: 'reconnect', name })
     if (!this.plain && !this.passphrase()) return this.set({ state: 'needs-passphrase', name })
     const device = (await getMeta(this.db, 'device')) ?? ''
-    const current = await folder.currentHeader(this.saved.handle, baseName(this.profile))
+    let current: Awaited<ReturnType<typeof folder.currentHeader>>
+    try {
+      current = await withTimeout(
+        folder.currentHeader(this.saved.handle, baseName(this.profile)),
+        FOLDER_TIMEOUT_MS,
+        name,
+      )
+    } catch (e) {
+      return this.set({ state: 'error', name, message: e instanceof Error ? e.message : String(e) })
+    }
     this.newer = hasNewer(current, device, this.saved.lastSeen)
-    this.set({ state: 'ready', name, pending: this.timer !== null, lastAt: this.lastAt, newer: this.newer })
+    const dirty = await this.dirty(device)
+    this.set({
+      state: 'ready',
+      name,
+      pending: this.timer !== null,
+      dirty,
+      lastAt: this.saved.lastAt ?? null,
+      newer: this.newer,
+    })
+    // Changes made while the folder was unreachable (or before a reload) go out without waiting
+    // for the next edit. A newer copy from another computer is left for the user to pull in.
+    if (dirty && this.auto && !this.newer && !this.timer && !this.busy) this.request()
+  }
+
+  /** Whether the database changed since this browser last wrote to or loaded from the folder. */
+  private async dirty(device: string): Promise<boolean> {
+    const seen = this.saved?.lastSeen
+    const generation = Number((await getMeta(this.db, 'generation')) ?? 0)
+    return !seen || seen.device !== device || generation > seen.generation
   }
 
   /** Choose (or replace) the folder. Must run from a click. */
   async choose(): Promise<void> {
     const handle = await folder.pick()
-    this.saved = { handle, lastSeen: null, plain: false }
+    this.saved = { handle, lastSeen: null, plain: false, auto: true }
     await folder.save(this.profile, this.saved)
     await this.refresh()
   }
@@ -122,20 +194,52 @@ class Backups {
     return n
   }
 
-  /** Autosave: debounced so a burst of writes (an import) produces one snapshot. */
+  /**
+   * A change happened. With automatic sync on, a backup follows after a quiet period (debounced so
+   * a burst of writes, like an import, produces one snapshot); with it off, the header just shows
+   * that there are unsynced changes.
+   */
   request(): void {
     if (!this.saved || this.status.state === 'unsupported' || this.status.state === 'none') return
-    if (this.timer) clearTimeout(this.timer)
+    if (!this.auto) {
+      if (this.status.state === 'ready') this.set({ ...this.status, dirty: true })
+      return
+    }
+    this.cancelPending()
     this.timer = setTimeout(() => {
       this.timer = null
       void this.backupNow()
     }, DEBOUNCE_MS)
-    if (this.status.state === 'ready') this.set({ ...this.status, pending: true })
+    if (this.status.state === 'ready') this.set({ ...this.status, pending: true, dirty: true })
+  }
+
+  /**
+   * The header's Sync button: bring in a newer snapshot from another computer first (a union, so
+   * nothing here is lost), then write this browser's state to the folder.
+   */
+  async sync(onProgress: Progress = () => {}): Promise<void> {
+    if (this.busy) return
+    this.cancelPending()
+    if (this.status.state === 'ready' && this.status.newer) {
+      this.set({ state: 'writing', name: this.name, step: 'loading' })
+      try {
+        await this.loadFromFolder(onProgress)
+      } catch (e) {
+        return this.set({
+          state: 'error',
+          name: this.name,
+          message: e instanceof Error ? e.message : String(e),
+        })
+      }
+      this.cancelPending()
+    }
+    await this.backupNow()
   }
 
   /** Writes a snapshot now, unless another browser's unseen snapshot is in the way. */
   async backupNow(force = false): Promise<void> {
     if (!this.saved || this.busy) return
+    this.cancelPending()
     const name = this.name
     if ((await folder.permission(this.saved.handle)) !== 'granted')
       return this.set({ state: 'reconnect', name })
@@ -156,8 +260,8 @@ class Backups {
       }
       await folder.writeSnapshot(this.saved.handle, base, bytes, location.origin)
       this.saved.lastSeen = { device, generation: Number((await getMeta(this.db, 'generation')) ?? 0) }
+      this.saved.lastAt = new Date().toISOString()
       await folder.save(this.profile, this.saved)
-      this.lastAt = new Date().toISOString()
       await this.refresh()
     } catch (e) {
       this.set({ state: 'error', name, message: e instanceof Error ? e.message : String(e) })

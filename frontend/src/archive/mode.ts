@@ -1,3 +1,4 @@
+import type { StartupLog } from '../app/startup'
 import { Database } from '../db/db'
 import { fetchOwnAsset } from '../egress/egress'
 import { downloadBytes } from '../export/exportDump'
@@ -37,10 +38,10 @@ export function archivePayload(): Uint8Array | null {
 export const isArchive = () => archivePayload() !== null
 
 /** Memory-only database with the worker and wasm that the archive build inlined. */
-export async function openArchiveDb(): Promise<Database> {
+export async function openArchiveDb(log?: StartupLog): Promise<Database> {
   if (!__HEARTH_ARCHIVE__) throw new Error('archive mode is only available in the archive build')
   const { makeWorker, wasmUrl } = await import('./worker')
-  return Database.open({ memory: true, worker: makeWorker, wasmUrl })
+  return Database.open({ memory: true, worker: makeWorker, wasmUrl, log })
 }
 
 /** What was written: the file name and its size in MB (one decimal), for the status line. */

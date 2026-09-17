@@ -9,7 +9,18 @@ import { useT } from '../i18n/context'
 import { BODY_PARTS, HEALTH_KIND_LABELS, type HealthKind, type Person } from '../types'
 import { ConsentForm } from './ConsentForm'
 
-const today = () => new Date().toISOString().slice(0, 10)
+/** Local date and time; toISOString() is UTC and gives yesterday's date late in the evening. */
+const pad = (n: number) => String(n).padStart(2, '0')
+const today = () => {
+  const d = new Date()
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
+}
+const nowTime = () => {
+  const d = new Date()
+  return `${pad(d.getHours())}:${pad(d.getMinutes())}`
+}
+/** Kinds usually recorded as they happen; the others mostly come from paper with no time on it. */
+const TIMED: ReadonlySet<HealthKind> = new Set(['symptom', 'measurement', 'medication'])
 const KINDS = Object.keys(HEALTH_KIND_LABELS) as HealthKind[]
 
 /** Which optional fields each type of entry shows; title, date, tags and text are always there. */
@@ -26,6 +37,7 @@ const FIELDS: Record<HealthKind, { value?: true; bodyPart?: true; severity?: tru
 
 const blank = (kind: HealthKind | null) => ({
   date: today(),
+  time: kind && TIMED.has(kind) ? nowTime() : '',
   kind,
   title: '',
   body: '',
@@ -106,6 +118,7 @@ export function HealthEntryForm({
     await addHealthEntry(db, {
       personId,
       date: form.date,
+      time: form.time,
       kind,
       title: form.title.trim(),
       body: form.body,
@@ -156,7 +169,13 @@ export function HealthEntryForm({
         {personPicker}
         <div className="kindpicker">
           {KINDS.map((k) => (
-            <button key={k} type="button" onClick={() => setForm({ ...form, kind: k })}>
+            <button
+              key={k}
+              type="button"
+              onClick={() =>
+                setForm({ ...form, kind: k, time: form.time || (TIMED.has(k) ? nowTime() : '') })
+              }
+            >
               <strong>{t(`kind.${k}`)}</strong>
               <span className="muted">{t(`healthForm.hint.${k}`)}</span>
             </button>
@@ -179,7 +198,7 @@ export function HealthEntryForm({
           <button
             type="button"
             className="small"
-            onClick={() => setForm({ ...blank(null), date: form.date })}
+            onClick={() => setForm({ ...blank(null), date: form.date, time: form.time })}
           >
             {t('healthForm.changeType')}
           </button>
@@ -204,6 +223,24 @@ export function HealthEntryForm({
         <label className="field">
           {t('healthLog.date')}
           <input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
+        </label>
+        <label className="field">
+          {t('healthForm.time')}
+          <span className="row inline">
+            <input
+              type="time"
+              value={form.time}
+              onChange={(e) => setForm({ ...form, time: e.target.value })}
+            />
+            <button
+              type="button"
+              className="small"
+              title={t('healthForm.nowHint')}
+              onClick={() => setForm({ ...form, date: today(), time: nowTime() })}
+            >
+              {t('healthForm.now')}
+            </button>
+          </span>
         </label>
         <label className="field" style={{ flex: 1 }}>
           {t(`healthForm.title.${kind}`)}

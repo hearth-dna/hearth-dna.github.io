@@ -1,4 +1,8 @@
+import type { StartupLog } from '../app/startup'
 import { SCHEMA_SQL, SCHEMA_VERSION } from './schema'
+
+/** Matches OPFS_ATTEMPTS in db.worker.ts (a worker module cannot be imported here). */
+const STORAGE_ATTEMPTS = 10
 
 /**
  * Main-thread handle to the SQLite worker (db.worker.ts). One request in flight at a time is not
@@ -17,6 +21,8 @@ export interface OpenOptions {
   wasmUrl?: string
   /** A worker constructor other than the bundled module worker (the archive inlines it). */
   worker?: () => Worker
+  /** Reports each stage (tab lock, SQLite engine, storage, schema) for the start screen. */
+  log?: StartupLog
 }
 
 export class Database {
@@ -54,7 +60,9 @@ export class Database {
     let release = () => {}
     let channel: BroadcastChannel | null = null
     let lost = () => {} // called when a newer tab steals our lock
+    const log = opts.log
     if (!opts.memory) {
+      log?.begin('lock')
       // One tab owns the database at a time: the OPFS SAH pool needs exclusive handles. The newest
       // tab always wins (WhatsApp Web style): it asks the current owner to let go over a
       // BroadcastChannel and waits briefly for the Web Lock; if the owner does not answer — a tab
@@ -80,7 +88,9 @@ export class Database {
           // Rejects when a newer tab steals from us — or when we steal ourselves (then ignore).
           .catch(() => !stealing && lost())
       })
+      log?.end('lock')
       if (!acquired) {
+        log?.begin('takeover')
         stealing = true
         await new Promise<void>((resolve) => {
           navigator.locks
@@ -93,6 +103,7 @@ export class Database {
         // The previous owner learns of the steal asynchronously; let it terminate its worker
         // before we ask OPFS for the same access handles.
         await new Promise((r) => setTimeout(r, 300))
+        log?.end('takeover')
       }
     }
     const worker = opts.worker
@@ -116,12 +127,18 @@ export class Database {
     if (channel) channel.onmessage = (ev) => ev.data === 'takeover' && takenOver()
     lost = takenOver
     worker.onmessage = (ev) => db.onMessage(ev.data)
-    const { persistent, reason } = (await db.send({
-      op: 'open',
-      profile,
-      memory: opts.memory,
-      wasmUrl: opts.wasmUrl,
-    })) as { persistent: boolean; reason: string }
+    log?.begin('engine')
+    const { persistent, reason } = (await db.send(
+      { op: 'open', profile, memory: opts.memory, wasmUrl: opts.wasmUrl },
+      (code) => {
+        if (code === 0) {
+          log?.end('engine')
+          if (!opts.memory) log?.begin('storage', { attempt: 1, of: STORAGE_ATTEMPTS })
+        } else if (code > 1) log?.begin('storage', { attempt: code, of: STORAGE_ATTEMPTS })
+      },
+    )) as { persistent: boolean; reason: string }
+    log?.end('storage')
+    log?.begin('schema')
     if (!persistent && !opts.memory) console.warn('[hearth db] not persistent —', reason)
     ready = new Database(worker, persistent, reason)
     // Re-point the worker at the final instance's pending map.
@@ -143,6 +160,7 @@ export class Database {
       'value REAL',
       'value2 REAL',
       "unit TEXT NOT NULL DEFAULT ''",
+      "time TEXT NOT NULL DEFAULT ''",
     ]) {
       await ready.exec(`ALTER TABLE health_log ADD COLUMN ${col}`).catch(() => {})
     }
@@ -153,6 +171,7 @@ export class Database {
     // Identifies this browser profile in backup headers (random, not derived from hardware).
     await ready.exec('INSERT OR IGNORE INTO meta(key, value) VALUES (?, ?)', ['device', crypto.randomUUID()])
     await ready.exec('INSERT OR IGNORE INTO meta(key, value) VALUES (?, ?)', ['generation', '0'])
+    log?.end('schema')
     return ready
   }
 
@@ -192,8 +211,7 @@ export class Database {
   }
 
   async exec(sql: string, bind?: unknown[]): Promise<void> {
-    await this.send({ op: 'exec', sql, bind })
-    if (/^\s*(INSERT|UPDATE|DELETE|REPLACE)\b/i.test(sql) && !/\bmeta\b/i.test(sql)) this.changed()
+    if (await this.send({ op: 'exec', sql, bind })) this.changed()
   }
 
   async query<T extends Row = Row>(sql: string, bind?: unknown[]): Promise<T[]> {

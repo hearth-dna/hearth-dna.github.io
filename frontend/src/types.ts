@@ -101,6 +101,8 @@ export interface HealthEntry {
   id: string
   personId: string
   date: string // YYYY-MM-DD, the document's date, not the import date
+  /** HH:MM local time of day, '' when unknown (a lab report from paper) or not recorded. */
+  time: string
   kind: HealthKind
   title: string
   body: string

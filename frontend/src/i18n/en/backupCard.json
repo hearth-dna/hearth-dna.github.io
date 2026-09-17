@@ -28,5 +28,6 @@
   "backupCard.building": "Building snapshot…",
   "backupCard.writingFile": "Writing to {name}…",
   "backupCard.loading": "Loading from {name}…",
-  "backupCard.done": "Backed up to {name} at {time}."
+  "backupCard.done": "Backed up to {name} at {time}.",
+  "backupCard.autoSync": "Sync automatically after every change"
 }

@@ -201,7 +201,10 @@ export function HealthTable({
                     className={open === e.id ? 'open' : ''}
                     onClick={() => setOpen(open === e.id ? null : e.id)}
                   >
-                    <td className="nowrap">{e.date}</td>
+                    <td className="nowrap">
+                      {e.date}
+                      {e.time && <span className="muted"> {e.time}</span>}
+                    </td>
                     {showPerson && <td>{name(e.personId)}</td>}
                     <td>
                       <span className={`badge kind-${e.kind}`}>{t(`kind.${e.kind}`)}</span>

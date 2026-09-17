@@ -82,3 +82,22 @@ button.tag.active { border-color: var(--accent); background: var(--accent); colo
 .kindpicker { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 0.5rem; margin-top: 0.6rem; }
 .kindpicker button { display: flex; flex-direction: column; align-items: flex-start; gap: 0.2rem; text-align: left; }
 .kindpicker button span { font-size: 0.8rem; }
+/* Start-up screen: one line per step. */
+.startup { max-width: 640px; margin: 2rem auto; }
+.startup ul.steps { list-style: none; padding: 0; margin: 0 0 0.8rem; }
+.startup ul.steps li { display: flex; align-items: center; gap: 0.6rem; padding: 0.25rem 0; }
+.startup ul.steps li .mark { width: 1.2em; display: inline-flex; justify-content: center; flex: none; }
+.startup ul.steps li.done .mark { color: var(--accent); }
+.startup ul.steps li.failed .mark { color: var(--danger); }
+.startup ul.steps li.done > span:nth-child(2) { color: var(--muted); }
+.startup ul.steps li .time { margin-left: auto; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* Header sync button: icon + short state; colour carries the state, the label says it too. */
+button.sync { display: inline-flex; align-items: center; gap: 0.4rem; margin-left: auto; white-space: nowrap; }
+button.sync.ok { border-color: color-mix(in srgb, var(--ok) 50%, var(--line)); }
+button.sync.ok > span:first-child { color: var(--ok); }
+button.sync.warn { border-color: var(--warn); }
+button.sync.warn > span:first-child { color: var(--warn); }
+button.sync.danger { border-color: var(--danger); color: var(--danger); }
+button.sync + .status { margin-left: 0; }
+@media (max-width: 640px) { button.sync .sync-label { display: none; } }

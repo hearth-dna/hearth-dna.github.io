@@ -28,6 +28,10 @@ export interface Saved {
   lastSeen: Seen | null
   /** The user chose to store without a passphrase. */
   plain: boolean
+  /** Back up automatically after every change; absent in handles saved before the switch existed. */
+  auto?: boolean
+  /** When this browser last wrote a snapshot to the folder (ISO). */
+  lastAt?: string
 }
 
 // ---- remembered handle (IndexedDB) ---------------------------------------------------------

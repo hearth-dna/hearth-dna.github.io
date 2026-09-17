@@ -76,7 +76,14 @@ export function BackupCard() {
   }
 
   const activity = writing
-    ? t(status.step === 'building' ? 'backupCard.building' : 'backupCard.writingFile', { name: status.name })
+    ? t(
+        status.step === 'loading'
+          ? 'backupCard.loading'
+          : status.step === 'building'
+            ? 'backupCard.building'
+            : 'backupCard.writingFile',
+        { name: status.name },
+      )
     : busy
 
   return (
@@ -129,6 +136,14 @@ export function BackupCard() {
                   backups.setPassphrase(e.target.value)
                 }}
               />
+            </label>
+            <label className="check">
+              <input
+                type="checkbox"
+                checked={backups.auto}
+                onChange={(e) => void backups.setAuto(e.target.checked)}
+              />
+              <span>{t('backupCard.autoSync')}</span>
             </label>
             <label className="check">
               <input

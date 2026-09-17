@@ -1,4 +1,4 @@
-import { formatTags, parseTags } from '../health/log'
+import { formatTags, normTime, parseTags } from '../health/log'
 import type { Call, HealthEntry, HealthKind, Person, Provider, Sex, SourceFile } from '../types'
 import type { Database, Row } from './db'
 
@@ -153,9 +153,20 @@ export async function listSourceFiles(db: Database): Promise<SourceFile[]> {
   }))
 }
 
+/**
+ * Genotype rows per person. Counting scans every row (over a second for a family of genomes), so
+ * the result is kept in meta and reused until a write to the genotype table or a person delete
+ * drops it (db.worker.ts). Counting and storing is one statement, so no write slips in between.
+ */
 export async function genotypeCounts(db: Database): Promise<Record<string, number>> {
-  const rows = await db.query('SELECT person_id, COUNT(*) AS n FROM genotype GROUP BY person_id')
-  return Object.fromEntries(rows.map((r) => [r.person_id as string, r.n as number]))
+  const cached = await getMeta(db, 'genotype_counts')
+  if (cached !== null) return JSON.parse(cached) as Record<string, number>
+  await db.exec(
+    `INSERT OR REPLACE INTO meta(key, value)
+     SELECT 'genotype_counts', json_group_object(person_id, n)
+     FROM (SELECT person_id, COUNT(*) AS n FROM genotype GROUP BY person_id)`,
+  )
+  return JSON.parse((await getMeta(db, 'genotype_counts')) ?? '{}') as Record<string, number>
 }
 
 export interface FamilyCall extends Call {
@@ -271,7 +282,7 @@ export async function personCalls(db: Database, personId: string): Promise<Call[
 
 export async function listHealthLog(db: Database, personId: string): Promise<HealthEntry[]> {
   const rows = await db.query(
-    'SELECT * FROM health_log WHERE person_id=? ORDER BY date DESC, created_at DESC',
+    'SELECT * FROM health_log WHERE person_id=? ORDER BY date DESC, time DESC, created_at DESC',
     [personId],
   )
   return rows.map(rowToHealthEntry)
@@ -279,7 +290,7 @@ export async function listHealthLog(db: Database, personId: string): Promise<Hea
 
 /** Every person's entries, newest first: the family timeline on the Health page. */
 export async function listFamilyHealthLog(db: Database): Promise<HealthEntry[]> {
-  const rows = await db.query('SELECT * FROM health_log ORDER BY date DESC, created_at DESC')
+  const rows = await db.query('SELECT * FROM health_log ORDER BY date DESC, time DESC, created_at DESC')
   return rows.map(rowToHealthEntry)
 }
 
@@ -288,6 +299,7 @@ function rowToHealthEntry(r: Row): HealthEntry {
     id: r.id as string,
     personId: r.person_id as string,
     date: r.date as string,
+    time: normTime((r.time as string) ?? ''),
     kind: r.kind as HealthKind,
     title: r.title as string,
     body: r.body as string,
@@ -307,6 +319,7 @@ export async function addHealthEntry(
   e: {
     personId: string
     date: string
+    time?: string
     kind: HealthKind
     title: string
     body: string
@@ -322,6 +335,7 @@ export async function addHealthEntry(
   const entry: HealthEntry = {
     id: newId(),
     createdAt: now(),
+    time: '',
     source: '',
     bodyPart: '',
     severity: null,
@@ -334,12 +348,14 @@ export async function addHealthEntry(
   entry.bodyPart = entry.bodyPart.trim().toLowerCase()
   entry.tags = parseTags(formatTags(entry.tags))
   entry.unit = entry.unit.trim()
+  entry.time = normTime(entry.time)
   await db.exec(
-    'INSERT INTO health_log(id,person_id,date,kind,title,body,source,body_part,severity,tags,value,value2,unit,created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+    'INSERT INTO health_log(id,person_id,date,time,kind,title,body,source,body_part,severity,tags,value,value2,unit,created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
     [
       entry.id,
       entry.personId,
       entry.date,
+      entry.time,
       entry.kind,
       entry.title,
       entry.body,

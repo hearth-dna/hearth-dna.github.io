@@ -79,6 +79,7 @@ const HEALTH_COLS = [
   'id',
   'person_id',
   'date',
+  'time',
   'kind',
   'title',
   'body',
@@ -97,6 +98,7 @@ const CHAT_COLS = ['id', 'person_ids', 'question', 'context_pack', 'answer', 'ti
 
 function withDefaults(rows: Rows): Rows {
   return rows.map((h) => ({
+    time: '',
     source: '',
     body_part: '',
     severity: null,

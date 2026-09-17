@@ -2,8 +2,6 @@
   "app.takenOver": "Hearth was opened in another tab, which now owns the local database.",
   "app.useHere": "Use it here instead",
   "app.startFailed": "Could not start: {error}",
-  "app.openingArchive": "Opening archive…",
-  "app.openingDb": "Opening local database…",
   "app.storageTitle": "Storage is not available",
   "app.storageIntro": "Hearth could not open its on-device database, so anything you import now would be lost on reload. Usually another Hearth tab still holds the storage: close it and retry. Private windows and some browsers do not offer persistent storage at all.",
   "app.storageReason": "Reason: {reason}",

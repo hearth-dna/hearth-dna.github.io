@@ -17,6 +17,16 @@ export function formatTags(tags: string[]): string {
   return tags.join(', ')
 }
 
+/** '8:05' → '08:05'; anything that is not a valid 24-hour HH:MM (or H:MM) becomes ''. */
+export function normTime(s: string): string {
+  const m = /^(\d{1,2}):(\d{2})(?::\d{2})?$/.exec(s.trim())
+  if (!m || Number(m[1]) > 23 || Number(m[2]) > 59) return ''
+  return `${m[1].padStart(2, '0')}:${m[2]}`
+}
+
+/** '2026-09-14 08:05', or just the date when no time was recorded. */
+export const when = (e: Pick<HealthEntry, 'date' | 'time'>) => (e.time ? `${e.date} ${e.time}` : e.date)
+
 /** '37.8 °C', '120/80 mmHg', '72' (no unit); '' when the entry has no value. */
 export function formatValue(e: Pick<HealthEntry, 'value' | 'value2' | 'unit'>): string {
   if (e.value === null) return ''
@@ -27,7 +37,7 @@ export function formatValue(e: Pick<HealthEntry, 'value' | 'value2' | 'unit'>): 
 /**
  * The entry on one line, as shown in the log and in the Ask context pack:
  * `2026-09-14 · Symptom · Pain in both hands (hands; severity 6/10; arthritis)`,
- * `2026-09-14 · Measurement · Blood pressure 120/80 mmHg`.
+ * `2026-09-14 08:05 · Measurement · Blood pressure 120/80 mmHg`.
  */
 export function describeEntry(e: HealthEntry): string {
   const value = formatValue(e)
@@ -36,7 +46,7 @@ export function describeEntry(e: HealthEntry): string {
     e.severity === null ? '' : `severity ${e.severity}/10`,
     formatTags(e.tags),
   ].filter(Boolean)
-  return `${e.date} · ${HEALTH_KIND_LABELS[e.kind]} · ${e.title}${value ? ` ${value}` : ''}${extra.length ? ` (${extra.join('; ')})` : ''}`
+  return `${when(e)} · ${HEALTH_KIND_LABELS[e.kind]} · ${e.title}${value ? ` ${value}` : ''}${extra.length ? ` (${extra.join('; ')})` : ''}`
 }
 
 export interface HealthFilter {
@@ -110,14 +120,16 @@ export function sortHealthLog(
   personName: (id: string) => string = (id) => id,
 ): HealthEntry[] {
   const sign = dir === 'asc' ? 1 : -1
+  // Same day: by time of day (an entry without a time counts as the start of the day), then by
+  // when it was typed in.
   const byDate = (a: HealthEntry, b: HealthEntry) =>
-    b.date.localeCompare(a.date) || b.createdAt.localeCompare(a.createdAt)
+    when(b).localeCompare(when(a)) || b.createdAt.localeCompare(a.createdAt)
   const text = (a: string, b: string) =>
     a === b ? 0 : a === '' ? 1 : b === '' ? -1 : sign * a.localeCompare(b)
   const num = (a: number | null, b: number | null) =>
     a === b ? 0 : a === null ? 1 : b === null ? -1 : sign * (a - b)
   const cmp: Record<HealthSortKey, (a: HealthEntry, b: HealthEntry) => number> = {
-    date: (a, b) => sign * a.date.localeCompare(b.date) || byDate(a, b),
+    date: (a, b) => sign * when(a).localeCompare(when(b)) || byDate(a, b),
     person: (a, b) => text(personName(a.personId), personName(b.personId)),
     kind: (a, b) => sign * HEALTH_KIND_LABELS[a.kind].localeCompare(HEALTH_KIND_LABELS[b.kind]),
     title: (a, b) => text(a.title.toLowerCase(), b.title.toLowerCase()),

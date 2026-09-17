@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { APP_VERSION, AppContext, type AppState } from './app/context'
 import { type Page, useRoute } from './app/routes'
+import { StartupLog, type StepState } from './app/startup'
 import { archivePayload, openArchiveDb } from './archive/mode'
 import { backups } from './backup/scheduler'
 import { AskPage } from './components/AskPage'
@@ -11,6 +12,8 @@ import { HealthPage } from './components/HealthPage'
 import { PeoplePage } from './components/PeoplePage'
 import { PersonPage } from './components/PersonPage'
 import { SettingsPage } from './components/SettingsPage'
+import { StartupScreen } from './components/StartupScreen'
+import { SyncButton } from './components/SyncButton'
 import { hasConsent } from './consent/consent'
 import { Database } from './db/db'
 import { genotypeCounts, listPersons, listRelationships } from './db/repo'
@@ -28,6 +31,10 @@ export function App() {
   const [consented, setConsented] = useState(false)
   const [page, setPage] = useRoute()
   const [erasing, setErasing] = useState(false)
+  const [steps, setSteps] = useState<StepState[]>([])
+  const [startup] = useState(() => new StartupLog(setSteps))
+  // StrictMode runs effects twice in dev; the start-up sequence must run once.
+  const booted = useRef(false)
   // Archive mode: the embedded payload waits here until the user supplies its passphrase.
   const [locked, setLocked] = useState<{ bytes: Uint8Array; load: (pass?: string) => Promise<void> } | null>(
     null,
@@ -36,6 +43,8 @@ export function App() {
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: the payload is fixed for the page's life
   useEffect(() => {
+    if (booted.current) return
+    booted.current = true
     let db: Database
     let kb: Kb
     const refresh = async () => {
@@ -46,26 +55,36 @@ export function App() {
       ])
       setState({ db, kb, persons, counts, relationships, refresh })
     }
+    // The first load goes step by step so the start screen can name what is slow.
+    const firstLoad = async () => {
+      const [persons, relationships] = await startup.run('people', () =>
+        Promise.all([listPersons(db), listRelationships(db)]),
+      )
+      const counts = await startup.run('genotypes', () => genotypeCounts(db))
+      setState({ db, kb, persons, counts, relationships, refresh })
+    }
     ;(async () => {
       try {
         ;[db, kb] = await Promise.all([
-          archive ? openArchiveDb() : Database.open({ onTakenOver: () => setTakenOver(true) }),
-          loadKb(),
+          archive
+            ? openArchiveDb(startup)
+            : Database.open({ onTakenOver: () => setTakenOver(true), log: startup }),
+          startup.run('kb', loadKb),
         ])
         if (import.meta.env.DEV) (window as unknown as { __hearth: unknown }).__hearth = { db }
         if (archive) {
           const load = async (pass?: string) => {
-            await restoreBytes(db, archive, pass)
+            await startup.run('archive', () => restoreBytes(db, archive, pass))
             setLocked(null)
             setConsented(await hasConsent(db, 'first_launch'))
-            await refresh()
+            await firstLoad()
           }
           if (readHeader(archive)?.encrypted) setLocked({ bytes: archive, load })
           else await load()
         } else {
-          await backups.start(db, APP_VERSION)
+          await startup.run('backup', () => backups.start(db, APP_VERSION))
           setConsented(await hasConsent(db, 'first_launch'))
-          await refresh()
+          await firstLoad()
         }
       } catch (e) {
         setError(String(e))
@@ -84,19 +103,9 @@ export function App() {
         </div>
       </main>
     )
-  if (error)
-    return (
-      <main>
-        <div className="card danger">{t('app.startFailed', { error })}</div>
-      </main>
-    )
+  if (error) return <StartupScreen steps={steps} startedAt={startup.startedAt} error={error} />
   if (locked) return <ArchiveGate onUnlock={locked.load} />
-  if (!state)
-    return (
-      <main>
-        <p className="muted">{archive ? t('app.openingArchive') : t('app.openingDb')}</p>
-      </main>
-    )
+  if (!state) return <StartupScreen steps={steps} startedAt={startup.startedAt} />
   if (!state.db.persistent && !memoryOk && !archive)
     return (
       <main>
@@ -138,6 +147,7 @@ export function App() {
           {nav({ name: 'ask' }, t('app.navAsk'))}
           {nav({ name: 'settings' }, t('app.navSettings'))}
         </nav>
+        {!archive && <SyncButton onOpenSettings={() => setPage({ name: 'settings' })} />}
         <span className="status">
           {t('app.status', {
             people: state.persons.length,

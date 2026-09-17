@@ -53,7 +53,11 @@ let reason = ''
 let filesDir: FileSystemDirectoryHandle | null = null
 const memoryFiles = new Map<string, Uint8Array>()
 
-async function open(req: { profile: string; memory?: boolean; wasmUrl?: string }) {
+/**
+ * Progress codes the open request reports, so the start screen can say what is slow:
+ * 0 = SQLite engine loaded; n ≥ 1 = attempt n at claiming on-device storage.
+ */
+async function open(req: { id: number; profile: string; memory?: boolean; wasmUrl?: string }) {
   const { profile, memory, wasmUrl } = req
   // The portable archive inlines sqlite3.wasm as a data: URL and hands the bytes straight to the
   // Emscripten loader (fetching from inside a blob worker on a file:// page never resolves); the
@@ -67,6 +71,7 @@ async function open(req: { profile: string; memory?: boolean; wasmUrl?: string }
         }
       : undefined,
   )
+  postMessage({ id: req.id, progress: 0 } satisfies Res)
   if (memory) {
     db = new sqlite3.oo1.DB(':memory:', 'c')
     return { persistent: false, reason: 'memory requested' }
@@ -76,6 +81,7 @@ async function open(req: { profile: string; memory?: boolean; wasmUrl?: string }
   // The access handles are exclusive; a tab that just handed over releases them asynchronously,
   // so retry for a few seconds before concluding OPFS is really unavailable.
   for (let attempt = 0; attempt < OPFS_ATTEMPTS; attempt++) {
+    postMessage({ id: req.id, progress: attempt + 1 } satisfies Res)
     try {
       const pool = await sqlite3.installOpfsSAHPoolVfs({
         name: `hearth-${profile}`,
@@ -236,6 +242,14 @@ function genomeText(personId: string): string {
 
 /** Every user-data write bumps meta.generation, which backups use to tell snapshots apart. */
 const isWrite = (sql: string) => /^\s*(INSERT|UPDATE|DELETE|REPLACE)\b/i.test(sql) && !/\bmeta\b/i.test(sql)
+/**
+ * Writes that can change how many genotypes a person has: any write naming the genotype table, and
+ * deleting a person (the rows cascade). They drop the cached counts (repo.genotypeCounts), here
+ * in the worker, so no code path can leave the cache stale.
+ */
+const touchesGenotypes = (sql: string) =>
+  isWrite(sql) && (/\bgenotype\b/i.test(sql) || /^\s*DELETE\s+FROM\s+person\b/i.test(sql))
+const DROP_GENOTYPE_COUNTS = "DELETE FROM meta WHERE key = 'genotype_counts'"
 const BUMP =
   "INSERT INTO meta(key, value) VALUES ('generation', '1') ON CONFLICT(key) DO UPDATE SET value = CAST(value AS INTEGER) + 1"
 
@@ -250,10 +264,15 @@ function handle(req: Req): unknown {
   switch (req.op) {
     case 'open':
       return open(req)
-    case 'exec':
+    case 'exec': {
       db.exec({ sql: req.sql, bind: req.bind as never })
-      if (isWrite(req.sql)) db.exec(BUMP)
-      return undefined
+      // Only a write that touched rows is a change: startup cleanups that delete nothing must not
+      // make the app look out of sync. Returns whether anything changed.
+      const changed = isWrite(req.sql) && db.changes() > 0
+      if (changed) db.exec(BUMP)
+      if (changed && touchesGenotypes(req.sql)) db.exec(DROP_GENOTYPE_COUNTS)
+      return changed
+    }
     case 'query':
       return db.exec({ sql: req.sql, bind: req.bind as never, rowMode: 'object', returnValue: 'resultRows' })
     case 'file-put':
@@ -306,6 +325,7 @@ function handle(req: Req): unknown {
             postMessage({ id: req.id, progress: end } satisfies Res)
         }
         db.exec(BUMP)
+        if (touchesGenotypes(req.sql)) db.exec(DROP_GENOTYPE_COUNTS)
         db.exec('COMMIT')
       } catch (e) {
         db.exec('ROLLBACK')

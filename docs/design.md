@@ -223,7 +223,7 @@ evidence grade, what it would change, what it would not, what to ask a clinician
 kb fields at tier 0, so the user gets a decision frame even without any LLM.
 
 ### 6.4 Medical documents — processed locally, never stored remotely
-- **Shipped first (health log):** a per-person `health_log(id, person_id, date, kind, title, body,
+- **Shipped first (health log):** a per-person `health_log(id, person_id, date, time, kind, title, body,
   body_part, severity, tags, value, value2, unit)` of dated entries — lab result, diagnosis,
   medication, doctor letter, a self-reported **symptom** ("pain in both hands", body part `hands`,
   severity 6/10, tags `arthritis`), or a home **measurement** stored as numbers (`value`, a second
