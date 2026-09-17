@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
 import { APP_VERSION, AppContext, type AppState } from './app/context'
+import { type Page, useRoute } from './app/routes'
 import { archivePayload, openArchiveDb } from './archive/mode'
 import { backups } from './backup/scheduler'
 import { AskPage } from './components/AskPage'
 import { ConsentGate } from './components/ConsentGate'
 import { EraseDialog } from './components/EraseDialog'
 import { FamilyPage } from './components/FamilyPage'
+import { HealthPage } from './components/HealthPage'
 import { PeoplePage } from './components/PeoplePage'
 import { PersonPage } from './components/PersonPage'
 import { SettingsPage } from './components/SettingsPage'
@@ -17,13 +19,6 @@ import { restoreBytes } from './export/restore'
 import { useT } from './i18n/context'
 import { type Kb, loadKb } from './kb/kb'
 
-type Page =
-  | { name: 'people' }
-  | { name: 'person'; id: string }
-  | { name: 'family' }
-  | { name: 'ask' }
-  | { name: 'settings' }
-
 export function App() {
   const t = useT()
   const [state, setState] = useState<AppState | null>(null)
@@ -31,7 +26,7 @@ export function App() {
   const [takenOver, setTakenOver] = useState(false)
   const [memoryOk, setMemoryOk] = useState(false)
   const [consented, setConsented] = useState(false)
-  const [page, setPage] = useState<Page>({ name: 'people' })
+  const [page, setPage] = useRoute()
   const [erasing, setErasing] = useState(false)
   // Archive mode: the embedded payload waits here until the user supplies its passphrase.
   const [locked, setLocked] = useState<{ bytes: Uint8Array; load: (pass?: string) => Promise<void> } | null>(
@@ -139,6 +134,7 @@ export function App() {
         <nav>
           {nav({ name: 'people' }, t('app.navPeople'))}
           {nav({ name: 'family' }, t('app.navFamily'))}
+          {nav({ name: 'health', person: '' }, t('app.navHealth'))}
           {nav({ name: 'ask' }, t('app.navAsk'))}
           {nav({ name: 'settings' }, t('app.navSettings'))}
         </nav>
@@ -164,6 +160,9 @@ export function App() {
         {page.name === 'people' && <PeoplePage onOpen={(id) => setPage({ name: 'person', id })} />}
         {page.name === 'person' && <PersonPage id={page.id} onBack={() => setPage({ name: 'people' })} />}
         {page.name === 'family' && <FamilyPage />}
+        {page.name === 'health' && (
+          <HealthPage person={page.person} onPerson={(person) => setPage({ name: 'health', person })} />
+        )}
         {page.name === 'ask' && <AskPage />}
         {page.name === 'settings' && <SettingsPage />}
       </main>

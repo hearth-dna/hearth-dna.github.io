@@ -1,6 +1,16 @@
 import { describe, expect, it } from 'vitest'
 import type { HealthEntry } from '../types'
-import { describeEntry, facets, filterHealthLog, formatTags, formatValue, NO_FILTER, parseTags } from './log'
+import {
+  describeEntry,
+  facets,
+  filterHealthLog,
+  formatTags,
+  formatValue,
+  isFiltering,
+  NO_FILTER,
+  parseTags,
+  sortHealthLog,
+} from './log'
 import { findPreset, PRESET_GROUPS } from './presets'
 
 const entry = (o: Partial<HealthEntry>): HealthEntry => ({
@@ -105,7 +115,58 @@ describe('filterHealthLog', () => {
     expect(ids({ text: '°c' })).toEqual(['4'])
     expect(ids({ kind: 'measurement' })).toEqual(['4'])
   })
+  it('filters by person, date range and minimum severity', () => {
+    const more = [
+      entry({ id: 'a', personId: 'p1', date: '2026-01-05', severity: 2 }),
+      entry({ id: 'b', personId: 'p2', date: '2026-02-10', severity: 7 }),
+      entry({ id: 'c', personId: 'p1', date: '2026-03-15' }),
+    ]
+    const f = (o: Partial<typeof NO_FILTER>) => filterHealthLog(more, { ...NO_FILTER, ...o }).map((e) => e.id)
+    expect(f({ person: 'p1' })).toEqual(['a', 'c'])
+    expect(f({ from: '2026-02-10' })).toEqual(['b', 'c'])
+    expect(f({ to: '2026-02-10' })).toEqual(['a', 'b'])
+    expect(f({ minSeverity: 3 })).toEqual(['b'])
+    expect(isFiltering(NO_FILTER)).toBe(false)
+    expect(isFiltering({ ...NO_FILTER, minSeverity: 1 })).toBe(true)
+  })
   it('lists distinct facets sorted', () => {
     expect(facets(log)).toEqual({ bodyParts: ['hands', 'head'], tags: ['arthritis', 'migraine'] })
+  })
+})
+
+describe('sortHealthLog', () => {
+  const log = [
+    entry({ id: '1', personId: 'b', date: '2026-01-01', kind: 'lab', title: 'CRP', createdAt: '1' }),
+    entry({ id: '2', personId: 'a', date: '2026-03-01', title: 'ache', severity: 4, createdAt: '2' }),
+    entry({
+      id: '3',
+      personId: 'a',
+      date: '2026-02-01',
+      kind: 'measurement',
+      title: 'Weight',
+      value: 70,
+      createdAt: '3',
+    }),
+    entry({ id: '4', personId: 'b', date: '2026-03-01', title: 'Back pain', severity: 8, createdAt: '4' }),
+  ]
+  const ids = (k: Parameters<typeof sortHealthLog>[1], d: 'asc' | 'desc', name?: (id: string) => string) =>
+    sortHealthLog(log, k, d, name).map((e) => e.id)
+
+  it('sorts by date both ways, ties newest-created first', () => {
+    expect(ids('date', 'desc')).toEqual(['4', '2', '3', '1'])
+    expect(ids('date', 'asc')).toEqual(['1', '3', '4', '2'])
+  })
+  it('keeps empty values last in either direction', () => {
+    expect(ids('severity', 'desc')).toEqual(['4', '2', '3', '1'])
+    expect(ids('severity', 'asc')).toEqual(['2', '4', '3', '1'])
+    expect(ids('value', 'asc')[0]).toBe('3')
+  })
+  it('sorts titles case-insensitively and people by display name', () => {
+    expect(ids('title', 'asc')).toEqual(['2', '4', '1', '3'])
+    expect(ids('person', 'asc', (id) => (id === 'a' ? 'Zoe' : 'Adam'))).toEqual(['4', '1', '2', '3'])
+  })
+  it('does not mutate its input', () => {
+    sortHealthLog(log, 'title', 'asc')
+    expect(log.map((e) => e.id)).toEqual(['1', '2', '3', '4'])
   })
 })

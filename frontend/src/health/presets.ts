@@ -114,3 +114,8 @@ export function findPreset(id: string): HealthPreset | undefined {
   }
   return undefined
 }
+
+/** Presets that start an entry of this kind, in list order, for the chips above the form. */
+export function presetsFor(kind: HealthKind): HealthPreset[] {
+  return PRESET_GROUPS.flatMap((g) => g.presets).filter((p) => p.kind === kind)
+}

@@ -59,9 +59,26 @@ dialog::backdrop { background: rgba(0,0,0,0.4); }
 @keyframes spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .spinner { animation-duration: 2s; } }
 
+button.link { background: none; border: none; padding: 0; color: var(--accent, inherit); text-decoration: underline; cursor: pointer; font: inherit; }
+
 /* Segmented control (People page view switcher). */
 .segmented { display: inline-flex; border: 1px solid var(--line); border-radius: 7px; overflow: hidden; }
 .segmented button { border: 0; border-radius: 0; padding: 0.3rem 0.8rem; font-size: 0.9rem; }
 .segmented button + button { border-left: 1px solid var(--line); }
 .segmented button.active { background: var(--accent); color: var(--accent-fg); }
 [dir='rtl'] .segmented button + button { border-left: 0; border-right: 1px solid var(--line); }
+.row.tabs button.active { border-color: var(--accent, var(--fg)); background: var(--bg); font-weight: 600; }
+/* Health log table and type-first add form. */
+.card.inset { background: var(--bg); margin: 0.6rem 0 1rem; }
+.row.tabs.kinds { margin-bottom: 0.6rem; }
+.row.inline { gap: 0.3rem; font-size: 0.85rem; color: var(--muted); }
+.row.presets { margin-top: 0.6rem; gap: 0.35rem; }
+.nowrap { white-space: nowrap; }
+table.healthtable tbody tr:not(.detail) { cursor: pointer; }
+table.healthtable tbody tr:not(.detail):hover, table.healthtable tr.open { background: var(--bg); }
+table.healthtable tr.detail td { background: var(--bg); }
+button.tag { padding: 0.1rem 0.5rem; margin: 0 0.25rem 0.2rem 0; font-size: 0.8rem; border-radius: 999px; }
+button.tag.active { border-color: var(--accent); background: var(--accent); color: var(--accent-fg); }
+.kindpicker { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 0.5rem; margin-top: 0.6rem; }
+.kindpicker button { display: flex; flex-direction: column; align-items: flex-start; gap: 0.2rem; text-align: left; }
+.kindpicker button span { font-size: 0.8rem; }

@@ -274,7 +274,17 @@ export async function listHealthLog(db: Database, personId: string): Promise<Hea
     'SELECT * FROM health_log WHERE person_id=? ORDER BY date DESC, created_at DESC',
     [personId],
   )
-  return rows.map((r) => ({
+  return rows.map(rowToHealthEntry)
+}
+
+/** Every person's entries, newest first: the family timeline on the Health page. */
+export async function listFamilyHealthLog(db: Database): Promise<HealthEntry[]> {
+  const rows = await db.query('SELECT * FROM health_log ORDER BY date DESC, created_at DESC')
+  return rows.map(rowToHealthEntry)
+}
+
+function rowToHealthEntry(r: Row): HealthEntry {
+  return {
     id: r.id as string,
     personId: r.person_id as string,
     date: r.date as string,
@@ -289,7 +299,7 @@ export async function listHealthLog(db: Database, personId: string): Promise<Hea
     value2: (r.value2 as number | null) ?? null,
     unit: (r.unit as string) ?? '',
     createdAt: r.created_at as string,
-  }))
+  }
 }
 
 export async function addHealthEntry(

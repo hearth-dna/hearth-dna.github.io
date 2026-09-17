@@ -40,24 +40,93 @@ export function describeEntry(e: HealthEntry): string {
 }
 
 export interface HealthFilter {
+  /** Person id; '' for everyone. */
+  person: string
   kind: HealthKind | ''
   bodyPart: string
   tag: string
+  /** Inclusive YYYY-MM-DD bounds; '' for open-ended. */
+  from: string
+  to: string
+  /** Only entries rated at least this much; null for any (including unrated). */
+  minSeverity: number | null
   /** Case-insensitive substring of title, body, body part, unit or tags. */
   text: string
 }
 
-export const NO_FILTER: HealthFilter = { kind: '', bodyPart: '', tag: '', text: '' }
+export const NO_FILTER: HealthFilter = {
+  person: '',
+  kind: '',
+  bodyPart: '',
+  tag: '',
+  from: '',
+  to: '',
+  minSeverity: null,
+  text: '',
+}
+
+export function isFiltering(f: HealthFilter): boolean {
+  return Object.values(f).some((v) => v !== '' && v !== null)
+}
 
 export function filterHealthLog(entries: HealthEntry[], f: HealthFilter): HealthEntry[] {
   const q = f.text.trim().toLowerCase()
   return entries.filter(
     (e) =>
+      (!f.person || e.personId === f.person) &&
       (!f.kind || e.kind === f.kind) &&
       (!f.bodyPart || e.bodyPart === f.bodyPart) &&
       (!f.tag || e.tags.includes(f.tag)) &&
+      (!f.from || e.date >= f.from) &&
+      (!f.to || e.date <= f.to) &&
+      (f.minSeverity === null || (e.severity !== null && e.severity >= f.minSeverity)) &&
       (!q || [e.title, e.body, e.bodyPart, e.unit, ...e.tags].some((s) => s.toLowerCase().includes(q))),
   )
+}
+
+export type HealthSortKey = 'date' | 'person' | 'kind' | 'title' | 'value' | 'bodyPart' | 'severity'
+export type SortDir = 'asc' | 'desc'
+
+/** Direction a column starts in when first clicked: newest, highest and worst first. */
+export const HEALTH_SORT_DEFAULT_DIR: Record<HealthSortKey, SortDir> = {
+  date: 'desc',
+  person: 'asc',
+  kind: 'asc',
+  title: 'asc',
+  value: 'desc',
+  bodyPart: 'asc',
+  severity: 'desc',
+}
+
+/**
+ * Stable sort for the table. Ties fall back to newest first. Empty values (no measurement,
+ * unrated, no body part) always sink to the bottom whatever the direction, so "highest first"
+ * and "lowest first" both start with real data. `personName` resolves ids for the Person column.
+ */
+export function sortHealthLog(
+  entries: HealthEntry[],
+  key: HealthSortKey,
+  dir: SortDir,
+  personName: (id: string) => string = (id) => id,
+): HealthEntry[] {
+  const sign = dir === 'asc' ? 1 : -1
+  const byDate = (a: HealthEntry, b: HealthEntry) =>
+    b.date.localeCompare(a.date) || b.createdAt.localeCompare(a.createdAt)
+  const text = (a: string, b: string) =>
+    a === b ? 0 : a === '' ? 1 : b === '' ? -1 : sign * a.localeCompare(b)
+  const num = (a: number | null, b: number | null) =>
+    a === b ? 0 : a === null ? 1 : b === null ? -1 : sign * (a - b)
+  const cmp: Record<HealthSortKey, (a: HealthEntry, b: HealthEntry) => number> = {
+    date: (a, b) => sign * a.date.localeCompare(b.date) || byDate(a, b),
+    person: (a, b) => text(personName(a.personId), personName(b.personId)),
+    kind: (a, b) => sign * HEALTH_KIND_LABELS[a.kind].localeCompare(HEALTH_KIND_LABELS[b.kind]),
+    title: (a, b) => text(a.title.toLowerCase(), b.title.toLowerCase()),
+    value: (a, b) => num(a.value, b.value),
+    bodyPart: (a, b) => text(a.bodyPart, b.bodyPart),
+    severity: (a, b) => num(a.severity, b.severity),
+  }
+  const c = cmp[key]
+  return [...entries].sort((a, b) => c(a, b) || byDate(a, b))
 }
 
 /** Distinct values present in the log, sorted, for the filter dropdowns. */

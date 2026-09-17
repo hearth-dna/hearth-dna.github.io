@@ -1,0 +1,12 @@
+{
+  "healthTable.empty": "Nothing recorded yet. Use Add entry to log a symptom, a measurement, a lab result or a medication.",
+  "healthTable.allKinds": "All",
+  "healthTable.minSeverity": "Severity",
+  "healthTable.anySeverity": "any severity",
+  "healthTable.severityAtLeast": "severity ≥ {n}",
+  "healthTable.from": "from",
+  "healthTable.to": "to",
+  "healthTable.colDate": "Date",
+  "healthTable.colTags": "Tags",
+  "healthTable.noText": "No text for this entry."
+}

@@ -1,0 +1,10 @@
+{
+  "healthPage.title": "Health",
+  "healthPage.intro": "One place for the whole family's health: symptoms, home measurements such as temperature and blood pressure, and the text of lab results, diagnoses and doctor letters. Everyone shows one table of every entry you can sort, filter and add to; pick a person to read a document into their log.",
+  "healthPage.noPeople": "Add a person on the People page first.",
+  "healthPage.everyone": "Everyone",
+  "healthPage.colPerson": "Person",
+  "healthPage.timeline": "Timeline",
+  "healthPage.filterPerson": "Person",
+  "healthPage.anyPerson": "anyone"
+}
