@@ -443,5 +443,18 @@
   "backupCard.building": "Создание снимка…",
   "backupCard.writingFile": "Запись в {name}…",
   "backupCard.loading": "Загрузка из {name}…",
-  "backupCard.done": "Резервная копия сохранена в {name} в {time}."
+  "backupCard.done": "Резервная копия сохранена в {name} в {time}.",
+  "openFormats.title": "Открытые форматы",
+  "openFormats.intro": "Простые файлы для собственного анализа: CSV открывается в Excel, Numbers или LibreOffice; JSON Lines (один объект JSON на строку) напрямую загружается в Python, R или любой скрипт. Генотипы: одна строка на SNP и столбец на человека; находки: каждое совпадение с базой знаний вместе с доказательствами; журнал здоровья: одна строка на запись.",
+  "openFormats.format": "Формат",
+  "openFormats.csv": "CSV (таблица)",
+  "openFormats.jsonl": "JSON Lines (скрипты)",
+  "openFormats.genotypes": "Генотипы",
+  "openFormats.findings": "Находки",
+  "openFormats.healthLog": "Журнал здоровья",
+  "openFormats.plaintextWarning": "Эти файлы не зашифрованы и содержат генетические и медицинские данные. Храните их там, где прочитать их можете только вы.",
+  "openFormats.building": "Создание: {what}…",
+  "openFormats.done": "Скачано {name}: {rows} строк, {mb} МБ.",
+  "openFormats.failed": "Ошибка: {error}",
+  "openFormats.sharedOnly": "Генотипы: только SNP, прочитанные у каждого человека (сопоставимый набор; снимите флажок для объединения всех файлов, которое может превысить лимит таблицы в 1 048 576 строк)"
 }

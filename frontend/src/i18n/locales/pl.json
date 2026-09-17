@@ -443,5 +443,18 @@
   "backupCard.building": "Tworzenie migawki…",
   "backupCard.writingFile": "Zapisywanie do {name}…",
   "backupCard.loading": "Wczytywanie z {name}…",
-  "backupCard.done": "Zapisano kopię w {name} o {time}."
+  "backupCard.done": "Zapisano kopię w {name} o {time}.",
+  "openFormats.title": "Otwarte formaty",
+  "openFormats.intro": "Proste pliki do własnej analizy: CSV otwiera się w Excelu, Numbers lub LibreOffice; JSON Lines (jeden obiekt JSON na wiersz) wczytuje się bezpośrednio do Pythona, R lub dowolnego skryptu. Genotypy: jeden wiersz na SNP z kolumną na osobę; wyniki: każde dopasowanie z bazy wiedzy wraz z dowodami; dziennik zdrowia: jeden wiersz na wpis.",
+  "openFormats.format": "Format",
+  "openFormats.csv": "CSV (arkusz kalkulacyjny)",
+  "openFormats.jsonl": "JSON Lines (skrypty)",
+  "openFormats.genotypes": "Genotypy",
+  "openFormats.findings": "Wyniki",
+  "openFormats.healthLog": "Dziennik zdrowia",
+  "openFormats.plaintextWarning": "Te pliki nie są zaszyfrowane i zawierają dane genetyczne i zdrowotne. Przechowuj je tam, gdzie tylko Ty możesz je odczytać.",
+  "openFormats.building": "Tworzenie: {what}…",
+  "openFormats.done": "Pobrano {name}: {rows} wierszy, {mb} MB.",
+  "openFormats.failed": "Niepowodzenie: {error}",
+  "openFormats.sharedOnly": "Genotypy: tylko SNP-y odczytane u każdej osoby (zbiór porównywalny; odznacz, aby uzyskać sumę wszystkich plików, która może przekroczyć limit 1 048 576 wierszy arkusza kalkulacyjnego)"
 }

@@ -443,5 +443,18 @@
   "backupCard.building": "Momentopname maken…",
   "backupCard.writingFile": "Schrijven naar {name}…",
   "backupCard.loading": "Laden uit {name}…",
-  "backupCard.done": "Back-up gemaakt naar {name} om {time}."
+  "backupCard.done": "Back-up gemaakt naar {name} om {time}.",
+  "openFormats.title": "Open formaten",
+  "openFormats.intro": "Eenvoudige bestanden voor je eigen analyse: CSV opent in Excel, Numbers of LibreOffice; JSON Lines (één JSON-object per regel) laadt direct in Python, R of elk script. Genotypen: één rij per SNP met een kolom per persoon; bevindingen: elke match uit de kennisbank met bewijs; gezondheidslogboek: één rij per item.",
+  "openFormats.format": "Formaat",
+  "openFormats.csv": "CSV (spreadsheet)",
+  "openFormats.jsonl": "JSON Lines (scripts)",
+  "openFormats.genotypes": "Genotypen",
+  "openFormats.findings": "Bevindingen",
+  "openFormats.healthLog": "Gezondheidslogboek",
+  "openFormats.plaintextWarning": "Deze bestanden zijn niet versleuteld en bevatten genetische en medische gegevens. Bewaar ze waar alleen jij ze kunt lezen.",
+  "openFormats.building": "{what} wordt gemaakt…",
+  "openFormats.done": "{name} gedownload: {rows} rijen, {mb} MB.",
+  "openFormats.failed": "Mislukt: {error}",
+  "openFormats.sharedOnly": "Genotypen: alleen SNP's waarvoor iedereen een waarde heeft (de vergelijkbare set; vink uit voor de vereniging van alle bestanden, die de limiet van 1.048.576 rijen van een spreadsheet kan overschrijden)"
 }

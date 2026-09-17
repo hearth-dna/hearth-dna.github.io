@@ -243,4 +243,16 @@ export class Database {
   async genomeGz(personId: string): Promise<Uint8Array> {
     return (await this.send({ op: 'genome-gz', personId })) as Uint8Array
   }
+
+  /** The wide genotype table (one column per person) as CSV or JSON Lines bytes, built in the worker. */
+  async genotypeTable(
+    columns: { id: string; name: string }[],
+    format: 'csv' | 'jsonl',
+    shared: boolean,
+  ): Promise<{ bytes: Uint8Array; rows: number }> {
+    return (await this.send({ op: 'genotype-table', columns, format, shared })) as {
+      bytes: Uint8Array
+      rows: number
+    }
+  }
 }

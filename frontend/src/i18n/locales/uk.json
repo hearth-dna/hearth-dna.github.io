@@ -443,5 +443,18 @@
   "backupCard.building": "Створення знімка…",
   "backupCard.writingFile": "Запис у {name}…",
   "backupCard.loading": "Завантаження з {name}…",
-  "backupCard.done": "Резервну копію збережено в {name} о {time}."
+  "backupCard.done": "Резервну копію збережено в {name} о {time}.",
+  "openFormats.title": "Відкриті формати",
+  "openFormats.intro": "Прості файли для власного аналізу: CSV відкривається в Excel, Numbers або LibreOffice; JSON Lines (один об'єкт JSON на рядок) напряму завантажується в Python, R чи будь-який скрипт. Генотипи: один рядок на SNP і стовпець на особу; знахідки: кожен збіг із базою знань разом із доказами; журнал здоров'я: один рядок на запис.",
+  "openFormats.format": "Формат",
+  "openFormats.csv": "CSV (таблиця)",
+  "openFormats.jsonl": "JSON Lines (скрипти)",
+  "openFormats.genotypes": "Генотипи",
+  "openFormats.findings": "Знахідки",
+  "openFormats.healthLog": "Журнал здоров'я",
+  "openFormats.plaintextWarning": "Ці файли не зашифровані й містять генетичні та медичні дані. Зберігайте їх там, де прочитати їх можете лише ви.",
+  "openFormats.building": "Створення: {what}…",
+  "openFormats.done": "Завантажено {name}: {rows} рядків, {mb} МБ.",
+  "openFormats.failed": "Помилка: {error}",
+  "openFormats.sharedOnly": "Генотипи: лише SNP, прочитані в кожної особи (порівнюваний набір; зніміть позначку для об'єднання всіх файлів, яке може перевищити ліміт таблиці в 1 048 576 рядків)"
 }

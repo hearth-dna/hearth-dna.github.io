@@ -443,5 +443,18 @@
   "backupCard.building": "Creazione dello snapshot…",
   "backupCard.writingFile": "Scrittura in {name}…",
   "backupCard.loading": "Caricamento da {name}…",
-  "backupCard.done": "Backup salvato in {name} alle {time}."
+  "backupCard.done": "Backup salvato in {name} alle {time}.",
+  "openFormats.title": "Formati aperti",
+  "openFormats.intro": "File semplici per la tua analisi: il CSV si apre in Excel, Numbers o LibreOffice; JSON Lines (un oggetto JSON per riga) si carica direttamente in Python, R o qualsiasi script. Genotipi: una riga per SNP con una colonna per persona; risultati: ogni corrispondenza della base di conoscenza con le sue evidenze; diario della salute: una riga per voce.",
+  "openFormats.format": "Formato",
+  "openFormats.csv": "CSV (foglio di calcolo)",
+  "openFormats.jsonl": "JSON Lines (script)",
+  "openFormats.genotypes": "Genotipi",
+  "openFormats.findings": "Risultati",
+  "openFormats.healthLog": "Diario della salute",
+  "openFormats.plaintextWarning": "Questi file non sono cifrati e contengono dati genetici e sanitari. Conservali dove solo tu puoi leggerli.",
+  "openFormats.building": "Creazione di {what}…",
+  "openFormats.done": "Scaricato {name}: {rows} righe, {mb} MB.",
+  "openFormats.failed": "Errore: {error}",
+  "openFormats.sharedOnly": "Genotipi: solo gli SNP letti per ogni persona (l'insieme confrontabile; deseleziona per l'unione di tutti i file, che può superare il limite di 1.048.576 righe di un foglio di calcolo)"
 }

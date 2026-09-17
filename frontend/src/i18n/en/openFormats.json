@@ -1,0 +1,15 @@
+{
+  "openFormats.title": "Open formats",
+  "openFormats.intro": "Plain files for your own analysis: CSV opens in Excel, Numbers or LibreOffice; JSON Lines (one JSON object per line) loads straight into Python, R or any script. Genotypes are one row per SNP with a column per person; findings are every knowledge-base match with its evidence; the health log is one row per entry.",
+  "openFormats.format": "Format",
+  "openFormats.csv": "CSV (spreadsheet)",
+  "openFormats.jsonl": "JSON Lines (scripts)",
+  "openFormats.genotypes": "Genotypes",
+  "openFormats.findings": "Findings",
+  "openFormats.healthLog": "Health log",
+  "openFormats.plaintextWarning": "These files are unencrypted and contain genetic and health data. Keep them where only you can read them.",
+  "openFormats.building": "Building {what}…",
+  "openFormats.done": "Downloaded {name}: {rows} rows, {mb} MB.",
+  "openFormats.failed": "Failed: {error}",
+  "openFormats.sharedOnly": "Genotypes: only SNPs every person has a call for (the comparable set; untick for the union of all files, which can exceed a spreadsheet's 1,048,576-row limit)"
+}

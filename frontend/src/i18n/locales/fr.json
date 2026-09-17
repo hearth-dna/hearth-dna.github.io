@@ -443,5 +443,18 @@
   "backupCard.building": "Création de l'instantané…",
   "backupCard.writingFile": "Écriture dans {name}…",
   "backupCard.loading": "Chargement depuis {name}…",
-  "backupCard.done": "Sauvegardé dans {name} à {time}."
+  "backupCard.done": "Sauvegardé dans {name} à {time}.",
+  "openFormats.title": "Formats ouverts",
+  "openFormats.intro": "Des fichiers simples pour votre propre analyse : le CSV s'ouvre dans Excel, Numbers ou LibreOffice ; JSON Lines (un objet JSON par ligne) se charge directement dans Python, R ou n'importe quel script. Génotypes : une ligne par SNP avec une colonne par personne ; résultats : chaque correspondance de la base de connaissances avec ses preuves ; journal de santé : une ligne par entrée.",
+  "openFormats.format": "Format",
+  "openFormats.csv": "CSV (tableur)",
+  "openFormats.jsonl": "JSON Lines (scripts)",
+  "openFormats.genotypes": "Génotypes",
+  "openFormats.findings": "Résultats",
+  "openFormats.healthLog": "Journal de santé",
+  "openFormats.plaintextWarning": "Ces fichiers ne sont pas chiffrés et contiennent des données génétiques et de santé. Conservez-les là où vous seul pouvez les lire.",
+  "openFormats.building": "Création de {what}…",
+  "openFormats.done": "{name} téléchargé : {rows} lignes, {mb} Mo.",
+  "openFormats.failed": "Échec : {error}",
+  "openFormats.sharedOnly": "Génotypes : uniquement les SNP renseignés pour chaque personne (l'ensemble comparable ; décochez pour l'union de tous les fichiers, qui peut dépasser la limite de 1 048 576 lignes d'un tableur)"
 }

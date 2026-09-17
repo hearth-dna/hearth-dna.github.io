@@ -443,5 +443,18 @@
   "backupCard.building": "Snapshot wird erstellt…",
   "backupCard.writingFile": "Schreibe nach {name}…",
   "backupCard.loading": "Lade aus {name}…",
-  "backupCard.done": "Gesichert nach {name} um {time}."
+  "backupCard.done": "Gesichert nach {name} um {time}.",
+  "openFormats.title": "Offene Formate",
+  "openFormats.intro": "Einfache Dateien für die eigene Auswertung: CSV öffnet sich in Excel, Numbers oder LibreOffice; JSON Lines (ein JSON-Objekt pro Zeile) lädt direkt in Python, R oder jedes Skript. Genotypen: eine Zeile pro SNP mit einer Spalte pro Person; Befunde: jeder Treffer der Wissensbasis mit seiner Evidenz; Gesundheitstagebuch: eine Zeile pro Eintrag.",
+  "openFormats.format": "Format",
+  "openFormats.csv": "CSV (Tabellenkalkulation)",
+  "openFormats.jsonl": "JSON Lines (Skripte)",
+  "openFormats.genotypes": "Genotypen",
+  "openFormats.findings": "Befunde",
+  "openFormats.healthLog": "Gesundheitstagebuch",
+  "openFormats.plaintextWarning": "Diese Dateien sind unverschlüsselt und enthalten genetische und Gesundheitsdaten. Bewahre sie dort auf, wo nur du sie lesen kannst.",
+  "openFormats.building": "{what} wird erstellt…",
+  "openFormats.done": "{name} heruntergeladen: {rows} Zeilen, {mb} MB.",
+  "openFormats.failed": "Fehlgeschlagen: {error}",
+  "openFormats.sharedOnly": "Genotypen: nur SNPs, für die jede Person einen Wert hat (die vergleichbare Menge; abwählen für die Vereinigung aller Dateien, die das Limit von 1.048.576 Zeilen einer Tabellenkalkulation überschreiten kann)"
 }

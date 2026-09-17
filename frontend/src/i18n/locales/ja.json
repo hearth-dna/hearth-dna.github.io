@@ -443,5 +443,18 @@
   "backupCard.building": "スナップショットを作成中…",
   "backupCard.writingFile": "{name} に書き込み中…",
   "backupCard.loading": "{name} から読み込み中…",
-  "backupCard.done": "{time} に {name} へバックアップしました。"
+  "backupCard.done": "{time} に {name} へバックアップしました。",
+  "openFormats.title": "オープン形式",
+  "openFormats.intro": "自分で分析するためのシンプルなファイルです。CSV は Excel、Numbers、LibreOffice で開けます。JSON Lines（1 行に 1 つの JSON オブジェクト）は Python や R などのスクリプトでそのまま読み込めます。遺伝子型は SNP ごとに 1 行、人物ごとに 1 列。所見はナレッジベースの一致ごとに根拠付きで 1 行。健康記録は項目ごとに 1 行です。",
+  "openFormats.format": "形式",
+  "openFormats.csv": "CSV（表計算）",
+  "openFormats.jsonl": "JSON Lines（スクリプト）",
+  "openFormats.genotypes": "遺伝子型",
+  "openFormats.findings": "所見",
+  "openFormats.healthLog": "健康記録",
+  "openFormats.plaintextWarning": "これらのファイルは暗号化されておらず、遺伝情報と健康データを含みます。自分だけが読める場所に保管してください。",
+  "openFormats.building": "{what} を作成中…",
+  "openFormats.done": "{name} をダウンロードしました: {rows} 行、{mb} MB。",
+  "openFormats.failed": "失敗: {error}",
+  "openFormats.sharedOnly": "遺伝子型: 全員に判定値がある SNP のみ（比較可能な集合。チェックを外すと全ファイルの和集合になり、表計算ソフトの上限 1,048,576 行を超えることがあります）"
 }

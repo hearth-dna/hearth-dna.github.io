@@ -443,5 +443,18 @@
   "backupCard.building": "A criar instantâneo…",
   "backupCard.writingFile": "A escrever em {name}…",
   "backupCard.loading": "A carregar de {name}…",
-  "backupCard.done": "Cópia guardada em {name} às {time}."
+  "backupCard.done": "Cópia guardada em {name} às {time}.",
+  "openFormats.title": "Formatos abertos",
+  "openFormats.intro": "Ficheiros simples para a sua própria análise: o CSV abre no Excel, Numbers ou LibreOffice; JSON Lines (um objeto JSON por linha) carrega diretamente em Python, R ou qualquer script. Genótipos: uma linha por SNP com uma coluna por pessoa; achados: cada correspondência da base de conhecimento com a sua evidência; registo de saúde: uma linha por entrada.",
+  "openFormats.format": "Formato",
+  "openFormats.csv": "CSV (folha de cálculo)",
+  "openFormats.jsonl": "JSON Lines (scripts)",
+  "openFormats.genotypes": "Genótipos",
+  "openFormats.findings": "Achados",
+  "openFormats.healthLog": "Registo de saúde",
+  "openFormats.plaintextWarning": "Estes ficheiros não estão cifrados e contêm dados genéticos e de saúde. Guarde-os onde só você os possa ler.",
+  "openFormats.building": "A criar {what}…",
+  "openFormats.done": "{name} transferido: {rows} linhas, {mb} MB.",
+  "openFormats.failed": "Falhou: {error}",
+  "openFormats.sharedOnly": "Genótipos: apenas SNPs com leitura em todas as pessoas (o conjunto comparável; desmarque para a união de todos os ficheiros, que pode ultrapassar o limite de 1.048.576 linhas de uma folha de cálculo)"
 }

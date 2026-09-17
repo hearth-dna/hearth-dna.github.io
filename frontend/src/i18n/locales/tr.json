@@ -443,5 +443,18 @@
   "backupCard.building": "Anlık görüntü oluşturuluyor…",
   "backupCard.writingFile": "{name} klasörüne yazılıyor…",
   "backupCard.loading": "{name} klasöründen yükleniyor…",
-  "backupCard.done": "{time} itibarıyla {name} klasörüne yedeklendi."
+  "backupCard.done": "{time} itibarıyla {name} klasörüne yedeklendi.",
+  "openFormats.title": "Açık biçimler",
+  "openFormats.intro": "Kendi analiziniz için sade dosyalar: CSV Excel, Numbers veya LibreOffice'te açılır; JSON Lines (satır başına bir JSON nesnesi) doğrudan Python, R veya herhangi bir betiğe yüklenir. Genotipler: SNP başına bir satır, kişi başına bir sütun; bulgular: bilgi tabanındaki her eşleşme kanıtıyla; sağlık günlüğü: kayıt başına bir satır.",
+  "openFormats.format": "Biçim",
+  "openFormats.csv": "CSV (hesap tablosu)",
+  "openFormats.jsonl": "JSON Lines (betikler)",
+  "openFormats.genotypes": "Genotipler",
+  "openFormats.findings": "Bulgular",
+  "openFormats.healthLog": "Sağlık günlüğü",
+  "openFormats.plaintextWarning": "Bu dosyalar şifrelenmemiştir ve genetik ile sağlık verileri içerir. Yalnızca sizin okuyabileceğiniz bir yerde saklayın.",
+  "openFormats.building": "{what} oluşturuluyor…",
+  "openFormats.done": "{name} indirildi: {rows} satır, {mb} MB.",
+  "openFormats.failed": "Başarısız: {error}",
+  "openFormats.sharedOnly": "Genotipler: yalnızca herkeste okuması olan SNP'ler (karşılaştırılabilir küme; tüm dosyaların birleşimi için işareti kaldırın, bu hesap tablosunun 1.048.576 satır sınırını aşabilir)"
 }

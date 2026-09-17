@@ -443,5 +443,18 @@
   "backupCard.building": "正在创建快照…",
   "backupCard.writingFile": "正在写入 {name}…",
   "backupCard.loading": "正在从 {name} 加载…",
-  "backupCard.done": "已于 {time} 备份到 {name}。"
+  "backupCard.done": "已于 {time} 备份到 {name}。",
+  "openFormats.title": "开放格式",
+  "openFormats.intro": "便于自行分析的纯文件：CSV 可在 Excel、Numbers 或 LibreOffice 中打开；JSON Lines（每行一个 JSON 对象）可直接载入 Python、R 或任何脚本。基因型：每个 SNP 一行，每人一列；发现：知识库中的每条匹配及其证据；健康日志：每条记录一行。",
+  "openFormats.format": "格式",
+  "openFormats.csv": "CSV（电子表格）",
+  "openFormats.jsonl": "JSON Lines（脚本）",
+  "openFormats.genotypes": "基因型",
+  "openFormats.findings": "发现",
+  "openFormats.healthLog": "健康日志",
+  "openFormats.plaintextWarning": "这些文件未加密，包含遗传和健康数据。请保存在只有您能读取的地方。",
+  "openFormats.building": "正在生成{what}…",
+  "openFormats.done": "已下载 {name}：{rows} 行，{mb} MB。",
+  "openFormats.failed": "失败：{error}",
+  "openFormats.sharedOnly": "基因型：仅包含每个人都有读数的 SNP（可比较的集合；取消勾选则导出所有文件的并集，可能超过电子表格 1,048,576 行的上限）"
 }

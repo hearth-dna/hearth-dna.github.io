@@ -443,5 +443,18 @@
   "backupCard.building": "스냅샷 생성 중…",
   "backupCard.writingFile": "{name}에 쓰는 중…",
   "backupCard.loading": "{name}에서 불러오는 중…",
-  "backupCard.done": "{time}에 {name}(으)로 백업했습니다."
+  "backupCard.done": "{time}에 {name}(으)로 백업했습니다.",
+  "openFormats.title": "개방형 형식",
+  "openFormats.intro": "직접 분석하기 위한 단순한 파일입니다. CSV는 Excel, Numbers, LibreOffice에서 열리고, JSON Lines(한 줄에 JSON 객체 하나)는 Python, R 등 모든 스크립트에 바로 불러올 수 있습니다. 유전자형은 SNP당 한 행, 사람당 한 열입니다. 소견은 지식 베이스의 일치 항목마다 근거와 함께 한 행, 건강 기록은 항목당 한 행입니다.",
+  "openFormats.format": "형식",
+  "openFormats.csv": "CSV (스프레드시트)",
+  "openFormats.jsonl": "JSON Lines (스크립트)",
+  "openFormats.genotypes": "유전자형",
+  "openFormats.findings": "소견",
+  "openFormats.healthLog": "건강 기록",
+  "openFormats.plaintextWarning": "이 파일들은 암호화되지 않았으며 유전 정보와 건강 데이터를 포함합니다. 본인만 읽을 수 있는 곳에 보관하세요.",
+  "openFormats.building": "{what} 생성 중…",
+  "openFormats.done": "{name} 다운로드 완료: {rows}행, {mb} MB.",
+  "openFormats.failed": "실패: {error}",
+  "openFormats.sharedOnly": "유전자형: 모든 사람에게 판독값이 있는 SNP만 (비교 가능한 집합. 해제하면 모든 파일의 합집합이 되어 스프레드시트의 1,048,576행 한도를 넘을 수 있습니다)"
 }

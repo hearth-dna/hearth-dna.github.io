@@ -29,6 +29,14 @@ type Req =
   | { id: number; op: 'file-delete'; name: string }
   | { id: number; op: 'file-list' }
   | { id: number; op: 'genome-gz'; personId: string }
+  | {
+      id: number
+      op: 'genotype-table'
+      columns: { id: string; name: string }[]
+      format: 'csv' | 'jsonl'
+      /** Only SNPs every listed person has a call for. */
+      shared: boolean
+    }
 
 type Res =
   | { id: number; ok: true; result?: unknown }
@@ -157,6 +165,56 @@ async function genomeGz(personId: string): Promise<Uint8Array> {
   return new Uint8Array(await new Response(stream).arrayBuffer())
 }
 
+/**
+ * One row per SNP with a genotype column per person, as CSV or JSON Lines bytes
+ * (docs/architecture/storage/open-formats.md). Built here so millions of rows never leave the
+ * worker: one MAX(CASE …) column per person, ordered numerically by chromosome.
+ */
+function genotypeTable(columns: { id: string; name: string }[], format: 'csv' | 'jsonl', shared: boolean) {
+  const q = (v: string) => `'${v.replace(/'/g, "''")}'`
+  const cols = columns.map((c, i) => `MAX(CASE WHEN person_id = ${q(c.id)} THEN a1 || a2 END) AS g${i}`)
+  const sql = `SELECT rsid, chromosome, position${cols.length ? `, ${cols.join(', ')}` : ''} FROM genotype
+    WHERE person_id IN (${columns.map((c) => q(c.id)).join(',') || "''"}) GROUP BY rsid
+    ${shared ? `HAVING COUNT(*) = ${columns.length}` : ''}
+    ORDER BY CASE WHEN chromosome GLOB '[0-9]*' THEN CAST(chromosome AS INTEGER) ELSE 100 END, chromosome, position`
+  const names = ['rsid', 'chromosome', 'position', ...columns.map((c) => c.name)]
+  const csvCell = (v: string) => (/[",\r\n]|^\s|\s$/.test(v) ? `"${v.replace(/"/g, '""')}"` : v)
+  const enc = new TextEncoder()
+  const chunks: Uint8Array[] = []
+  let lines: string[] = format === 'csv' ? [`\uFEFF${names.map(csvCell).join(',')}`] : []
+  let rows = 0
+  const flush = () => {
+    chunks.push(enc.encode(`${lines.join('\n')}\n`))
+    lines = []
+  }
+  const stmt = db.prepare(sql)
+  try {
+    while (stmt.step()) {
+      const r = stmt.get([]) as (string | number | null)[]
+      if (format === 'csv') lines.push(r.map((v) => (v === null ? '' : csvCell(String(v)))).join(','))
+      else {
+        const o: Record<string, unknown> = {}
+        names.forEach((n, i) => {
+          o[n] = r[i]
+        })
+        lines.push(JSON.stringify(o))
+      }
+      if (++rows % 50000 === 0) flush()
+    }
+  } finally {
+    stmt.finalize()
+  }
+  if (lines.length) flush()
+  const total = chunks.reduce((n, c) => n + c.length, 0)
+  const bytes = new Uint8Array(total)
+  let o = 0
+  for (const c of chunks) {
+    bytes.set(c, o)
+    o += c.length
+  }
+  return { bytes, rows }
+}
+
 function genomeText(personId: string): string {
   const lines = ['# Hearth export: rsid chromosome position genotype (forward strand)']
   const stmt = db.prepare(
@@ -208,6 +266,8 @@ function handle(req: Req): unknown {
       return fileList()
     case 'genome-gz':
       return genomeGz(req.personId)
+    case 'genotype-table':
+      return genotypeTable(req.columns, req.format, req.shared)
     case 'bulk': {
       // Sorting by the primary-key columns turns random B-tree inserts into appends; with the
       // rsid index dropped for the duration (see repo.importCalls) a 700k-row genome lands in

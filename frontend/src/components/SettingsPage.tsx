@@ -12,6 +12,7 @@ import { ArchiveCard } from './ArchiveCard'
 import { BackupCard } from './BackupCard'
 import { EraseDialog } from './EraseDialog'
 import { GeminiKeySteps } from './GeminiKeySteps'
+import { OpenFormatsCard } from './OpenFormatsCard'
 
 export function SettingsPage() {
   const { db, persons, refresh } = useApp()
@@ -95,6 +96,7 @@ export function SettingsPage() {
 
       <BackupCard />
       <ArchiveCard />
+      <OpenFormatsCard />
 
       <div className="card">
         <h2>{t('settingsPage.documentReading')}</h2>

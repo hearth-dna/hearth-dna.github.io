@@ -11,6 +11,7 @@ Status: **implemented** (2026-09-14). Each document ends with where the code liv
 | [`backup-folder.md`](backup-folder.md) | A user-chosen folder (USB stick, Google Drive / Dropbox / OneDrive synced folder) the app writes backups to and restores from. The primary mechanism. |
 | [`portable-archive.md`](portable-archive.md) | One self-contained `hearth-<date>.html` that *is* the app plus the data: double-click it anywhere, browse, save a new copy. |
 | [`cloud-drives.md`](cloud-drives.md) | Google Drive and friends: why the synced-folder route is chosen over a Drive API integration, and what an API integration would cost if it is ever wanted. |
+| [`open-formats.md`](open-formats.md) | CSV and JSON Lines exports of genotypes, findings and the health log for the user's own spreadsheets and scripts. |
 | [`dump-v2.md`](dump-v2.md) | Changes to the dump container that the three above need: generation counter, per-genome blobs, one envelope for encryption. |
 
 ## Options considered
