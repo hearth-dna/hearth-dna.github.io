@@ -456,5 +456,14 @@
   "openFormats.building": "Tworzenie: {what}…",
   "openFormats.done": "Pobrano {name}: {rows} wierszy, {mb} MB.",
   "openFormats.failed": "Niepowodzenie: {error}",
-  "openFormats.sharedOnly": "Genotypy: tylko SNP-y odczytane u każdej osoby (zbiór porównywalny; odznacz, aby uzyskać sumę wszystkich plików, która może przekroczyć limit 1 048 576 wierszy arkusza kalkulacyjnego)"
+  "openFormats.sharedOnly": "Genotypy: tylko SNP-y odczytane u każdej osoby (zbiór porównywalny; odznacz, aby uzyskać sumę wszystkich plików, która może przekroczyć limit 1 048 576 wierszy arkusza kalkulacyjnego)",
+  "peoplePage.view": "Widok",
+  "peoplePage.viewCards": "Karty",
+  "peoplePage.viewTable": "Tabela",
+  "peoplePage.viewTree": "Drzewo",
+  "peoplePage.name": "Imię",
+  "peoplePage.parentsHeader": "Rodzice",
+  "peoplePage.snpsHeader": "SNP",
+  "peoplePage.treeAria": "Drzewo rodzinne",
+  "peoplePage.treeHint": "Wszyscy są w jednym rzędzie, dopóki nie ustawisz rodziców; dodaj ich na kartach, aby zbudować drzewo."
 }

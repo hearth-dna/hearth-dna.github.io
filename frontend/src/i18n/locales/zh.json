@@ -456,5 +456,14 @@
   "openFormats.building": "正在生成{what}…",
   "openFormats.done": "已下载 {name}：{rows} 行，{mb} MB。",
   "openFormats.failed": "失败：{error}",
-  "openFormats.sharedOnly": "基因型：仅包含每个人都有读数的 SNP（可比较的集合；取消勾选则导出所有文件的并集，可能超过电子表格 1,048,576 行的上限）"
+  "openFormats.sharedOnly": "基因型：仅包含每个人都有读数的 SNP（可比较的集合；取消勾选则导出所有文件的并集，可能超过电子表格 1,048,576 行的上限）",
+  "peoplePage.view": "视图",
+  "peoplePage.viewCards": "卡片",
+  "peoplePage.viewTable": "表格",
+  "peoplePage.viewTree": "家谱",
+  "peoplePage.name": "姓名",
+  "peoplePage.parentsHeader": "父母",
+  "peoplePage.snpsHeader": "SNP 数",
+  "peoplePage.treeAria": "家谱",
+  "peoplePage.treeHint": "在设置父母之前，所有人都在同一行；请在卡片中添加父母以构建家谱。"
 }

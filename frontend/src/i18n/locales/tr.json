@@ -456,5 +456,14 @@
   "openFormats.building": "{what} oluşturuluyor…",
   "openFormats.done": "{name} indirildi: {rows} satır, {mb} MB.",
   "openFormats.failed": "Başarısız: {error}",
-  "openFormats.sharedOnly": "Genotipler: yalnızca herkeste okuması olan SNP'ler (karşılaştırılabilir küme; tüm dosyaların birleşimi için işareti kaldırın, bu hesap tablosunun 1.048.576 satır sınırını aşabilir)"
+  "openFormats.sharedOnly": "Genotipler: yalnızca herkeste okuması olan SNP'ler (karşılaştırılabilir küme; tüm dosyaların birleşimi için işareti kaldırın, bu hesap tablosunun 1.048.576 satır sınırını aşabilir)",
+  "peoplePage.view": "Görünüm",
+  "peoplePage.viewCards": "Kartlar",
+  "peoplePage.viewTable": "Tablo",
+  "peoplePage.viewTree": "Ağaç",
+  "peoplePage.name": "Ad",
+  "peoplePage.parentsHeader": "Ebeveynler",
+  "peoplePage.snpsHeader": "SNP",
+  "peoplePage.treeAria": "Aile ağacı",
+  "peoplePage.treeHint": "Ebeveynler ayarlanana kadar herkes tek sırada görünür; ağacı oluşturmak için kartlardan ekleyin."
 }

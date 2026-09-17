@@ -456,5 +456,14 @@
   "openFormats.building": "Generando {what}…",
   "openFormats.done": "Descargado {name}: {rows} filas, {mb} MB.",
   "openFormats.failed": "Error: {error}",
-  "openFormats.sharedOnly": "Genotipos: solo SNPs con lectura en todas las personas (el conjunto comparable; desmarca para la unión de todos los archivos, que puede superar el límite de 1.048.576 filas de una hoja de cálculo)"
+  "openFormats.sharedOnly": "Genotipos: solo SNPs con lectura en todas las personas (el conjunto comparable; desmarca para la unión de todos los archivos, que puede superar el límite de 1.048.576 filas de una hoja de cálculo)",
+  "peoplePage.view": "Vista",
+  "peoplePage.viewCards": "Tarjetas",
+  "peoplePage.viewTable": "Tabla",
+  "peoplePage.viewTree": "Árbol",
+  "peoplePage.name": "Nombre",
+  "peoplePage.parentsHeader": "Padres",
+  "peoplePage.snpsHeader": "SNPs",
+  "peoplePage.treeAria": "Árbol familiar",
+  "peoplePage.treeHint": "Todos aparecen en una sola fila hasta que se indiquen los padres; añádalos en las tarjetas para construir el árbol."
 }

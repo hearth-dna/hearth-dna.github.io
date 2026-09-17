@@ -456,5 +456,14 @@
   "openFormats.building": "Створення: {what}…",
   "openFormats.done": "Завантажено {name}: {rows} рядків, {mb} МБ.",
   "openFormats.failed": "Помилка: {error}",
-  "openFormats.sharedOnly": "Генотипи: лише SNP, прочитані в кожної особи (порівнюваний набір; зніміть позначку для об'єднання всіх файлів, яке може перевищити ліміт таблиці в 1 048 576 рядків)"
+  "openFormats.sharedOnly": "Генотипи: лише SNP, прочитані в кожної особи (порівнюваний набір; зніміть позначку для об'єднання всіх файлів, яке може перевищити ліміт таблиці в 1 048 576 рядків)",
+  "peoplePage.view": "Вигляд",
+  "peoplePage.viewCards": "Картки",
+  "peoplePage.viewTable": "Таблиця",
+  "peoplePage.viewTree": "Дерево",
+  "peoplePage.name": "Ім’я",
+  "peoplePage.parentsHeader": "Батьки",
+  "peoplePage.snpsHeader": "SNP",
+  "peoplePage.treeAria": "Родинне дерево",
+  "peoplePage.treeHint": "Поки батьків не вказано, усі стоять в одному ряду; додайте їх на картках, щоб побудувати дерево."
 }

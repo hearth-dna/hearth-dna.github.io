@@ -49,7 +49,7 @@ describe('layoutPedigree', () => {
     notes: '',
     createdAt,
   })
-  it('puts founders on top and children under the mean of their parents', () => {
+  it('puts founders on top, co-parents side by side and children under them', () => {
     const nodes = layoutPedigree(
       [p('kid', '3'), p('gran', '0'), p('mum', '1'), p('dad', '2'), p('uncle', '4')],
       [
@@ -61,9 +61,25 @@ describe('layoutPedigree', () => {
     )
     const at = (id: string) => nodes.find((n) => n.person.id === id)!
     expect([at('gran').generation, at('dad').generation, at('mum').generation, at('kid').generation]).toEqual(
-      [0, 0, 1, 2],
+      [0, 1, 1, 2],
     )
     expect(at('mum').column).toBeLessThan(at('uncle').column) // both under gran; creation order
+    expect(Math.abs(at('dad').column - at('mum').column)).toBe(1) // married in: next to mum, not the uncle
     expect(at('kid').parents.sort()).toEqual(['dad', 'mum'])
+  })
+  it('keeps a child below a parent who was pulled down to a co-parent', () => {
+    // gran → mum; mum + dad → kid; dad + step → half. step is a founder co-parenting with dad (gen 1).
+    const nodes = layoutPedigree(
+      [p('gran', '0'), p('mum', '1'), p('dad', '2'), p('kid', '3'), p('step', '4'), p('half', '5')],
+      [
+        { parentId: 'gran', childId: 'mum' },
+        { parentId: 'mum', childId: 'kid' },
+        { parentId: 'dad', childId: 'kid' },
+        { parentId: 'dad', childId: 'half' },
+        { parentId: 'step', childId: 'half' },
+      ],
+    )
+    const at = (id: string) => nodes.find((n) => n.person.id === id)!
+    expect([at('step').generation, at('half').generation]).toEqual([1, 2])
   })
 })

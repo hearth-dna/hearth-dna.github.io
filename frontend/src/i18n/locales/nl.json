@@ -456,5 +456,14 @@
   "openFormats.building": "{what} wordt gemaakt…",
   "openFormats.done": "{name} gedownload: {rows} rijen, {mb} MB.",
   "openFormats.failed": "Mislukt: {error}",
-  "openFormats.sharedOnly": "Genotypen: alleen SNP's waarvoor iedereen een waarde heeft (de vergelijkbare set; vink uit voor de vereniging van alle bestanden, die de limiet van 1.048.576 rijen van een spreadsheet kan overschrijden)"
+  "openFormats.sharedOnly": "Genotypen: alleen SNP's waarvoor iedereen een waarde heeft (de vergelijkbare set; vink uit voor de vereniging van alle bestanden, die de limiet van 1.048.576 rijen van een spreadsheet kan overschrijden)",
+  "peoplePage.view": "Weergave",
+  "peoplePage.viewCards": "Kaarten",
+  "peoplePage.viewTable": "Tabel",
+  "peoplePage.viewTree": "Stamboom",
+  "peoplePage.name": "Naam",
+  "peoplePage.parentsHeader": "Ouders",
+  "peoplePage.snpsHeader": "SNP’s",
+  "peoplePage.treeAria": "Stamboom",
+  "peoplePage.treeHint": "Iedereen staat op één rij totdat ouders zijn ingesteld; voeg ze toe op de kaarten om de stamboom op te bouwen."
 }

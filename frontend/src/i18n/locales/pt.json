@@ -456,5 +456,14 @@
   "openFormats.building": "A criar {what}…",
   "openFormats.done": "{name} transferido: {rows} linhas, {mb} MB.",
   "openFormats.failed": "Falhou: {error}",
-  "openFormats.sharedOnly": "Genótipos: apenas SNPs com leitura em todas as pessoas (o conjunto comparável; desmarque para a união de todos os ficheiros, que pode ultrapassar o limite de 1.048.576 linhas de uma folha de cálculo)"
+  "openFormats.sharedOnly": "Genótipos: apenas SNPs com leitura em todas as pessoas (o conjunto comparável; desmarque para a união de todos os ficheiros, que pode ultrapassar o limite de 1.048.576 linhas de uma folha de cálculo)",
+  "peoplePage.view": "Vista",
+  "peoplePage.viewCards": "Cartões",
+  "peoplePage.viewTable": "Tabela",
+  "peoplePage.viewTree": "Árvore",
+  "peoplePage.name": "Nome",
+  "peoplePage.parentsHeader": "Pais",
+  "peoplePage.snpsHeader": "SNPs",
+  "peoplePage.treeAria": "Árvore genealógica",
+  "peoplePage.treeHint": "Todos ficam numa única linha até que os pais sejam definidos; adicione-os nos cartões para construir a árvore."
 }

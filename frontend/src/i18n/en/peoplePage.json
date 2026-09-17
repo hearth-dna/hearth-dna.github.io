@@ -25,5 +25,14 @@
   "peoplePage.importDna": "Import DNA file",
   "peoplePage.report": "Report",
   "peoplePage.confirmDelete": "Delete {name} and all their data?",
-  "peoplePage.delete": "Delete"
+  "peoplePage.delete": "Delete",
+  "peoplePage.view": "View",
+  "peoplePage.viewCards": "Cards",
+  "peoplePage.viewTable": "Table",
+  "peoplePage.viewTree": "Tree",
+  "peoplePage.name": "Name",
+  "peoplePage.parentsHeader": "Parents",
+  "peoplePage.snpsHeader": "SNPs",
+  "peoplePage.treeAria": "Family tree",
+  "peoplePage.treeHint": "Everyone sits on one row until parents are set; add them on the cards to build the tree."
 }

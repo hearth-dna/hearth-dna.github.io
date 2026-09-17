@@ -456,5 +456,14 @@
   "openFormats.building": "Création de {what}…",
   "openFormats.done": "{name} téléchargé : {rows} lignes, {mb} Mo.",
   "openFormats.failed": "Échec : {error}",
-  "openFormats.sharedOnly": "Génotypes : uniquement les SNP renseignés pour chaque personne (l'ensemble comparable ; décochez pour l'union de tous les fichiers, qui peut dépasser la limite de 1 048 576 lignes d'un tableur)"
+  "openFormats.sharedOnly": "Génotypes : uniquement les SNP renseignés pour chaque personne (l'ensemble comparable ; décochez pour l'union de tous les fichiers, qui peut dépasser la limite de 1 048 576 lignes d'un tableur)",
+  "peoplePage.view": "Affichage",
+  "peoplePage.viewCards": "Cartes",
+  "peoplePage.viewTable": "Tableau",
+  "peoplePage.viewTree": "Arbre",
+  "peoplePage.name": "Nom",
+  "peoplePage.parentsHeader": "Parents",
+  "peoplePage.snpsHeader": "SNP",
+  "peoplePage.treeAria": "Arbre généalogique",
+  "peoplePage.treeHint": "Tout le monde est sur une seule ligne tant que les parents ne sont pas renseignés ; ajoutez-les sur les cartes pour construire l’arbre."
 }

@@ -58,3 +58,10 @@ dialog::backdrop { background: rgba(0,0,0,0.4); }
 .spinner { width: 1em; height: 1em; border: 2px solid var(--line); border-top-color: var(--accent, currentColor); border-radius: 50%; animation: spin 0.8s linear infinite; flex: none; }
 @keyframes spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .spinner { animation-duration: 2s; } }
+
+/* Segmented control (People page view switcher). */
+.segmented { display: inline-flex; border: 1px solid var(--line); border-radius: 7px; overflow: hidden; }
+.segmented button { border: 0; border-radius: 0; padding: 0.3rem 0.8rem; font-size: 0.9rem; }
+.segmented button + button { border-left: 1px solid var(--line); }
+.segmented button.active { background: var(--accent); color: var(--accent-fg); }
+[dir='rtl'] .segmented button + button { border-left: 0; border-right: 1px solid var(--line); }

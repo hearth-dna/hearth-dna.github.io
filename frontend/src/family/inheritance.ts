@@ -93,8 +93,10 @@ export interface PedigreeNode {
 }
 
 /**
- * Generation = longest ancestor chain (founders 0). Within a generation people are ordered by the
- * mean column of their parents, so children sit under them; ties keep creation order.
+ * Generation = longest ancestor chain (founders 0), then co-parents are pulled down to the same
+ * row so a spouse who married in sits beside their partner rather than among the grandparents.
+ * Within a generation people are ordered by the mean column of their parents (or of their
+ * co-parent's parents), so children sit under them; ties keep creation order.
  */
 export function layoutPedigree(
   persons: Person[],
@@ -114,6 +116,22 @@ export function layoutPedigree(
     return d
   }
   for (const p of persons) depth(p.id, new Set())
+  const coParentsOf = new Map<string, Set<string>>()
+  for (const ps of parentsOf.values())
+    for (const a of ps)
+      for (const b of ps) if (a !== b) coParentsOf.set(a, new Set(coParentsOf.get(a)).add(b))
+  // Fixpoint: co-parents share a row, children stay below every parent. Bounded for cyclic dumps.
+  for (let changed = true, guard = persons.length * 2; changed && guard > 0; guard--) {
+    changed = false
+    const lift = (id: string, to: number) => {
+      if ((gen.get(id) ?? 0) < to) {
+        gen.set(id, to)
+        changed = true
+      }
+    }
+    for (const [a, bs] of coParentsOf) for (const b of bs) lift(a, gen.get(b) ?? 0)
+    for (const [child, ps] of parentsOf) lift(child, Math.max(...ps.map((q) => gen.get(q) ?? 0)) + 1)
+  }
   const nodes: PedigreeNode[] = persons.map((person) => ({
     person,
     generation: gen.get(person.id) ?? 0,
@@ -124,9 +142,15 @@ export function layoutPedigree(
   const maxGen = Math.max(0, ...nodes.map((n) => n.generation))
   for (let g = 0; g <= maxGen; g++) {
     const row = nodes.filter((n) => n.generation === g)
-    const key = (n: PedigreeNode) => {
-      const cs = n.parents.map((p) => col.get(p)).filter((c): c is number => c !== undefined)
+    const mean = (ids: string[]) => {
+      const cs = ids.map((p) => col.get(p)).filter((c): c is number => c !== undefined)
       return cs.length ? cs.reduce((a, b) => a + b, 0) / cs.length : Number.POSITIVE_INFINITY
+    }
+    const key = (n: PedigreeNode) => {
+      const own = mean(n.parents)
+      if (own !== Number.POSITIVE_INFINITY) return own
+      const inLaws = [...(coParentsOf.get(n.person.id) ?? [])].flatMap((c) => parentsOf.get(c) ?? [])
+      return mean(inLaws)
     }
     row.sort((a, b) => key(a) - key(b) || a.person.createdAt.localeCompare(b.person.createdAt))
     row.forEach((n, i) => {

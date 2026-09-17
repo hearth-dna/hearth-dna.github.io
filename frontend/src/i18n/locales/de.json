@@ -456,5 +456,14 @@
   "openFormats.building": "{what} wird erstellt…",
   "openFormats.done": "{name} heruntergeladen: {rows} Zeilen, {mb} MB.",
   "openFormats.failed": "Fehlgeschlagen: {error}",
-  "openFormats.sharedOnly": "Genotypen: nur SNPs, für die jede Person einen Wert hat (die vergleichbare Menge; abwählen für die Vereinigung aller Dateien, die das Limit von 1.048.576 Zeilen einer Tabellenkalkulation überschreiten kann)"
+  "openFormats.sharedOnly": "Genotypen: nur SNPs, für die jede Person einen Wert hat (die vergleichbare Menge; abwählen für die Vereinigung aller Dateien, die das Limit von 1.048.576 Zeilen einer Tabellenkalkulation überschreiten kann)",
+  "peoplePage.view": "Ansicht",
+  "peoplePage.viewCards": "Karten",
+  "peoplePage.viewTable": "Tabelle",
+  "peoplePage.viewTree": "Stammbaum",
+  "peoplePage.name": "Name",
+  "peoplePage.parentsHeader": "Eltern",
+  "peoplePage.snpsHeader": "SNPs",
+  "peoplePage.treeAria": "Stammbaum",
+  "peoplePage.treeHint": "Alle stehen in einer Reihe, bis Eltern eingetragen sind; fügen Sie sie auf den Karten hinzu, um den Stammbaum aufzubauen."
 }

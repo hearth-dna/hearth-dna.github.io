@@ -456,5 +456,14 @@
   "openFormats.building": "Creazione di {what}…",
   "openFormats.done": "Scaricato {name}: {rows} righe, {mb} MB.",
   "openFormats.failed": "Errore: {error}",
-  "openFormats.sharedOnly": "Genotipi: solo gli SNP letti per ogni persona (l'insieme confrontabile; deseleziona per l'unione di tutti i file, che può superare il limite di 1.048.576 righe di un foglio di calcolo)"
+  "openFormats.sharedOnly": "Genotipi: solo gli SNP letti per ogni persona (l'insieme confrontabile; deseleziona per l'unione di tutti i file, che può superare il limite di 1.048.576 righe di un foglio di calcolo)",
+  "peoplePage.view": "Vista",
+  "peoplePage.viewCards": "Schede",
+  "peoplePage.viewTable": "Tabella",
+  "peoplePage.viewTree": "Albero",
+  "peoplePage.name": "Nome",
+  "peoplePage.parentsHeader": "Genitori",
+  "peoplePage.snpsHeader": "SNP",
+  "peoplePage.treeAria": "Albero genealogico",
+  "peoplePage.treeHint": "Tutti sono su una sola riga finché non vengono indicati i genitori; aggiungili nelle schede per costruire l’albero."
 }

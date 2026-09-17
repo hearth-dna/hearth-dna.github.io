@@ -456,5 +456,14 @@
   "openFormats.building": "{what} を作成中…",
   "openFormats.done": "{name} をダウンロードしました: {rows} 行、{mb} MB。",
   "openFormats.failed": "失敗: {error}",
-  "openFormats.sharedOnly": "遺伝子型: 全員に判定値がある SNP のみ（比較可能な集合。チェックを外すと全ファイルの和集合になり、表計算ソフトの上限 1,048,576 行を超えることがあります）"
+  "openFormats.sharedOnly": "遺伝子型: 全員に判定値がある SNP のみ（比較可能な集合。チェックを外すと全ファイルの和集合になり、表計算ソフトの上限 1,048,576 行を超えることがあります）",
+  "peoplePage.view": "表示",
+  "peoplePage.viewCards": "カード",
+  "peoplePage.viewTable": "表",
+  "peoplePage.viewTree": "家系図",
+  "peoplePage.name": "名前",
+  "peoplePage.parentsHeader": "親",
+  "peoplePage.snpsHeader": "SNP数",
+  "peoplePage.treeAria": "家系図",
+  "peoplePage.treeHint": "親が設定されるまで全員が一列に並びます。カードで親を追加すると家系図ができます。"
 }

@@ -456,5 +456,14 @@
   "openFormats.building": "Создание: {what}…",
   "openFormats.done": "Скачано {name}: {rows} строк, {mb} МБ.",
   "openFormats.failed": "Ошибка: {error}",
-  "openFormats.sharedOnly": "Генотипы: только SNP, прочитанные у каждого человека (сопоставимый набор; снимите флажок для объединения всех файлов, которое может превысить лимит таблицы в 1 048 576 строк)"
+  "openFormats.sharedOnly": "Генотипы: только SNP, прочитанные у каждого человека (сопоставимый набор; снимите флажок для объединения всех файлов, которое может превысить лимит таблицы в 1 048 576 строк)",
+  "peoplePage.view": "Вид",
+  "peoplePage.viewCards": "Карточки",
+  "peoplePage.viewTable": "Таблица",
+  "peoplePage.viewTree": "Дерево",
+  "peoplePage.name": "Имя",
+  "peoplePage.parentsHeader": "Родители",
+  "peoplePage.snpsHeader": "SNP",
+  "peoplePage.treeAria": "Семейное дерево",
+  "peoplePage.treeHint": "Пока родители не указаны, все стоят в одном ряду; добавьте их на карточках, чтобы построить дерево."
 }
