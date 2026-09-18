@@ -4,5 +4,6 @@
   "prompt.medication.title": "Is this medication affected by my genetics?",
   "prompt.compare.title": "Compare two family members on this topic",
   "prompt.labs.title": "Interpret my lab results with my genetics",
-  "prompt.second-opinion.title": "Second opinion on a report"
+  "prompt.second-opinion.title": "Second opinion on a report",
+  "prompt.symptoms.title": "Make sense of my symptoms and measurements"
 }

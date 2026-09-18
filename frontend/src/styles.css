@@ -101,3 +101,10 @@ button.sync.warn > span:first-child { color: var(--warn); }
 button.sync.danger { border-color: var(--danger); color: var(--danger); }
 button.sync + .status { margin-left: 0; }
 @media (max-width: 640px) { button.sync .sync-label { display: none; } }
+/* Ask: pick lists of records with an include/remove button, question-type badges. */
+ul.picklist { list-style: none; padding: 0; margin: 0.4rem 0; }
+ul.picklist li { display: flex; gap: 0.5rem; align-items: baseline; padding: 0.2rem 0; border-bottom: 1px solid var(--line); }
+ul.picklist li > button, ul.picklist li > .small { flex: none; min-width: 5.5rem; }
+button.small.active { border-color: var(--accent); background: var(--accent); color: var(--accent-fg); }
+.badge.intent.primary { border-color: var(--accent); color: var(--accent); font-weight: 600; }
+span.small { font-size: 0.8rem; }

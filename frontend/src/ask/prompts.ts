@@ -45,6 +45,13 @@ export const PROMPTS: PromptTemplate[] = [
     text: 'Read the dated health-log entries above together with the genotypes. Point out values outside their reference ranges, any trend across dates, and where a genotype plausibly explains or modifies a value. Say plainly when there is no link. Do not diagnose.',
   },
   {
+    id: 'symptoms',
+    title: 'Make sense of my symptoms and measurements',
+    titleKey: 'prompt.symptoms.title',
+    needs: ['health', 'genotypes'],
+    text: 'Read the dated symptoms and measurements above as a timeline. Describe the pattern (onset, frequency, what changed with medication), which measurements are outside usual ranges, and which common, non-alarming explanations and which warning signs are worth checking with a clinician, and how urgently. Mention a genotype only where it is plausibly relevant. Do not diagnose.',
+  },
+  {
     id: 'second-opinion',
     title: 'Second opinion on a report',
     titleKey: 'prompt.second-opinion.title',

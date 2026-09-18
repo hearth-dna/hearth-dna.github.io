@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { Finding, KbEntry } from '../kb/kb'
 import type { Person } from '../types'
-import { buildContextPack, packStats } from './contextPack'
+import { buildContextPack, type PackOptions, packStats, squeeze } from './contextPack'
 import { PROMPTS } from './prompts'
 
 const entry: KbEntry = {
@@ -63,7 +63,7 @@ describe('buildContextPack', () => {
     expect(pack).toContain(PROMPTS[2].text)
   })
   it('lists health-log entries under the person with the body indented', () => {
-    const pack = buildContextPack({
+    const opts: PackOptions = {
       question: 'Lipids?',
       people: [
         {
@@ -109,19 +109,103 @@ describe('buildContextPack', () => {
       ],
       realNames: false,
       now,
-    })
+    }
+    const pack = buildContextPack(opts)
     expect(pack).toContain(
       "### Health log (the person's documents and self-reported symptoms, dated)\n- 2026-05-01 · Lab result · Lipid panel\n  LDL 4.1 mmol/L (ref < 3.0)\n  HDL 1.2 mmol/L\n- 2026-04-20 · Symptom · Aching hands in the morning (hands; severity 5/10; arthritis)",
     )
-    expect(packStats(pack).healthEntries).toBe(2)
+    expect(packStats(opts, pack).healthEntries).toBe(2)
   })
   it('counts genotypes for the sharing log', () => {
-    const pack = buildContextPack({
-      question: 'q',
-      people: [{ person: vova, findings: [finding] }],
-      realNames: false,
-      now,
+    const opts = { question: 'q', people: [{ person: vova, findings: [finding] }], realNames: false, now }
+    const pack = buildContextPack(opts)
+    expect(packStats(opts, pack)).toEqual({
+      chars: pack.length,
+      tokens: Math.ceil(pack.length / 4),
+      genotypes: 1,
+      healthEntries: 0,
     })
-    expect(packStats(pack).genotypes).toBe(1)
+  })
+})
+
+describe('compact context pack', () => {
+  const now = new Date('2026-09-13T00:00:00Z')
+  const base = {
+    personId: 'p1',
+    time: '',
+    source: '',
+    bodyPart: '',
+    severity: null,
+    tags: [],
+    value: null,
+    value2: null,
+    unit: '',
+    createdAt: 't',
+    body: '',
+  }
+  const bp = (id: string, date: string, v: number, v2: number, time = '') => ({
+    ...base,
+    id,
+    date,
+    time,
+    kind: 'measurement' as const,
+    title: 'Blood pressure',
+    value: v,
+    value2: v2,
+    unit: 'mmHg',
+  })
+  const pack = buildContextPack({
+    question: 'q',
+    realNames: false,
+    compact: true,
+    now,
+    people: [
+      {
+        person: vova,
+        findings: [finding],
+        genotypes: [{ rsid: 'rs999', chromosome: '2', position: 42, a1: 'C', a2: 'T' }],
+        health: [
+          bp('b2', '2026-09-10', 124, 82, '08:05'),
+          {
+            ...base,
+            id: 'l1',
+            date: '2026-09-05',
+            kind: 'lab',
+            title: 'Lipid panel',
+            body: 'LDL 4.1 mmol/L\n\n  HDL 1.2',
+          },
+          bp('b1', '2026-09-01', 120, 80),
+        ],
+      },
+    ],
+  })
+  it('puts each record on one line and folds a measurement series', () => {
+    expect(pack).toContain(
+      [
+        'Genotypes:',
+        '- CYP2C19 rs4244285 A/G: *1/*2 intermediate metaboliser [evidence A]',
+        '- rs999 C/T (chr2:42; not in knowledge base)',
+        'Health log:',
+        '- Blood pressure, mmHg (2 readings): 2026-09-01 120/80; 2026-09-10 08:05 124/82',
+        '- 2026-09-05 lab: Lipid panel — LDL 4.1 mmol/L; HDL 1.2',
+      ].join('\n'),
+    )
+  })
+  it('keeps one source per evidence note and can drop the notes', () => {
+    expect(pack).toContain('- CYP2C19*2: Loss-of-function allele. Sources: https://cpicpgx.org/x')
+    const bare = buildContextPack({
+      question: 'q',
+      realNames: false,
+      compact: true,
+      evidence: false,
+      now,
+      people: [{ person: vova, findings: [finding] }],
+    })
+    expect(bare).not.toContain('Evidence notes')
+  })
+  it('shortens long text', () => {
+    expect(squeeze('a\n b', 10)).toBe('a; b')
+    expect(squeeze('Once a day.\nAfter food', 40)).toBe('Once a day. After food')
+    expect(squeeze('x'.repeat(20), 10)).toBe(`${'x'.repeat(9)}…`)
   })
 })
