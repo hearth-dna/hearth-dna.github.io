@@ -72,12 +72,12 @@ configured. See §11 for the GCP backend that fits inside the Always Free tier.
 └───────────────────────────────────────────────────────────────────────┘
           │ static assets + kb.db (versioned, ~10–50 MB, cached by SW)
           ▼
-   Cloudflare (free plan): Pages serves the app shell on app.<domain>,
-   R2 serves kb.db, a Worker fronts api.<domain> → Cloud Run (see §11, §12)
-          │ optional, opt-in per feature, stateless (see §11)
+   GitHub Pages: the app shell and kb.json, served from the origin root
+   of a dedicated <org>.github.io (ADR 0005). Nothing else is deployed.
+          │ optional, opt-in per feature, BYOK: browser → provider directly
           ▼
-   Cloud Run "helper" service (Go), europe-west1: LLM proxy, OCR/extraction,
-   encrypted-blob sync. Nothing personal is written to disk or logs.
+   No hosted backend. The Go "helper" service (LLM proxy, OCR/extraction,
+   encrypted-blob sync) is described below and runs only if self-hosted.
           │
           ▼
    LLM provider (operator key via proxy, or user's own key direct from
@@ -314,8 +314,9 @@ kb fields at tier 0, so the user gets a decision frame even without any LLM.
 
 1. **Framework:** ~~Svelte vs React~~ → **decided: React + TypeScript + Vite**, to mirror `../sentio`'s
    frontend and reuse its Biome/Vitest/i18n tooling (§12).
-2. **Hosting:** ~~GitHub Pages vs separate repo~~ → **decided: separate repo `hearth`** on Cloudflare
-   Pages, this repo stays the private data + kb source (§12).
+2. **Hosting:** ~~GitHub Pages vs separate repo~~ → **decided: separate repo, on GitHub Pages**
+   (ADR 0005 — it supersedes the Cloudflare/GCP topology sketched in §11 and §12). This repo stays
+   the private data + kb source.
 3. **SNPedia inclusion:** include with attribution while strictly non-commercial, or exclude like codegen. Recommendation: include, flag entries by source, make it switchable in the kb build.
 4. **Language:** UI in English first; content is already mixed Russian/English in this repo. Recommendation: i18n scaffold from day one, English + Russian.
 5. **Genotek VCF:** convert on import (GT-resolved alleles, as done in the 2026-03-15 fix) and keep REF/ALT in `snp_index`.
@@ -330,6 +331,11 @@ kb fields at tier 0, so the user gets a decision frame even without any LLM.
 - **Medical-device boundary.** Keep language informational; a lawyer's read before any public release.
 
 ## 11. GCP backend under the Always Free tier
+
+> **Historical.** Superseded by ADR 0005: nothing in §11 or §12 is deployed. There is no hosted
+> backend — the app is static files on GitHub Pages, and the remote Ask path is BYOK, browser
+> straight to the provider. Kept because it is still the design anyone self-hosting the helper
+> service would follow.
 
 Decision: the app stays local-first, and **the backend is optional infrastructure, not a
 dependency**. With the copy-out tier in §6.3 the app delivers its full value with zero server-side
@@ -442,8 +448,12 @@ Rules baked into the service:
 ## 12. Repository layout and infrastructure — mirroring `../sentio`
 
 The app gets its own repository (open decision 2 → **decided: separate repo, working name
-`hearth`**), laid out exactly like `../sentio` so the tooling, runbooks and CI carry over. This
-repo (`family_dna`) stays the private data set and the source of the knowledge-base build.
+`hearth`**), laid out like `../sentio` so the tooling, runbooks and CI carry over. This repo
+(`family_dna`) stays the private data set and the source of the knowledge-base build.
+
+> **Historical, as above.** The repository is public and named `<org>.github.io`; `terraform/`,
+> `scripts/bootstrap.sh` and the Cloudflare/GCP deploy surface described below no longer exist.
+> §12.4 records the topology that actually ships.
 
 ### 12.1 Tree
 
@@ -455,7 +465,7 @@ hearth/
 ├── frontend/                                    # the PWA — React + TypeScript + Vite, Biome, Vitest
 │   ├── AGENTS.md
 │   ├── package.json  vite.config.ts  biome.jsonc  tsconfig.json
-│   ├── public/            manifest.webmanifest, icons, _redirects, _headers (CSP)
+│   ├── public/            favicon, kb.json (the CSP is injected into index.html at build time)
 │   └── src/
 │       ├── main.tsx  App.tsx  routes.ts
 │       ├── db/            sqlite-wasm + OPFS bootstrap, migrations, typed queries
@@ -522,57 +532,55 @@ hearth/
 
 ```
 help
-frontend-install  frontend-run  frontend-build  frontend-test  frontend-deploy
-backend-build     backend-test  backend-run     backend-image  backend-deploy   smoke
-landing-deploy    landing-check
-kb-build          kb-test       kb-publish                      # build_kb.py → kb.db → R2
+frontend-install  frontend-run  frontend-build  frontend-build-archive
+frontend-build-pages  frontend-preview-pages  frontend-test  frontend-lint
+backend-build     backend-test  backend-run    backend-lint
+pages-deploy                                                    # gh workflow run pages.yml
+kb-build                                                        # build_kb.py → frontend/public/kb.json
 dump-roundtrip                                                  # export → import → diff, in Vitest
 dev  dev-stop  dev-status                                       # backend + Vite in the background
-setup  setup-plan  setup-verify  setup-steps  ci-secrets  ci-secrets-check
 i18n-check  i18n-gate
 ```
 
-### 12.4 Edge and origin
+### 12.4 Hosting (ADR 0005)
 
 ```
-                         ┌── app.<domain>  → Cloudflare Pages (frontend/dist, SPA fallback, CSP headers)
-                         ├── <domain>      → Cloudflare Pages (landing/, privacy, terms)
-Client ── Cloudflare ────┼── kb.<domain>   → R2 bucket (kb-<version>.db, immutable, cache 1y)
-        (TLS/CDN/WAF/    └── api.<domain>  → Worker rewrites Host → Cloud Run hearth-backend
-         1 rate-limit)                        (min 0 / max 1, 512Mi, europe-west1)
-                                                  ├── Secret Manager: llm-api-key
-                                                  └── GCS: <project>-sqlite-replica (Litestream, ciphertext only)
-Cloud Scheduler ── /health every 5 min (only when sync is enabled — otherwise let it scale to zero)
+                        ┌── /                → the app shell (frontend/dist, index.html)
+                        ├── /404.html        → the same shell; the SPA fallback, since Pages
+Client ── GitHub Pages ─┤                       has no rewrite rules
+        (TLS, HSTS-     ├── /kb.json         → the bundled knowledge base
+         preloaded)     ├── /privacy.html /terms.html /landing.css → from landing/
+                        └── /sw.js           → the service worker, scope /
+                                    ▲
+                        .github/workflows/pages.yml: npm run build:pages
+                                → upload-pages-artifact → deploy-pages
 ```
 
-Differences from sentio's ADR 0047 worth recording in hearth's own ADR:
-- **The origin is reachable without personal data.** sentio accepts that `*.run.app` bypasses the
-  rate limiter; hearth adds a shared-secret header set by the Worker and checked in Go middleware,
-  because the free LLM/OCR quotas are the thing an abuser would drain.
-- **Keep-warm is off by default.** There is no Litestream restore cost unless sync is enabled, and a
-  cold start on an opt-in helper call is acceptable.
-- **R2, not GCS, for public files**, because egress is free and the region restriction goes away.
+One origin, one dedicated `<org>.github.io`, no backend, no DNS to own. The three consequences of
+Pages sending no custom headers — the CSP moves into a build-injected `<meta>`, `frame-ancestors`
+becomes a top-frame guard in `main.tsx`, and `_redirects` becomes `404.html` — are recorded in
+ADR 0005, along with why cross-origin isolation is not needed (ADR 0002's SAH-pool VFS).
 
 ### 12.5 ADRs to write first
 
 1. `0001-local-first-no-personal-data-on-the-server.md` — the household-exemption argument (§2).
 2. `0002-sqlite-wasm-on-opfs.md` — why not IndexedDB; the schema ports from `family_dna`.
-3. `0003-cloudflare-edge-gcp-free-tier.md` — port of sentio ADR 0047 with §12.4's differences.
+3. `0003-cloudflare-edge-gcp-free-tier.md` — written, then superseded by
+   `0005-github-pages-hosting.md`; §12.4 is what ships.
 4. `0004-stateless-helper-endpoints.md` — LLM proxy, OCR, extraction; no body logging; per-device caps.
 5. `0005-dump-format-v1.md` — JSON envelope, compact genotype arrays, gzip, AES-GCM, migration policy.
 6. `0006-knowledge-base-build-and-licences.md` — sources, SNPedia non-commercial switch, LLM labelling.
 
 ### 12.6 Bootstrapping order
 
-1. `git init hearth`; copy `Makefile`, `scripts/lib.sh`, `scripts/bootstrap.sh`, `terraform/`,
-   `.github/workflows/`, `backend/{Dockerfile,entrypoint.sh,litestream.yml}` from sentio; strip
-   mobile and OAuth pieces.
+1. `git init hearth`; copy `Makefile` and `.github/workflows/` from sentio; strip mobile, OAuth and
+   (per ADR 0005) the Terraform and Cloudflare/GCP deploy pieces.
 2. `frontend/`: Vite React template + Biome config from sentio; add sqlite-wasm and the PWA plugin;
    port `family_all` and the COVERAGE.md Mendelian query as the first two tests.
 3. `kb/build_kb.py` v0: export the reviewed SNP tables from this repo's analysis files to `kb.db`.
-4. `make setup` against a fresh GCP project, `enable_cloudflare = false`; apply the GCP half.
-5. Register the domain, flip `enable_cloudflare`, apply; `make frontend-deploy`, `make kb-publish`.
-6. Only then write the first backend handler (`/v1/ask` with BYOK passthrough).
+4. Create the `<org>.github.io` repository, make it public, set Pages Source = GitHub Actions.
+5. `make frontend-build-pages` and verify locally, then `make pages-deploy`.
+6. Only then write the first backend handler (`/v1/ask` with BYOK passthrough), for local use.
 
 ## 13. Legal compliance and consent UX
 
@@ -605,8 +613,9 @@ gate. No "revoked" rows are kept.
 
 - No network call carries genotypes, observations or document text unless a tier-3 or helper
   consent is active **and** the specific request was confirmed. Enforced by a single `egress.ts`
-  gateway that every fetch goes through; the CSP and a Vitest test assert nothing else can reach
-  the network.
+  gateway that every fetch goes through; a Vitest test asserts no other module calls `fetch`, and
+  the CSP — a `<meta>` tag injected at build time, because GitHub Pages sends no headers (ADR 0005)
+  — restricts `connect-src` to this origin and the two BYOK provider hosts.
 - Copy-out packs are generated by pure functions with snapshot tests so the user can rely on "what I
   previewed is what I copied".
 - Default pseudonymisation in packs (labels, ages rounded to 5 years, dates to month) with an

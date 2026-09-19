@@ -14,8 +14,8 @@ Guidance for Claude Code in this repository. Kept short; detail lives in `/docs`
 - **Open-source ready, always.** Treat every commit as if the repo were public tomorrow. Nothing
   private or attack-useful is committed: no secrets, tokens, keys, account or project IDs, numeric
   GCP project numbers, zone IDs, bucket names that are not placeholders, real domains, emails,
-  internal hostnames, IPs, or sample genomes. Real values live only in `.env`, `terraform/*.tfvars`
-  and GitHub secrets (all gitignored or off-repo); committed files carry placeholders
+  internal hostnames, IPs, or sample genomes. Real values live only in `.env` and GitHub secrets
+  (gitignored or off-repo); committed files carry placeholders
   (`<domain>`, `hearth.example`, `*.tfvars.example`). Security must not depend on obscurity: a
   reader with full source and no secrets must gain nothing. Base design decisions on this.
 

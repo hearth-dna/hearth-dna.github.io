@@ -1,0 +1,77 @@
+name: Pages
+
+# Deploys frontend/dist to GitHub Pages, the only hosting target (ADR 0005). Separate from ci.yml
+# on purpose: Pages needs `pages: write` + `id-token: write` and the build/deploy job split that
+# actions/deploy-pages expects, and folding that into ci.yml would widen that job's token scope on
+# every run. The minute-budget reasoning behind ci.yml's single-job shape does not apply here —
+# Actions is free and unlimited on public repositories.
+#
+# Requires Settings → Pages → Source = "GitHub Actions". The site is served verbatim from the
+# uploaded artifact; Jekyll never runs, so no .nojekyll is needed. dist/404.html is the SPA
+# fallback: Pages has no rewrite rules, so a deep link like /health-log/<id> is served 404.html,
+# which boots the app and lets src/app/routes.ts resolve the URL.
+#
+# Push triggers are commented out until the first deploy is verified by hand.
+on:
+  # push:
+  #   branches: [main]
+  #   paths:
+  #     - 'frontend/**'
+  #     - 'kb/**'
+  #     - 'landing/**'
+  #     - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+env:
+  NODE_VERSION: '24'
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - uses: actions/configure-pages@v5
+
+      # No tests here: ci.yml owns the suite, and running it twice buys no extra signal.
+      - name: Build
+        working-directory: frontend
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run build:pages
+
+      # The app owns /; the landing pages are served as plain files beside it. Copy them by name so
+      # landing/index.html can never overwrite the app shell.
+      - name: Add the landing pages
+        run: cp landing/privacy.html landing/terms.html landing/landing.css frontend/dist/
+
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: frontend/dist
+
+  deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

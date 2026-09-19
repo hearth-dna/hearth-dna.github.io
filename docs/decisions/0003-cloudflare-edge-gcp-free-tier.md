@@ -1,6 +1,9 @@
 # ADR 0003: Cloudflare at the edge, GCP free tier at the origin
 
-**Date:** 2026-09-13 · **Status:** Accepted (declared in `terraform/`, not yet applied)
+**Date:** 2026-09-13 · **Status:** Superseded by [0005](0005-github-pages-hosting.md)
+
+Never applied. The Terraform that declared it was deleted with 0005, which replaced the whole
+topology with GitHub Pages and no backend. Kept as a record of what was considered.
 
 Port of sentio ADR 0047 with three deliberate differences (design §12.4):
 

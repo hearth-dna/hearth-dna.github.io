@@ -18,7 +18,9 @@ backend/bin/
 backend/*.test
 backend/*.out
 
-# Terraform
+# Terraform — the tracked files were deleted with ADR 0005, but the local production.tfvars and
+# .terraform/ state hold real values and are still on disk. These rules keep them out of a public
+# repository; delete the rules only once you have deleted those local files too.
 terraform/.terraform/
 terraform/*.tfstate
 terraform/*.tfstate.*

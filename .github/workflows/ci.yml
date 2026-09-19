@@ -1,45 +1,25 @@
 name: CI
 
-# The only workflow, tuned for the free-tier minute budget (private repo: 2,000 min/month):
-#   - one job on one runner, so checkout/setup happen once and only one job gets rounded up to a
-#     whole billed minute;
-#   - tests run exactly once per event — deploys are steps in the same job, so they never re-run
-#     the suite or re-install/re-build what the test steps already produced;
-#   - a cheap `git diff` decides which areas to test and deploy, so a landing-only push does not
-#     install npm or compile Go, and docs-only PRs never start a runner (paths-ignore below);
+# Tests only. Deployment lives in pages.yml (ADR 0005); nothing here ships bytes anywhere.
+#   - one job on one runner, so checkout/setup happen once;
+#   - a cheap `git diff` decides which areas to test, so a landing-only push does not install npm
+#     or compile Go, and docs-only PRs never start a runner (paths-ignore below);
 #   - hard timeout so a hung step cannot burn hours;
-#   - PR runs are cancelled when a newer push arrives; deploys on main are never cancelled midway.
-# No Dependabot version updates: every such PR would cost a full CI run. Security alerts still
-# work (repository settings), and deps get bumped by hand in batches.
-#
-# Deploy notes: Terraform owns the Cloud Run service (env vars, scaling, secrets, service account)
-# and both Pages projects; this workflow only ships bytes. Never add --set-env-vars to the Cloud
-# Run deploy: it replaces the whole set. GCP auth is Workload Identity Federation — no long-lived
-# key exists anywhere. `--branch=main` on Pages is load-bearing: custom domains serve only
-# production-branch deployments.
-
-# DISABLED until the first production deployment: no automatic runs, to keep the free-tier
-# minutes untouched while nothing is deployed. Manual "Run workflow" still works. To re-enable,
-# uncomment the push and pull_request triggers below.
+#   - PR runs are cancelled when a newer push arrives.
+# No Dependabot version updates: deps get bumped by hand in batches. Security alerts still work
+# (repository settings).
 on:
-  # push:
-  #   branches: [main]
-  # pull_request:
-  #   branches: [main]
-  #   paths-ignore:
-  #     - 'docs/**'
-  #     - 'terraform/**'
-  #     - 'scripts/**'
-  #     - '**.md'
-  #     - '.env.example'
-  #     - '.gitignore'
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+    paths-ignore:
+      - 'docs/**'
+      - 'scripts/**'
+      - '**.md'
+      - '.env.example'
+      - '.gitignore'
   workflow_dispatch:
-    inputs:
-      deploy:
-        description: What to (re)deploy after tests
-        type: choice
-        default: none
-        options: [none, backend, frontend, landing, all]
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -47,17 +27,13 @@ concurrency:
 
 permissions:
   contents: read
-  id-token: write # GCP Workload Identity Federation (push to main only)
 
 env:
   NODE_VERSION: '24'
-  SERVICE: hearth-backend
-  PAGES_PROJECT: hearth-frontend # must match terraform/cloudflare-pages.tf and the Makefile
-  LANDING_PAGES_PROJECT: hearth-landing
 
 jobs:
   ci:
-    name: Test and deploy
+    name: Test
     runs-on: ubuntu-latest
     timeout-minutes: 15
     if: github.actor != 'dependabot[bot]'
@@ -68,7 +44,6 @@ jobs:
         id: changes
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
-          DEPLOY_INPUT: ${{ inputs.deploy }}
         run: |
           set -euo pipefail
           # PR: diff against the base branch tip (HEAD is the merge commit). Push: diff against the
@@ -80,22 +55,12 @@ jobs:
           else
             changed() { true; }
           fi
-          backend=false; frontend=false; landing=false; deploy=false
+          backend=false; frontend=false; landing=false
           changed '^(backend/|\.github/workflows/)' && backend=true
           changed '^(frontend/|kb/|\.github/workflows/)' && frontend=true
           changed '^(landing/|\.github/workflows/)' && landing=true
-          case "$GITHUB_EVENT_NAME" in
-            push) deploy=true ;;
-            workflow_dispatch)
-              case "$DEPLOY_INPUT" in
-                backend)  deploy=true; frontend=false; landing=false ;;
-                frontend) deploy=true; backend=false; landing=false ;;
-                landing)  deploy=true; backend=false; frontend=false ;;
-                all)      deploy=true ;;
-              esac ;;
-          esac
-          printf 'backend=%s\nfrontend=%s\nlanding=%s\ndeploy=%s\n' \
-            "$backend" "$frontend" "$landing" "$deploy" | tee -a "$GITHUB_OUTPUT"
+          printf 'backend=%s\nfrontend=%s\nlanding=%s\n' \
+            "$backend" "$frontend" "$landing" | tee -a "$GITHUB_OUTPUT"
 
       # Backend tests ------------------------------------------------------------------------
       - uses: actions/setup-go@v6
@@ -111,7 +76,7 @@ jobs:
           test -z "$(gofmt -l .)" || { gofmt -l .; exit 1; }
           go vet ./... && go test ./...
 
-      # Frontend tests (build output is reused by the deploy step) ---------------------------
+      # Frontend tests ------------------------------------------------------------------------
       - uses: actions/setup-node@v7
         if: steps.changes.outputs.frontend == 'true'
         with:
@@ -136,43 +101,3 @@ jobs:
       - name: Landing pages present
         if: steps.changes.outputs.landing == 'true'
         run: for f in landing/index.html landing/privacy.html landing/terms.html; do [ -s "$f" ] || { echo "::error::$f missing"; exit 1; }; done
-
-      # Deploys (push to main or manual dispatch only) -----------------------------------------
-      - uses: google-github-actions/auth@v3
-        if: steps.changes.outputs.deploy == 'true' && steps.changes.outputs.backend == 'true'
-        with:
-          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
-      - uses: google-github-actions/setup-gcloud@v3
-        if: steps.changes.outputs.deploy == 'true' && steps.changes.outputs.backend == 'true'
-      - name: Deploy backend to Cloud Run
-        if: steps.changes.outputs.deploy == 'true' && steps.changes.outputs.backend == 'true'
-        working-directory: backend
-        env:
-          IMAGE: ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/hearth-registry/backend
-          PROJECT: ${{ secrets.GCP_PROJECT_ID }}
-          REGION: ${{ secrets.GCP_REGION }}
-        run: |
-          set -euo pipefail
-          gcloud auth configure-docker "$REGION-docker.pkg.dev" --quiet
-          docker build -t "$IMAGE:$GITHUB_SHA" -t "$IMAGE:latest" .
-          docker push "$IMAGE:$GITHUB_SHA"
-          docker push "$IMAGE:latest"
-          gcloud run deploy "$SERVICE" --project="$PROJECT" --region="$REGION" --image="$IMAGE:$GITHUB_SHA" --quiet
-          url="$(gcloud run services describe "$SERVICE" --project="$PROJECT" --region="$REGION" --format='value(status.url)')"
-          curl -fsS --retry 6 --retry-delay 5 --retry-all-errors "$url/health"
-
-      - name: Deploy frontend to Cloudflare Pages
-        if: steps.changes.outputs.deploy == 'true' && steps.changes.outputs.frontend == 'true'
-        working-directory: frontend
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: npx --yes wrangler@4 pages deploy dist --project-name="$PAGES_PROJECT" --branch=main
-
-      - name: Deploy landing to Cloudflare Pages
-        if: steps.changes.outputs.deploy == 'true' && steps.changes.outputs.landing == 'true'
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: npx --yes wrangler@4 pages deploy landing --project-name="$LANDING_PAGES_PROJECT" --branch=main

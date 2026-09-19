@@ -6,6 +6,8 @@ knowledge base, and lets you build a context pack to paste into any chat assista
 trust. No account, no server-side copy of your data.
 
 Design: [`docs/design.md`](docs/design.md) (the full proposal, ported from the `family_dna` repo).
+Hosting: GitHub Pages, and nothing else — see
+[ADR 0005](docs/decisions/0005-github-pages-hosting.md).
 
 ## Repository layout
 
@@ -14,8 +16,7 @@ hearth/
 ├── frontend/      React + TypeScript + Vite PWA; SQLite WASM on OPFS; all analysis runs here
 ├── backend/       Go helper service (optional; stateless; /health, /v1/ask BYOK passthrough)
 ├── kb/            knowledge-base source (reviewed SNP entries) and build script → frontend/public/kb.json
-├── landing/       static marketing / privacy / terms pages (Cloudflare Pages, apex)
-├── terraform/     GCP + Cloudflare infra (ported from ../sentio; not yet added)
+├── landing/       static privacy / terms pages, published beside the app
 ├── scripts/       dev helpers
 └── docs/          architecture, decisions (ADRs), runbooks
 ```

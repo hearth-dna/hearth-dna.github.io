@@ -1,14 +1,15 @@
 # Architecture overview
 
-See `../design.md` for the full proposal; `storage/` for backups, portable archives and dump v2. One screen:
+See `../design.md` for the full proposal; `storage/` for backups, portable archives and dump v2;
+`../decisions/0005-github-pages-hosting.md` for the deployment. One screen:
 
 ```
 Browser (PWA)                                   Static hosting          Optional helper
 ┌──────────────────────────────┐                ┌──────────────┐        ┌──────────────────┐
-│ React UI                     │ ── kb.json ──▶ │ Pages / R2   │        │ Cloud Run (Go)   │
-│  People · Report · Family    │                └──────────────┘        │ /v1/ask (BYOK or │
-│  Ask · Settings/export       │                                        │  operator key)   │
-│ egress.ts (only fetch site)  │ ── previewed context, per-request ───▶ │ no DB, no logs   │
+│ React UI                     │ ── kb.json ──▶ │ GitHub Pages │        │ Go backend, local│
+│  People · Report · Family    │                └──────────────┘        │ or self-hosted   │
+│  Ask · Settings/export       │                                        │ /v1/ask (BYOK or │
+│ egress.ts (only fetch site)  │ ── previewed context, per-request ───▶ │  operator key)   │
 │ db.ts ⇄ db.worker.ts         │      confirmation, opt-in consent      └──────────────────┘
 │   SQLite WASM on OPFS        │
 │ import/ kb/ family/ ask/     │   Copy-out: clipboard → any assistant the user trusts

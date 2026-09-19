@@ -1,7 +1,8 @@
 .PHONY: help dev dev-stop dev-status test lint \
-	backend-build backend-test backend-run backend-lint backend-image backend-deploy \
-	frontend-install frontend-run frontend-build frontend-build-archive frontend-test frontend-lint frontend-deploy \
-	kb-build landing-deploy
+	backend-build backend-test backend-run backend-lint \
+	frontend-install frontend-run frontend-build frontend-build-archive frontend-build-pages \
+	frontend-preview-pages frontend-test frontend-lint pages-deploy \
+	kb-build
 
 .DEFAULT_GOAL := help
 
@@ -25,10 +26,6 @@ lint: backend-lint frontend-lint ## gofmt + go vet + Biome
 # Backend
 # =======
 BACKEND_DIR := backend
-GCP_PROJECT_ID ?= hearth-production
-GCP_REGION ?= europe-west1
-IMAGE_TAG ?= latest
-BACKEND_IMAGE := $(GCP_REGION)-docker.pkg.dev/$(GCP_PROJECT_ID)/hearth-registry/backend:$(IMAGE_TAG)
 
 BACKEND_LOCAL_ENV = PORT=$(PORT) LLM_API_KEY=$(LLM_API_KEY) EDGE_SHARED_SECRET=$(EDGE_SHARED_SECRET) \
 	WEB_ORIGINS=$(WEB_ORIGINS) ENVIRONMENT=local
@@ -47,17 +44,9 @@ backend-run: ## Run the backend locally in the foreground
 	@echo "Starting hearth-backend on :$(PORT)  (health: http://localhost:$(PORT)/health)"
 	cd $(BACKEND_DIR) && $(BACKEND_LOCAL_ENV) go run ./cmd/server
 
-backend-image: ## Build and push the backend Docker image to Artifact Registry
-	cd $(BACKEND_DIR) && docker build -t $(BACKEND_IMAGE) .
-	docker push $(BACKEND_IMAGE)
-
-backend-deploy: ## Deploy the just-pushed image to Cloud Run (terraform/ owns the service)
-	gcloud run deploy hearth-backend --project=$(GCP_PROJECT_ID) --region=$(GCP_REGION) --image=$(BACKEND_IMAGE)
-
 # Frontend
 # ========
 FRONTEND_DIR := frontend
-PAGES_PROJECT ?= hearth-frontend
 
 frontend-install: ## Install frontend npm dependencies
 	cd $(FRONTEND_DIR) && npm install
@@ -71,27 +60,27 @@ frontend-build: ## Type-check and build the production bundle (frontend/dist/, a
 frontend-build-archive: ## Build only the single-file portable archive template (frontend/dist-archive/)
 	cd $(FRONTEND_DIR) && npm run build:archive
 
+frontend-build-pages: ## Build the GitHub Pages bundle (adds the 404.html SPA fallback)
+	cd $(FRONTEND_DIR) && npm run build:pages
+
+frontend-preview-pages: frontend-build-pages ## Serve the GitHub Pages build locally on :5181
+	cd $(FRONTEND_DIR) && npx vite preview --port 5181
+
 frontend-test: ## Run frontend unit tests (Vitest)
 	cd $(FRONTEND_DIR) && npm run test
 
 frontend-lint: ## Biome check
 	cd $(FRONTEND_DIR) && npm run lint
 
-# Deliberately manual, same split as ../sentio: Terraform owns the Pages project, this uploads.
-frontend-deploy: frontend-build ## Deploy the built frontend to Cloudflare Pages
-	cd $(FRONTEND_DIR) && npx wrangler pages deploy dist --project-name=$(PAGES_PROJECT) --branch=main --commit-dirty=true
+# Publishing runs in Actions: actions/deploy-pages needs the workflow's OIDC token, so there is no
+# local equivalent. This only presses the button.
+pages-deploy: ## Trigger the GitHub Pages deploy workflow
+	gh workflow run pages.yml
 
 # Knowledge base
 # ==============
 kb-build: ## Build frontend/public/kb.json from kb/reviewed/*.json
 	python3 kb/build_kb.py
-
-# Landing
-# =======
-LANDING_PAGES_PROJECT ?= hearth-landing
-
-landing-deploy: ## Deploy landing/ to Cloudflare Pages (apex domain)
-	npx wrangler pages deploy landing --project-name=$(LANDING_PAGES_PROJECT) --branch=main --commit-dirty=true
 
 # Dev servers
 # ===========

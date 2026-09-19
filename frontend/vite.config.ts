@@ -1,14 +1,43 @@
 import react from '@vitejs/plugin-react'
-import { defineConfig } from 'vitest/config'
+import { defineConfig, type Plugin } from 'vitest/config'
 import { VitePWA } from 'vite-plugin-pwa'
 
 // /api is proxied to the Go backend in dev so the browser sees one origin (same idea as ../sentio).
 // The backend is optional: the app never calls it unless the user enables Ask tier 3.
 const backendTarget = process.env.HEARTH_BACKEND_PROXY_TARGET ?? 'http://localhost:8080'
 
+// "Nothing but our own origin" (docs/design.md §2, §13.2), enforced in the page itself because
+// GitHub Pages serves no custom headers (ADR 0005). The two provider hosts are the BYOK Ask and
+// document-reading endpoints in src/egress/egress.ts; nothing else may be contacted.
+const CSP = [
+  "default-src 'self'",
+  "script-src 'self' 'wasm-unsafe-eval'",
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob:",
+  "font-src 'self'",
+  "connect-src 'self' https://api.anthropic.com https://generativelanguage.googleapis.com",
+  "worker-src 'self' blob:",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "object-src 'none'",
+].join('; ')
+
+// Build only: the dev server would break, because @vitejs/plugin-react injects an inline refresh
+// preamble that `script-src 'self'` forbids. A meta CSP applies only from where the parser reaches
+// it, so it goes first — `frame-ancestors` is ignored in meta and is covered by the top-frame
+// guard in src/main.tsx instead.
+const cspMeta = (): Plugin => ({
+  name: 'hearth-csp-meta',
+  apply: 'build',
+  transformIndexHtml: () => [
+    { tag: 'meta', attrs: { 'http-equiv': 'Content-Security-Policy', content: CSP }, injectTo: 'head-prepend' },
+  ],
+})
+
 export default defineConfig({
   plugins: [
     react(),
+    cspMeta(),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'kb.json'],
@@ -26,17 +55,19 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,svg,wasm,json}'],
         maximumFileSizeToCacheInBytes: 8 * 1024 * 1024,
         // Nothing but our own origin is ever fetched at runtime; no runtime caching rules needed.
+        //
+        // The app shell answers every navigation it does not have a precached file for — that is
+        // what makes the 404.html fallback work on GitHub Pages (ADR 0005). The landing pages are
+        // published beside the app but are not part of this build, so without this denylist the
+        // worker would swallow them and show /people instead: privacy and terms would be
+        // unreachable for anyone who had visited once.
+        navigateFallbackDenylist: [/^\/privacy\.html$/, /^\/terms\.html$/],
       },
     }),
   ],
   define: { __HEARTH_ARCHIVE__: 'false' },
   optimizeDeps: { exclude: ['@sqlite.org/sqlite-wasm'] },
   server: {
-    // OPFS + SharedArrayBuffer need cross-origin isolation. public/_headers sets the same in prod.
-    headers: {
-      'Cross-Origin-Opener-Policy': 'same-origin',
-      'Cross-Origin-Embedder-Policy': 'require-corp',
-    },
     proxy: { '/api': { target: backendTarget, rewrite: (p) => p.replace(/^\/api/, '') } },
   },
   worker: { format: 'es' },

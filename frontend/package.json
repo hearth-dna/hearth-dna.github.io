@@ -6,6 +6,7 @@
   "scripts": {
     "build": "tsc && npm run build:archive && vite build",
     "build:archive": "vite build -c vite.archive.config.ts && cp dist-archive/archive.html public/hearth-archive.html",
+    "build:pages": "npm run build && cp dist/index.html dist/404.html",
     "dev": "vite",
     "lint": "biome check src",
     "lint:fix": "biome check --write src",
