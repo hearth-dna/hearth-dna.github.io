@@ -63,7 +63,7 @@ jobs:
             "$backend" "$frontend" "$landing" | tee -a "$GITHUB_OUTPUT"
 
       # Backend tests ------------------------------------------------------------------------
-      - uses: actions/setup-go@v6
+      - uses: actions/setup-go@v7
         if: steps.changes.outputs.backend == 'true'
         with:
           go-version-file: backend/go.mod
