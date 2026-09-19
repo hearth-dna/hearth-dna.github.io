@@ -13,7 +13,7 @@ import {
   sortHealthLog,
   when,
 } from './log'
-import { findPreset, PRESET_GROUPS } from './presets'
+import { findPreset, MEASUREMENT_PRESETS, measurementOrder, PRESET_GROUPS } from './presets'
 
 const entry = (o: Partial<HealthEntry>): HealthEntry => ({
   id: 'x',
@@ -78,6 +78,22 @@ describe('formatValue', () => {
     expect(formatValue({ value: null, value2: null, unit: '°C' })).toBe('')
     expect(formatValue({ value: 72, value2: null, unit: '' })).toBe('72')
     expect(formatValue({ value: 120, value2: 80, unit: 'mmHg' })).toBe('120/80 mmHg')
+  })
+})
+
+describe('measurementOrder', () => {
+  it('puts what the person records most recently first, then the rest', () => {
+    const e = (kind: string, title: string) => ({ kind, title })
+    const order = measurementOrder([
+      e('measurement', 'Weight'),
+      e('symptom', 'Headache'),
+      e('measurement', ' height '),
+      e('measurement', 'Weight'),
+    ])
+    expect(order.slice(0, 2).map((p) => p.id)).toEqual(['weight', 'height'])
+    expect(order.length).toBe(MEASUREMENT_PRESETS.length)
+    expect(new Set(order.map((p) => p.id)).size).toBe(order.length)
+    expect(measurementOrder([]).map((p) => p.id)).toEqual(MEASUREMENT_PRESETS.map((p) => p.id))
   })
 })
 

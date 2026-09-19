@@ -53,6 +53,16 @@ export const MEASUREMENT_PRESETS: HealthPreset[] = [
   m('sleep', 'Sleep', 'h', 0.25),
   m('peak-flow', 'Peak flow', 'L/min', 5, { bodyPart: 'lungs' }),
   m('respiratory-rate', 'Breathing rate', 'breaths/min', 1, { bodyPart: 'lungs' }),
+  m('waist', 'Waist circumference', 'cm', 0.5, { bodyPart: 'abdomen' }),
+  m('hip', 'Hip circumference', 'cm', 0.5, { bodyPart: 'hips' }),
+  m('body-fat', 'Body fat', '%', 0.1),
+  m('muscle-mass', 'Muscle mass', '%', 0.1),
+  m('head-circumference', 'Head circumference', 'cm', 0.5, { bodyPart: 'head' }),
+  m('steps', 'Steps', 'steps', 100),
+  m('water', 'Water drunk', 'L', 0.1),
+  m('mood', 'Mood', '/10', 1),
+  m('stress', 'Stress', '/10', 1),
+  m('inr', 'INR (blood clotting)', 'ratio', 0.1),
 ]
 
 export const SYMPTOM_PRESETS: HealthPreset[] = [
@@ -113,6 +123,20 @@ export function findPreset(id: string): HealthPreset | undefined {
     if (p) return p
   }
   return undefined
+}
+
+/**
+ * Measurement presets ordered for the quick bar: the ones this person has recorded before come
+ * first, most recently used first, then the rest in list order. `entries` must be newest first.
+ */
+export function measurementOrder(entries: { kind: string; title: string }[]): HealthPreset[] {
+  const used: HealthPreset[] = []
+  for (const e of entries) {
+    if (e.kind !== 'measurement') continue
+    const p = MEASUREMENT_PRESETS.find((x) => x.title.toLowerCase() === e.title.trim().toLowerCase())
+    if (p && !used.includes(p)) used.push(p)
+  }
+  return [...used, ...MEASUREMENT_PRESETS.filter((p) => !used.includes(p))]
 }
 
 /** Presets that start an entry of this kind, in list order, for the chips above the form. */

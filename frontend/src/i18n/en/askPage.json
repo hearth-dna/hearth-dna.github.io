@@ -2,7 +2,7 @@
   "askPage.title": "Ask",
   "askPage.intro": "Ask a question, include the records that matter, and paste the context pack into ChatGPT, Claude, Gemini or any assistant you already use. Hearth suggests records for the kind of question you ask; you can search the health log and DNA for anything else. Hearth sends nothing itself, and names are replaced by labels unless you switch them on.",
   "askPage.question": "Your question",
-  "askPage.questionPlaceholder": "e.g. Should Vova worry about clopidogrel? · Who inherited the TCF7L2 diabetes variant? · Is simvastatin a good choice for Polina?",
+  "askPage.questionPlaceholder": "e.g. Should Alex worry about clopidogrel? · Who inherited the TCF7L2 diabetes variant? · Is simvastatin a good choice for Maria?",
   "askPage.people": "People:",
   "askPage.promptTemplate": "Prompt template",
   "askPage.realNames": "include real names and exact ages",

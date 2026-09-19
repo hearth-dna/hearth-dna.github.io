@@ -7,6 +7,7 @@ import { useT } from '../i18n/context'
 import type { HealthEntry, Person } from '../types'
 import { HealthEntryForm } from './HealthEntryForm'
 import { HealthTable } from './HealthTable'
+import { QuickMeasurement } from './QuickMeasurement'
 import { ReadDocumentDialog } from './ReadDocumentDialog'
 
 /**
@@ -45,6 +46,7 @@ export function HealthLog({ person }: { person: Person }) {
         </button>
       </div>
       <p className="muted">{t('healthLog.intro')}</p>
+      <QuickMeasurement persons={[person]} personId={person.id} entries={entries} onSaved={reload} />
       {adding && (
         <HealthEntryForm
           key={adding.draft?.source ?? 'new'}

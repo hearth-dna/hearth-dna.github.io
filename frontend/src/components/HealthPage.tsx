@@ -7,6 +7,7 @@ import type { HealthEntry } from '../types'
 import { HealthEntryForm } from './HealthEntryForm'
 import { HealthLog } from './HealthLog'
 import { HealthTable } from './HealthTable'
+import { QuickMeasurement } from './QuickMeasurement'
 
 /**
  * The Health section (`/health-log`): one sortable, filterable table of the whole family's
@@ -63,6 +64,12 @@ export function HealthPage({ person: who, onPerson }: { person: string; onPerson
               {t('healthLog.addEntry')}
             </button>
           </div>
+          <QuickMeasurement
+            persons={persons}
+            personId={filter.person || (persons.length === 1 ? persons[0].id : '')}
+            entries={entries}
+            onSaved={reload}
+          />
           {adding && (
             <HealthEntryForm
               persons={persons}

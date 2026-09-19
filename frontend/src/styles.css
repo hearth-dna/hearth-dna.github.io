@@ -108,3 +108,6 @@ ul.picklist li > button, ul.picklist li > .small { flex: none; min-width: 5.5rem
 button.small.active { border-color: var(--accent); background: var(--accent); color: var(--accent-fg); }
 .badge.intent.primary { border-color: var(--accent); color: var(--accent); font-weight: 600; }
 span.small { font-size: 0.8rem; }
+/* Quick measurement bar: one line to record a number. */
+.row.quickmeasure { margin: 0.6rem 0; padding: 0.5rem 0.6rem; background: var(--bg); border: 1px solid var(--line); border-radius: 7px; }
+.row.quickmeasure input[type='number'] { width: 6rem; }

@@ -1,0 +1,8 @@
+{
+  "quick.label": "Quick measurement:",
+  "quick.parameter": "Parameter",
+  "quick.custom": "something else…",
+  "quick.customPlaceholder": "e.g. Grip strength",
+  "quick.save": "Save",
+  "quick.saved": "Saved {what}"
+}

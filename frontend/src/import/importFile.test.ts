@@ -7,13 +7,13 @@ describe('personFromFileName', () => {
       label: 'ancestrydna-1',
       displayName: 'AncestryDNA (1)',
     })
-    expect(personFromFileName('vova_23andme.txt.zip')).toEqual({
-      label: 'vova-23andme',
-      displayName: 'vova_23andme',
+    expect(personFromFileName('alex_23andme.txt.zip')).toEqual({
+      label: 'alex-23andme',
+      displayName: 'alex_23andme',
     })
-    expect(personFromFileName('genome_Polina.csv.gz')).toEqual({
-      label: 'genome-polina',
-      displayName: 'genome_Polina',
+    expect(personFromFileName('genome_Maria.csv.gz')).toEqual({
+      label: 'genome-maria',
+      displayName: 'genome_Maria',
     })
   })
   it('never yields an empty label', () => {

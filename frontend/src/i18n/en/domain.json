@@ -90,5 +90,15 @@
   "preset.doctor-visit": "Doctor visit",
   "preset.injury": "Injury",
   "preset.allergic-reaction": "Allergic reaction",
-  "preset.fainting": "Fainting"
+  "preset.fainting": "Fainting",
+  "preset.waist": "Waist circumference",
+  "preset.hip": "Hip circumference",
+  "preset.body-fat": "Body fat",
+  "preset.muscle-mass": "Muscle mass",
+  "preset.head-circumference": "Head circumference",
+  "preset.steps": "Steps",
+  "preset.water": "Water drunk",
+  "preset.mood": "Mood",
+  "preset.stress": "Stress",
+  "preset.inr": "INR (blood clotting)"
 }
