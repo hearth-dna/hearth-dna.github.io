@@ -5,12 +5,12 @@ Guidance for Claude Code in this repository. Kept short; detail lives in `/docs`
 ## Rules
 
 - **Root stays clean:** only `README.md`, `CLAUDE.md`, `AGENTS.md`, `Makefile`, `.env.example`
-  and dotfiles. Everything else goes under `frontend/`, `backend/`, `mobile/`, `kb/`, `landing/`,
-  `docs/`.
-- **No personal data ever reaches the backend by default.** Every network call in the frontend goes
-  through `frontend/src/egress/egress.ts`; a Vitest test asserts nothing else calls `fetch`. The
-  backend has no table for genotypes or documents and must never gain one (`docs/design.md` §2, §13).
-- **Never create a root `package.json`.** Frontend deps live in `frontend/`; the backend is Go.
+  and dotfiles. Everything else goes under `frontend/`, `mobile/`, `kb/`, `landing/`, `docs/`.
+- **There is no server.** Every network call in the frontend goes through
+  `frontend/src/egress/egress.ts`; a Vitest test asserts nothing else calls `fetch`. The only
+  destinations are our own origin for static assets and the provider the user brings a key for.
+  Nothing server-side may be added back without a new ADR superseding 0007.
+- **Never create a root `package.json`.** Frontend deps live in `frontend/`.
 - No dead code, minimal deps, simple over clever.
 - **Open-source ready, always.** Treat every commit as if the repo were public tomorrow. Nothing
   private or attack-useful is committed: no secrets, tokens, keys, account or project IDs, numeric
@@ -22,8 +22,8 @@ Guidance for Claude Code in this repository. Kept short; detail lives in `/docs`
 
 ## Build & run
 
-`make help` is the source of truth. `make dev` runs backend + frontend in the background with
-pidfiles under `.dev/`; `make dev-stop` stops them; `make test` runs both suites.
+`make help` is the source of truth. `make dev` runs the frontend in the background with a pidfile
+under `.dev/`; `make dev-stop` stops it; `make test` runs the suite.
 
 ## Architecture (one screen)
 
@@ -34,11 +34,10 @@ pidfiles under `.dev/`; `make dev-stop` stops them; `make test` runs both suites
 - `frontend/src/ask` — local retrieval, context packs, prompt templates (design §6.3).
 - `frontend/src/export` — dump v1: JSON → gzip (CompressionStream) → optional AES-GCM.
 - `frontend/src/consent` — consent records (design §13).
-- `backend/` — chi server, `/health`, `/v1/ask` (BYOK passthrough only unless `LLM_API_KEY` set).
 - `mobile/android`, `mobile/ios` — native shells around the same web build; no data logic lives
   there (ADR 0006). `make mobile-web` copies `frontend/dist/` into both.
 
 ## Conventions
 
 TypeScript: Biome (single quotes, no semicolons, 2-space). Tests: Vitest, pure-logic suites in
-`node` env, DOM suites opt in per file. Go: `gofmt`, table tests. Commits: imperative, lower-case.
+`node` env, DOM suites opt in per file. Commits: imperative, lower-case.

@@ -1,17 +1,18 @@
 # Local development
 
 ```bash
-cp .env.example .env         # PORT, WEB_ORIGINS; no secrets needed locally
+cp .env.example .env         # only needed for store uploads; nothing required locally
 make frontend-install
-make dev                     # backend + Vite in the background, opens the app
+make dev                     # Vite in the background, opens the app
 make dev-stop
-make test                    # Go + Vitest
+make test                    # Vitest
 make lint
 ```
 
-`make dev` uses ports 8080 (backend) and 5173 (frontend). If another checkout holds them
-(`../sentio` does by default), set `PORT=8090` in `.env` and run `make dev FRONTEND_PORT=5180`
-— the port guard never kills a process from another repo.
+`make dev` uses port 5180. It is deliberately not Vite's default 5173, which `../sentio` holds —
+a service worker's scope is per origin, so a shared port would serve sentio's cached shell instead
+of Hearth. If something else already holds 5180, run `make dev FRONTEND_PORT=5190`; the port guard
+never kills a process from another repo.
 
 - Dev-only handles: `window.__hearth.db` exposes the database wrapper in the browser console.
 - `?profile=<name>` opens a separate local database (OPFS directory `.hearth-<name>`). Handy for

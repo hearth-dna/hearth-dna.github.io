@@ -1,5 +1,4 @@
 .PHONY: help dev dev-stop dev-status test lint \
-	backend-build backend-test backend-run backend-lint \
 	frontend-install frontend-run frontend-build frontend-build-archive frontend-build-pages \
 	frontend-preview-pages frontend-test frontend-lint pages-deploy \
 	kb-build \
@@ -18,36 +17,11 @@ help: ## Show this help message
 
 # Shared
 # ======
-# Resolves in order: an already-exported shell var, then root .env (same idiom as ../sentio).
-PORT ?= $(or $(shell grep -s '^PORT=' .env | cut -d= -f2-),8080)
-LLM_API_KEY ?= $(shell grep -s '^LLM_API_KEY=' .env | cut -d= -f2-)
-EDGE_SHARED_SECRET ?= $(shell grep -s '^EDGE_SHARED_SECRET=' .env | cut -d= -f2-)
-WEB_ORIGINS ?= $(or $(shell grep -s '^WEB_ORIGINS=' .env | cut -d= -f2-),http://localhost:5180)
+# Values resolve in order: an already-exported shell var, then root .env (same idiom as ../sentio).
 
-test: backend-test frontend-test ## Run every test suite (Go + Vitest)
+test: frontend-test ## Run every test suite (Vitest)
 
-lint: backend-lint frontend-lint ## gofmt + go vet + Biome
-
-# Backend
-# =======
-BACKEND_DIR := backend
-
-BACKEND_LOCAL_ENV = PORT=$(PORT) LLM_API_KEY=$(LLM_API_KEY) EDGE_SHARED_SECRET=$(EDGE_SHARED_SECRET) \
-	WEB_ORIGINS=$(WEB_ORIGINS) ENVIRONMENT=local
-
-backend-build: ## Build the backend binary
-	cd $(BACKEND_DIR) && go build -o bin/server ./cmd/server
-
-backend-test: ## Run backend unit tests
-	cd $(BACKEND_DIR) && go test ./...
-
-backend-lint: ## gofmt -l + go vet
-	@cd $(BACKEND_DIR) && test -z "$$(gofmt -l .)" || { gofmt -l .; echo "gofmt: files above need formatting"; exit 1; }
-	cd $(BACKEND_DIR) && go vet ./...
-
-backend-run: ## Run the backend locally in the foreground
-	@echo "Starting hearth-backend on :$(PORT)  (health: http://localhost:$(PORT)/health)"
-	cd $(BACKEND_DIR) && $(BACKEND_LOCAL_ENV) go run ./cmd/server
+lint: frontend-lint ## Biome check
 
 # Frontend
 # ========
@@ -364,9 +338,7 @@ mobile-secrets: ## Show which publishing inputs are set (names and status only, 
 # Ported from ../sentio/Makefile: pidfiles under .dev/, stop by pidfile *and* by port, never touch
 # a process whose cwd is another checkout.
 DEV_DIR := .dev
-BACKEND_PID_FILE := $(DEV_DIR)/backend.pid
 FRONTEND_PID_FILE := $(DEV_DIR)/frontend.pid
-BACKEND_LOG := $(DEV_DIR)/backend.log
 FRONTEND_LOG := $(DEV_DIR)/frontend.log
 # 5180, not Vite's 5173: ../sentio is a PWA on localhost:5173 and its service worker would serve
 # sentio's cached shell instead of Hearth. Service-worker scope is per origin, so use a distinct port.
@@ -434,36 +406,25 @@ define start_check
 	fi
 endef
 
-dev: ## Start backend + frontend in the background and open the app (restarts if already running)
+dev: ## Start the frontend in the background and open the app (restarts if already running)
 	@if [ ! -x "$(FRONTEND_DIR)/node_modules/.bin/vite" ]; then \
 		echo "Error: frontend dependencies not installed — run 'make frontend-install' first"; exit 1; \
 	fi
 	@echo "Stopping anything already running..."
-	$(call stop_service,$(BACKEND_PID_FILE),$(PORT),Backend)
 	$(call stop_service,$(FRONTEND_PID_FILE),$(FRONTEND_PORT),Frontend)
 	@mkdir -p $(DEV_DIR)
-	@echo "Building backend..."
-	@cd $(BACKEND_DIR) && go build -o bin/server ./cmd/server
-	@echo "Starting backend on :$(PORT)..."
-	@( cd $(BACKEND_DIR) && exec env $(BACKEND_LOCAL_ENV) ./bin/server ) > $(BACKEND_LOG) 2>&1 & echo $$! > $(BACKEND_PID_FILE)
-	$(call start_check,$(BACKEND_PID_FILE),http://localhost:$(PORT)/health,$(BACKEND_LOG),Backend)
 	@echo "Starting frontend on :$(FRONTEND_PORT)..."
-	@( cd $(FRONTEND_DIR) && exec env HEARTH_BACKEND_PROXY_TARGET=http://localhost:$(PORT) ./node_modules/.bin/vite --port $(FRONTEND_PORT) --strictPort ) > $(FRONTEND_LOG) 2>&1 & echo $$! > $(FRONTEND_PID_FILE)
+	@( cd $(FRONTEND_DIR) && exec ./node_modules/.bin/vite --port $(FRONTEND_PORT) --strictPort ) > $(FRONTEND_LOG) 2>&1 & echo $$! > $(FRONTEND_PID_FILE)
 	$(call start_check,$(FRONTEND_PID_FILE),$(FRONTEND_URL),$(FRONTEND_LOG),Frontend)
 	@echo ""
-	@echo "Backend:  http://localhost:$(PORT)  (PID $$(cat $(BACKEND_PID_FILE)), log: $(BACKEND_LOG))"
 	@echo "Frontend: $(FRONTEND_URL)  (PID $$(cat $(FRONTEND_PID_FILE)), log: $(FRONTEND_LOG))"
 	@(xdg-open $(FRONTEND_URL) >/dev/null 2>&1 &) || (open $(FRONTEND_URL) >/dev/null 2>&1 &) || echo "Open $(FRONTEND_URL) in your browser."
 	@echo "Run 'make dev-stop' to stop both."
 
-dev-stop: ## Stop the backend/frontend dev servers (by pidfile and by listening port)
-	$(call stop_service,$(BACKEND_PID_FILE),$(PORT),Backend)
+dev-stop: ## Stop the frontend dev server (by pidfile and by listening port)
 	$(call stop_service,$(FRONTEND_PID_FILE),$(FRONTEND_PORT),Frontend)
 
-dev-status: ## Show what the dev pidfiles claim and what actually holds the dev ports
-	@printf 'Backend  (:%s)\n' "$(PORT)"
-	@printf '  pidfile: %s\n' "$$(if [ -f $(BACKEND_PID_FILE) ]; then p=$$(cat $(BACKEND_PID_FILE)); if kill -0 $$p 2>/dev/null; then echo "$$p (alive)"; else echo "$$p (dead — stale)"; fi; else echo "none"; fi)"
-	@printf '  port:    %s\n' "$$(lsof -a -u$$(id -un) -ti tcp:$(PORT) -sTCP:LISTEN 2>/dev/null | tr '\n' ' ' | sed 's/ $$//;s/^$$/free/')"
+dev-status: ## Show what the dev pidfile claims and what actually holds the dev port
 	@printf 'Frontend (:%s)\n' "$(FRONTEND_PORT)"
 	@printf '  pidfile: %s\n' "$$(if [ -f $(FRONTEND_PID_FILE) ]; then p=$$(cat $(FRONTEND_PID_FILE)); if kill -0 $$p 2>/dev/null; then echo "$$p (alive)"; else echo "$$p (dead — stale)"; fi; else echo "none"; fi)"
 	@printf '  port:    %s\n' "$$(lsof -a -u$$(id -un) -ti tcp:$(FRONTEND_PORT) -sTCP:LISTEN 2>/dev/null | tr '\n' ' ' | sed 's/ $$//;s/^$$/free/')"

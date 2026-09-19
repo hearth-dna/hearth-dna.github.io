@@ -2,10 +2,6 @@ import react from '@vitejs/plugin-react'
 import { defineConfig, type Plugin } from 'vitest/config'
 import { VitePWA } from 'vite-plugin-pwa'
 
-// /api is proxied to the Go backend in dev so the browser sees one origin (same idea as ../sentio).
-// The backend is optional: the app never calls it unless the user enables Ask tier 3.
-const backendTarget = process.env.HEARTH_BACKEND_PROXY_TARGET ?? 'http://localhost:8080'
-
 // "Nothing but our own origin" (docs/design.md §2, §13.2), enforced in the page itself because
 // GitHub Pages serves no custom headers (ADR 0005). The two provider hosts are the BYOK Ask and
 // document-reading endpoints in src/egress/egress.ts; nothing else may be contacted.
@@ -67,9 +63,6 @@ export default defineConfig({
   ],
   define: { __HEARTH_ARCHIVE__: 'false' },
   optimizeDeps: { exclude: ['@sqlite.org/sqlite-wasm'] },
-  server: {
-    proxy: { '/api': { target: backendTarget, rewrite: (p) => p.replace(/^\/api/, '') } },
-  },
   worker: { format: 'es' },
   test: { environment: 'node', include: ['src/**/*.test.{ts,tsx}'] },
 })

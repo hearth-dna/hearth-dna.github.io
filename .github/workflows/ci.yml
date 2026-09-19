@@ -2,8 +2,8 @@ name: CI
 
 # Tests only. Deployment lives in pages.yml (ADR 0005); nothing here ships bytes anywhere.
 #   - one job on one runner, so checkout/setup happen once;
-#   - a cheap `git diff` decides which areas to test, so a landing-only push does not install npm
-#     or compile Go, and docs-only PRs never start a runner (paths-ignore below);
+#   - a cheap `git diff` decides which areas to test, so a landing-only push does not install npm,
+#     and docs-only PRs never start a runner (paths-ignore below);
 #   - hard timeout so a hung step cannot burn hours;
 #   - PR runs are cancelled when a newer push arrives.
 # No Dependabot version updates: deps get bumped by hand in batches. Security alerts still work
@@ -55,26 +55,11 @@ jobs:
           else
             changed() { true; }
           fi
-          backend=false; frontend=false; landing=false
-          changed '^(backend/|\.github/workflows/)' && backend=true
+          frontend=false; landing=false
           changed '^(frontend/|kb/|\.github/workflows/)' && frontend=true
           changed '^(landing/|\.github/workflows/)' && landing=true
-          printf 'backend=%s\nfrontend=%s\nlanding=%s\n' \
-            "$backend" "$frontend" "$landing" | tee -a "$GITHUB_OUTPUT"
-
-      # Backend tests ------------------------------------------------------------------------
-      - uses: actions/setup-go@v7
-        if: steps.changes.outputs.backend == 'true'
-        with:
-          go-version-file: backend/go.mod
-          cache-dependency-path: backend/go.sum
-      - name: gofmt + vet + test
-        if: steps.changes.outputs.backend == 'true'
-        working-directory: backend
-        run: |
-          set -euo pipefail
-          test -z "$(gofmt -l .)" || { gofmt -l .; exit 1; }
-          go vet ./... && go test ./...
+          printf 'frontend=%s\nlanding=%s\n' \
+            "$frontend" "$landing" | tee -a "$GITHUB_OUTPUT"
 
       # Frontend tests ------------------------------------------------------------------------
       - uses: actions/setup-node@v7

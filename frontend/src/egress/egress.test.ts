@@ -29,7 +29,7 @@ describe('egress gateway', () => {
   })
 
   it('refuses to send personal data without a confirmation token', async () => {
-    await expect(sendContext({ kind: 'helper' }, '# ctx', 'q', { confirmedAt: '' })).rejects.toThrow(
+    await expect(sendContext({ byokKey: 'k' }, '# ctx', 'q', { confirmedAt: '' })).rejects.toThrow(
       /confirmation/,
     )
     await expect(readDocumentWithGemini({ byokKey: 'k' }, [], 'p', {}, { confirmedAt: '' })).rejects.toThrow(

@@ -45,10 +45,10 @@ Residual obligations that still apply to us, and are cheap to meet:
   used if the project is ever monetised.
 - **No telemetry.** Same as codegen: no analytics, no remote fonts, strict CSP, all assets self-hosted.
 
-**Hard rule for the codebase:** the app works completely with no backend. Any backend call is an
-explicit, per-feature opt-in, goes to a separate origin, is stateless, and never persists genetic or
-medical data. CSP `connect-src` lists only `'self'`, the backend origin, and the LLM endpoint the user
-configured. See §11 for the GCP backend that fits inside the Always Free tier.
+**Hard rule for the codebase:** there is no server. The app is static files, and the only remote
+call it can make is the user's own opt-in, per-request BYOK request straight to a provider. CSP
+`connect-src` lists `'self'` and the two provider hosts, nothing else. The Go helper service was
+removed in ADR 0007; §11 records the hosted design that was never deployed.
 
 ## 3. Architecture
 
@@ -78,8 +78,8 @@ configured. See §11 for the GCP backend that fits inside the Always Free tier.
    of a dedicated <org>.github.io (ADR 0005). Nothing else is deployed.
           │ optional, opt-in per feature, BYOK: browser → provider directly
           ▼
-   No hosted backend. The Go "helper" service (LLM proxy, OCR/extraction,
-   encrypted-blob sync) is described below and runs only if self-hosted.
+   No server of any kind (ADR 0007). The Go "helper" service that once
+   proxied this path was removed; §11 records what it would have been.
           │
           ▼
    LLM provider (operator key via proxy, or user's own key direct from
@@ -318,9 +318,9 @@ kb fields at tier 0, so the user gets a decision frame even without any LLM.
 
 1. **Framework:** ~~Svelte vs React~~ → **decided: React + TypeScript + Vite**, to mirror `../sentio`'s
    frontend and reuse its Biome/Vitest/i18n tooling (§12).
-2. **Hosting:** ~~GitHub Pages vs separate repo~~ → **decided: separate repo, on GitHub Pages**
-   (ADR 0005 — it supersedes the Cloudflare/GCP topology sketched in §11 and §12). This repo stays
-   the private data + kb source.
+2. **Hosting:** ~~GitHub Pages vs separate repo~~ → **decided: a dedicated `<org>.github.io` repo on
+   GitHub Pages** (ADR 0005 — it supersedes the Cloudflare/GCP topology sketched in §11 and §12), and
+   that repo is now the only one (ADR 0007 removed the backend; the source is public).
 3. **SNPedia inclusion:** include with attribution while strictly non-commercial, or exclude like codegen. Recommendation: include, flag entries by source, make it switchable in the kb build.
 4. **Language:** UI in English first; content is already mixed Russian/English in this repo. Recommendation: i18n scaffold from day one, English + Russian.
 5. **Genotek VCF:** convert on import (GT-resolved alleles, as done in the 2026-03-15 fix) and keep REF/ALT in `snp_index`.
@@ -336,10 +336,11 @@ kb fields at tier 0, so the user gets a decision frame even without any LLM.
 
 ## 11. GCP backend under the Always Free tier
 
-> **Historical.** Superseded by ADR 0005: nothing in §11 or §12 is deployed. There is no hosted
-> backend — the app is static files on GitHub Pages, and the remote Ask path is BYOK, browser
-> straight to the provider. Kept because it is still the design anyone self-hosting the helper
-> service would follow.
+> **Historical.** Superseded by ADR 0005 (nothing here was ever deployed) and then by ADR 0007,
+> which deleted `backend/` outright: no Go source, no Makefile target, no CI job. The app is static
+> files on GitHub Pages and the only remote Ask path is BYOK, browser straight to the provider.
+> Kept as the record of a road not taken — and of what anyone reviving a helper service would have
+> to build, and would need a new ADR to justify.
 
 Decision: the app stays local-first, and **the backend is optional infrastructure, not a
 dependency**. With the copy-out tier in §6.3 the app delivers its full value with zero server-side

@@ -13,7 +13,6 @@ export type ConsentKind =
   | 'import_document'
   | 'tier3_byok'
   | 'read_document_byok'
-  | 'helper_backend'
   | 'backup_folder'
 
 export interface ConsentText {
@@ -41,6 +40,5 @@ export const CONSENTS: Record<ConsentKind, ConsentText> = {
   import_document: text('import_document', 1, 1),
   tier3_byok: text('tier3_byok', 1, 3),
   read_document_byok: text('read_document_byok', 1, 3),
-  helper_backend: text('helper_backend', 1, 2),
   backup_folder: text('backup_folder', 1, 3),
 }

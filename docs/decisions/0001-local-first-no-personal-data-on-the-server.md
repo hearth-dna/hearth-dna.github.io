@@ -1,6 +1,6 @@
 # ADR 0001: Local-first — no personal data on any server we operate
 
-**Date:** 2026-09-13 · **Status:** Accepted
+**Date:** 2026-09-13 · **Status:** Accepted · **Amended by:** [0007](0007-no-backend.md)
 
 ## Context
 
@@ -21,6 +21,8 @@ lists only our origin and the opt-in API host; a backend with no table for perso
 ## Consequences
 
 - No accounts, no sync in v1; the dump file is the only backup and the app says so.
+- ADR 0007 deleted the helper service, so the rule below is now unconditional: no server of ours
+  processes Article 9 data at all, transiently or otherwise. Kept for the reasoning.
 - The helper backend's LLM proxy and OCR endpoints do transiently process Article 9 data; they
   stay opt-in behind their own consent (design §13.1) and are not a dependency.
 - Legal documents still needed before public release: privacy notice, terms, third-party

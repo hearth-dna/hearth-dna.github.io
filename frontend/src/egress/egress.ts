@@ -1,13 +1,13 @@
 /**
  * The only module allowed to call `fetch` (docs/design.md §13.2; egress.test.ts enforces it).
  * Two destinations exist: our own origin for static assets (kb.json, service worker) and the
- * opt-in Ask tier 3 endpoints. Every personal-data egress must go through `sendContext`, which
- * requires an explicit per-request confirmation token from the UI.
+ * provider the user brings a key for. There is no server of ours in between (ADR 0007). Every
+ * personal-data egress must go through `sendContext`, which requires an explicit per-request
+ * confirmation token from the UI.
  */
 
 export interface AskTarget {
-  kind: 'helper' | 'anthropic'
-  byokKey?: string
+  byokKey: string
   model?: string
 }
 
@@ -28,7 +28,7 @@ export interface DocumentPart {
 
 /**
  * Sends the pages of one medical document straight to Gemini with the user's own key and returns
- * the model's JSON text. Tier 3 (design §6.3/§6.4): browser → provider, nothing via our backend.
+ * the model's JSON text. Browser → provider directly; nothing of ours sits in between.
  */
 export async function readDocumentWithGemini(
   target: { byokKey: string; model?: string },
@@ -78,18 +78,6 @@ export async function sendContext(
   confirmed: ConfirmedSend,
 ): Promise<{ answer: string; model: string }> {
   if (!confirmed?.confirmedAt) throw new Error('refusing to send without an explicit confirmation')
-  if (target.kind === 'helper') {
-    const res = await fetch('/api/v1/ask', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        ...(target.byokKey ? { 'X-Hearth-Byok': target.byokKey } : {}),
-      },
-      body: JSON.stringify({ context: contextPack, question, model: target.model }),
-    })
-    if (!res.ok) throw new Error(`helper returned ${res.status}`)
-    return (await res.json()) as { answer: string; model: string }
-  }
   if (!target.byokKey) throw new Error('an API key is required for a direct provider call')
   const res = await fetch(ANTHROPIC_URL, {
     method: 'POST',

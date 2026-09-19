@@ -28,7 +28,7 @@ make frontend-install / frontend-run / frontend-test / frontend-build / frontend
 
 The source is open-source ready: no real API endpoints, keys, account IDs or personal sample data
 in `src/`, `public/` or tests. Fixtures are synthetic; the family_dna samples referenced below are
-gitignored local files, never committed. Backend origin comes from the Vite proxy / build env.
+gitignored local files, never committed.
 
 - No `fetch`/XHR/WebSocket/sendBeacon outside `src/egress/egress.ts`.
 - `sendContext` refuses to send without a confirmation token from the UI.

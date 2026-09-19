@@ -1,6 +1,6 @@
 # ADR 0005: GitHub Pages is the whole deployment
 
-**Date:** 2026-09-19 · **Status:** Accepted · **Supersedes:** [0003](0003-cloudflare-edge-gcp-free-tier.md)
+**Date:** 2026-09-19 · **Status:** Accepted · **Supersedes:** [0003](0003-cloudflare-edge-gcp-free-tier.md) · **Amended by:** [0007](0007-no-backend.md)
 
 ## Context
 
@@ -24,7 +24,8 @@ The frontend is deployed to **GitHub Pages only**, from a dedicated free organis
 named `<org>.github.io`, so the app is served at the **origin root**. `terraform/`, both Cloudflare
 Pages projects, the Worker, R2 and the Cloud Run deploy are removed; `.github/workflows/pages.yml`
 builds `frontend/dist` and publishes it with `actions/deploy-pages`. The backend source stays for
-`make dev` and for anyone self-hosting, but nothing deploys it.
+`make dev` and for anyone self-hosting, but nothing deploys it. *(ADR 0007 went further and deleted
+it; `make dev` now starts the frontend alone.)*
 
 A dedicated org, rather than a project page under a personal account, because **OPFS, localStorage
 and service-worker scope are partitioned per origin**: every project page under `<user>.github.io`
@@ -53,7 +54,8 @@ reading. The meta CSP names the two provider hosts and nothing else.
   anyway, and named `<org>.github.io`.
 - The Ask **helper tier is dead in the hosted app**: `/api/v1/ask` hits the SPA fallback and returns
   `404.html`. BYOK is the only remote path. The settings UI should stop offering the tier when no
-  backend is configured.
+  backend is configured. *(Resolved by ADR 0007: the tier, its consent and its egress branch are
+  gone. It turned out no UI ever offered it.)*
 - No control over `X-Content-Type-Options` or `Referrer-Policy`. TLS is enforced and `github.io` is
   HSTS-preloaded.
 - A deploy takes up to ~10 minutes to reach a browser with no service worker yet (Pages sends
