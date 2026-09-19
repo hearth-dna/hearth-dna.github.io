@@ -1,0 +1,99 @@
+# Store upload lanes, one per platform.
+#
+# Deliberately thin, and deliberately without an Appfile: the app identifier is not committed
+# anywhere in this repository (root CLAUDE.md, "open-source ready"), so it arrives in
+# HEARTH_APPLICATION_ID like every other publishing input. See docs/runbook/store-release.md.
+#
+# These lanes do not build, bump versions or fetch secrets. `make android-bundle` / `make ios-ipa`
+# do that, and they can be read as ordinary shell.
+
+def app_identifier
+  id = ENV["HEARTH_APPLICATION_ID"]
+  UI.user_error!("HEARTH_APPLICATION_ID is not set — see docs/runbook/store-release.md") if id.to_s.empty?
+  # The committed placeholder must never reach a store: `.example` is a reserved TLD, so the
+  # listing it names cannot exist, and the upload would fail late with an opaque API error.
+  UI.user_error!("HEARTH_APPLICATION_ID is still the placeholder (#{id})") if id.start_with?("example.")
+  id
+end
+
+platform :android do
+  desc "Upload an already-built AAB to Play. Params: aab, track, rollout"
+  lane :upload do |options|
+    aab = options[:aab]
+    UI.user_error!("AAB not found: #{aab} — run `make android-bundle` first") unless aab && File.exist?(aab)
+
+    track = options[:track] || "internal"
+    # A staged rollout only means something on a track with an audience to stage across. The API
+    # accepts a fraction on `internal` and then ignores it, which reads as a canary that isn't one.
+    rollout = options[:rollout]
+    if rollout && track != "production"
+      UI.important("Ignoring rollout=#{rollout}: staged rollout applies to production only.")
+      rollout = nil
+    end
+
+    supply(
+      package_name: app_identifier,
+      aab: aab,
+      track: track,
+      rollout: rollout,
+      release_status: rollout ? "inProgress" : "completed",
+      # The store listing is never touched by a binary upload. Publishing a build should not be
+      # able to overwrite the description and screenshots as a side effect.
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+      skip_upload_changelogs: true,
+      json_key: ENV["SUPPLY_JSON_KEY"],
+    )
+  end
+end
+
+platform :ios do
+  # App Store Connect API key, never an Apple ID: 2FA makes the interactive path unscriptable, and
+  # a key can be revoked without touching the account's password.
+  before_all do
+    key_id = ENV["ASC_KEY_ID"]
+    issuer_id = ENV["ASC_ISSUER_ID"]
+    key_path = ENV["ASC_KEY_PATH"]
+    next if [key_id, issuer_id, key_path].any? { |value| value.to_s.empty? }
+
+    app_store_connect_api_key(
+      key_id: key_id,
+      issuer_id: issuer_id,
+      key_filepath: key_path,
+      # Apple's ceiling is 20 minutes; a shorter token can expire mid-upload.
+      duration: 1200,
+      in_house: false,
+    )
+  end
+
+  desc "Show the newest build App Store Connect holds, and whether it has finished processing"
+  lane :status do
+    identifier = app_identifier
+    build = Spaceship::ConnectAPI::Build.all(app_id: Spaceship::ConnectAPI::App.find(identifier).id, limit: 1).first
+    if build.nil?
+      UI.important("No builds yet for #{identifier}.")
+      next
+    end
+    # `processingState` is the answer to the only question this lane exists for: a build that is
+    # still PROCESSING cannot be tested or submitted, and Apple sends no notification when it is.
+    UI.message("#{identifier} #{build.app_version} (#{build.version}) — #{build.processing_state}")
+    UI.message("Expires: #{build.expired? ? 'yes' : 'no'}")
+  end
+
+  desc "Upload an already-exported .ipa to TestFlight. Params: ipa, changelog"
+  lane :upload_build do |options|
+    ipa = options[:ipa]
+    UI.user_error!("No ipa: given — run `make ios-ipa` first") unless ipa && File.exist?(ipa)
+
+    upload_to_testflight(
+      ipa: ipa,
+      app_identifier: app_identifier,
+      changelog: options[:changelog],
+      # Apple's processing takes 5–30 minutes and there is nothing useful to do while it runs.
+      skip_waiting_for_build_processing: true,
+      # Nothing is submitted for review by an upload: that is a decision made in the Console.
+      distribute_external: false,
+    )
+  end
+end

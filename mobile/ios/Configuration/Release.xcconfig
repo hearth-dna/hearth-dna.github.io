@@ -1,0 +1,4 @@
+// Release build settings.
+BUNDLE_ID_SUFFIX =
+
+#include? "Local.xcconfig"

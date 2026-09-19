@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--
+      The only permission. It is not for the shell, which has no network code at all: it is for the
+      web app's one outbound path, the BYOK Ask call the user makes with their own API key
+      (frontend/src/egress/egress.ts). Without it that feature fails with an error that explains
+      nothing. Nothing else in the app touches the network — the whole database is local.
+    -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!--
+      allowBackup="false" is a privacy decision, not an oversight: the WebView's storage is where
+      the raw genomes live, and Android's own backup would copy that to Google Drive. There is one
+      backup path in this app, the one the user drives from Settings.
+    -->
+    <application
+        android:label="@string/app_name"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher"
+        android:theme="@style/Theme.Hearth"
+        android:supportsRtl="true"
+        android:usesCleartextTraffic="false"
+        android:allowBackup="false">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:windowSoftInputMode="adjustResize"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|uiMode|density|fontScale|layoutDirection">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>

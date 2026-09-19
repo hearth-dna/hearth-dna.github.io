@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      DayNight so the system bars follow the phone's theme, matching the web app's own
+      prefers-color-scheme styling (frontend/src/styles.css). The window background is the web
+      app's light background, so a cold start does not flash white-then-cream.
+    -->
+    <style name="Theme.Hearth" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="android:windowBackground">@color/window_background</item>
+    </style>
+</resources>

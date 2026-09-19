@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Apple's privacy manifest. Every list here is empty, and that is the accurate answer rather than a
+  stub: Hearth collects nothing, tracks nothing, and contacts no third-party server of its own
+  (docs/decisions/0001-local-first-no-personal-data-on-the-server.md). The one outbound call the app
+  can make is the BYOK Ask request the user configures with their own API key, to their own
+  provider — the user's relationship, not the app's.
+
+  This is not the same thing as the App Store Connect privacy label, which is filled in separately
+  and must say the same.
+-->
+<plist version="1.0">
+<dict>
+    <key>NSPrivacyTracking</key>
+    <false/>
+    <key>NSPrivacyTrackingDomains</key>
+    <array/>
+    <key>NSPrivacyCollectedDataTypes</key>
+    <array/>
+    <!-- No required-reason API is used: no UserDefaults, no file timestamps, no disk-space checks,
+         no active-keyboard or system-boot-time reads. The shell is a web view and a loopback
+         socket. -->
+    <key>NSPrivacyAccessedAPITypes</key>
+    <array/>
+</dict>
+</plist>

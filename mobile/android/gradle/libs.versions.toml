@@ -1,0 +1,43 @@
+# Every dependency version for the Android shell, in one place (the idiom is ../../../sentio's).
+# The shell is deliberately tiny: an Activity, a WebView, an asset loader. Anything that would
+# add a DI container, a UI toolkit or a networking library belongs in the web app instead — see
+# ../../docs/decisions/0006-native-shells-around-the-pwa.md.
+
+[versions]
+agp = "8.13.2"
+kotlin = "2.2.21"
+
+# SDK levels. minSdk 29 (Android 10), for one concrete reason: saving an export goes through
+# MediaStore's Downloads collection, which below 29 does not exist and is replaced by a
+# WRITE_EXTERNAL_STORAGE permission over the whole shared store. An app that holds raw genomes
+# asking for the entire SD card, so that it can write one file the user asked for, is not a
+# trade worth two OS versions of reach.
+#
+# The OS is not the real floor anyway: the WebView engine is, it updates independently of the
+# system, and MainActivity checks it at runtime (OPFS synchronous access handles need Chromium
+# 108+).
+compileSdk = "36"
+minSdk = "29"
+targetSdk = "36"
+
+activity = "1.9.3"
+appcompat = "1.7.0"
+coreKtx = "1.15.0"
+webkit = "1.12.1"
+
+junit = "4.13.2"
+
+[libraries]
+androidx-activity = { module = "androidx.activity:activity", version.ref = "activity" }
+androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
+androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
+# The asset loader and the WebView feature checks. This is what lets the app serve its own files
+# over https://appassets.androidplatform.net/ instead of file://, which is the whole reason OPFS
+# and the service worker work at all.
+androidx-webkit = { module = "androidx.webkit:webkit", version.ref = "webkit" }
+
+junit = { module = "junit:junit", version.ref = "junit" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

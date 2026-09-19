@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Both from frontend/src/styles.css (the bg custom property) and the PWA manifest theme_color. -->
+    <color name="window_background">#faf8f4</color>
+    <color name="hearth_green">#1f4d3a</color>
+</resources>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Template for `xcodebuild -exportArchive`. `make ios-ipa` substitutes __TEAM_ID__ from
+  APPLE_TEAM_ID and writes ExportOptions.plist beside this file; that generated copy is gitignored,
+  because a team identifier is an account identifier and this repository is public.
+-->
+<plist version="1.0">
+<dict>
+    <key>method</key>
+    <string>app-store-connect</string>
+    <key>teamID</key>
+    <string>__TEAM_ID__</string>
+    <!-- Automatic signing, matching CODE_SIGN_STYLE in project.yml. The make target passes
+         -allowProvisioningUpdates so Xcode can create the distribution profile on first use. -->
+    <key>signingStyle</key>
+    <string>automatic</string>
+    <!-- dSYMs. Without them an App Store crash report is unsymbolicated, and they cannot be
+         attached retroactively. -->
+    <key>uploadSymbols</key>
+    <true/>
+    <key>stripSwiftSymbols</key>
+    <true/>
+</dict>
+</plist>

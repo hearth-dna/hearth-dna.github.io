@@ -1,0 +1,7 @@
+// Debug build settings. A debug install gets its own bundle identifier so it can sit beside a
+// release one on the same phone without either overwriting the other's database.
+BUNDLE_ID_SUFFIX = .debug
+
+// Local overrides (a development team, a different suffix) go in Local.xcconfig, which is
+// gitignored. It is optional: everything here builds on a clean checkout without it.
+#include? "Local.xcconfig"

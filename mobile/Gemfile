@@ -1,0 +1,15 @@
+# fastlane is used for exactly two things: `supply` (the Play Developer API client) and
+# `pilot` (the App Store Connect one). Both APIs are the part of publishing with no reasonable
+# alternative — everything before them (build, sign, verify) is `make`, because a Makefile can be
+# read and dry-run without a Ruby toolchain.
+#
+# Vendored, not installed globally: .bundle/config pins the path to vendor/bundle, so
+# `bundle install` here cannot disturb another Ruby project on the machine.
+source "https://rubygems.org"
+
+gem "fastlane"
+
+# fastlane depends on nkf, a *bundled* gem rather than a default one. With shared gems disabled the
+# system copy is invisible, so `bundle install` succeeds and `bundle exec fastlane` then fails at
+# resolve time with "nkf could not be found".
+gem "nkf"

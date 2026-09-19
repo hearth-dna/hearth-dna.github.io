@@ -5,7 +5,8 @@ Guidance for Claude Code in this repository. Kept short; detail lives in `/docs`
 ## Rules
 
 - **Root stays clean:** only `README.md`, `CLAUDE.md`, `AGENTS.md`, `Makefile`, `.env.example`
-  and dotfiles. Everything else goes under `frontend/`, `backend/`, `kb/`, `landing/`, `docs/`.
+  and dotfiles. Everything else goes under `frontend/`, `backend/`, `mobile/`, `kb/`, `landing/`,
+  `docs/`.
 - **No personal data ever reaches the backend by default.** Every network call in the frontend goes
   through `frontend/src/egress/egress.ts`; a Vitest test asserts nothing else calls `fetch`. The
   backend has no table for genotypes or documents and must never gain one (`docs/design.md` §2, §13).
@@ -34,6 +35,8 @@ pidfiles under `.dev/`; `make dev-stop` stops them; `make test` runs both suites
 - `frontend/src/export` — dump v1: JSON → gzip (CompressionStream) → optional AES-GCM.
 - `frontend/src/consent` — consent records (design §13).
 - `backend/` — chi server, `/health`, `/v1/ask` (BYOK passthrough only unless `LLM_API_KEY` set).
+- `mobile/android`, `mobile/ios` — native shells around the same web build; no data logic lives
+  there (ADR 0006). `make mobile-web` copies `frontend/dist/` into both.
 
 ## Conventions
 

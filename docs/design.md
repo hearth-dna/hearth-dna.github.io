@@ -8,7 +8,9 @@
 
 ## 1. Goal
 
-A browser app (installable PWA, no native mobile app in v1) that does what codegen.eu does and more,
+A browser app (installable PWA; since [ADR 0006](decisions/0006-native-shells-around-the-pwa.md)
+also shipped as Android and iOS apps that run the same build in a native window) that does what
+codegen.eu does and more,
 while **never letting genetic or medical data touch a server we operate**:
 
 - Stores a **whole family** (many genomes + pedigree), not one genome per session.
@@ -282,6 +284,8 @@ kb fields at tier 0, so the user gets a decision frame even without any LLM.
 - Optional app lock: passphrase-derived key wraps a random data key; SQLite pages stay plain in OPFS
   in v1 (OPFS is origin-private), with an option to encrypt the DB file at rest in v2.
 - Strict CSP; no third-party origins except the user-configured LLM endpoint.
+- On phones the same build runs inside the shells in `mobile/`, which exist to give it a real
+  origin (so OPFS survives), a file picker and a way to save a dump — ADR 0006.
 
 ## 7. Comparison with codegen.eu
 

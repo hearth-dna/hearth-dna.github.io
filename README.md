@@ -15,6 +15,7 @@ Hosting: GitHub Pages, and nothing else — see
 hearth/
 ├── frontend/      React + TypeScript + Vite PWA; SQLite WASM on OPFS; all analysis runs here
 ├── backend/       Go helper service (optional; stateless; /health, /v1/ask BYOK passthrough)
+├── mobile/        Android + iOS shells that run the same web build in a native window (ADR 0006)
 ├── kb/            knowledge-base source (reviewed SNP entries) and build script → frontend/public/kb.json
 ├── landing/       static privacy / terms pages, published beside the app
 ├── scripts/       dev helpers

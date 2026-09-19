@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A hearth: a flame over a hearthstone. Drawn here rather than imported so the app icon is
+     source, not a binary blob nobody can edit. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#f2a65a"
+        android:pathData="M54,26c8,10 14,16 14,25a14,14 0 0 1 -28,0c0,-9 6,-15 14,-25z" />
+    <path
+        android:fillColor="#faf8f4"
+        android:pathData="M54,44c4,5 6,8 6,12a6,6 0 0 1 -12,0c0,-4 2,-7 6,-12z" />
+    <path
+        android:fillColor="#faf8f4"
+        android:pathData="M33,72h42v6h-42z" />
+</vector>
