@@ -635,5 +635,7 @@
   "eraseDialog.attachmentsNotice": "添付文書もこの端末から消えます。バックアップフォルダの複製は、フォルダを解除してそのファイルを削除するまで残ります。",
   "archiveCard.attachmentsNotice": "アーカイブには健康記録は入りますが、添付文書は入りません。それらはバックアップフォルダにあります。",
   "readDocumentDialog.keepOriginals": "元のページを記録と一緒に残す",
-  "readDocumentDialog.keepOriginalsHint": "ファイルはこの端末に残ります。モデルに送られるのは上に挙げたページだけです。"
+  "readDocumentDialog.keepOriginalsHint": "ファイルはこの端末に残ります。モデルに送られるのは上に挙げたページだけです。",
+  "app.tabFamily": "検索",
+  "app.tabSettings": "設定"
 }

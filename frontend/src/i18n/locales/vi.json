@@ -635,5 +635,7 @@
   "eraseDialog.attachmentsNotice": "Tài liệu đính kèm cũng bị xóa khỏi thiết bị này. Bản sao trong thư mục sao lưu vẫn còn cho đến khi bạn quên thư mục và xóa các tệp của nó.",
   "archiveCard.attachmentsNotice": "Bản lưu trữ mang theo nhật ký sức khỏe, nhưng không mang tài liệu đính kèm; chúng nằm trong thư mục sao lưu của bạn.",
   "readDocumentDialog.keepOriginals": "Giữ các trang gốc cùng với mục",
-  "readDocumentDialog.keepOriginalsHint": "Các tệp ở lại trên thiết bị này. Chỉ những trang liệt kê ở trên được gửi tới mô hình."
+  "readDocumentDialog.keepOriginalsHint": "Các tệp ở lại trên thiết bị này. Chỉ những trang liệt kê ở trên được gửi tới mô hình.",
+  "app.tabFamily": "Tra cứu",
+  "app.tabSettings": "Cài đặt"
 }

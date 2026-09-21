@@ -635,5 +635,7 @@
   "eraseDialog.attachmentsNotice": "Os documentos anexados também são apagados deste dispositivo. As cópias em uma pasta de backup ficam até você esquecer a pasta e excluir seus arquivos.",
   "archiveCard.attachmentsNotice": "O arquivo leva o diário de saúde, mas não os documentos anexados; esses ficam na sua pasta de backup.",
   "readDocumentDialog.keepOriginals": "Guardar as páginas originais com o registro",
-  "readDocumentDialog.keepOriginalsHint": "Os arquivos ficam neste dispositivo. Só as páginas listadas acima são enviadas ao modelo."
+  "readDocumentDialog.keepOriginalsHint": "Os arquivos ficam neste dispositivo. Só as páginas listadas acima são enviadas ao modelo.",
+  "app.tabFamily": "Pesquisar",
+  "app.tabSettings": "Ajustes"
 }

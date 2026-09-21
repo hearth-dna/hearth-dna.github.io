@@ -635,5 +635,7 @@
   "eraseDialog.attachmentsNotice": "منسلک دستاویزات بھی اس آلے سے مٹ جاتی ہیں۔ بیک اپ فولڈر کی نقول اُس وقت تک رہتی ہیں جب تک آپ فولڈر کو بھلا کر اس کی فائلیں نہ مٹا دیں۔",
   "archiveCard.attachmentsNotice": "آرکائیو صحت کا نوشتہ رکھتا ہے، منسلک دستاویزات نہیں؛ وہ آپ کے بیک اپ فولڈر میں رہتی ہیں۔",
   "readDocumentDialog.keepOriginals": "اصل صفحات اندراج کے ساتھ رکھیں",
-  "readDocumentDialog.keepOriginalsHint": "فائلیں اسی آلے پر رہتی ہیں۔ ماڈل کو صرف اوپر درج صفحات بھیجے جاتے ہیں۔"
+  "readDocumentDialog.keepOriginalsHint": "فائلیں اسی آلے پر رہتی ہیں۔ ماڈل کو صرف اوپر درج صفحات بھیجے جاتے ہیں۔",
+  "app.tabFamily": "تلاش",
+  "app.tabSettings": "ترتیبات"
 }

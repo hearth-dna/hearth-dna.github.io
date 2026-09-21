@@ -635,5 +635,7 @@
   "eraseDialog.attachmentsNotice": "संलग्न दस्तावेज़ भी इस उपकरण से मिट जाते हैं। बैकअप फ़ोल्डर की नक़लें तब तक रहती हैं जब तक आप फ़ोल्डर भुलाकर उसकी फ़ाइलें न मिटा दें।",
   "archiveCard.attachmentsNotice": "संग्रह स्वास्थ्य लॉग रखता है, संलग्न दस्तावेज़ नहीं; वे आपके बैकअप फ़ोल्डर में रहते हैं।",
   "readDocumentDialog.keepOriginals": "मूल पृष्ठ प्रविष्टि के साथ रखें",
-  "readDocumentDialog.keepOriginalsHint": "फ़ाइलें इसी उपकरण पर रहती हैं। मॉडल को केवल ऊपर सूचीबद्ध पृष्ठ भेजे जाते हैं।"
+  "readDocumentDialog.keepOriginalsHint": "फ़ाइलें इसी उपकरण पर रहती हैं। मॉडल को केवल ऊपर सूचीबद्ध पृष्ठ भेजे जाते हैं।",
+  "app.tabFamily": "खोज",
+  "app.tabSettings": "सेटिंग्स"
 }

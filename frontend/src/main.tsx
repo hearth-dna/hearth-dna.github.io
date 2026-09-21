@@ -2,6 +2,7 @@ import { registerSW } from 'virtual:pwa-register'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { App } from './App'
+import { detectPlatform } from './app/platform'
 import { I18nProvider } from './i18n/context'
 import './styles.css'
 
@@ -12,6 +13,8 @@ if (window.top !== window.self) {
   document.body.textContent = 'Hearth cannot run inside a frame.'
   throw new Error('refusing to run in a frame')
 }
+
+document.documentElement.dataset.platform = detectPlatform(navigator.userAgent, navigator.maxTouchPoints)
 
 registerSW({ immediate: true })
 

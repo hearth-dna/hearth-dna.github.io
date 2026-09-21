@@ -635,5 +635,7 @@
   "eraseDialog.attachmentsNotice": "Ekli belgeler de bu aygıttan silinir. Yedek klasöründeki kopyalar, siz klasörü unutup dosyalarını silene dek kalır.",
   "archiveCard.attachmentsNotice": "Arşiv sağlık günlüğünü taşır ama ekli belgeleri taşımaz; onlar yedek klasörünüzde durur.",
   "readDocumentDialog.keepOriginals": "Özgün sayfaları kayıtla birlikte sakla",
-  "readDocumentDialog.keepOriginalsHint": "Dosyalar bu aygıtta kalır. Modele yalnızca yukarıda listelenen sayfalar gönderilir."
+  "readDocumentDialog.keepOriginalsHint": "Dosyalar bu aygıtta kalır. Modele yalnızca yukarıda listelenen sayfalar gönderilir.",
+  "app.tabFamily": "Ara",
+  "app.tabSettings": "Ayarlar"
 }

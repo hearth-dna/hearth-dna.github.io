@@ -635,5 +635,7 @@
   "eraseDialog.attachmentsNotice": "Angehängte Dokumente werden ebenfalls von diesem Gerät gelöscht. Kopien in einem Backup-Ordner bleiben, bis Sie den Ordner vergessen und seine Dateien löschen.",
   "archiveCard.attachmentsNotice": "Das Archiv enthält das Gesundheitstagebuch, aber nicht die angehängten Dokumente; die liegen in Ihrem Backup-Ordner.",
   "readDocumentDialog.keepOriginals": "Originalseiten beim Eintrag behalten",
-  "readDocumentDialog.keepOriginalsHint": "Die Dateien bleiben auf diesem Gerät. Nur die oben aufgeführten Seiten werden an das Modell gesendet."
+  "readDocumentDialog.keepOriginalsHint": "Die Dateien bleiben auf diesem Gerät. Nur die oben aufgeführten Seiten werden an das Modell gesendet.",
+  "app.tabFamily": "Suche",
+  "app.tabSettings": "Einstellungen"
 }

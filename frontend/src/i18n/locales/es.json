@@ -635,5 +635,7 @@
   "eraseDialog.attachmentsNotice": "Los documentos adjuntos también se borran de este dispositivo. Las copias en una carpeta de copias permanecen hasta que olvide la carpeta y elimine sus archivos.",
   "archiveCard.attachmentsNotice": "El archivo incluye el diario de salud, pero no los documentos adjuntos; esos están en su carpeta de copias.",
   "readDocumentDialog.keepOriginals": "Conservar las páginas originales con la entrada",
-  "readDocumentDialog.keepOriginalsHint": "Los archivos se quedan en este dispositivo. Solo se envían al modelo las páginas listadas arriba."
+  "readDocumentDialog.keepOriginalsHint": "Los archivos se quedan en este dispositivo. Solo se envían al modelo las páginas listadas arriba.",
+  "app.tabFamily": "Buscar",
+  "app.tabSettings": "Ajustes"
 }

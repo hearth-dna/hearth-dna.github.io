@@ -5,9 +5,10 @@ import WebKit
 /// The web view, and the two things a web app cannot do for itself on iOS: open a link outside
 /// itself, and hand the user a file.
 ///
-/// It deliberately does *not* ignore the safe area. The web app lays out for the viewport it is
-/// given and knows nothing about the notch or the home indicator, so SwiftUI's default inset is
-/// exactly right (the Android shell insets its WebView for the same reason).
+/// It draws edge to edge (see HearthApp) and leaves the safe area to the page: the web app sets
+/// `viewport-fit=cover` and pads its own translucent top bar and tab bar with
+/// `env(safe-area-inset-*)`, so content scrolls under the status bar and home indicator the way it
+/// does in a native iOS app. For that, the scroll view must not add the same insets a second time.
 struct WebAppView: UIViewRepresentable {
     let url: URL
 
@@ -24,6 +25,12 @@ struct WebAppView: UIViewRepresentable {
         web.navigationDelegate = context.coordinator
         web.allowsBackForwardNavigationGestures = true
         web.allowsLinkPreview = false
+        web.scrollView.contentInsetAdjustmentBehavior = .never
+        // The page's own background (the launch colour is the same one), so the frames before the
+        // first paint are not white in dark mode.
+        web.isOpaque = false
+        web.backgroundColor = UIColor(named: "LaunchBackground")
+        web.scrollView.backgroundColor = UIColor(named: "LaunchBackground")
         #if DEBUG
         // Safari's Web Inspector, debug builds only. The web app's own console is the only way to
         // see what the database worker is doing.

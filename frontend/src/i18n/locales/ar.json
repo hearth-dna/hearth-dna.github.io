@@ -635,5 +635,7 @@
   "eraseDialog.attachmentsNotice": "تُمحى المستندات المرفقة من هذا الجهاز أيضًا. تبقى النسخ في مجلد النسخ الاحتياطي حتى تنسى المجلد وتحذف ملفاته.",
   "archiveCard.attachmentsNotice": "يحمل الأرشيف سجل الصحة، لا المستندات المرفقة؛ فتلك تبقى في مجلد النسخ الاحتياطي.",
   "readDocumentDialog.keepOriginals": "احتفظ بالصفحات الأصلية مع المدخل",
-  "readDocumentDialog.keepOriginalsHint": "تبقى الملفات على هذا الجهاز. ولا يُرسل إلى النموذج سوى الصفحات المذكورة أعلاه."
+  "readDocumentDialog.keepOriginalsHint": "تبقى الملفات على هذا الجهاز. ولا يُرسل إلى النموذج سوى الصفحات المذكورة أعلاه.",
+  "app.tabFamily": "بحث",
+  "app.tabSettings": "الإعدادات"
 }

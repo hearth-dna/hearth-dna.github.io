@@ -18,8 +18,16 @@ What is left for a shell is small, and each piece has a reason it cannot be done
 | Serving the app | `WebViewAssetLoader`, `https://appassets.androidplatform.net/` | `LocalWebServer.swift`, `http://127.0.0.1:17800/` |
 | Picking a file to import | `WebChromeClient.onShowFileChooser` | nothing — WKWebView does it |
 | Saving an export | `Downloads.kt` → MediaStore | `WKDownload` → the share sheet |
-| Screen fit | window insets on the container view | SwiftUI's safe area |
+| Screen fit | edge to edge; insets (bars, cutout, keyboard) pad the container, painted in the web app's bar colour | edge to edge; the page pads itself with `env(safe-area-inset-*)` |
 | Links off-origin | `shouldOverrideUrlLoading` → browser | `decidePolicyFor` → Safari |
+
+## Look and feel
+
+The native feel is web work, in `frontend/src/styles.css` (the phone layer at ≤ 640px): a compact
+top bar, a bottom tab bar (`components/TabBar.tsx`), 44pt/48dp touch targets, dialogs as bottom
+sheets. `app/platform.ts` puts `data-platform="ios|android"` on `<html>`, so the same build draws a
+translucent iOS tab bar on an iPhone and a Material 3 navigation bar on Android. The shells' only
+part is to get out of the way: draw edge to edge, and match the bars and launch colours.
 
 ## Build and run
 

@@ -635,5 +635,7 @@
   "eraseDialog.attachmentsNotice": "Dokumen lampiran juga terhapus dari perangkat ini. Salinan di folder cadangan tetap ada sampai Anda melupakan folder itu dan menghapus berkasnya.",
   "archiveCard.attachmentsNotice": "Arsip membawa catatan kesehatan, tetapi bukan dokumen lampiran; dokumen itu ada di folder cadangan Anda.",
   "readDocumentDialog.keepOriginals": "Simpan halaman asli bersama catatan",
-  "readDocumentDialog.keepOriginalsHint": "Berkas tetap di perangkat ini. Hanya halaman yang tercantum di atas yang dikirim ke model."
+  "readDocumentDialog.keepOriginalsHint": "Berkas tetap di perangkat ini. Hanya halaman yang tercantum di atas yang dikirim ke model.",
+  "app.tabFamily": "Cari",
+  "app.tabSettings": "Setelan"
 }

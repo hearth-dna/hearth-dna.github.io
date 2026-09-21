@@ -76,13 +76,15 @@ export function PeoplePage({ onOpen }: { onOpen: (id: string) => void }) {
       <h1>{t('peoplePage.title')}</h1>
       <div className="card">
         <h2>{t('peoplePage.addPerson')}</h2>
-        <div className="row">
+        <div className="row form">
           <label className="field">
             {t('peoplePage.shortLabel')}
             <input
               value={form.label}
               onChange={(e) => setForm({ ...form, label: e.target.value })}
               placeholder={t('peoplePage.shortLabelPlaceholder')}
+              autoComplete="off"
+              autoCapitalize="none"
             />
           </label>
           <label className="field">
@@ -91,6 +93,7 @@ export function PeoplePage({ onOpen }: { onOpen: (id: string) => void }) {
               value={form.displayName}
               onChange={(e) => setForm({ ...form, displayName: e.target.value })}
               placeholder={t('peoplePage.displayNamePlaceholder')}
+              autoComplete="off"
             />
           </label>
           <label className="field">
@@ -105,7 +108,8 @@ export function PeoplePage({ onOpen }: { onOpen: (id: string) => void }) {
               value={form.birthYear}
               onChange={(e) => setForm({ ...form, birthYear: e.target.value })}
               placeholder={t('peoplePage.birthYearPlaceholder')}
-              style={{ width: '6rem' }}
+              inputMode="numeric"
+              className="year"
             />
           </label>
           <button type="button" className="primary" onClick={submit}>
@@ -269,7 +273,12 @@ function PersonCard({
           </label>
           <label className="field">
             {t('peoplePage.birthYear')}
-            <input value={edit.birthYear} onChange={(e) => setEdit({ ...edit, birthYear: e.target.value })} />
+            <input
+              value={edit.birthYear}
+              inputMode="numeric"
+              className="year"
+              onChange={(e) => setEdit({ ...edit, birthYear: e.target.value })}
+            />
           </label>
           <button type="button" className="primary" onClick={saveEdit}>
             {t('common.save')}
@@ -336,7 +345,7 @@ function PersonCard({
           </button>
         ))}
       </div>
-      <div className="row" style={{ marginTop: '0.6rem' }}>
+      <div className="row actions">
         <button type="button" className="primary" onClick={onImport}>
           {t('peoplePage.importDna')}
         </button>

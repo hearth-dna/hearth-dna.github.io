@@ -635,5 +635,7 @@
   "eraseDialog.attachmentsNotice": "Załączone dokumenty również znikną z tego urządzenia. Kopie w folderze kopii zapasowej zostają, dopóki nie zapomnisz folderu i nie usuniesz jego plików.",
   "archiveCard.attachmentsNotice": "Archiwum zawiera dziennik zdrowia, ale nie załączone dokumenty; te są w folderze kopii zapasowej.",
   "readDocumentDialog.keepOriginals": "Zachowaj oryginalne strony przy wpisie",
-  "readDocumentDialog.keepOriginalsHint": "Pliki zostają na tym urządzeniu. Do modelu trafiają tylko strony wymienione powyżej."
+  "readDocumentDialog.keepOriginalsHint": "Pliki zostają na tym urządzeniu. Do modelu trafiają tylko strony wymienione powyżej.",
+  "app.tabFamily": "Szukaj",
+  "app.tabSettings": "Ustawienia"
 }

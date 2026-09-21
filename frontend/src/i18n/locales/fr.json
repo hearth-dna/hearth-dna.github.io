@@ -635,5 +635,7 @@
   "eraseDialog.attachmentsNotice": "Les documents joints sont également effacés de cet appareil. Les copies dans un dossier de sauvegarde restent jusqu'à ce que vous oubliiez le dossier et supprimiez ses fichiers.",
   "archiveCard.attachmentsNotice": "L'archive contient le journal de santé, mais pas les documents joints ; ceux-ci restent dans votre dossier de sauvegarde.",
   "readDocumentDialog.keepOriginals": "Conserver les pages d'origine avec l'entrée",
-  "readDocumentDialog.keepOriginalsHint": "Les fichiers restent sur cet appareil. Seules les pages listées ci-dessus sont envoyées au modèle."
+  "readDocumentDialog.keepOriginalsHint": "Les fichiers restent sur cet appareil. Seules les pages listées ci-dessus sont envoyées au modèle.",
+  "app.tabFamily": "Recherche",
+  "app.tabSettings": "Réglages"
 }

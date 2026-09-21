@@ -73,6 +73,13 @@ targets:
           - UIInterfaceOrientationPortrait
           - UIInterfaceOrientationLandscapeLeft
           - UIInterfaceOrientationLandscapeRight
+        # iPad gets all four: the App Store requires it for Split View and Stage Manager unless the
+        # app opts out of multitasking, and a record-keeping app has no reason to.
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
         # The app talks to one server: its own, on 127.0.0.1, over plain HTTP, because that is the
         # only way to give the web app a trustworthy origin (see LocalWebServer.swift). This is the
         # narrow key — it permits cleartext to local hosts only and leaves the public internet

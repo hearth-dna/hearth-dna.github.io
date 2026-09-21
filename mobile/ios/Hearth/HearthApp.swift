@@ -33,7 +33,11 @@ struct HearthApp: App {
     var body: some Scene {
         WindowGroup {
             if let server {
+                // Edge to edge, keyboard included: the page pads itself with env(safe-area-inset-*),
+                // and WKWebView scrolls a focused field above the keyboard on its own.
                 WebAppView(url: server.url)
+                    .ignoresSafeArea()
+                    .background(Color("LaunchBackground").ignoresSafeArea())
             } else if let failure {
                 FailureView(failure: failure)
             }

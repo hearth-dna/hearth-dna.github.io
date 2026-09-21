@@ -635,5 +635,7 @@
   "eraseDialog.attachmentsNotice": "Anche i documenti allegati vengono cancellati da questo dispositivo. Le copie in una cartella di backup restano finché non dimenticate la cartella e ne eliminate i file.",
   "archiveCard.attachmentsNotice": "L'archivio contiene il diario di salute, ma non i documenti allegati: quelli restano nella cartella di backup.",
   "readDocumentDialog.keepOriginals": "Conserva le pagine originali insieme alla voce",
-  "readDocumentDialog.keepOriginalsHint": "I file restano su questo dispositivo. Al modello vengono inviate solo le pagine elencate sopra."
+  "readDocumentDialog.keepOriginalsHint": "I file restano su questo dispositivo. Al modello vengono inviate solo le pagine elencate sopra.",
+  "app.tabFamily": "Cerca",
+  "app.tabSettings": "Impostazioni"
 }

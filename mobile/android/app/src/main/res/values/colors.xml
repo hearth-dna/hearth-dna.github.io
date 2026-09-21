@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Both from frontend/src/styles.css (the bg custom property) and the PWA manifest theme_color. -->
+    <!-- Both from frontend/src/styles.css: the page background (bg) and the top and navigation
+         bars (bar-solid), which the system bars continue edge to edge. -->
     <color name="window_background">#faf8f4</color>
+    <color name="bar_background">#ffffff</color>
     <color name="hearth_green">#1f4d3a</color>
 </resources>

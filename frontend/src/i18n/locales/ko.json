@@ -635,5 +635,7 @@
   "eraseDialog.attachmentsNotice": "첨부 문서도 이 기기에서 지워집니다. 백업 폴더의 사본은 폴더를 잊고 그 파일을 지울 때까지 남습니다.",
   "archiveCard.attachmentsNotice": "아카이브에는 건강 기록은 담기지만 첨부 문서는 담기지 않습니다. 그것들은 백업 폴더에 있습니다.",
   "readDocumentDialog.keepOriginals": "원본 페이지를 기록과 함께 보관",
-  "readDocumentDialog.keepOriginalsHint": "파일은 이 기기에 남습니다. 모델에는 위에 나열된 페이지만 전송됩니다."
+  "readDocumentDialog.keepOriginalsHint": "파일은 이 기기에 남습니다. 모델에는 위에 나열된 페이지만 전송됩니다.",
+  "app.tabFamily": "검색",
+  "app.tabSettings": "설정"
 }

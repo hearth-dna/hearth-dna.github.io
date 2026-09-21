@@ -635,5 +635,7 @@
   "eraseDialog.attachmentsNotice": "附件文档也会从本设备清除。备份文件夹中的副本会一直保留，直到你忘记该文件夹并删除其中的文件。",
   "archiveCard.attachmentsNotice": "存档包含健康日志，但不含附件文档；那些留在你的备份文件夹里。",
   "readDocumentDialog.keepOriginals": "把原始页面随记录一起保留",
-  "readDocumentDialog.keepOriginalsHint": "文件留在本设备上。只有上面列出的页面会发送给模型。"
+  "readDocumentDialog.keepOriginalsHint": "文件留在本设备上。只有上面列出的页面会发送给模型。",
+  "app.tabFamily": "查询",
+  "app.tabSettings": "设置"
 }

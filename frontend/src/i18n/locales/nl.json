@@ -635,5 +635,7 @@
   "eraseDialog.attachmentsNotice": "Bijgevoegde documenten worden ook van dit apparaat gewist. Kopieën in een back-upmap blijven staan tot je de map vergeet en haar bestanden verwijdert.",
   "archiveCard.attachmentsNotice": "Het archief bevat het gezondheidslogboek, maar niet de bijgevoegde documenten; die staan in je back-upmap.",
   "readDocumentDialog.keepOriginals": "Originele pagina's bij de notitie bewaren",
-  "readDocumentDialog.keepOriginalsHint": "De bestanden blijven op dit apparaat. Alleen de hierboven genoemde pagina's gaan naar het model."
+  "readDocumentDialog.keepOriginalsHint": "De bestanden blijven op dit apparaat. Alleen de hierboven genoemde pagina's gaan naar het model.",
+  "app.tabFamily": "Zoeken",
+  "app.tabSettings": "Instellingen"
 }

@@ -3,17 +3,23 @@ package com.hearth
 import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
+import android.view.Gravity
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.SystemBarStyle
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.webkit.WebViewCompat
 
 /**
@@ -42,6 +48,15 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Edge to edge, as Android 15 expects, with transparent bars whose icons follow the
+        // light/dark theme. The strips behind them are painted by the container below in the web
+        // app's own bar colour, so the status bar reads as part of its top bar and the gesture
+        // area as part of its navigation bar.
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT),
+            navigationBarStyle = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT),
+        )
+        window.isNavigationBarContrastEnforced = false
 
         // The engine, not the OS, is what has to be new enough: the database uses OPFS synchronous
         // access handles, which arrived in Chromium 108. An older WebView would fall back to the
@@ -51,22 +66,28 @@ class MainActivity : AppCompatActivity() {
         if (engine != null && engine < MIN_WEBVIEW_MAJOR) {
             setContentView(TextView(this).apply {
                 text = getString(R.string.webview_too_old, engine, MIN_WEBVIEW_MAJOR)
-                setPadding(48, 48, 48, 48)
+                setTextAppearance(android.R.style.TextAppearance_Material_Body1)
+                gravity = Gravity.CENTER
+                val pad = (24 * resources.displayMetrics.density).toInt()
+                setPadding(pad, pad, pad, pad)
+                fitInsets(this, pad)
             })
             return
         }
 
         web = HearthWebView.create(this, ::openExternally)
 
-        // The web app lays out for the viewport it is given and knows nothing about status bars or
-        // gesture handles; without this its first heading sits under the clock. The insets are
-        // applied to a plain container rather than to the WebView itself, because a WebView paints
-        // its document across its whole bounds and ignores its own padding.
+        // The web app lays out for the viewport it is given and knows nothing about status bars,
+        // gesture handles or the keyboard; without this its top bar sits under the clock. The
+        // insets are applied to a plain container rather than to the WebView itself, because a
+        // WebView paints its document across its whole bounds and ignores its own padding. The
+        // container is painted in the web app's bar colour (colors.xml), which is what shows
+        // through the transparent system bars.
         val root = FrameLayout(this).apply {
-            fitsSystemWindows = true
-            setBackgroundColor(ContextCompat.getColor(this@MainActivity, R.color.window_background))
+            setBackgroundColor(ContextCompat.getColor(this@MainActivity, R.color.bar_background))
             addView(web, FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
         }
+        fitInsets(root, 0)
         setContentView(root)
 
         web.webChromeClient = object : WebChromeClient() {
@@ -115,6 +136,26 @@ class MainActivity : AppCompatActivity() {
         pendingFileChooser = null
         if (::web.isInitialized) web.destroy()
         super.onDestroy()
+    }
+
+    /**
+     * Pads [view] clear of the system bars, the display cutout and — since edge to edge turns off
+     * `adjustResize` — the keyboard, so a focused field is never hidden behind it.
+     */
+    private fun fitInsets(view: android.view.View, extra: Int) {
+        ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
+            val bars = insets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            )
+            val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
+            v.setPadding(
+                bars.left + extra,
+                bars.top + extra,
+                bars.right + extra,
+                maxOf(bars.bottom, ime.bottom) + extra,
+            )
+            WindowInsetsCompat.CONSUMED
+        }
     }
 
     /** Links that leave the app's own origin open in the browser, never inside the shell. */

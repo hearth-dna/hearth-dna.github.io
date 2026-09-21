@@ -7,6 +7,7 @@ import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.webkit.WebViewAssetLoader
 
 /**
@@ -34,6 +35,8 @@ object HearthWebView {
             .build()
 
         return WebView(activity).apply {
+            // The page's own background, so the frames before the first paint are not white.
+            setBackgroundColor(ContextCompat.getColor(activity, R.color.window_background))
             settings.javaScriptEnabled = true
             settings.domStorageEnabled = true
             // Nothing outside `assets/web/` is ever needed, and a WebView that can read the

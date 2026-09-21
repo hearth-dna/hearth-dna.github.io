@@ -14,6 +14,7 @@ import { PersonPage } from './components/PersonPage'
 import { SettingsPage } from './components/SettingsPage'
 import { StartupScreen } from './components/StartupScreen'
 import { SyncButton } from './components/SyncButton'
+import { TabBar } from './components/TabBar'
 import { hasConsent } from './consent/consent'
 import { Database } from './db/db'
 import { genotypeCounts, listPersons, listRelationships } from './db/repo'
@@ -159,7 +160,7 @@ export function App() {
                 : t('app.storageMemory'),
           })}
         </span>
-        <button type="button" className="danger small" onClick={() => setErasing(true)}>
+        <button type="button" className="danger small erase" onClick={() => setErasing(true)}>
           {t('app.eraseData')}
         </button>
       </header>
@@ -176,6 +177,7 @@ export function App() {
         {page.name === 'ask' && <AskPage />}
         {page.name === 'settings' && <SettingsPage />}
       </main>
+      <TabBar page={page} onPage={setPage} />
     </AppContext.Provider>
   )
 }
