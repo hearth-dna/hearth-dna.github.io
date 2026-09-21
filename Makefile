@@ -106,6 +106,16 @@ ANDROID_RELEASE_ENV = HEARTH_APPLICATION_ID=$(ANDROID_APP_ID) \
 	RELEASE_KEY_ALIAS=$(ANDROID_KEY_ALIAS) \
 	RELEASE_KEY_PASSWORD=$(ANDROID_KEY_PASSWORD)
 
+# adb refuses to guess when more than one transport is attached, and an emulator that died leaves an
+# `offline` one behind that still counts. Pick the single device that is actually online, or the one
+# named by ANDROID_SERIAL, and export it so every adb call in the recipe goes to the same device.
+define adb_device
+	set -- $${ANDROID_SERIAL:-$$(adb devices | awk 'NR > 1 && $$2 == "device" { print $$1 }')}; \
+	if [ $$# -eq 0 ]; then echo "Error: no device — connect one and enable USB debugging"; exit 1; fi; \
+	if [ $$# -gt 1 ]; then echo "Error: $$# devices online ($$*) — choose one with ANDROID_SERIAL=<serial>"; exit 1; fi; \
+	export ANDROID_SERIAL=$$1
+endef
+
 define require_var
 	@if [ -z "$(2)" ]; then \
 		echo "Error: $(1) is not set — see docs/runbook/store-release.md"; exit 1; \
@@ -125,10 +135,12 @@ android-build: mobile-web ## Build the debug APK without installing
 	cd $(ANDROID_DIR) && HEARTH_APPLICATION_ID=$(ANDROID_APP_ID) $(GRADLE) :app:assembleDebug
 	@echo "APK: $(ANDROID_DIR)/app/build/outputs/apk/debug/app-debug.apk"
 
-android-install: android-build ## Build and install the debug app on a connected device
-	@adb get-state >/dev/null 2>&1 || { echo "Error: no device — connect one and enable USB debugging"; exit 1; }
-	adb install -r $(ANDROID_DIR)/app/build/outputs/apk/debug/app-debug.apk
-	adb shell monkey -p $(ANDROID_APP_ID).debug -c android.intent.category.LAUNCHER 1 >/dev/null
+android-install: android-build ## Build and install the debug app on a connected device (ANDROID_SERIAL= picks one of several)
+	@$(adb_device); \
+	echo "Installing on $$ANDROID_SERIAL"; \
+	adb install -r $(ANDROID_DIR)/app/build/outputs/apk/debug/app-debug.apk && \
+	{ adb shell monkey -p $(ANDROID_APP_ID).debug -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1 || \
+	  { echo "Error: installed, but could not launch $(ANDROID_APP_ID).debug"; exit 1; }; }
 
 android-test: ## Run the shell's unit tests (JVM, no device, no web build needed)
 	cd $(ANDROID_DIR) && $(GRADLE) :app:testDebugUnitTest
@@ -137,6 +149,7 @@ android-lint: ## Run Android Lint on the shell
 	cd $(ANDROID_DIR) && $(GRADLE) :app:lintDebug
 
 android-logs: ## Follow the app's logs (requires a connected device)
+	@$(adb_device); \
 	adb logcat --pid=$$(adb shell pidof -s $(ANDROID_APP_ID).debug)
 
 android-clean: ## Clean Android build artifacts and the copied web build
