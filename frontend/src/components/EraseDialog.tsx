@@ -46,6 +46,7 @@ export function EraseDialog({ onClose }: { onClose: () => void }) {
       <h2 style={{ marginTop: 0 }}>{t('eraseDialog.title')}</h2>
       <p>{t('eraseDialog.intro')}</p>
       <div className="notice">{rich(t('eraseDialog.exportFirst'))}</div>
+      <p className="muted">{t('eraseDialog.attachmentsNotice')}</p>
       <div className="row">
         <label className="field">
           {t('eraseDialog.passphrase')}

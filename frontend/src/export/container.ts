@@ -44,6 +44,8 @@ export interface Journal {
   source_files: unknown[]
   consents: unknown[]
   health_log: unknown[]
+  /** Metadata only. The bytes travel beside the snapshot, see backup/mirror (added after v2). */
+  attachments?: unknown[]
   notes: unknown[]
   chats: unknown[]
   sharing_log: unknown[]

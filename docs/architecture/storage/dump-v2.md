@@ -57,7 +57,11 @@ Genome blobs are cached in OPFS under a separate directory (`hearth-<profile>-fi
 `genome-<sha256 of the text>.gz`), written at import time and on restore, keyed by the sha256 the
 `source_file` row already stores. A person imported before that gets a generic-format file rebuilt and
 gzipped inside the worker once, cached as `generic-<person>-<rows>.gz` (the row count invalidates it
-after a new import). `pruneGenomeBlobs` drops orphans after delete, revoke, erase and import. Not a SQLite
+after a new import). Documents attached to health log entries live in the same directory as `att-<sha256>.bin`, and
+travel to the backup folder as sidecars rather than inside the container (see `backup-folder.md`);
+the journal carries their rows only, so the autosave cost above is unchanged. `pruneBlobs` drops
+orphans of either kind after delete, revoke, erase and import — it builds the whole keep-set
+before deleting anything, because a half-built set would take live files with it. Not a SQLite
 table, so ADR 0001's "no blob tables" spirit holds and the SAH pool directory stays untouched.
 When a person or source file is deleted the blob goes with it (same revoke path). If a blob is
 missing (imported before v2), the worker reconstructs a provider-style text from the genotype

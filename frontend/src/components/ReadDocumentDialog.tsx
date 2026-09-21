@@ -48,7 +48,7 @@ export function ReadDocumentDialog({
   onClose,
 }: {
   person: Person
-  onDraft: (d: HealthDraft, source: string) => void
+  onDraft: (d: HealthDraft, source: string, files?: File[]) => void
   onClose: () => void
 }) {
   const { db } = useApp()
@@ -60,6 +60,7 @@ export function ReadDocumentDialog({
   const [newKey, setNewKey] = useState('')
   const [model, setModel] = useState(GEMINI_DEFAULT_MODEL)
   const [consented, setConsented] = useState(false)
+  const [keepOriginals, setKeepOriginals] = useState(true)
   const [stage, setStage] = useState<Stage>({ s: 'pick' })
 
   useEffect(() => {
@@ -100,7 +101,7 @@ export function ReadDocumentDialog({
       )
       await logSharing(db, 'document', `gemini:${usedModel}`, JSON.stringify(meta, null, 2))
       const draft = draftFromJson(text, new Date().toISOString().slice(0, 10))
-      onDraft(draft, `gemini:${usedModel}:${hashes.join('+')}`)
+      onDraft(draft, `gemini:${usedModel}:${hashes.join('+')}`, keepOriginals ? files : undefined)
       ref.current?.close()
     } catch (e) {
       setStage({ s: 'error', message: String(e) })
@@ -162,6 +163,17 @@ export function ReadDocumentDialog({
               </li>
             ))}
           </ul>
+          <label className="field">
+            <span>
+              <input
+                type="checkbox"
+                checked={keepOriginals}
+                onChange={(e) => setKeepOriginals(e.target.checked)}
+              />{' '}
+              {t('readDocumentDialog.keepOriginals')}
+            </span>
+          </label>
+          <p className="muted">{t('readDocumentDialog.keepOriginalsHint')}</p>
           <div className="row">
             <button type="button" className="primary" disabled={stage.s === 'sending'} onClick={send}>
               {stage.s === 'sending' ? t('readDocumentDialog.sending') : t('readDocumentDialog.send')}

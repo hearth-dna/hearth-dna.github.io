@@ -1,0 +1,13 @@
+{
+  "attachments.add": "Keep the original files",
+  "attachments.addHint": "Images or PDFs, up to 25 MB each. They stay on this device and are copied to your backup folder.",
+  "attachments.remove": "Remove",
+  "attachments.missingBytes": "not on this device",
+  "attachments.confirmDelete": "Delete {name}? The file is removed from this device.",
+  "attachments.badType": "{name} is not an image or a PDF.",
+  "attachments.tooBig": "{name} is larger than {max} MB.",
+  "attachments.tooMany": "At most {max} files per entry.",
+  "attachments.noSpace": "There is not enough room left in this browser for that file.",
+  "attachments.saveFailed": "The entry was saved, but {name} could not be stored.",
+  "attachments.notPersistent": "This browser is not keeping data on disk, so files cannot be stored with an entry."
+}

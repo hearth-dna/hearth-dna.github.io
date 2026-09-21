@@ -44,7 +44,7 @@ export async function buildSnapshot(db: Database, appVersion: string): Promise<C
         })
     } else {
       // Rebuilt once in the worker and cached; the name carries the row count, so a later import
-      // for this person produces a fresh file and pruneGenomeBlobs drops the stale one.
+      // for this person produces a fresh file and pruneBlobs drops the stale one.
       const name = rebuiltBlobName(p.id, rows)
       let bytes = await db.fileGet(name)
       if (!bytes) {
@@ -76,6 +76,7 @@ export async function buildSnapshot(db: Database, appVersion: string): Promise<C
       source_files: await db.query('SELECT * FROM source_file'),
       consents: await listConsents(db),
       health_log: await db.query('SELECT * FROM health_log'),
+      attachments: await db.query('SELECT * FROM attachment'),
       notes: await db.query('SELECT * FROM note'),
       chats: await db.query('SELECT * FROM chat'),
       sharing_log: await db.query('SELECT kind, destination, payload, created_at FROM sharing_log'),

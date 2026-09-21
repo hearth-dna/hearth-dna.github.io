@@ -117,7 +117,7 @@ describe('tables', () => {
       unit: '',
       createdAt: 'c',
     }
-    const t = healthTable([{ person: person('1', 'me', 'Me'), entries: [e] }])
+    const t = healthTable([{ person: person('1', 'me', 'Me'), entries: [e] }], { [e.id]: 2 })
     expect(t.rows[0]).toEqual([
       'Me',
       '2026-01-02',
@@ -132,6 +132,7 @@ describe('tables', () => {
       'migraine; stress',
       '',
       'mild',
+      2, // attachments: the count, never the file names
       'c',
     ])
   })

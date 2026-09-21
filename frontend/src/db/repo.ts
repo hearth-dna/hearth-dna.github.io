@@ -1,5 +1,6 @@
+import { attachmentBlobName } from '../attachments/file'
 import { formatTags, normTime, parseTags } from '../health/log'
-import type { Call, HealthEntry, HealthKind, Person, Provider, Sex, SourceFile } from '../types'
+import type { Attachment, Call, HealthEntry, HealthKind, Person, Provider, Sex, SourceFile } from '../types'
 import type { Database, Row } from './db'
 
 export function newId(): string {
@@ -50,7 +51,7 @@ export async function updatePerson(
 
 export async function deletePerson(db: Database, id: string): Promise<void> {
   await db.exec('DELETE FROM person WHERE id = ?', [id])
-  await pruneGenomeBlobs(db)
+  await pruneBlobs(db)
 }
 
 function rowToPerson(r: Row): Person {
@@ -129,13 +130,20 @@ export const genomeBlobName = (sha256OfText: string) => `genome-${sha256OfText}.
  */
 export const rebuiltBlobName = (personId: string, rows: number) => `generic-${personId}-${rows}.gz`
 
-/** Drops cached genome files nothing refers to any more (after delete, revoke, erase, re-import). */
-export async function pruneGenomeBlobs(db: Database): Promise<void> {
+/**
+ * Drops cached files nothing refers to any more (after delete, revoke, erase, re-import): genome
+ * originals, rebuilt genomes and attached documents.
+ *
+ * The whole keep-set is built before the first delete on purpose. A query that throws here must
+ * abort the sweep rather than leave it deleting against a half-built set — that is the one way
+ * this function could destroy a file the user still has a row for.
+ */
+export async function pruneBlobs(db: Database): Promise<void> {
   const keep = new Set((await listSourceFiles(db)).map((s) => genomeBlobName(s.sha256)))
   for (const [pid, n] of Object.entries(await genotypeCounts(db))) keep.add(rebuiltBlobName(pid, n))
+  for (const sha of await attachmentShas(db)) keep.add(attachmentBlobName(sha))
   for (const name of await db.fileList()) {
-    if ((name.startsWith('genome-') || name.startsWith('generic-')) && !keep.has(name))
-      await db.fileDelete(name)
+    if (/^(genome-|generic-|att-)/.test(name) && !keep.has(name)) await db.fileDelete(name)
   }
 }
 
@@ -374,6 +382,79 @@ export async function addHealthEntry(
 
 export async function deleteHealthEntry(db: Database, id: string): Promise<void> {
   await db.exec('DELETE FROM health_log WHERE id=?', [id])
+  // The attachment rows go with the entry (ON DELETE CASCADE); their blobs need collecting.
+  await pruneBlobs(db)
+}
+
+// ---- attachments ---------------------------------------------------------------------------
+
+function rowToAttachment(r: Row): Attachment {
+  return {
+    id: r.id as string,
+    healthLogId: r.health_log_id as string,
+    personId: r.person_id as string,
+    sha256: r.sha256 as string,
+    mime: r.mime as string,
+    bytes: r.bytes as number,
+    name: r.name as string,
+    createdAt: r.created_at as string,
+  }
+}
+
+/** Every entry's attachments in one query, keyed by entry id; entries with none are absent. */
+export async function listAttachments(
+  db: Database,
+  entryIds: string[],
+): Promise<Record<string, Attachment[]>> {
+  const out: Record<string, Attachment[]> = {}
+  for (let i = 0; i < entryIds.length; i += 500) {
+    const slice = entryIds.slice(i, i + 500)
+    const rows = await db.query(
+      `SELECT * FROM attachment WHERE health_log_id IN (${slice.map(() => '?').join(',')})
+       ORDER BY created_at`,
+      slice,
+    )
+    for (const r of rows) {
+      const a = rowToAttachment(r)
+      const list = out[a.healthLogId]
+      if (list) list.push(a)
+      else out[a.healthLogId] = [a]
+    }
+  }
+  return out
+}
+
+export async function insertAttachment(db: Database, a: Attachment): Promise<void> {
+  await db.exec(
+    'INSERT INTO attachment(id,health_log_id,person_id,sha256,mime,bytes,name,created_at) VALUES (?,?,?,?,?,?,?,?)',
+    [a.id, a.healthLogId, a.personId, a.sha256, a.mime, a.bytes, a.name, a.createdAt],
+  )
+}
+
+export async function deleteAttachment(db: Database, id: string): Promise<void> {
+  await db.exec('DELETE FROM attachment WHERE id=?', [id])
+}
+
+/** Every distinct blob an attachment row refers to: the prune keep-set and the mirror's wanted set. */
+export async function attachmentShas(db: Database): Promise<string[]> {
+  const rows = await db.query('SELECT DISTINCT sha256 FROM attachment ORDER BY sha256')
+  return rows.map((r) => r.sha256 as string)
+}
+
+/** Rows, distinct blobs and the bytes those blobs occupy (a document attached twice counts once). */
+export async function countAttachments(
+  db: Database,
+): Promise<{ rows: number; blobs: number; bytes: number }> {
+  const row = await db.one(
+    `SELECT (SELECT COUNT(*) FROM attachment) AS rows,
+            COUNT(*) AS blobs, COALESCE(SUM(bytes), 0) AS bytes
+     FROM (SELECT sha256, MAX(bytes) AS bytes FROM attachment GROUP BY sha256)`,
+  )
+  return {
+    rows: (row?.rows as number) ?? 0,
+    blobs: (row?.blobs as number) ?? 0,
+    bytes: (row?.bytes as number) ?? 0,
+  }
 }
 
 // ---- consent / sharing log / meta -----------------------------------------------------------
@@ -398,6 +479,7 @@ export async function eraseEverything(db: Database): Promise<void> {
     'chat',
     'note',
     'consent',
+    'attachment',
     'health_log',
     'genotype',
     'source_file',
@@ -407,7 +489,7 @@ export async function eraseEverything(db: Database): Promise<void> {
     await db.exec(`DELETE FROM ${t}`)
   }
   await db.exec("DELETE FROM meta WHERE key NOT IN ('schema_version', 'device')")
-  await pruneGenomeBlobs(db)
+  await pruneBlobs(db)
 }
 
 export async function logSharing(

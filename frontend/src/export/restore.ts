@@ -75,7 +75,7 @@ async function insertConsents(db: Database, consents: Rows): Promise<void> {
   }
 }
 
-const HEALTH_COLS = [
+export const HEALTH_COLS = [
   'id',
   'person_id',
   'date',
@@ -90,6 +90,16 @@ const HEALTH_COLS = [
   'value',
   'value2',
   'unit',
+  'created_at',
+]
+export const ATTACHMENT_COLS = [
+  'id',
+  'health_log_id',
+  'person_id',
+  'sha256',
+  'mime',
+  'bytes',
+  'name',
   'created_at',
 ]
 const PERSON_COLS = ['id', 'label', 'display_name', 'sex', 'birth_year', 'notes', 'created_at']
@@ -108,6 +118,25 @@ function withDefaults(rows: Rows): Rows {
     unit: '',
     ...h,
   }))
+}
+
+/**
+ * Attachment rows, skipping any whose entry is not here: ON CONFLICT does not cover foreign-key
+ * violations, so a plain INSERT OR IGNORE would throw on an orphan row from a damaged file.
+ *
+ * Only metadata travels in a dump. Rows whose bytes this device does not have show as missing
+ * until the backup folder hands them over (attachments/mirror.ts).
+ */
+async function insertAttachmentRows(db: Database, rows: Rows): Promise<void> {
+  const cols = ATTACHMENT_COLS.join(',')
+  for (const a of rows) {
+    await db.exec(
+      `INSERT OR IGNORE INTO attachment(${cols})
+       SELECT ${ATTACHMENT_COLS.map(() => '?').join(',')}
+       WHERE EXISTS (SELECT 1 FROM health_log WHERE id = ?)`,
+      [...ATTACHMENT_COLS.map((c) => a[c] ?? null), a.health_log_id ?? null],
+    )
+  }
 }
 
 async function restoreContainer(db: Database, c: Container, onProgress: Progress): Promise<RestoreResult> {
@@ -129,6 +158,7 @@ async function restoreContainer(db: Database, c: Container, onProgress: Progress
       importedAt: s.imported_at as string,
     })
   await insertRows(db, 'health_log', HEALTH_COLS, withDefaults(j.health_log as Rows))
+  await insertAttachmentRows(db, (j.attachments ?? []) as Rows)
   await insertRows(db, 'note', NOTE_COLS, j.notes as Rows)
   await insertRows(db, 'chat', CHAT_COLS, j.chats as Rows)
   await insertConsents(db, j.consents as Rows)

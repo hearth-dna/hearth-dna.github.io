@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useApp } from '../app/context'
-import { deleteHealthEntry, listHealthLog } from '../db/repo'
+import { removeAttachment } from '../attachments/store'
+import { deleteHealthEntry, listAttachments, listHealthLog } from '../db/repo'
 import type { HealthDraft } from '../documents/draft'
 import { facets, type HealthFilter, NO_FILTER } from '../health/log'
 import { useT } from '../i18n/context'
-import type { HealthEntry, Person } from '../types'
+import type { Attachment, HealthEntry, Person } from '../types'
 import { HealthEntryForm } from './HealthEntryForm'
 import { HealthTable } from './HealthTable'
 import { QuickMeasurement } from './QuickMeasurement'
@@ -20,11 +21,23 @@ export function HealthLog({ person }: { person: Person }) {
   const { db } = useApp()
   const t = useT()
   const [entries, setEntries] = useState<HealthEntry[]>([])
+  const [attachments, setAttachments] = useState<Record<string, Attachment[]>>({})
   const [filter, setFilter] = useState<HealthFilter>(NO_FILTER)
-  const [adding, setAdding] = useState<{ draft?: { draft: HealthDraft; source: string } } | null>(null)
+  const [adding, setAdding] = useState<{
+    draft?: { draft: HealthDraft; source: string; files?: File[] }
+  } | null>(null)
   const [reading, setReading] = useState(false)
 
-  const reload = async () => setEntries(await listHealthLog(db, person.id))
+  const reload = async () => {
+    const rows = await listHealthLog(db, person.id)
+    setEntries(rows)
+    setAttachments(
+      await listAttachments(
+        db,
+        rows.map((e) => e.id),
+      ),
+    )
+  }
   // biome-ignore lint/correctness/useExhaustiveDependencies: reload is stable per db/person
   useEffect(() => {
     reload()
@@ -64,6 +77,7 @@ export function HealthLog({ person }: { person: Person }) {
       <HealthTable
         entries={entries}
         persons={[person]}
+        attachments={attachments}
         showPerson={false}
         filter={filter}
         onFilter={setFilter}
@@ -73,12 +87,18 @@ export function HealthLog({ person }: { person: Person }) {
             await reload()
           }
         }}
+        onDeleteAttachment={async (a) => {
+          if (confirm(t('attachments.confirmDelete', { name: a.name }))) {
+            await removeAttachment(db, a.id)
+            await reload()
+          }
+        }}
       />
       {reading && (
         <ReadDocumentDialog
           person={person}
           onClose={() => setReading(false)}
-          onDraft={(draft, source) => setAdding({ draft: { draft, source } })}
+          onDraft={(draft, source, files) => setAdding({ draft: { draft, source, files } })}
         />
       )}
     </div>

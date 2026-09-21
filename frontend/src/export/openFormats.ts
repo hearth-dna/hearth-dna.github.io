@@ -1,5 +1,5 @@
 import type { Database } from '../db/db'
-import { listHealthLog, personCallsFor } from '../db/repo'
+import { listAttachments, listHealthLog, personCallsFor } from '../db/repo'
 import { computeFindings, type Kb } from '../kb/kb'
 import type { Person } from '../types'
 import { downloadBytes } from './exportDump'
@@ -56,8 +56,15 @@ export async function exportHealthLog(
   format: OpenFormat,
 ): Promise<Exported> {
   const byPerson = []
-  for (const person of persons) byPerson.push({ person, entries: await listHealthLog(db, person.id) })
-  const table = healthTable(byPerson)
+  const ids: string[] = []
+  for (const person of persons) {
+    const entries = await listHealthLog(db, person.id)
+    byPerson.push({ person, entries })
+    ids.push(...entries.map((e) => e.id))
+  }
+  const attachments = await listAttachments(db, ids)
+  const counts = Object.fromEntries(Object.entries(attachments).map(([id, a]) => [id, a.length]))
+  const table = healthTable(byPerson, counts)
   const bytes = text(render(table, format))
   const name = openFileName('health-log', format)
   downloadBytes(bytes, name, format === 'csv' ? 'text/csv' : 'application/x-ndjson')

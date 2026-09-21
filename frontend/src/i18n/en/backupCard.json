@@ -22,12 +22,17 @@
   "backupCard.backUpNow": "Back up now",
   "backupCard.changeFolder": "Change folder…",
   "backupCard.forgetConfirm": "Also delete the backup files in the folder? (Cancel keeps them.)",
-  "backupCard.forgottenDeleted": "Folder forgotten; {n} backup files deleted.",
+  "backupCard.forgottenDeletedWithFiles": "Folder forgotten; {n} backup files and {files} documents deleted.",
   "backupCard.forgottenKept": "Folder forgotten; files kept.",
   "backupCard.forgetFolder": "Forget folder",
   "backupCard.building": "Building snapshot…",
   "backupCard.writingFile": "Writing to {name}…",
   "backupCard.loading": "Loading from {name}…",
   "backupCard.done": "Backed up to {name} at {time}.",
-  "backupCard.autoSync": "Sync automatically after every change"
+  "backupCard.autoSync": "Sync automatically after every change",
+  "backupCard.copyingAttachments": "Copying documents to {name}…",
+  "backupCard.attachmentsPending": " · {n} documents to copy",
+  "backupCard.attachmentsMissing": "{n} attached documents are not on this computer yet.",
+  "backupCard.fetchAttachments": "Fetch documents",
+  "backupCard.attachmentsFetched": "Fetched {n} documents; {missing} still missing."
 }

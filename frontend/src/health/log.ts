@@ -38,6 +38,9 @@ export function formatValue(e: Pick<HealthEntry, 'value' | 'value2' | 'unit'>): 
  * The entry on one line, as shown in the log and in the Ask context pack:
  * `2026-09-14 · Symptom · Pain in both hands (hands; severity 6/10; arthritis)`,
  * `2026-09-14 08:05 · Measurement · Blood pressure 120/80 mmHg`.
+ *
+ * This line is what the Ask context pack sends to a model, so it must never grow to mention an
+ * entry's attachments: a file name like `biopsy-2026.pdf` would leave the device with it.
  */
 export function describeEntry(e: HealthEntry): string {
   const value = formatValue(e)

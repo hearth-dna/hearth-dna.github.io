@@ -1,5 +1,5 @@
 import { Database } from '../db/db'
-import { META_GEMINI_KEY, now, pruneGenomeBlobs, setMeta } from '../db/repo'
+import { META_GEMINI_KEY, now, pruneBlobs, setMeta } from '../db/repo'
 import { CONSENTS, type ConsentKind } from './kinds'
 
 /**
@@ -67,7 +67,11 @@ export const revokeDeletesData = (kind: ConsentKind) =>
  * log. The person, notes and pedigree stay.
  */
 export async function revokeConsent(db: Database, kind: ConsentKind, subject = ''): Promise<void> {
-  if (kind === 'import_document') await db.exec('DELETE FROM health_log WHERE person_id=?', [subject])
+  if (kind === 'import_document') {
+    // The entries go, their attachment rows cascade, and the document blobs must go with them.
+    await db.exec('DELETE FROM health_log WHERE person_id=?', [subject])
+    await pruneBlobs(db)
+  }
   if (kind === 'read_document_byok') await setMeta(db, META_GEMINI_KEY, null)
   if (kind === 'first_launch') setLocalGrantedAt(null)
   if (revokeDeletesGenome(kind)) {
@@ -76,7 +80,7 @@ export async function revokeConsent(db: Database, kind: ConsentKind, subject = '
     await db.exec("DELETE FROM consent WHERE kind IN ('import_genome','import_minor') AND subject=?", [
       subject,
     ])
-    await pruneGenomeBlobs(db)
+    await pruneBlobs(db)
     return
   }
   await db.exec('DELETE FROM consent WHERE kind=? AND subject=?', [kind, subject])

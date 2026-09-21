@@ -12,7 +12,8 @@ import {
   sortHealthLog,
 } from '../health/log'
 import { useT } from '../i18n/context'
-import { HEALTH_KIND_LABELS, type HealthEntry, type HealthKind, type Person } from '../types'
+import { type Attachment, HEALTH_KIND_LABELS, type HealthEntry, type HealthKind, type Person } from '../types'
+import { AttachmentList } from './AttachmentList'
 
 const KINDS = Object.keys(HEALTH_KIND_LABELS) as HealthKind[]
 
@@ -24,17 +25,22 @@ const KINDS = Object.keys(HEALTH_KIND_LABELS) as HealthKind[]
 export function HealthTable({
   entries,
   persons,
+  attachments,
   showPerson,
   filter,
   onFilter,
   onDelete,
+  onDeleteAttachment,
 }: {
   entries: HealthEntry[]
   persons: Person[]
+  /** Each entry's attached documents, keyed by entry id; loaded once by the parent. */
+  attachments?: Record<string, Attachment[]>
   showPerson: boolean
   filter: HealthFilter
   onFilter: (f: HealthFilter) => void
   onDelete?: (e: HealthEntry) => void
+  onDeleteAttachment?: (a: Attachment) => void
 }) {
   const t = useT()
   const [sort, setSort] = useState<{ key: HealthSortKey; dir: SortDir }>({ key: 'date', dir: 'desc' })
@@ -212,6 +218,15 @@ export function HealthTable({
                     <td>
                       {e.title}
                       {e.body && <span className="muted"> ¶</span>}
+                      {attachments?.[e.id]?.length ? (
+                        <span
+                          className="muted"
+                          title={t('healthTable.hasAttachments', { n: attachments[e.id].length })}
+                        >
+                          {' '}
+                          📎{attachments[e.id].length}
+                        </span>
+                      ) : null}
                     </td>
                     <td className="nowrap">{formatValue(e)}</td>
                     <td>{e.bodyPart}</td>
@@ -239,6 +254,9 @@ export function HealthTable({
                           <pre className="pack">{e.body}</pre>
                         ) : (
                           <p className="muted">{t('healthTable.noText')}</p>
+                        )}
+                        {onDeleteAttachment && (
+                          <AttachmentList items={attachments?.[e.id] ?? []} onDelete={onDeleteAttachment} />
                         )}
                         <div className="row">
                           {e.source && (

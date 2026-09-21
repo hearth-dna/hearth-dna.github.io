@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useApp } from '../app/context'
-import { deleteHealthEntry, listFamilyHealthLog } from '../db/repo'
+import { removeAttachment } from '../attachments/store'
+import { deleteHealthEntry, listAttachments, listFamilyHealthLog } from '../db/repo'
 import { facets, type HealthFilter, NO_FILTER } from '../health/log'
 import { useT } from '../i18n/context'
-import type { HealthEntry } from '../types'
+import type { Attachment, HealthEntry } from '../types'
 import { HealthEntryForm } from './HealthEntryForm'
 import { HealthLog } from './HealthLog'
 import { HealthTable } from './HealthTable'
@@ -19,10 +20,20 @@ export function HealthPage({ person: who, onPerson }: { person: string; onPerson
   const { db, persons } = useApp()
   const t = useT()
   const [entries, setEntries] = useState<HealthEntry[]>([])
+  const [attachments, setAttachments] = useState<Record<string, Attachment[]>>({})
   const [filter, setFilter] = useState<HealthFilter>(NO_FILTER)
   const [adding, setAdding] = useState(false)
 
-  const reload = async () => setEntries(await listFamilyHealthLog(db))
+  const reload = async () => {
+    const rows = await listFamilyHealthLog(db)
+    setEntries(rows)
+    setAttachments(
+      await listAttachments(
+        db,
+        rows.map((e) => e.id),
+      ),
+    )
+  }
   // biome-ignore lint/correctness/useExhaustiveDependencies: reload is stable per db; `who` re-reads after edits in a person's log
   useEffect(() => {
     reload()
@@ -85,12 +96,19 @@ export function HealthPage({ person: who, onPerson }: { person: string; onPerson
           <HealthTable
             entries={entries}
             persons={persons}
+            attachments={attachments}
             showPerson
             filter={filter}
             onFilter={setFilter}
             onDelete={async (e) => {
               if (confirm(t('healthLog.confirmDelete', { title: e.title, date: e.date }))) {
                 await deleteHealthEntry(db, e.id)
+                await reload()
+              }
+            }}
+            onDeleteAttachment={async (a) => {
+              if (confirm(t('attachments.confirmDelete', { name: a.name }))) {
+                await removeAttachment(db, a.id)
                 await reload()
               }
             }}

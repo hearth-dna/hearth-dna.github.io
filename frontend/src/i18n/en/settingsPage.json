@@ -37,5 +37,8 @@
   "settingsPage.eraseAllData": "Erase all data",
   "settingsPage.footer": "Hearth {version} · storage: {storage} · id {id}",
   "settingsPage.storageOpfs": "OPFS (persistent)",
-  "settingsPage.storageMemory": "memory (not persistent in this browser context)"
+  "settingsPage.storageMemory": "memory (not persistent in this browser context)",
+  "settingsPage.attachmentStorage": "{n} attached documents, {mb} MB.",
+  "settingsPage.storagePersisted": "This browser has promised to keep them.",
+  "settingsPage.storageBestEffort": "The browser may clear them if it runs short of space; keep a backup folder."
 }

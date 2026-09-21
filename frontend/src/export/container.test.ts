@@ -79,6 +79,23 @@ describe('dump v2 container', () => {
     await expect(openContainer(await serialiseContainer(c))).rejects.toThrow(/corrupt/)
   })
 
+  it('carries attachment metadata, and no attachment bytes', async () => {
+    const c = await sample()
+    const a = { id: 'a1', health_log_id: 'h1', sha256: 'ab', mime: 'application/pdf', bytes: 4096 }
+    c.journal.attachments = [a]
+    const bytes = await serialiseContainer(c)
+    const back = await openContainer(bytes)
+    expect(back.journal.attachments).toEqual([a])
+    // The whole point of the sidecar design: a document must not grow the snapshot.
+    expect(bytes.length).toBeLessThan(2048)
+  })
+
+  it('opens a container written before attachments existed', async () => {
+    const c = await sample()
+    const back = await openContainer(await serialiseContainer(c))
+    expect(back.journal.attachments).toBeUndefined()
+  })
+
   it('returns null for v1 files and other bytes', async () => {
     const v1 = await serialiseDump(
       buildDump({ appVersion: '0', persons: [], relationships: [], sourceFiles: [], callsByPerson: {} }),

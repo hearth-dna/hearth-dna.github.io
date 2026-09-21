@@ -123,6 +123,23 @@ export interface HealthEntry {
   createdAt: string
 }
 
+/**
+ * An original document (image or PDF) kept with a health log entry. The bytes live in the OPFS
+ * file cache under `att-<sha256>.bin`; this row is the only place the user's file name exists.
+ */
+export interface Attachment {
+  id: string
+  healthLogId: string
+  personId: string
+  /** sha256 of the plaintext bytes: identity, dedup key and integrity check. */
+  sha256: string
+  mime: string
+  bytes: number
+  /** The file name to show; never used to build a file name on disk. */
+  name: string
+  createdAt: string
+}
+
 export interface SourceFile {
   id: string
   personId: string

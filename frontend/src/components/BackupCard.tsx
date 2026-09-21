@@ -81,7 +81,9 @@ export function BackupCard() {
           ? 'backupCard.loading'
           : status.step === 'building'
             ? 'backupCard.building'
-            : 'backupCard.writingFile',
+            : status.step === 'attachments'
+              ? 'backupCard.copyingAttachments'
+              : 'backupCard.writingFile',
         { name: status.name },
       )
     : busy
@@ -118,7 +120,29 @@ export function BackupCard() {
             {status.state === 'ready' && status.pending && (
               <span className="muted">{t('backupCard.pending')}</span>
             )}
+            {status.state === 'ready' && status.attachmentsPending > 0 && (
+              <span className="muted">
+                {t('backupCard.attachmentsPending', { n: status.attachmentsPending })}
+              </span>
+            )}
           </p>
+          {status.state === 'ready' && status.attachmentsMissing > 0 && (
+            <p className="notice">
+              {t('backupCard.attachmentsMissing', { n: status.attachmentsMissing })}{' '}
+              <button
+                type="button"
+                disabled={working}
+                onClick={() =>
+                  run(async () => {
+                    const r = await backups.pullNow()
+                    return t('backupCard.attachmentsFetched', { n: r.pulled, missing: r.missing })
+                  })
+                }
+              >
+                {t('backupCard.fetchAttachments')}
+              </button>
+            </p>
+          )}
           {activity && (
             <p className="activity" role="status" aria-live="polite">
               <span className="spinner" aria-hidden="true" /> {activity}
@@ -210,9 +234,11 @@ export function BackupCard() {
               onClick={() =>
                 run(async () => {
                   const del = confirm(t('backupCard.forgetConfirm'))
-                  const n = await backups.forget(del)
+                  const { snapshots, attachments } = await backups.forget(del)
                   await revokeConsent(db, 'backup_folder')
-                  return del ? t('backupCard.forgottenDeleted', { n }) : t('backupCard.forgottenKept')
+                  return del
+                    ? t('backupCard.forgottenDeletedWithFiles', { n: snapshots, files: attachments })
+                    : t('backupCard.forgottenKept')
                 })
               }
             >

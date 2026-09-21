@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useApp } from '../app/context'
+import { addAttachment, requestPersistence } from '../attachments/store'
 import { grantConsent, hasConsent } from '../consent/consent'
 import { addHealthEntry } from '../db/repo'
 import type { HealthDraft } from '../documents/draft'
@@ -7,6 +8,7 @@ import { parseTags } from '../health/log'
 import { findPreset, presetsFor } from '../health/presets'
 import { useT } from '../i18n/context'
 import { BODY_PARTS, HEALTH_KIND_LABELS, type HealthKind, type Person } from '../types'
+import { AttachmentPicker } from './AttachmentPicker'
 import { ConsentForm } from './ConsentForm'
 
 /** Local date and time; toISOString() is UTC and gives yesterday's date late in the evening. */
@@ -67,8 +69,8 @@ export function HealthEntryForm({
 }: {
   persons: Person[]
   personId: string
-  /** Prefill from a document reader; skips the type picker. */
-  draft?: { draft: HealthDraft; source: string }
+  /** Prefill from a document reader; skips the type picker. `files` are its pages, to keep. */
+  draft?: { draft: HealthDraft; source: string; files?: File[] }
   tagSuggestions: string[]
   onSaved: () => void
   onCancel: () => void
@@ -80,6 +82,8 @@ export function HealthEntryForm({
   const [form, setForm] = useState(() =>
     draft ? { ...blank(null), ...draft.draft, source: draft.source } : blank(null),
   )
+  const [staged, setStaged] = useState<File[]>(draft?.files ?? [])
+  const [failed, setFailed] = useState<string[]>([])
 
   useEffect(() => {
     setConsented(null)
@@ -115,7 +119,7 @@ export function HealthEntryForm({
 
   const save = async () => {
     if (!valid || !kind) return
-    await addHealthEntry(db, {
+    const entry = await addHealthEntry(db, {
       personId,
       date: form.date,
       time: form.time,
@@ -130,6 +134,23 @@ export function HealthEntryForm({
       value2: pair ? Number(form.value2) : null,
       unit: fields.value ? form.unit.trim() : '',
     })
+    if (staged.length > 0) {
+      await requestPersistence(db)
+      const bad: string[] = []
+      for (const [i, file] of staged.entries()) {
+        // A file that will not store must not cost the user the text they just typed.
+        try {
+          await addAttachment(db, entry.id, personId, file, i)
+        } catch {
+          bad.push(file.name)
+        }
+      }
+      if (bad.length > 0) {
+        setFailed(bad)
+        setStaged([])
+        return
+      }
+    }
     onSaved()
   }
 
@@ -338,6 +359,17 @@ export function HealthEntryForm({
           onChange={(e) => setForm({ ...form, body: e.target.value })}
         />
       </label>
+      <AttachmentPicker
+        files={staged}
+        onChange={setStaged}
+        disabled={!db.persistent}
+        notice={db.persistent ? undefined : t('attachments.notPersistent')}
+      />
+      {failed.map((name) => (
+        <p key={name} className="muted">
+          {t('attachments.saveFailed', { name })}
+        </p>
+      ))}
       {form.source && <p className="muted">{t('healthLog.transcribedNotice')}</p>}
       <div className="row" style={{ marginTop: '0.6rem' }}>
         <button type="button" className="primary" disabled={!valid || consented !== true} onClick={save}>

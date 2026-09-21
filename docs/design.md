@@ -242,8 +242,18 @@ kb fields at tier 0, so the user gets a decision frame even without any LLM.
   a transcription-only JSON draft the user reviews in the health-log form. The key lives in `meta`,
   is never dumped, and is deleted by "Erase all data" or by revoking the consent. Free-tier keys
   are flagged: Google may train on the input.
-- Accept PDF, images, plain text. `pdf.js` extracts the text layer; `Tesseract.js` OCRs scans; both in
-  a worker. Originals stored as blobs in OPFS, referenced from `document`.
+- **Shipped third (attachments):** the original image or PDF is kept with the entry —
+  `attachment(id, health_log_id, person_id, sha256, mime, bytes, name, created_at)` with the bytes
+  in the OPFS file cache as `att-<sha256>.bin`, never in a BLOB column (ADR 0001). Content
+  addressed, so the same scan attached twice is stored once; the user's file name lives only in
+  the row, never on disk. The dump carries the rows; the bytes travel to the backup folder as
+  encrypted sidecars (`docs/architecture/storage/backup-folder.md`), which keeps the few-second
+  autosave as cheap as it was. Restoring elsewhere without the folder leaves them marked "not on
+  this device" rather than failing. No new consent: `import_document` already covers documents,
+  and revoking it deletes the entries and their attachments. `describeEntry` deliberately says
+  nothing about attachments, so no file name can reach the Ask context pack.
+- Still to build: `pdf.js` for the text layer and `Tesseract.js` for scans, both in a worker, to
+  read an attachment without sending it anywhere.
 - Structured extraction into `observation` rows (lab values with units and reference ranges,
   diagnoses, medications). Tier 0: regex/table heuristics for common lab layouts; tiers 1–2: LLM
   extraction with a fixed JSON schema.

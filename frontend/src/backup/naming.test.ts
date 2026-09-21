@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Header } from '../export/container'
-import { baseName, conflictName, hasNewer, isForeign, rotationPlan } from './naming'
+import { attachmentsDirName, baseName, conflictName, hasNewer, isForeign, rotationPlan } from './naming'
 
 const header = (device: string, generation: number): Header => ({
   format: 'hearth-dump',
@@ -47,5 +47,12 @@ describe('backup naming', () => {
     expect(hasNewer(header('B', 5), 'A', { device: 'B', generation: 5 })).toBe(false)
     expect(hasNewer(header('B', 7), 'A', { device: 'B', generation: 5 })).toBe(true)
     expect(hasNewer(header('A', 7), 'A', null)).toBe(false)
+  })
+})
+
+describe('attachmentsDirName', () => {
+  it('is shared by default and separate per profile', () => {
+    expect(attachmentsDirName('default')).toBe('attachments')
+    expect(attachmentsDirName('mum')).toBe('attachments-mum')
   })
 })

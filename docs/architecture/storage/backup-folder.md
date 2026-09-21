@@ -29,6 +29,7 @@ existing buttons. Feature detection is `'showDirectoryPicker' in window`.
   hearth-backup.hearth        ← current snapshot (see dump-v2.md)
   hearth-backup.hearth.1      ← previous snapshot
   hearth-backup.hearth.2      ← the one before (ROTATIONS = 3)
+  attachments/<sha256>.att    ← one per document attached to a health log entry
   README.txt                  ← "This folder is written by Hearth (<url>). Files are encrypted
                                  with your passphrase / plaintext. Open <url> and choose this
                                  folder to restore."
@@ -39,7 +40,31 @@ only then is the current file overwritten, so a crash mid-write leaves `.1` inta
 truncated current file fails to open rather than silently restoring something partial.
 
 Multiple families on one stick: the profile name is part of the file name only when the profile
-is not `default` (`hearth-backup-<profile>.hearth`), so the common case stays tidy.
+is not `default` (`hearth-backup-<profile>.hearth`), so the common case stays tidy. The
+attachments folder follows the same rule (`attachments-<profile>/`), so *Forget folder → delete
+files* never takes the other family's documents with it.
+
+**Attachments are sidecars, not snapshot content.** The snapshot is rewritten in full every few
+seconds and kept in three rotations; documents inside it would be copied four times over on every
+edit, which is why the journal carries only the `attachment` rows and the bytes sit beside it.
+Each file is named after the sha256 of its content and written once:
+
+- Content addressing means two computers writing the same name write the same bytes, so a sidecar
+  cannot conflict the way the snapshot can. The conflict path mirrors as usual.
+- The set to write is recomputed each run as `wanted − present` (`attachments/sidecar.ts`), so a
+  reformatted stick, a cloud client that dropped a file, or documents attached while the folder
+  was unreachable all heal on the next backup. A run copies at most 25 files or 100 MB and
+  continues on the next one, so an autosave never sits on the folder for minutes.
+- Sidecars are never rotated and never deleted, even when the entry goes: the rotated snapshots
+  beside them may still refer to the document. They go when the user forgets the folder and asks
+  for its files to be deleted. `README.txt` says so.
+- Encryption matches the snapshot: each file is the same `HRTH1` envelope used by the dump, with
+  one PBKDF2 derivation per run rather than per file (600 k iterations × a hundred documents
+  would block the tab for a minute). With *store unencrypted* the raw original is written, which
+  also makes the folder readable as an ordinary archive of documents.
+- Pulling back (`loadFromFolder`, or *Fetch documents*) hashes every file again before storing it:
+  the name is a claim about the content, and a folder is something other programs can write to.
+  A row whose bytes are nowhere shows in the log as "not on this device" rather than failing.
 
 ## Behaviour details
 
@@ -94,6 +119,10 @@ backup files in the folder (best effort, then tells the user to check the stick)
 - Files are the dump v2 envelope: AES-GCM, PBKDF2 600k (already in `dump.ts`). Header fields
   outside the ciphertext are format, version, generation, device id (random UUID, not a machine
   identifier), export time and whether the payload is encrypted. No names, no counts.
+- Sidecar names are content hashes and carry no file names: the document's own name, its type and
+  its size live only in the `attachment` row, inside the encrypted snapshot. Someone who finds the
+  stick learns how many documents exist and their hashes — enough to confirm possession of a file
+  they already hold, not to learn anything new.
 - The passphrase lives in `sessionStorage` (this tab, until it closes); autosave requires it to
   have been entered once since launch. If it has not, the card shows *Enter passphrase to resume
   backups* instead of silently doing nothing.
@@ -103,6 +132,10 @@ backup files in the folder (best effort, then tells the user to check the stick)
 - `backup/naming.ts` (pure, tested): file names, rotation plan, conflict name, `isForeign`,
   `hasNewer`. `backup/folder.ts`: picker, IndexedDB handle store, permissions, read/write/rotate.
   `backup/scheduler.ts`: the app-wide `backups` singleton the card renders.
-- Consent kind `backup_folder`; *Forget folder* revokes it and offers to delete the snapshots.
+- `attachments/{sidecar,crypto,mirror}.ts`: sidecar naming and the diff (pure, tested), the
+  per-run seal/open, and the push/pull the scheduler calls after a snapshot and after a restore.
+- Consent kind `backup_folder` (still version 1: mirroring encrypted documents beside the snapshot
+  is the promise it already makes); *Forget folder* revokes it and offers to delete the snapshots
+  and the attachments folder.
 - Not exercised end to end in this session: the directory picker needs a real click in a real
   Chromium window, so choose a temporary folder and try *Back up now* / *Load from folder* by hand.

@@ -13,6 +13,13 @@ export function baseName(profile: string): string {
 
 export const rotatedName = (base: string, n: number) => `${base}.${n}`
 
+/**
+ * Where the copies of attached documents go. Per profile, so two families sharing one stick never
+ * delete each other's documents when one of them forgets the folder.
+ */
+export const attachmentsDirName = (profile: string) =>
+  profile === 'default' ? 'attachments' : `attachments-${profile}`
+
 /** Copies to make, oldest first, so that `base` can then be overwritten with the newest snapshot. */
 export function rotationPlan(
   existing: string[],
@@ -62,6 +69,11 @@ export const README = (url: string) =>
     'log, notes). The newest is hearth-backup.hearth; .1, .2, ... are older copies. A file starting',
     'with "HRTH2" is encrypted with the passphrase set in Hearth; a file starting with "PK" is a',
     'plain zip and readable by anyone who has it.',
+    '',
+    'The attachments folder holds one file per image or PDF attached to a health log entry, named',
+    'after the content of the file. Files starting with "HRTH1" are encrypted with the same',
+    'passphrase. They are written once and kept even after an entry is deleted, because the older',
+    'snapshots above may still refer to them; removing one only loses that document.',
     '',
     `To restore: open ${url}, go to Settings, choose this folder, and press "Load from folder".`,
     '',

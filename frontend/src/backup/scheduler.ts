@@ -1,9 +1,11 @@
+import { mirrorAttachments, pullAttachments } from '../attachments/mirror'
+import { missingLocally } from '../attachments/store'
 import { Database } from '../db/db'
-import { getMeta } from '../db/repo'
+import { countAttachments, getMeta } from '../db/repo'
 import { type Progress, type RestoreResult, restoreBytes } from '../export/restore'
 import { snapshotBytes } from '../export/snapshot'
 import * as folder from './folder'
-import { baseName, conflictName, hasNewer, isForeign } from './naming'
+import { attachmentsDirName, baseName, conflictName, hasNewer, isForeign } from './naming'
 
 /**
  * App-wide backup state: the remembered folder, the session passphrase, a debounced autosave
@@ -24,8 +26,12 @@ export type Status =
       dirty: boolean
       lastAt: string | null
       newer: boolean
+      /** Attached documents this browser has not copied to the folder yet. */
+      attachmentsPending: number
+      /** Attached documents this browser has a row for but not the bytes. */
+      attachmentsMissing: number
     }
-  | { state: 'writing'; name: string; step: 'loading' | 'building' | 'writing' }
+  | { state: 'writing'; name: string; step: 'loading' | 'building' | 'writing' | 'attachments' }
   | { state: 'conflict'; name: string; file: string }
   | { state: 'error'; name: string; message: string }
 
@@ -151,6 +157,9 @@ class Backups {
     }
     this.newer = hasNewer(current, device, this.saved.lastSeen)
     const dirty = await this.dirty(device)
+    // Counted from the database, never by listing the folder: refresh runs often and a cloud
+    // mount is slow enough that a scan here would stall the whole card.
+    const blobs = (await countAttachments(this.db)).blobs
     this.set({
       state: 'ready',
       name,
@@ -158,6 +167,8 @@ class Backups {
       dirty,
       lastAt: this.saved.lastAt ?? null,
       newer: this.newer,
+      attachmentsPending: Math.max(0, blobs - (this.saved.mirrored ?? 0)),
+      attachmentsMissing: (await missingLocally(this.db)).length,
     })
     // Changes made while the folder was unreachable (or before a reload) go out without waiting
     // for the next edit. A newer copy from another computer is left for the user to pull in.
@@ -184,14 +195,18 @@ class Backups {
   }
 
   /** Forgets the folder and, if asked, deletes the snapshots in it. */
-  async forget(deleteFiles: boolean): Promise<number> {
+  async forget(deleteFiles: boolean): Promise<{ snapshots: number; attachments: number }> {
     let n = 0
-    if (this.saved && deleteFiles) n = await folder.deleteSnapshots(this.saved.handle, baseName(this.profile))
+    let files = 0
+    if (this.saved && deleteFiles) {
+      n = await folder.deleteSnapshots(this.saved.handle, baseName(this.profile))
+      files = await folder.removeDir(this.saved.handle, attachmentsDirName(this.profile))
+    }
     this.saved = null
     await folder.forget(this.profile)
     this.setPassphrase('')
     this.set({ state: 'none' })
-    return n
+    return { snapshots: n, attachments: files }
   }
 
   /**
@@ -256,18 +271,56 @@ class Backups {
       if (!force && isForeign(current, device, this.saved.lastSeen)) {
         const file = conflictName(base, device, new Date().toISOString())
         await folder.writeConflict(this.saved.handle, file, bytes)
+        // The conflict snapshot refers to these documents too, and a sidecar cannot conflict:
+        // two computers writing the same name write the same bytes.
+        await this.mirror()
         return this.set({ state: 'conflict', name, file })
       }
       await folder.writeSnapshot(this.saved.handle, base, bytes, location.origin)
       this.saved.lastSeen = { device, generation: Number((await getMeta(this.db, 'generation')) ?? 0) }
       this.saved.lastAt = new Date().toISOString()
       await folder.save(this.profile, this.saved)
+      this.set({ state: 'writing', name, step: 'attachments' })
+      await this.mirror()
       await this.refresh()
     } catch (e) {
       this.set({ state: 'error', name, message: e instanceof Error ? e.message : String(e) })
     } finally {
       this.busy = false
     }
+  }
+
+  /**
+   * Copies documents the folder does not have yet. Deliberately not fatal: the journal is already
+   * written by this point, and a folder that refuses a file must not cost the user the snapshot.
+   */
+  private async mirror(): Promise<void> {
+    if (!this.saved) return
+    try {
+      const r = await withTimeout(
+        mirrorAttachments(this.saved.handle, this.db, this.profile, this.plain ? null : this.passphrase()),
+        FOLDER_TIMEOUT_MS,
+        this.name,
+      )
+      const sub = await folder.subdir(this.saved.handle, attachmentsDirName(this.profile))
+      this.saved.mirrored = sub ? (await folder.listNames(sub)).length : r.written
+      await folder.save(this.profile, this.saved)
+    } catch {
+      // Left for the next backup; `attachmentsPending` keeps saying there is work to do.
+    }
+  }
+
+  /** Fetches documents this browser has rows for but not bytes (after restoring on a new PC). */
+  async pullNow(): Promise<{ pulled: number; missing: number }> {
+    if (!this.saved) return { pulled: 0, missing: 0 }
+    const r = await pullAttachments(
+      this.saved.handle,
+      this.db,
+      this.profile,
+      this.plain ? null : this.passphrase(),
+    )
+    await this.refresh()
+    return r
   }
 
   /** Loads the folder's current snapshot into this browser (union by id, see restore.ts). */
@@ -282,6 +335,8 @@ class Backups {
       this.plain ? undefined : this.passphrase() || undefined,
       onProgress,
     )
+    onProgress('restore.pullingAttachments')
+    await pullAttachments(this.saved.handle, this.db, this.profile, this.plain ? null : this.passphrase())
     const header = await folder.currentHeader(this.saved.handle, base)
     if (header) this.saved.lastSeen = { device: header.device, generation: header.generation }
     await folder.save(this.profile, this.saved)

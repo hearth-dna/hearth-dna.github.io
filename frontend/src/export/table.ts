@@ -116,10 +116,15 @@ export const HEALTH_HEADER = [
   'tags',
   'source',
   'body',
+  // How many documents are attached, never their names: this file is plain text by design.
+  'attachments',
   'created_at',
 ]
 
-export function healthTable(byPerson: { person: Person; entries: HealthEntry[] }[]): Table {
+export function healthTable(
+  byPerson: { person: Person; entries: HealthEntry[] }[],
+  attachmentCounts: Record<string, number> = {},
+): Table {
   const rows: Cell[][] = []
   for (const { person, entries } of byPerson) {
     for (const e of entries) {
@@ -137,6 +142,7 @@ export function healthTable(byPerson: { person: Person; entries: HealthEntry[] }
         e.tags.join('; '),
         e.source,
         e.body,
+        attachmentCounts[e.id] ?? 0,
         e.createdAt,
       ])
     }

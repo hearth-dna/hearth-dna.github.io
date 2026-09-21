@@ -9,7 +9,7 @@ import { README, ROTATIONS, rotationPlan, type Seen } from './naming'
 
 // The picker and permission methods are not in TypeScript's DOM lib yet.
 type Permission = 'granted' | 'denied' | 'prompt'
-interface Dir extends FileSystemDirectoryHandle {
+export interface Dir extends FileSystemDirectoryHandle {
   queryPermission(d: { mode: 'readwrite' }): Promise<Permission>
   requestPermission(d: { mode: 'readwrite' }): Promise<Permission>
 }
@@ -32,6 +32,8 @@ export interface Saved {
   auto?: boolean
   /** When this browser last wrote a snapshot to the folder (ISO). */
   lastAt?: string
+  /** How many attachment sidecars the folder held after the last successful mirror. */
+  mirrored?: number
 }
 
 // ---- remembered handle (IndexedDB) ---------------------------------------------------------
@@ -91,6 +93,23 @@ export const reconnect = async (dir: Dir) =>
 
 // ---- files ----------------------------------------------------------------------------------
 
+/** The attachments subfolder, or null when it is not there and we are not creating it. */
+export async function subdir(dir: Dir, name: string, create = false): Promise<Dir | null> {
+  try {
+    return (await dir.getDirectoryHandle(name, { create })) as Dir
+  } catch {
+    return null
+  }
+}
+
+export async function removeDir(dir: Dir, name: string): Promise<number> {
+  const sub = await subdir(dir, name)
+  if (!sub) return 0
+  const n = (await names(sub)).length
+  await dir.removeEntry(name, { recursive: true }).catch(() => {})
+  return n
+}
+
 async function names(dir: Dir): Promise<string[]> {
   const out: string[] = []
   for await (const name of dir.keys()) out.push(name)
@@ -114,6 +133,10 @@ async function writeFile(dir: Dir, name: string, bytes: Uint8Array | string): Pr
     await w.close()
   }
 }
+
+export const listNames = (dir: Dir) => names(dir)
+export const readFrom = (dir: Dir, name: string) => readFile(dir, name)
+export const writeTo = (dir: Dir, name: string, bytes: Uint8Array) => writeFile(dir, name, bytes)
 
 /** Header of the current snapshot in the folder; null when there is none or it is unreadable. */
 export async function currentHeader(dir: Dir, base: string): Promise<Header | null> {

@@ -1,6 +1,6 @@
 import { gzipSync, strToU8 } from 'fflate'
 import type { Database } from '../db/db'
-import { genomeBlobName, importCalls, pruneGenomeBlobs } from '../db/repo'
+import { genomeBlobName, importCalls, pruneBlobs } from '../db/repo'
 import type { Translate } from '../i18n/context'
 import { PROVIDER_LABELS, type Provider } from '../types'
 import { parseRawText } from './parseFile'
@@ -49,7 +49,7 @@ export async function importGenomeFile(
   )
   // The original text is kept, gzipped, so backups ship it instead of re-serialising every row.
   await db.filePut(genomeBlobName(sha256), gzipSync(strToU8(text)))
-  await pruneGenomeBlobs(db)
+  await pruneBlobs(db)
   return t('importFile.summary', {
     n: r.calls.length.toLocaleString(),
     provider: PROVIDER_LABELS[r.provider],

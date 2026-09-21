@@ -18,5 +18,7 @@
   "readDocumentDialog.hint.diagnosis": "Diagnosis",
   "readDocumentDialog.tooBig": "{mb} MB selected; the limit is {max} MB per document. Split it or downscale the photos.",
   "readDocumentDialog.failed": "Failed: {message}",
-  "readDocumentDialog.continue": "Continue…"
+  "readDocumentDialog.continue": "Continue…",
+  "readDocumentDialog.keepOriginals": "Keep the original pages with the entry",
+  "readDocumentDialog.keepOriginalsHint": "The files stay on this device. Only the pages listed above are sent to the model."
 }

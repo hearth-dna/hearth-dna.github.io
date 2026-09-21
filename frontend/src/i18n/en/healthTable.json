@@ -8,5 +8,6 @@
   "healthTable.to": "to",
   "healthTable.colDate": "Date",
   "healthTable.colTags": "Tags",
-  "healthTable.noText": "No text for this entry."
+  "healthTable.noText": "No text for this entry.",
+  "healthTable.hasAttachments": "{n} attached documents"
 }
