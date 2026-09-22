@@ -9,5 +9,18 @@
   "healthTable.colDate": "Date",
   "healthTable.colTags": "Tags",
   "healthTable.noText": "No text for this entry.",
-  "healthTable.hasAttachments": "{n} attached documents"
+  "healthTable.hasAttachments": "{n} attached documents",
+  "healthTable.filters": "Filters",
+  "healthTable.sortBy": "Sort by",
+  "healthTable.sortAsc": "Ascending",
+  "healthTable.sortDesc": "Descending",
+  "healthTable.viewCards": "Cards",
+  "healthTable.viewTable": "Table",
+  "healthTable.period": "Period",
+  "healthTable.periodDays": "{n} days",
+  "healthTable.periodYear": "12 months",
+  "healthTable.showResults": "Show {n}",
+  "healthTable.removeFilter": "Remove filter: {label}",
+  "healthTable.today": "Today",
+  "healthTable.yesterday": "Yesterday"
 }

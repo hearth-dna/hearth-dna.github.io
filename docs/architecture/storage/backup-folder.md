@@ -11,29 +11,46 @@ Settings gains a **Backup folder** card:
   *Back up now* button.
 - **Autosave** is on by default once a folder is chosen: every change (import, health-log entry,
   note, consent) schedules a backup after a short quiet period.
-- **Restore**: if a chosen folder already contains a backup newer than what this browser has, the
-  card offers *Load from folder*. The same button is how a second PC gets the data: install the
-  PWA, choose the same folder, load.
+- **Restore** is automatic: a backup in the folder newer than what this browser has seen is loaded
+  at start, when the app comes back to the foreground, and before every backup (see *Newer data
+  wins* below). A second PC gets the data by choosing the same folder; *Load from folder* forces it.
 - The folder is remembered across launches. On the next launch Chrome asks once whether to allow
   access again (or not at all after the user picks "Allow on every visit", Chrome 122+); until it
   is re-granted the card shows *Reconnect folder*.
 
-Browsers without the directory picker (Firefox, Safari, all mobile) see the card with one line:
-"Your browser cannot write to a folder on its own; use Export dump and Import dump" and the
+Browsers without the directory picker (Firefox, Safari, mobile browsers) see the card with one
+line: "Your browser cannot write to a folder on its own; use Export dump and Import dump" and the
 existing buttons. Feature detection is `'showDirectoryPicker' in window`.
+
+**The phone apps** (ADR 0008) have no directory picker either, so the shells lend the system one.
+Above it, when the build is set up for them, sit **Google Drive**, **Dropbox** and **iCloud Drive**
+buttons (ADR 0009): the same folder layout, reached through the providers' APIs or the iCloud
+container; encrypted when a passphrase is set, and following the backup already there when not.
+The card offers *Choose folder…*, *Create backup file…* and *Open backup file…* — file first on
+Android, where the picker lists Google Drive, Dropbox and OneDrive (behind its ☰ menu) only for
+files, and folder first on iOS, where iCloud Drive lends folders. A folder behaves
+exactly as below; a single file — what Google Drive and Dropbox on Android lend — holds only the
+snapshot, with no rotations and no attachments. `folder.ts` hides the difference
+behind one `Dir` interface; `native.ts` is the channel to the shell (`Files.kt`,
+`NativeFiles.swift`).
 
 ## Layout in the folder
 
 ```
 <folder>/
-  hearth-backup.hearth        ← current snapshot (see dump-v2.md)
+  hearth-backup.hearth        ← current snapshot (see dump-v2.md): header, manifest, journal
   hearth-backup.hearth.1      ← previous snapshot
   hearth-backup.hearth.2      ← the one before (ROTATIONS = 3)
+  genomes/<sha256>.txt.gz     ← one per genome file the manifest names, written once
   attachments/<sha256>.att    ← one per document attached to a health log entry
   README.txt                  ← "This folder is written by Hearth (<url>). Files are encrypted
                                  with your passphrase / plaintext. Open <url> and choose this
                                  folder to restore."
 ```
+
+On Google Drive and Dropbox there are no `.1`/`.2` copies: the provider keeps every earlier
+version of `hearth-backup.hearth` itself, and each copy would cost a download and an upload of the
+whole snapshot.
 
 Rotation is by copy (handles on removable media cannot be renamed portably), oldest first, and
 only then is the current file overwritten, so a crash mid-write leaves `.1` intact and the
@@ -50,7 +67,7 @@ edit, which is why the journal carries only the `attachment` rows and the bytes 
 Each file is named after the sha256 of its content and written once:
 
 - Content addressing means two computers writing the same name write the same bytes, so a sidecar
-  cannot conflict the way the snapshot can. The conflict path mirrors as usual.
+  cannot conflict the way the snapshot can.
 - The set to write is recomputed each run as `wanted − present` (`attachments/sidecar.ts`), so a
   reformatted stick, a cloud client that dropped a file, or documents attached while the folder
   was unreachable all heal on the next backup. A run copies at most 25 files or 100 MB and
@@ -81,25 +98,32 @@ from `meta.generation` against the generation last written or loaded; when it is
 sync is on, the next start or reconnect syncs without waiting for another edit.
 
 **Header Sync button.** `components/SyncButton.tsx` shows the state in a word and a colour:
-synced (with the time), syncing soon, not synced, syncing, newer copy on another computer,
-passphrase needed, reconnect, conflict, failed. A click syncs: a newer copy is loaded first (a
-union by id, so nothing here is lost), then this browser's state is written. States that need a
+synced (with the time), syncing soon, not synced, syncing, passphrase needed, reconnect, failed.
+A click syncs: a newer copy is loaded first (a union by id, so nothing here is lost), then this
+browser's state is written. States that need a
 decision open Settings. Folder reads time out after 10 s, so a stuck cloud mount shows "Sync
 failed" instead of blocking the app.
 
-**Cost.** A full backup of seven genomes is ~5 MB compressed. Building it today means pulling
-every genotype to the main thread; `dump-v2.md` moves genotype serialisation into the worker and
-caches per-source-file blobs, so an autosave after a health-log edit costs milliseconds, not
-seconds. Until that lands autosave is fine but noticeably slow after an import; acceptable for
-the first cut, and the reason dump v2 is step 1.
+**Cost: genomes beside the snapshot.** Genomes are nearly all of a backup (a family of eight is
+~40 MB) and change only on import, so a folder snapshot does not carry them: its manifest lists
+each one (`external_genomes: true`) and the bytes sit in `genomes/<sha256>.txt.gz`, written once
+before the first snapshot that names them, encrypted like the attachment sidecars. Each file's
+hash is computed once and remembered in `meta`, so building a snapshot after an edit reads no
+genome at all, and the upload is the journal alone — kilobytes instead of the whole family on
+every change. A restore fetches a genome only for a person the device has no genotypes for,
+checks it against the manifest, and skips (to retry on the next load) one the folder does not
+have yet. The manual dump, the portable archive and a single-file backup still embed everything;
+a reader without this change refuses a folder snapshot with "missing genomes/…" rather than
+restoring it without its genomes.
 
-**Conflict detection.** Before overwriting, read the header of the current folder file (the
+**Newer data wins** (the simple rule, until real conflict resolution exists). Before any write,
+and at start and on returning to the foreground, the app reads the folder snapshot's header (the
 first few hundred bytes are plaintext: format, generation, device, exported_at, even when the
-payload is encrypted). If its `generation` is not the one this browser last wrote or loaded, and
-its `device` differs, do not overwrite: write `hearth-backup.conflict-<device>-<date>.hearth` and show
-"Another computer saved a newer backup. Load theirs, or keep yours?" Choosing *keep yours* writes
-the current file. This is last-writer-wins with a visible seam, which is what a family sharing a
-stick or a Drive folder actually needs.
+payload is encrypted). If another device wrote a generation this browser has not seen, that
+snapshot is loaded first — a union by id (`INSERT OR IGNORE`), so records only here survive, a
+record both sides have keeps this device's version, and a deletion does not travel — and only then
+is the union written back. No conflict copies, no
+prompt. Loading a plaintext snapshot needs no passphrase; an encrypted one waits for it.
 
 **Synced-folder specifics.** Google Drive for desktop, Dropbox and OneDrive all sync a rewritten
 file within seconds; a 5 MB file is trivial. Two clients writing the same path concurrently
@@ -123,14 +147,18 @@ backup files in the folder (best effort, then tells the user to check the stick)
   its size live only in the `attachment` row, inside the encrypted snapshot. Someone who finds the
   stick learns how many documents exist and their hashes — enough to confirm possession of a file
   they already hold, not to learn anything new.
-- The passphrase lives in `sessionStorage` (this tab, until it closes); autosave requires it to
-  have been entered once since launch. If it has not, the card shows *Enter passphrase to resume
-  backups* instead of silently doing nothing.
+- In the browser the passphrase lives in `sessionStorage` (this tab, until it closes); autosave
+  requires it to have been entered once since launch. If it has not, the card shows *Enter
+  passphrase to resume backups* instead of silently doing nothing. In the phone apps, where the OS
+  ends the app in the background at will, the shell keeps it across restarts: sealed with an
+  Android Keystore key (`Secrets.kt`) or in the iOS Keychain, on this device only; *Forget* clears
+  it. It protects the copy that leaves the device; the data on the device is the app's own.
 
 ## As built
 
-- `backup/naming.ts` (pure, tested): file names, rotation plan, conflict name, `isForeign`,
-  `hasNewer`. `backup/folder.ts`: picker, IndexedDB handle store, permissions, read/write/rotate.
+- `backup/naming.ts` (pure, tested): file names, rotation plan, `hasNewer`. `backup/folder.ts`: picker, IndexedDB place store, permissions, read/write/rotate,
+  over a `Dir` that is a browser handle or a native place. `backup/native.ts` (+ test against an
+  in-memory shell): the phones' picker and chunked file calls.
   `backup/scheduler.ts`: the app-wide `backups` singleton the card renders.
 - `attachments/{sidecar,crypto,mirror}.ts`: sidecar naming and the diff (pure, tested), the
   per-run seal/open, and the push/pull the scheduler calls after a snapshot and after a restore.

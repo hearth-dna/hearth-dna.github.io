@@ -96,11 +96,18 @@ APPLE_TEAM_ID ?= $(shell grep -s '^APPLE_TEAM_ID=' .env | cut -d= -f2-)
 ASC_KEY_ID ?= $(shell grep -s '^ASC_KEY_ID=' .env | cut -d= -f2-)
 ASC_ISSUER_ID ?= $(shell grep -s '^ASC_ISSUER_ID=' .env | cut -d= -f2-)
 ASC_KEY_PATH ?= $(shell grep -s '^ASC_KEY_PATH=' .env | cut -d= -f2-)
+# Cloud backup buttons (docs/runbook/cloud-backups.md). Unset means the button is not offered.
+HEARTH_GOOGLE_DRIVE ?= $(shell grep -s '^HEARTH_GOOGLE_DRIVE=' .env | cut -d= -f2-)
+HEARTH_DROPBOX_APP_KEY ?= $(shell grep -s '^HEARTH_DROPBOX_APP_KEY=' .env | cut -d= -f2-)
+HEARTH_GOOGLE_IOS_CLIENT_ID ?= $(shell grep -s '^HEARTH_GOOGLE_IOS_CLIENT_ID=' .env | cut -d= -f2-)
+CLOUD_ENV = HEARTH_GOOGLE_DRIVE=$(HEARTH_GOOGLE_DRIVE) HEARTH_DROPBOX_APP_KEY=$(HEARTH_DROPBOX_APP_KEY)
+# The same two for xcodebuild, as build settings that Info.plist reads.
+IOS_CLOUD_SETTINGS = HEARTH_GOOGLE_IOS_CLIENT_ID=$(HEARTH_GOOGLE_IOS_CLIENT_ID) HEARTH_DROPBOX_APP_KEY=$(HEARTH_DROPBOX_APP_KEY)
 
 # Passed through the environment rather than as -P flags: a `-PRELEASE_KEYSTORE_PASSWORD=...` is
 # visible to every process on the machine in `ps`, while /proc/<pid>/environ is readable only by
 # its owner.
-ANDROID_RELEASE_ENV = HEARTH_APPLICATION_ID=$(ANDROID_APP_ID) \
+ANDROID_RELEASE_ENV = HEARTH_APPLICATION_ID=$(ANDROID_APP_ID) $(CLOUD_ENV) \
 	RELEASE_KEYSTORE_PATH=$(ANDROID_KEYSTORE_PATH) \
 	RELEASE_KEYSTORE_PASSWORD=$(ANDROID_KEYSTORE_PASSWORD) \
 	RELEASE_KEY_ALIAS=$(ANDROID_KEY_ALIAS) \
@@ -132,7 +139,7 @@ mobile-web: frontend-build ## Build the PWA and copy it into both app bundles
 android: android-install ## Alias for android-install
 
 android-build: mobile-web ## Build the debug APK without installing
-	cd $(ANDROID_DIR) && HEARTH_APPLICATION_ID=$(ANDROID_APP_ID) $(GRADLE) :app:assembleDebug
+	cd $(ANDROID_DIR) && HEARTH_APPLICATION_ID=$(ANDROID_APP_ID) $(CLOUD_ENV) $(GRADLE) :app:assembleDebug
 	@echo "APK: $(ANDROID_DIR)/app/build/outputs/apk/debug/app-debug.apk"
 
 android-install: android-build ## Build and install the debug app on a connected device (ANDROID_SERIAL= picks one of several)
@@ -171,12 +178,14 @@ ios-generate: ## Regenerate mobile/ios/Hearth.xcodeproj from project.yml (macOS)
 ios-build: mobile-web ios-generate ## Build and run the app on a simulator (macOS)
 	$(call require_macos,ios-build)
 	xcodebuild build -project $(IOS_DIR)/Hearth.xcodeproj -scheme Hearth \
-		-destination "platform=iOS Simulator,name=iPhone 16" -quiet
+		-destination "platform=iOS Simulator,name=iPhone 16" -quiet \
+		$(IOS_CLOUD_SETTINGS)
 
 ios-test: ios-generate ## Run the iOS unit tests on a simulator (macOS)
 	$(call require_macos,ios-test)
 	xcodebuild test -project $(IOS_DIR)/Hearth.xcodeproj -scheme Hearth \
-		-destination "platform=iOS Simulator,name=iPhone 16" -quiet
+		-destination "platform=iOS Simulator,name=iPhone 16" -quiet \
+		$(IOS_CLOUD_SETTINGS)
 
 ios-clean: ## Clean iOS build artifacts and the copied web build
 	rm -rf $(IOS_DIR)/Hearth.xcodeproj $(IOS_DIR)/build $(IOS_WEB)
@@ -276,7 +285,7 @@ ios-archive: _ios-release-ready mobile-web ios-generate ## Archive the app for d
 	xcodebuild archive -project $(IOS_DIR)/Hearth.xcodeproj -scheme Hearth \
 		-destination "generic/platform=iOS" -archivePath $(IOS_ARCHIVE) \
 		PRODUCT_BUNDLE_IDENTIFIER=$(HEARTH_APPLICATION_ID) DEVELOPMENT_TEAM=$(APPLE_TEAM_ID) \
-		$(IOS_AUTH_ARGS) -allowProvisioningUpdates
+		$(IOS_CLOUD_SETTINGS) $(IOS_AUTH_ARGS) -allowProvisioningUpdates
 
 # ExportOptions.plist is written here, not committed: its teamID is an account identifier.
 ios-ipa: ios-archive ## Export a signed .ipa from the archive, then verify it (macOS)
@@ -345,6 +354,9 @@ mobile-secrets: ## Show which publishing inputs are set (names and status only, 
 	@printf '  %-28s %s\n' "ASC_KEY_ID" "$(if $(ASC_KEY_ID),set,MISSING)"
 	@printf '  %-28s %s\n' "ASC_ISSUER_ID" "$(if $(ASC_ISSUER_ID),set,MISSING)"
 	@printf '  %-28s %s\n' "ASC_KEY_PATH" "$(if $(wildcard $(ASC_KEY_PATH)),found,MISSING - TestFlight uploads unavailable)"
+	@printf '  %-28s %s\n' "HEARTH_GOOGLE_DRIVE" "$(if $(filter 1,$(HEARTH_GOOGLE_DRIVE)),on,off - no Google Drive button on Android)"
+	@printf '  %-28s %s\n' "HEARTH_GOOGLE_IOS_CLIENT_ID" "$(if $(HEARTH_GOOGLE_IOS_CLIENT_ID),set,MISSING - no Google Drive button on iOS)"
+	@printf '  %-28s %s\n' "HEARTH_DROPBOX_APP_KEY" "$(if $(HEARTH_DROPBOX_APP_KEY),set,MISSING - no Dropbox button)"
 
 # Dev servers
 # ===========

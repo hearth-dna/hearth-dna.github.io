@@ -17,7 +17,7 @@ type Look = {
  * Header button for the backup folder (docs/architecture/storage/backup-folder.md). Shows at a
  * glance whether this browser and the folder agree, and syncs on click: loads a newer snapshot
  * from another computer first, then writes this browser's state. States that need the user
- * (no folder yet, passphrase, a conflict) open Settings instead.
+ * (no folder yet, a passphrase) open Settings instead.
  */
 export function SyncButton({ onOpenSettings }: { onOpenSettings: () => void }) {
   const t = useT()
@@ -48,18 +48,9 @@ export function SyncButton({ onOpenSettings }: { onOpenSettings: () => void }) {
           tone: '',
           busy: true,
         }
-      case 'conflict':
-        return { icon: '!', label: t('sync.conflict'), title: t('sync.conflictHint'), tone: 'danger' }
       case 'error':
         return { icon: '!', label: t('sync.error'), title: status.message, tone: 'danger' }
       case 'ready':
-        if (status.newer)
-          return {
-            icon: '↓',
-            label: t('sync.newer'),
-            title: t('sync.newerHint', { name: status.name }),
-            tone: 'warn',
-          }
         if (status.dirty)
           return {
             icon: '●',

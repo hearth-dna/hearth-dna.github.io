@@ -4,19 +4,14 @@ import { addAttachment, requestPersistence } from '../attachments/store'
 import { grantConsent, hasConsent } from '../consent/consent'
 import { addHealthEntry } from '../db/repo'
 import type { HealthDraft } from '../documents/draft'
-import { parseTags } from '../health/log'
+import { localDate, parseTags } from '../health/log'
 import { findPreset, presetsFor } from '../health/presets'
 import { useT } from '../i18n/context'
 import { BODY_PARTS, HEALTH_KIND_LABELS, type HealthKind, type Person } from '../types'
 import { AttachmentPicker } from './AttachmentPicker'
 import { ConsentForm } from './ConsentForm'
 
-/** Local date and time; toISOString() is UTC and gives yesterday's date late in the evening. */
 const pad = (n: number) => String(n).padStart(2, '0')
-const today = () => {
-  const d = new Date()
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
-}
 const nowTime = () => {
   const d = new Date()
   return `${pad(d.getHours())}:${pad(d.getMinutes())}`
@@ -38,7 +33,7 @@ const FIELDS: Record<HealthKind, { value?: true; bodyPart?: true; severity?: tru
 }
 
 const blank = (kind: HealthKind | null) => ({
-  date: today(),
+  date: localDate(),
   time: kind && TIMED.has(kind) ? nowTime() : '',
   kind,
   title: '',
@@ -257,7 +252,7 @@ export function HealthEntryForm({
               type="button"
               className="small"
               title={t('healthForm.nowHint')}
-              onClick={() => setForm({ ...form, date: today(), time: nowTime() })}
+              onClick={() => setForm({ ...form, date: localDate(), time: nowTime() })}
             >
               {t('healthForm.now')}
             </button>

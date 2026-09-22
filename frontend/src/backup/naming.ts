@@ -1,7 +1,7 @@
 import type { Header } from '../export/container'
 
 /**
- * Pure naming and conflict rules for the backup folder (docs/architecture/storage/backup-folder.md).
+ * Pure naming and newer-copy rules for the backup folder (docs/architecture/storage/backup-folder.md).
  * Everything that touches a real directory handle lives in folder.ts.
  */
 export const ROTATIONS = 3
@@ -20,6 +20,9 @@ export const rotatedName = (base: string, n: number) => `${base}.${n}`
 export const attachmentsDirName = (profile: string) =>
   profile === 'default' ? 'attachments' : `attachments-${profile}`
 
+/** Where a folder snapshot's genome files go (`external_genomes`), per profile like attachments. */
+export const genomesDirName = (profile: string) => (profile === 'default' ? 'genomes' : `genomes-${profile}`)
+
 /** Copies to make, oldest first, so that `base` can then be overwritten with the newest snapshot. */
 export function rotationPlan(
   existing: string[],
@@ -36,23 +39,10 @@ export function rotationPlan(
   return plan
 }
 
-export function conflictName(base: string, device: string, at: string): string {
-  return `${base.replace(/\.hearth$/, '')}.conflict-${device.slice(0, 8)}-${at.slice(0, 19).replace(/[:T]/g, '-')}.hearth`
-}
-
 /** The header of the snapshot this browser last wrote to or loaded from the folder. */
 export interface Seen {
   device: string
   generation: number
-}
-
-/**
- * True when the folder holds a snapshot from another browser that this one has not loaded: a
- * second PC saved since we last looked, and overwriting would silently discard its work.
- */
-export function isForeign(current: Header | null, ourDevice: string, lastSeen: Seen | null): boolean {
-  if (!current || current.device === ourDevice) return false
-  return !(lastSeen && lastSeen.device === current.device && lastSeen.generation === current.generation)
 }
 
 /** The folder file is newer than what this browser has loaded from it. */

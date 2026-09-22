@@ -3,5 +3,6 @@
   "restore.parsingGenome": "Parsing genome {n} of {total}…",
   "restore.storingCalls": "Storing {n} calls…",
   "restore.storingGenotypes": "Storing genotypes for {name}…",
-  "restore.pullingAttachments": "Fetching attached documents…"
+  "restore.pullingAttachments": "Fetching attached documents…",
+  "restore.fetchingGenome": "Fetching genome {n} of {total}…"
 }

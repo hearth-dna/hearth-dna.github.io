@@ -49,6 +49,19 @@ android {
         targetSdk = libs.versions.targetSdk.get().toInt()
         versionCode = versionProps.getProperty("VERSION_CODE").trim().toInt()
         versionName = versionProps.getProperty("VERSION_NAME").trim()
+
+        // Cloud backup buttons (Cloud.kt, docs/runbook/cloud-backups.md). Both off unless set, so a
+        // clean checkout builds without accounts. Google needs no id in the app — only an Android
+        // OAuth client for this package and signing certificate, registered by the publisher — so
+        // its switch is just "that registration exists". Dropbox's app key is public by design.
+        val dropboxKey = buildProp("HEARTH_DROPBOX_APP_KEY") ?: ""
+        buildConfigField("boolean", "GOOGLE_DRIVE", (buildProp("HEARTH_GOOGLE_DRIVE") == "1").toString())
+        buildConfigField("String", "DROPBOX_APP_KEY", "\"$dropboxKey\"")
+        manifestPlaceholders["dropboxScheme"] = "db-${dropboxKey.ifEmpty { "unset" }}"
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 
     signingConfigs {
@@ -106,6 +119,8 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.webkit)
+    implementation(libs.play.services.auth)
+
 
     testImplementation(libs.junit)
 }

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useApp } from '../app/context'
 import { removeAttachment } from '../attachments/store'
 import { deleteHealthEntry, listAttachments, listFamilyHealthLog } from '../db/repo'
@@ -23,6 +23,11 @@ export function HealthPage({ person: who, onPerson }: { person: string; onPerson
   const [attachments, setAttachments] = useState<Record<string, Attachment[]>>({})
   const [filter, setFilter] = useState<HealthFilter>(NO_FILTER)
   const [adding, setAdding] = useState(false)
+  const formRef = useRef<HTMLDivElement>(null)
+  // On a phone the add button floats over the list; bring the form it opens into view.
+  useEffect(() => {
+    if (adding) formRef.current?.scrollIntoView({ block: 'start', behavior: 'smooth' })
+  }, [adding])
 
   const reload = async () => {
     const rows = await listFamilyHealthLog(db)
@@ -45,7 +50,7 @@ export function HealthPage({ person: who, onPerson }: { person: string; onPerson
   return (
     <div>
       <h1>{t('healthPage.title')}</h1>
-      <p className="muted">{t('healthPage.intro')}</p>
+      <p className="muted intro">{t('healthPage.intro')}</p>
       {persons.length === 0 ? (
         <p className="muted">{t('healthPage.noPeople')}</p>
       ) : (
@@ -68,10 +73,10 @@ export function HealthPage({ person: who, onPerson }: { person: string; onPerson
       {person ? (
         <HealthLog person={person} />
       ) : persons.length > 0 ? (
-        <div className="card">
-          <div className="row">
+        <div className="card log">
+          <div className="row head">
             <h2 style={{ marginRight: 'auto' }}>{t('healthPage.timeline')}</h2>
-            <button type="button" className="primary" disabled={adding} onClick={() => setAdding(true)}>
+            <button type="button" className="primary fab" disabled={adding} onClick={() => setAdding(true)}>
               {t('healthLog.addEntry')}
             </button>
           </div>
@@ -81,6 +86,7 @@ export function HealthPage({ person: who, onPerson }: { person: string; onPerson
             entries={entries}
             onSaved={reload}
           />
+          <div ref={formRef} className="formanchor" />
           {adding && (
             <HealthEntryForm
               persons={persons}

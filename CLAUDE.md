@@ -8,7 +8,8 @@ Guidance for Claude Code in this repository. Kept short; detail lives in `/docs`
   and dotfiles. Everything else goes under `frontend/`, `mobile/`, `kb/`, `landing/`, `docs/`.
 - **There is no server.** Every network call in the frontend goes through
   `frontend/src/egress/egress.ts`; a Vitest test asserts nothing else calls `fetch`. The only
-  destinations are our own origin for static assets and the provider the user brings a key for.
+  destinations are our own origin for static assets, the provider the user brings a key for, and
+  the cloud drive the user signs in to for backups (ADR 0009: provider API hosts only, checked there).
   Nothing server-side may be added back without a new ADR superseding 0007.
 - **Never create a root `package.json`.** Frontend deps live in `frontend/`.
 - No dead code, minimal deps, simple over clever.

@@ -24,5 +24,9 @@
   "consent.backup_folder.title": "Backing up to a folder",
   "consent.backup_folder.statement1": "Hearth will write a copy of everything, including genetic data, to the folder I choose on this computer, a USB stick, or a folder another program syncs to a cloud drive.",
   "consent.backup_folder.statement2": "Whoever can read that folder can read the backup unless I set a passphrase. Losing the passphrase means losing the backup.",
-  "consent.backup_folder.statement3": "Nothing is sent anywhere by Hearth itself; any syncing is done by the software I installed, under its terms."
+  "consent.backup_folder.statement3": "Nothing is sent anywhere by Hearth itself; any syncing is done by the software I installed, under its terms.",
+  "consent.cloud_backup.title": "Backing up to a cloud drive",
+  "consent.cloud_backup.statement1": "Hearth will send an encrypted copy of everything, including genetic data, to the cloud account I choose (Google Drive, Dropbox or iCloud Drive), where it is kept under that provider's terms.",
+  "consent.cloud_backup.statement2": "The copy is encrypted with my passphrase if I set one, and the passphrase stays on this device. Stored unencrypted, anyone who can open that folder can read it. Losing the passphrase means losing an encrypted backup.",
+  "consent.cloud_backup.statement3": "On Google Drive, Hearth can see my whole Drive so that I can choose the folder, and it reads and writes only the backup files in that folder. On Dropbox it reaches only its own app folder. Forgetting the backup in Settings signs Hearth out."
 }

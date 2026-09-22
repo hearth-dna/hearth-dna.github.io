@@ -5,6 +5,7 @@ import {
   genomePath,
   openContainer,
   readHeader,
+  readHeaderPrefix,
   serialiseContainer,
   sha256,
 } from './container'
@@ -52,6 +53,18 @@ async function sample(): Promise<Container> {
 }
 
 describe('dump v2 container', () => {
+  it('reads the header from the first bytes alone, plaintext or encrypted', async () => {
+    const c = await sample()
+    for (const pass of [undefined, 'correct horse']) {
+      const bytes = await serialiseContainer(c, pass)
+      const head = bytes.subarray(0, 1024)
+      expect(readHeaderPrefix(head)).toMatchObject({ generation: 7, device: 'dev-1', encrypted: !!pass })
+      // Too few bytes to settle it: the caller reads the whole file instead of guessing.
+      expect(readHeaderPrefix(bytes.subarray(0, 20))).toBeUndefined()
+    }
+    expect(readHeaderPrefix(strToU8('not a hearth file'))).toBeNull()
+  })
+
   it('round-trips plaintext and exposes the header without opening', async () => {
     const c = await sample()
     const bytes = await serialiseContainer(c)

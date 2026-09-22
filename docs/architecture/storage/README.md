@@ -8,7 +8,7 @@ Status: **implemented** (2026-09-14). Each document ends with where the code liv
 
 | Document | Covers |
 |---|---|
-| [`backup-folder.md`](backup-folder.md) | A user-chosen folder (USB stick, Google Drive / Dropbox / OneDrive synced folder) the app writes backups to and restores from. The primary mechanism. |
+| [`backup-folder.md`](backup-folder.md) | A user-chosen folder (USB stick, Google Drive / Dropbox / OneDrive synced folder) the app writes backups to and restores from. The primary mechanism. On the phones, a folder or single file from the system picker (ADR 0008). |
 | [`portable-archive.md`](portable-archive.md) | One self-contained `hearth-<date>.html` that *is* the app plus the data: double-click it anywhere, browse, save a new copy. |
 | [`cloud-drives.md`](cloud-drives.md) | Google Drive and friends: why the synced-folder route is chosen over a Drive API integration, and what an API integration would cost if it is ever wanted. |
 | [`open-formats.md`](open-formats.md) | CSV and JSON Lines exports of genotypes, findings and the health log for the user's own spreadsheets and scripts. |
@@ -52,7 +52,7 @@ Status: **implemented** (2026-09-14). Each document ends with where the code liv
 | Snapshot from the live database | `frontend/src/export/snapshot.ts` |
 | Restore of v2, v1 and `.html` archives | `frontend/src/export/restore.ts` |
 | Genome file cache, generation counter | `frontend/src/db/db.worker.ts`, `db.ts` |
-| Backup folder | `frontend/src/backup/` (naming + test, folder, scheduler), `components/BackupCard.tsx` |
+| Backup folder | `frontend/src/backup/` (naming + test, folder, native + test, scheduler), `components/BackupCard.tsx`; phones: `mobile/android/.../Files.kt`, `mobile/ios/Hearth/NativeFiles.swift` |
 | Portable archive | `frontend/src/archive/` (payload + test, mode, worker), `archive.html`, `vite.archive.config.ts`, `components/ArchiveCard.tsx` |
 
 Revisit `cloud-drives.md` only if users ask for a browser-only Drive path on a machine where they

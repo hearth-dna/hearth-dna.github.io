@@ -1,5 +1,4 @@
 import type { Dir } from '../backup/folder'
-import { listNames, readFrom, subdir, writeTo } from '../backup/folder'
 import { attachmentsDirName } from '../backup/naming'
 import type { Database } from '../db/db'
 import { attachmentShas } from '../db/repo'
@@ -36,9 +35,9 @@ export async function mirrorAttachments(
 ): Promise<MirrorResult> {
   const wanted = await attachmentShas(db)
   if (wanted.length === 0) return { written: 0, skipped: 0, remaining: 0 }
-  const sub = await subdir(dir, attachmentsDirName(profile), true)
+  const sub = await dir.subdir(attachmentsDirName(profile), true)
   if (!sub) throw new Error('cannot open the attachments folder')
-  const todo = missingSidecars(wanted, await listNames(sub))
+  const todo = missingSidecars(wanted, await sub.names())
   const seal = passphrase ? await sealer(passphrase) : null
   let written = 0
   let skipped = 0
@@ -52,7 +51,7 @@ export async function mirrorAttachments(
       skipped++
       continue
     }
-    await writeTo(sub, sidecarName(todo[i]), seal ? await seal(plain) : plain)
+    await sub.write(sidecarName(todo[i]), seal ? await seal(plain) : plain)
     written++
     bytes += plain.length
   }
@@ -81,14 +80,14 @@ export async function pullAttachments(
   const have = new Set(await db.fileList())
   const todo = shas.filter((sha) => !have.has(attachmentBlobName(sha)))
   if (todo.length === 0) return { pulled: 0, missing: 0 }
-  const sub = await subdir(dir, attachmentsDirName(profile))
+  const sub = await dir.subdir(attachmentsDirName(profile))
   if (!sub) return { pulled: 0, missing: todo.length }
   const open = passphrase ? await opener(passphrase) : null
   let pulled = 0
   let missing = 0
   for (const [n, sha] of todo.entries()) {
     onStep?.(n, todo.length)
-    const raw = await readFrom(sub, sidecarName(sha))
+    const raw = await sub.read(sidecarName(sha))
     if (!raw) {
       missing++
       continue

@@ -25,7 +25,8 @@ object HearthWebView {
 
     /** Where `make mobile-web` puts `frontend/dist/`, inside `src/main/assets/`. */
     private const val WEB_DIR = "web/"
-    const val START_URL = "https://$DOMAIN/index.html"
+    const val ORIGIN = "https://$DOMAIN"
+    const val START_URL = "$ORIGIN/index.html"
 
     @SuppressLint("SetJavaScriptEnabled")
     fun create(activity: AppCompatActivity, openExternally: (Uri) -> Unit): WebView {

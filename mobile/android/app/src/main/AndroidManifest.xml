@@ -2,10 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!--
-      The only permission. It is not for the shell, which has no network code at all: it is for the
-      web app's one outbound path, the BYOK Ask call the user makes with their own API key
-      (frontend/src/egress/egress.ts). Without it that feature fails with an error that explains
-      nothing. Nothing else in the app touches the network — the whole database is local.
+      The only permission. It is for the web app's outbound paths in frontend/src/egress/egress.ts:
+      the BYOK Ask call the user makes with their own API key, and the encrypted cloud backup the
+      user signs in to. The shell's own network use is signing in to that backup (Cloud.kt) and
+      nothing else; the whole database is local.
     -->
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -32,6 +32,18 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <!--
+              Where the browser returns after a Dropbox sign-in (Cloud.kt). The scheme is
+              db-<app key>, filled from HEARTH_DROPBOX_APP_KEY at build time; without a key it is a
+              scheme nothing ever opens. Anything may open it, which is why Cloud.kt checks the
+              state it sent and PKCE makes a stolen code useless.
+            -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="${dropboxScheme}" />
             </intent-filter>
         </activity>
     </application>

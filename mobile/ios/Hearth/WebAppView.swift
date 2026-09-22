@@ -2,8 +2,9 @@ import SwiftUI
 import UIKit
 import WebKit
 
-/// The web view, and the two things a web app cannot do for itself on iOS: open a link outside
-/// itself, and hand the user a file.
+/// The web view, and the three things a web app cannot do for itself on iOS: open a link outside
+/// itself, hand the user a file, and keep a backup in a folder or file the user picked
+/// (NativeFiles.swift).
 ///
 /// It draws edge to edge (see HearthApp) and leaves the safe area to the page: the web app sets
 /// `viewport-fit=cover` and pads its own translucent top bar and tab bar with
@@ -20,6 +21,12 @@ struct WebAppView: UIViewRepresentable {
         // A tap must never open a page inside the app's own origin-bearing web view; links go to
         // Safari (see the navigation delegate below), and a window.open target has nowhere to go.
         configuration.preferences.javaScriptCanOpenWindowsAutomatically = false
+        // The backup place (Settings → Backup): a folder or file from the Files picker, which is
+        // how iCloud Drive, Google Drive and Dropbox reach other apps. Page world only, and the
+        // handler itself refuses any origin but the app's own.
+        configuration.userContentController.addScriptMessageHandler(
+            context.coordinator.files, contentWorld: .page, name: NativeFiles.name
+        )
 
         let web = WKWebView(frame: .zero, configuration: configuration)
         web.navigationDelegate = context.coordinator
@@ -43,6 +50,8 @@ struct WebAppView: UIViewRepresentable {
     func updateUIView(_ uiView: WKWebView, context: Context) {}
 
     final class Coordinator: NSObject, WKNavigationDelegate, WKDownloadDelegate {
+        let files = NativeFiles()
+
         /// Where each running download is being written. Keyed by the download, cleared when it
         /// finishes or fails.
         private var destinations: [ObjectIdentifier: URL] = [:]
@@ -113,7 +122,7 @@ struct WebAppView: UIViewRepresentable {
             guard let file = destinations.removeValue(forKey: ObjectIdentifier(download)) else { return }
             // The share sheet, not a silent save: on iOS the user picks where a file goes — Files,
             // AirDrop, another app — and a dump they cannot find is a backup they do not have.
-            present(UIActivityViewController(activityItems: [file], applicationActivities: nil))
+            presentOnTop(UIActivityViewController(activityItems: [file], applicationActivities: nil))
         }
 
         func download(_ download: WKDownload, didFailWithError error: Error, resumeData: Data?) {
@@ -121,20 +130,22 @@ struct WebAppView: UIViewRepresentable {
                 try? FileManager.default.removeItem(at: file.deletingLastPathComponent())
             }
         }
-
-        private func present(_ controller: UIViewController) {
-            let scene = UIApplication.shared.connectedScenes.first { $0.activationState == .foregroundActive }
-            guard let window = (scene as? UIWindowScene)?.keyWindow,
-                  let top = window.rootViewController
-            else { return }
-            // An iPad share sheet is a popover and needs an anchor, or it crashes on presentation.
-            controller.popoverPresentationController?.sourceView = window
-            controller.popoverPresentationController?.sourceRect = CGRect(
-                x: window.bounds.midX, y: window.bounds.maxY, width: 0, height: 0
-            )
-            top.present(controller, animated: true)
-        }
     }
+}
+
+/// Shows a system sheet (the share sheet, the document picker) over whatever is on screen.
+func presentOnTop(_ controller: UIViewController) {
+    let scene = UIApplication.shared.connectedScenes.first { $0.activationState == .foregroundActive }
+    guard let window = (scene as? UIWindowScene)?.keyWindow,
+          var top = window.rootViewController
+    else { return }
+    while let presented = top.presentedViewController { top = presented }
+    // An iPad share sheet is a popover and needs an anchor, or it crashes on presentation.
+    controller.popoverPresentationController?.sourceView = window
+    controller.popoverPresentationController?.sourceRect = CGRect(
+        x: window.bounds.midX, y: window.bounds.maxY, width: 0, height: 0
+    )
+    top.present(controller, animated: true)
 }
 
 /// The name a downloaded file is written under.

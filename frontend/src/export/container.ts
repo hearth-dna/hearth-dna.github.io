@@ -36,6 +36,11 @@ export interface Manifest {
   app_version: string
   profile: string
   genomes: GenomeEntry[]
+  /**
+   * The genome files are not in the zip but beside it, in the backup folder's `genomes/`, each named
+   * by its entry's path and checked against its sha256 on load. Absent means they are inside.
+   */
+  external_genomes?: boolean
 }
 
 export interface Journal {
@@ -129,6 +134,31 @@ export function readHeader(bytes: Uint8Array): Header | null {
   return raw ? parseHeader(raw) : null
 }
 
+/**
+ * The header from the first bytes of a file alone, so checking a folder for news never downloads a
+ * whole snapshot (tens of megabytes on a cloud drive). Works because `header.json` travels in front:
+ * plaintext ahead of an envelope, or as the first, stored zip entry. Undefined when the prefix does
+ * not settle it (an older layout, too few bytes): read the whole file then.
+ */
+export function readHeaderPrefix(bytes: Uint8Array): Header | null | undefined {
+  if (isEnvelope(bytes)) {
+    const at = MAGIC.length + 2
+    if (bytes.length < at) return undefined
+    const len = (bytes[MAGIC.length] << 8) | bytes[MAGIC.length + 1]
+    return bytes.length < at + len ? undefined : parseHeader(bytes.subarray(at, at + len))
+  }
+  if (!isZip(bytes)) return null
+  const v = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength)
+  if (bytes.length < 30 || v.getUint32(0, true) !== 0x04034b50) return undefined
+  const method = v.getUint16(8, true)
+  const size = v.getUint32(18, true)
+  const nameLength = v.getUint16(26, true)
+  const start = 30 + nameLength + v.getUint16(28, true)
+  if (method !== 0 || bytes.length < start + size) return undefined
+  if (strFromU8(bytes.subarray(30, 30 + nameLength)) !== HEADER_ENTRY) return undefined
+  return parseHeader(bytes.subarray(start, start + size))
+}
+
 /** Bytes → container, verifying every genome entry's hash. */
 export async function openContainer(bytes: Uint8Array, passphrase?: string): Promise<Container> {
   let zip = bytes
@@ -157,6 +187,7 @@ export async function openContainer(bytes: Uint8Array, passphrase?: string): Pro
   const genomes: Record<string, Uint8Array> = {}
   for (const g of manifest.genomes) {
     const data = entries[g.path]
+    if (!data && manifest.external_genomes) continue
     if (!data) throw new Error(`missing ${g.path}`)
     if ((await sha256(data)) !== g.sha256) throw new Error(`corrupt entry ${g.path}`)
     genomes[g.path] = data

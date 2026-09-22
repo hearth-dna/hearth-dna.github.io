@@ -33,6 +33,7 @@ import androidx.webkit.WebViewCompat
  */
 class MainActivity : AppCompatActivity() {
     private lateinit var web: WebView
+    private lateinit var files: Files
     private var pendingFileChooser: ValueCallback<Array<Uri>>? = null
 
     /**
@@ -76,6 +77,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         web = HearthWebView.create(this, ::openExternally)
+        // The backup place (Settings → Backup): a folder or file from the system picker, which is
+        // how Google Drive, Dropbox and OneDrive reach other apps. Installed before the first load,
+        // since the page only gets the channel on navigations that start after this.
+        files = Files(this).also { it.install(web) }
+        intent?.data?.let { files.cloud.onRedirect(it) }
 
         // The web app lays out for the viewport it is given and knows nothing about status bars,
         // gesture handles or the keyboard; without this its top bar sits under the clock. The
@@ -117,6 +123,17 @@ class MainActivity : AppCompatActivity() {
         })
 
         if (savedInstanceState == null) web.loadUrl(HearthWebView.START_URL)
+    }
+
+    /** The browser coming back from a Dropbox sign-in (the `db-<app key>` scheme, singleTask). */
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        if (::files.isInitialized) intent.data?.let { files.cloud.onRedirect(it) }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (::files.isInitialized) files.cloud.onResume()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

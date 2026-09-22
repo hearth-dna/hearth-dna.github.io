@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Database } from '../db/db'
-import { type Container, serialiseContainer } from './container'
+import { type Container, genomePath, serialiseContainer, sha256 } from './container'
 import { restoreBytes } from './restore'
 
 /** Records every statement; enough to assert what a restore writes. */
@@ -95,5 +95,63 @@ describe('restoring attachments', () => {
     c.journal.attachments = undefined
     await restoreBytes(db, await serialiseContainer(c), undefined)
     expect(log.some(([sql]) => sql.includes('INTO attachment'))).toBe(false)
+  })
+})
+
+describe('restoring a folder snapshot whose genomes live beside it', () => {
+  const external = async (gz: Uint8Array): Promise<Container> => {
+    const c = container([])
+    const hash = await sha256(gz)
+    return {
+      ...c,
+      manifest: {
+        ...c.manifest,
+        external_genomes: true,
+        genomes: [
+          {
+            path: genomePath(hash),
+            sha256: hash,
+            person_id: 'p1',
+            source_file_id: null,
+            provider: 'generic',
+            build: '37',
+            kind: 'reconstructed',
+          },
+        ],
+      },
+    }
+  }
+  const gz = new Uint8Array([31, 139, 8, 0, 0, 0, 0, 0])
+
+  it('asks the folder for each genome by its manifest path', async () => {
+    const { db } = fakeDb()
+    const asked: string[] = []
+    const r = await restoreBytes(
+      db,
+      await serialiseContainer(await external(gz)),
+      undefined,
+      () => {},
+      async (g) => {
+        asked.push(g.path)
+        return null
+      },
+    )
+    expect(asked).toEqual([genomePath(await sha256(gz))])
+    // Not in the folder yet: skipped, and retried by the next load.
+    expect(r.genomes).toBe(0)
+  })
+
+  it('refuses a genome file that does not match the manifest', async () => {
+    const { db } = fakeDb()
+    const bytes = await serialiseContainer(await external(gz))
+    await expect(
+      restoreBytes(
+        db,
+        bytes,
+        undefined,
+        () => {},
+        async () => new Uint8Array([1, 2, 3]),
+      ),
+    ).rejects.toThrow(/corrupt genome file/)
   })
 })

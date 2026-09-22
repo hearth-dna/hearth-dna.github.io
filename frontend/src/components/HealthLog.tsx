@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useApp } from '../app/context'
 import { removeAttachment } from '../attachments/store'
 import { deleteHealthEntry, listAttachments, listHealthLog } from '../db/repo'
@@ -27,6 +27,11 @@ export function HealthLog({ person }: { person: Person }) {
     draft?: { draft: HealthDraft; source: string; files?: File[] }
   } | null>(null)
   const [reading, setReading] = useState(false)
+  const formRef = useRef<HTMLDivElement>(null)
+  // On a phone the add button floats over the list; bring the form it opens into view.
+  useEffect(() => {
+    if (adding) formRef.current?.scrollIntoView({ block: 'start', behavior: 'smooth' })
+  }, [adding])
 
   const reload = async () => {
     const rows = await listHealthLog(db, person.id)
@@ -48,18 +53,19 @@ export function HealthLog({ person }: { person: Person }) {
   const { tags } = useMemo(() => facets(entries), [entries])
 
   return (
-    <div className="card">
-      <div className="row">
+    <div className="card log">
+      <div className="row head">
         <h2 style={{ marginRight: 'auto' }}>{t('healthLog.title')}</h2>
-        <button type="button" className="primary" disabled={!!adding} onClick={() => setAdding({})}>
+        <button type="button" className="primary fab" disabled={!!adding} onClick={() => setAdding({})}>
           {t('healthLog.addEntry')}
         </button>
         <button type="button" onClick={() => setReading(true)}>
           {t('healthLog.readDocument')}
         </button>
       </div>
-      <p className="muted">{t('healthLog.intro')}</p>
+      <p className="muted intro">{t('healthLog.intro')}</p>
       <QuickMeasurement persons={[person]} personId={person.id} entries={entries} onSaved={reload} />
+      <div ref={formRef} className="formanchor" />
       {adding && (
         <HealthEntryForm
           key={adding.draft?.source ?? 'new'}

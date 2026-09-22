@@ -86,8 +86,34 @@ targets:
         # still requiring HTTPS, which is what the BYOK Ask call uses.
         NSAppTransportSecurity:
           NSAllowsLocalNetworking: true
+        # The cloud backup buttons (Cloud.swift, docs/runbook/cloud-backups.md). Filled from the
+        # gitignored .env through build settings; empty means the button is not offered. Both are
+        # public identifiers (an iOS OAuth client id, a Dropbox app key), but still account
+        # identifiers, so they never appear in this file.
+        HearthGoogleClientID: $(HEARTH_GOOGLE_IOS_CLIENT_ID)
+        HearthDropboxAppKey: $(HEARTH_DROPBOX_APP_KEY)
+        # Shows the app's iCloud container in iCloud Drive as a "Hearth" folder, so the user can
+        # see the backup there and it survives the app being deleted.
+        NSUbiquitousContainers:
+          iCloud.$(PRODUCT_BUNDLE_IDENTIFIER):
+            NSUbiquitousContainerIsDocumentScopePublic: true
+            NSUbiquitousContainerName: Hearth
+            NSUbiquitousContainerSupportedFolderLevels: Any
+    # iCloud Drive for the iCloud backup button. The container is named after the bundle id, so it
+    # follows HEARTH_APPLICATION_ID; the publisher enables iCloud (CloudDocuments) on that App ID.
+    entitlements:
+      path: Hearth/Hearth.entitlements
+      properties:
+        com.apple.developer.icloud-container-identifiers:
+          - iCloud.$(PRODUCT_BUNDLE_IDENTIFIER)
+        com.apple.developer.icloud-services:
+          - CloudDocuments
+        com.apple.developer.ubiquity-container-identifiers:
+          - iCloud.$(PRODUCT_BUNDLE_IDENTIFIER)
     settings:
       base:
+        HEARTH_GOOGLE_IOS_CLIENT_ID: ""
+        HEARTH_DROPBOX_APP_KEY: ""
         PRODUCT_BUNDLE_IDENTIFIER: example.hearth.app$(BUNDLE_ID_SUFFIX)
         PRODUCT_NAME: Hearth
         TARGETED_DEVICE_FAMILY: "1,2"

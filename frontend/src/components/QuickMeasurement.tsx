@@ -2,17 +2,13 @@ import { useEffect, useState } from 'react'
 import { useApp } from '../app/context'
 import { grantConsent, hasConsent } from '../consent/consent'
 import { addHealthEntry } from '../db/repo'
-import { formatValue } from '../health/log'
+import { formatValue, localDate } from '../health/log'
 import { findPreset, type HealthPreset, measurementOrder } from '../health/presets'
 import { useT } from '../i18n/context'
 import type { HealthEntry, Person } from '../types'
 import { ConsentForm } from './ConsentForm'
 
 const pad = (n: number) => String(n).padStart(2, '0')
-const today = () => {
-  const d = new Date()
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
-}
 const nowTime = () => {
   const d = new Date()
   return `${pad(d.getHours())}:${pad(d.getMinutes())}`
@@ -67,7 +63,7 @@ export function QuickMeasurement({
     if (consented === false) return setAsking(true)
     const entry = {
       personId,
-      date: today(),
+      date: localDate(),
       time: nowTime(),
       kind: 'measurement' as const,
       title: finalTitle,

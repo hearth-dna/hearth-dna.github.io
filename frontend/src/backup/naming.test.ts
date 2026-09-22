@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Header } from '../export/container'
-import { attachmentsDirName, baseName, conflictName, hasNewer, isForeign, rotationPlan } from './naming'
+import { attachmentsDirName, baseName, hasNewer, rotationPlan } from './naming'
 
 const header = (device: string, generation: number): Header => ({
   format: 'hearth-dump',
@@ -26,20 +26,6 @@ describe('backup naming', () => {
       { from: `${base}.1`, to: `${base}.2` },
       { from: base, to: `${base}.1` },
     ])
-  })
-
-  it('builds a conflict name without colons', () => {
-    expect(conflictName('hearth-backup.hearth', 'abcdef01-2345', '2026-09-14T10:00:00.000Z')).toBe(
-      'hearth-backup.conflict-abcdef01-2026-09-14-10-00-00.hearth',
-    )
-  })
-
-  it('detects another device having written since we last looked', () => {
-    expect(isForeign(null, 'A', null)).toBe(false)
-    expect(isForeign(header('A', 9), 'A', null)).toBe(false)
-    expect(isForeign(header('B', 5), 'A', null)).toBe(true)
-    expect(isForeign(header('B', 5), 'A', { device: 'B', generation: 5 })).toBe(false)
-    expect(isForeign(header('B', 6), 'A', { device: 'B', generation: 5 })).toBe(true)
   })
 
   it('offers a load when the folder is ahead of what we loaded', () => {

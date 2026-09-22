@@ -5,7 +5,7 @@ import { genomeBlobName, importCalls, insertSourceFile, setParent, storeCalls } 
 import { parseRawText } from '../import/parseFile'
 import { sha256Hex } from '../import/unpack'
 import type { Person, SourceFile } from '../types'
-import { type Container, openContainer, readHeader } from './container'
+import { type Container, type GenomeEntry, openContainer, readHeader, sha256 } from './container'
 import { type DumpV1, deserialiseDump, expandDump } from './dump'
 
 /**
@@ -24,17 +24,24 @@ export interface RestoreResult {
   exportedAt: string
 }
 
+/**
+ * Fetches a genome a folder snapshot keeps beside itself (`external_genomes`); null when the folder
+ * does not have it (yet). Its bytes are checked against the manifest before anything is parsed.
+ */
+export type LoadGenome = (entry: GenomeEntry) => Promise<Uint8Array | null>
+
 export async function restoreBytes(
   db: Database,
   bytes: Uint8Array,
   passphrase: string | undefined,
   onProgress: Progress = () => {},
+  loadGenome: LoadGenome = async () => null,
 ): Promise<RestoreResult> {
   const b64 = looksLikeHtml(bytes) ? extractPayload(strFromU8(bytes)) : null
-  if (b64) return restoreBytes(db, decodePayload(b64), passphrase, onProgress)
+  if (b64) return restoreBytes(db, decodePayload(b64), passphrase, onProgress, loadGenome)
   if (readHeader(bytes)) {
     onProgress('restore.openingDump')
-    return restoreContainer(db, await openContainer(bytes, passphrase), onProgress)
+    return restoreContainer(db, await openContainer(bytes, passphrase), onProgress, loadGenome)
   }
   onProgress('restore.openingDump')
   return restoreV1(db, await deserialiseDump(bytes, passphrase), onProgress)
@@ -139,7 +146,12 @@ async function insertAttachmentRows(db: Database, rows: Rows): Promise<void> {
   }
 }
 
-async function restoreContainer(db: Database, c: Container, onProgress: Progress): Promise<RestoreResult> {
+async function restoreContainer(
+  db: Database,
+  c: Container,
+  onProgress: Progress,
+  loadGenome: LoadGenome,
+): Promise<RestoreResult> {
   const j = c.journal
   const hadGenotypes = await personsWithGenotypes(db)
   const before = await existingIds(db, 'person')
@@ -172,13 +184,22 @@ async function restoreContainer(db: Database, c: Container, onProgress: Progress
   let genomes = 0
   for (const g of c.manifest.genomes) {
     if (hadGenotypes.has(g.person_id)) continue
-    const text = strFromU8(gunzipSync(c.genomes[g.path]))
+    let gz: Uint8Array | null = c.genomes[g.path] ?? null
+    if (!gz) {
+      onProgress('restore.fetchingGenome', { n: genomes + 1, total: c.manifest.genomes.length })
+      gz = await loadGenome(g)
+      // Not in the folder yet (the other device is still uploading it): this person keeps no
+      // genotypes for now, and the next load, which skips people who have them, tries again.
+      if (!gz) continue
+      if ((await sha256(gz)) !== g.sha256) throw new Error(`corrupt genome file ${g.path}`)
+    }
+    const text = strFromU8(gunzipSync(gz))
     onProgress('restore.parsingGenome', { n: genomes + 1, total: c.manifest.genomes.length })
     const r = await parseRawText(text, undefined, g.kind === 'original' ? g.provider : 'generic')
     onProgress('restore.storingCalls', { n: r.calls.length.toLocaleString() })
     await storeCalls(db, g.person_id, r.calls)
     // Keep the original so this browser's own backups ship it too.
-    if (g.kind === 'original') await db.filePut(genomeBlobName(await sha256Hex(text)), c.genomes[g.path])
+    if (g.kind === 'original') await db.filePut(genomeBlobName(await sha256Hex(text)), gz)
     genomes++
   }
   const after = await existingIds(db, 'person')

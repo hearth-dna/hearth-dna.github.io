@@ -18,6 +18,8 @@ What is left for a shell is small, and each piece has a reason it cannot be done
 | Serving the app | `WebViewAssetLoader`, `https://appassets.androidplatform.net/` | `LocalWebServer.swift`, `http://127.0.0.1:17800/` |
 | Picking a file to import | `WebChromeClient.onShowFileChooser` | nothing — WKWebView does it |
 | Saving an export | `Downloads.kt` → MediaStore | `WKDownload` → the share sheet |
+| Backup place | `Files.kt` → Storage Access Framework (folder or single file) | `NativeFiles.swift` → Files picker, security-scoped bookmarks, the iCloud container |
+| Cloud sign-in | `Cloud.kt` → Play services (Google), PKCE in the browser (Dropbox) | `Cloud.swift` → PKCE in `ASWebAuthenticationSession`, Keychain |
 | Screen fit | edge to edge; insets (bars, cutout, keyboard) pad the container, painted in the web app's bar colour | edge to edge; the page pads itself with `env(safe-area-inset-*)` |
 | Links off-origin | `shouldOverrideUrlLoading` → browser | `decidePolicyFor` → Safari |
 
@@ -69,7 +71,9 @@ with no installs, reviews or upgrade path.
 
 ## What the shells deliberately do not have
 
-No push notifications, no background work, no native sync, no analytics, no crash reporter, no
-third-party SDK of any kind. Android asks for exactly one permission (`INTERNET`, for the web app's
-BYOK Ask call) and turns off `allowBackup` so that Android's own cloud backup cannot copy the
-database off the device.
+No push notifications, no background work, no native sync (the backup place is file I/O through the
+system picker, driven by the web app — ADR 0008; cloud sign-in hands the web app tokens and nothing
+else — ADR 0009), no analytics, no crash reporter, and no third-party SDK beyond Play services'
+sign-in client (ADR 0009). Android asks for exactly one permission (`INTERNET`, for the web app's
+BYOK Ask call and cloud backups) and turns off `allowBackup` so that Android's own cloud backup
+cannot copy the database off the device.

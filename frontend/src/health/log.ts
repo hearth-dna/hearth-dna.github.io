@@ -24,6 +24,20 @@ export function normTime(s: string): string {
   return `${m[1].padStart(2, '0')}:${m[2]}`
 }
 
+const pad = (n: number) => String(n).padStart(2, '0')
+
+/** Today (or `d`) as a local YYYY-MM-DD; toISOString() is UTC and gives yesterday's date late in the evening. */
+export function localDate(d = new Date()): string {
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
+}
+
+/** The YYYY-MM-DD `days` calendar days before `date`. */
+export function daysBefore(date: string, days: number): string {
+  const d = new Date(`${date}T00:00:00Z`)
+  d.setUTCDate(d.getUTCDate() - days)
+  return d.toISOString().slice(0, 10)
+}
+
 /** '2026-09-14 08:05', or just the date when no time was recorded. */
 export const when = (e: Pick<HealthEntry, 'date' | 'time'>) => (e.time ? `${e.date} ${e.time}` : e.date)
 
@@ -80,6 +94,11 @@ export const NO_FILTER: HealthFilter = {
 
 export function isFiltering(f: HealthFilter): boolean {
   return Object.values(f).some((v) => v !== '' && v !== null)
+}
+
+/** Filters set in the Filters panel (not the kind chips or the search box); the count on its button. */
+export function panelFilterCount(f: HealthFilter): number {
+  return [f.person, f.bodyPart, f.tag, f.from || f.to, f.minSeverity !== null].filter(Boolean).length
 }
 
 export function filterHealthLog(entries: HealthEntry[], f: HealthFilter): HealthEntry[] {
@@ -153,4 +172,15 @@ export function facets(entries: HealthEntry[]): { bodyParts: string[]; tags: str
     for (const t of e.tags) tags.add(t)
   }
   return { bodyParts: [...bodyParts].sort(), tags: [...tags].sort() }
+}
+
+/** Runs of consecutive entries sharing a date, in the order given: the card view's day headings. */
+export function groupByDate(entries: HealthEntry[]): { date: string; entries: HealthEntry[] }[] {
+  const out: { date: string; entries: HealthEntry[] }[] = []
+  for (const e of entries) {
+    const last = out[out.length - 1]
+    if (last?.date === e.date) last.entries.push(e)
+    else out.push({ date: e.date, entries: [e] })
+  }
+  return out
 }

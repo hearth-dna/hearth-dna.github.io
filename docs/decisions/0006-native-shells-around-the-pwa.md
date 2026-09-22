@@ -1,6 +1,6 @@
 # ADR 0006: the mobile apps are native shells around the PWA
 
-**Date:** 2026-09-19 · **Status:** Accepted · **Amends:** [design.md §1, §6.6](../design.md)
+**Date:** 2026-09-19 · **Status:** Accepted · **Amends:** [design.md §1, §6.6](../design.md) · **Amended by:** [0008](0008-cloud-backups-on-the-phones.md)
 
 ## Context
 
@@ -64,3 +64,5 @@ database. When 17800 is taken the app says so and stops.
   be a reason to hold data outside the web app.
 - **Revisit if** a feature needs a platform API the web cannot reach at all (health-kit style
   imports, a background folder sync). That would be one native module beside the shell, not a port.
+  ADR 0008 is the first such module: the system document picker and file calls for the backup
+  place.
