@@ -678,5 +678,17 @@
   "driveFolder.pickOne": "Pilih folder: cari, atau buka Drive Saya di bawah.",
   "driveFolder.expand": "Tampilkan folder di {name}",
   "backupCard.passphraseKept": "Disimpan di perangkat ini, dienkripsi oleh ponsel, sehingga pencadangan berlanjut setelah dimulai ulang.",
-  "restore.fetchingGenome": "Mengambil genom {n} dari {total}…"
+  "restore.fetchingGenome": "Mengambil genom {n} dari {total}…",
+  "native.intro": "Catatan kesehatan dan genom keluarga Anda hanya disimpan di ponsel ini. Tidak ada akun dan tidak ada salinan di server. Untuk memindahkan data antarperangkat, gunakan cadangan.",
+  "native.restoreBackup": "Pulihkan cadangan…",
+  "native.restored": "{people} orang baru dan {entries} catatan kesehatan dipulihkan. Genom dan file lampiran belum ada di versi aplikasi ini.",
+  "native.encryptedTitle": "Cadangan ini terenkripsi",
+  "native.open": "Buka",
+  "native.ok": "OK",
+  "native.emptyTitle": "Belum ada apa-apa",
+  "native.emptyBody": "Pulihkan cadangan yang dibuat dengan Hearth di web atau di ponsel lain untuk melihat catatan kesehatan keluarga Anda di sini.",
+  "native.firstLaunchStorage": "Semua yang saya impor tetap di ponsel ini. Hearth tidak punya akun dan tidak menyimpan salinan data saya di server; jika saya mencopot aplikasi tanpa membuat cadangan, data itu hilang.",
+  "native.notBackup": "File ini bukan cadangan Hearth yang dapat dibuka aplikasi ini. Pilih file .hearth yang disimpan dengan versi Hearth saat ini.",
+  "native.damaged": "Cadangan ini rusak dan tidak dapat dibaca. Tidak ada yang diubah.",
+  "native.error": "Terjadi kesalahan: {error}"
 }

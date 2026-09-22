@@ -678,5 +678,17 @@
   "driveFolder.pickOne": "フォルダを選んでください。検索するか、下のマイドライブを開きます。",
   "driveFolder.expand": "{name} 内のフォルダを表示",
   "backupCard.passphraseKept": "この端末に、電話機によって暗号化して保存されるため、再起動後もバックアップが続きます。",
-  "restore.fetchingGenome": "ゲノム {n}/{total} を取得中…"
+  "restore.fetchingGenome": "ゲノム {n}/{total} を取得中…",
+  "native.intro": "ご家族の健康記録とゲノムは、この電話にのみ保存されます。アカウントもサーバー上のコピーもありません。端末間でデータを移すにはバックアップを使ってください。",
+  "native.restoreBackup": "バックアップを復元…",
+  "native.restored": "新しい人物 {people} 人と健康記録 {entries} 件を復元しました。ゲノムと添付ファイルは、このバージョンのアプリではまだ扱えません。",
+  "native.encryptedTitle": "このバックアップは暗号化されています",
+  "native.open": "開く",
+  "native.ok": "OK",
+  "native.emptyTitle": "まだ何もありません",
+  "native.emptyBody": "ウェブ版や別の電話の Hearth で作ったバックアップを復元すると、ご家族の健康記録がここに表示されます。",
+  "native.firstLaunchStorage": "取り込んだものはすべてこの電話に残ります。Hearth にはアカウントがなく、サーバーにデータのコピーもありません。バックアップを作らずにアプリを削除すると、データは失われます。",
+  "native.notBackup": "このファイルは、このアプリで開ける Hearth のバックアップではありません。現在のバージョンの Hearth で保存した .hearth ファイルを選んでください。",
+  "native.damaged": "このバックアップは破損していて読み込めませんでした。何も変更されていません。",
+  "native.error": "問題が発生しました: {error}"
 }

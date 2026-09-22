@@ -678,5 +678,17 @@
   "driveFolder.pickOne": "请选择文件夹：搜索，或展开下方的“我的云端硬盘”。",
   "driveFolder.expand": "显示 {name} 中的文件夹",
   "backupCard.passphraseKept": "由手机加密后保存在本设备上，因此重启后备份仍会继续。",
-  "restore.fetchingGenome": "正在获取第 {n}/{total} 个基因组…"
+  "restore.fetchingGenome": "正在获取第 {n}/{total} 个基因组…",
+  "native.intro": "您家人的健康日志和基因组只保存在这部手机上。没有账户，服务器上也没有副本。要在设备之间转移数据，请使用备份。",
+  "native.restoreBackup": "恢复备份…",
+  "native.restored": "已恢复 {people} 位新成员和 {entries} 条健康记录。此版本的应用暂不支持基因组和附件。",
+  "native.encryptedTitle": "此备份已加密",
+  "native.open": "打开",
+  "native.ok": "确定",
+  "native.emptyTitle": "这里还没有内容",
+  "native.emptyBody": "恢复用网页版或另一部手机上的 Hearth 创建的备份，即可在这里查看家人的健康日志。",
+  "native.firstLaunchStorage": "我导入的所有内容都留在这部手机上。Hearth 没有账户，服务器上也没有我的数据副本；如果不先备份就卸载应用，数据将会丢失。",
+  "native.notBackup": "此文件不是本应用能打开的 Hearth 备份。请选择用当前版本 Hearth 保存的 .hearth 文件。",
+  "native.damaged": "此备份已损坏，无法读取。未做任何更改。",
+  "native.error": "出错了：{error}"
 }

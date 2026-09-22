@@ -678,5 +678,17 @@
   "driveFolder.pickOne": "Bir klasör seçin: arayın ya da aşağıda Drive'ım'ı açın.",
   "driveFolder.expand": "{name} içindeki klasörleri göster",
   "backupCard.passphraseKept": "Bu cihazda, telefon tarafından şifrelenmiş olarak saklanır; böylece yedekler yeniden başlatmadan sonra da sürer.",
-  "restore.fetchingGenome": "Genom {n}/{total} alınıyor…"
+  "restore.fetchingGenome": "Genom {n}/{total} alınıyor…",
+  "native.intro": "Ailenizin sağlık günlüğü ve genomları yalnızca bu telefonda saklanır. Hesap yoktur, sunucuda kopya yoktur. Verileri cihazlar arasında taşımak için yedek kullanın.",
+  "native.restoreBackup": "Yedeği geri yükle…",
+  "native.restored": "{people} yeni kişi ve {entries} sağlık kaydı geri yüklendi. Genomlar ve ekli dosyalar uygulamanın bu sürümünde henüz yok.",
+  "native.encryptedTitle": "Bu yedek şifreli",
+  "native.open": "Aç",
+  "native.ok": "Tamam",
+  "native.emptyTitle": "Burada henüz bir şey yok",
+  "native.emptyBody": "Ailenizin sağlık günlüğünü burada görmek için web'de veya başka bir telefonda Hearth ile alınmış bir yedeği geri yükleyin.",
+  "native.firstLaunchStorage": "İçe aktardığım her şey bu telefonda kalır. Hearth'in hesabı ve sunucuda verilerimin kopyası yoktur; yedek almadan uygulamayı kaldırırsam veriler kaybolur.",
+  "native.notBackup": "Bu dosya, bu uygulamanın açabileceği bir Hearth yedeği değil. Hearth'in güncel sürümüyle kaydedilmiş bir .hearth dosyası seçin.",
+  "native.damaged": "Bu yedek bozuk ve okunamadı. Hiçbir şey değiştirilmedi.",
+  "native.error": "Bir şeyler ters gitti: {error}"
 }

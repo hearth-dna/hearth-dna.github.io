@@ -678,5 +678,17 @@
   "driveFolder.pickOne": "Wybierz folder: wyszukaj albo otwórz Mój dysk poniżej.",
   "driveFolder.expand": "Pokaż foldery w {name}",
   "backupCard.passphraseKept": "Przechowywane na tym urządzeniu, zaszyfrowane przez telefon, więc kopie działają dalej po ponownym uruchomieniu.",
-  "restore.fetchingGenome": "Pobieranie genomu {n} z {total}…"
+  "restore.fetchingGenome": "Pobieranie genomu {n} z {total}…",
+  "native.intro": "Dziennik zdrowia i genomy Twojej rodziny są przechowywane tylko na tym telefonie. Nie ma konta ani kopii na żadnym serwerze. Aby przenieść dane między urządzeniami, użyj kopii zapasowej.",
+  "native.restoreBackup": "Przywróć kopię zapasową…",
+  "native.restored": "Przywrócono nowe osoby ({people}) i wpisy zdrowotne ({entries}). Genomy i załączone pliki nie są jeszcze obsługiwane w tej wersji aplikacji.",
+  "native.encryptedTitle": "Ta kopia zapasowa jest zaszyfrowana",
+  "native.open": "Otwórz",
+  "native.ok": "OK",
+  "native.emptyTitle": "Jeszcze nic tu nie ma",
+  "native.emptyBody": "Przywróć kopię zapasową utworzoną w Hearth w przeglądarce lub na innym telefonie, aby zobaczyć tu dziennik zdrowia rodziny.",
+  "native.firstLaunchStorage": "Wszystko, co importuję, zostaje na tym telefonie. Hearth nie ma kont ani kopii moich danych na serwerze; jeśli odinstaluję aplikację bez kopii zapasowej, dane przepadną.",
+  "native.notBackup": "Ten plik nie jest kopią zapasową Hearth, którą ta aplikacja może otworzyć. Wybierz plik .hearth zapisany w bieżącej wersji Hearth.",
+  "native.damaged": "Ta kopia zapasowa jest uszkodzona i nie dało się jej odczytać. Nic nie zostało zmienione.",
+  "native.error": "Coś poszło nie tak: {error}"
 }

@@ -1,5 +1,13 @@
 # mobile/ — the Android and iOS apps
 
+> **In transition.** [ADR 0010](../docs/decisions/0010-native-apps.md) replaces the web-view shells
+> described below with native apps (Compose on Android, SwiftUI on iOS), each with its own data
+> layer, built screen by screen beside the shell; the spec is
+> [native-apps.md](../docs/architecture/native-apps.md). Until parity, everything below still
+> describes what ships. The native screens run from a debug-only entry point: the **Hearth
+> native** launcher icon on Android, the `-native` launch argument on iOS. `make mobile-i18n`
+> copies the strings in; `mobile/fixtures/` holds the backups every restore test opens.
+
 Both apps are the same PWA in a native window: one `WebView` on Android, one `WKWebView` on iOS,
 each serving `frontend/dist/` from inside the app over a real, network-less origin. There is no
 native model layer on either side, and there must not be one — the genome, the pedigree, the health

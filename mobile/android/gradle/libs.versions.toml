@@ -1,7 +1,7 @@
-# Every dependency version for the Android shell, in one place (the idiom is ../../../sentio's).
-# The shell is deliberately tiny: an Activity, a WebView, an asset loader. Anything that would
-# add a DI container, a UI toolkit or a networking library belongs in the web app instead — see
-# ../../docs/decisions/0006-native-shells-around-the-pwa.md.
+# Every dependency version for the Android app, in one place (the idiom is ../../../sentio's).
+# The app is moving from a web-view shell to native Compose screens
+# (../../docs/decisions/0010-native-apps.md). Keep the list short: Compose and Material 3 are the
+# UI; the database is the framework's SQLite, the backup crypto is javax.crypto, zip is java.util.
 
 [versions]
 agp = "8.13.2"
@@ -25,8 +25,14 @@ appcompat = "1.7.0"
 coreKtx = "1.15.0"
 webkit = "1.12.1"
 playServicesAuth = "21.3.0"
+# The Compose BOM and lifecycle are held where ../../../sentio holds them: the 2026.x BOMs and
+# current lifecycle/activity releases declare an AAR-metadata floor of compileSdk 37.
+composeBom = "2024.12.01"
+lifecycle = "2.8.7"
 
 junit = "4.13.2"
+json = "20231013"
+sqliteJdbc = "3.41.2.2"
 
 [libraries]
 androidx-activity = { module = "androidx.activity:activity", version.ref = "activity" }
@@ -40,9 +46,21 @@ androidx-webkit = { module = "androidx.webkit:webkit", version.ref = "webkit" }
 # client id or secret in the app. The one dependency the shell has that is not AndroidX.
 play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
 
+# Compose is a BOM: the androidx.compose artifacts are version-less and take theirs from it.
+androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
+androidx-compose-ui = { module = "androidx.compose.ui:ui" }
+androidx-compose-material3 = { module = "androidx.compose.material3:material3" }
+androidx-compose-material-icons-core = { module = "androidx.compose.material:material-icons-core" }
+androidx-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
+androidx-compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity" }
+androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
 
 junit = { module = "junit:junit", version.ref = "junit" }
+json = { module = "org.json:json", version.ref = "json" }
+sqlite-jdbc = { module = "org.xerial:sqlite-jdbc", version.ref = "sqliteJdbc" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

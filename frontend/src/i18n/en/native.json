@@ -1,0 +1,14 @@
+{
+  "native.intro": "Your family's health log and genomes are stored only on this phone. There is no account and no server-side copy. To move data between devices, use a backup.",
+  "native.restoreBackup": "Restore a backup…",
+  "native.restored": "Restored {people} new people and {entries} health entries. Genomes and attached files are not in this version of the app yet.",
+  "native.encryptedTitle": "This backup is encrypted",
+  "native.open": "Open",
+  "native.ok": "OK",
+  "native.emptyTitle": "Nothing here yet",
+  "native.emptyBody": "Restore a backup made with Hearth on the web or on another phone to see your family's health log here.",
+  "native.firstLaunchStorage": "Everything I import stays on this phone. Hearth has no account and no server-side copy of my data; if I uninstall the app without making a backup, it is gone.",
+  "native.notBackup": "This file is not a Hearth backup this app can open. Choose a .hearth file saved by the current version of Hearth.",
+  "native.damaged": "This backup is damaged and could not be read. Nothing was changed.",
+  "native.error": "Something went wrong: {error}"
+}

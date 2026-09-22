@@ -678,5 +678,17 @@
   "driveFolder.pickOne": "Scegli una cartella: cerca, oppure apri Il mio Drive qui sotto.",
   "driveFolder.expand": "Mostra le cartelle in {name}",
   "backupCard.passphraseKept": "Conservata su questo dispositivo, cifrata dal telefono, così i backup continuano dopo un riavvio.",
-  "restore.fetchingGenome": "Recupero del genoma {n} di {total}…"
+  "restore.fetchingGenome": "Recupero del genoma {n} di {total}…",
+  "native.intro": "Il diario della salute e i genomi della tua famiglia sono salvati solo su questo telefono. Non c’è alcun account né copia su un server. Per spostare i dati tra dispositivi, usa un backup.",
+  "native.restoreBackup": "Ripristina un backup…",
+  "native.restored": "Ripristinate {people} nuove persone e {entries} voci di salute. Genomi e file allegati non sono ancora supportati in questa versione dell’app.",
+  "native.encryptedTitle": "Questo backup è cifrato",
+  "native.open": "Apri",
+  "native.ok": "OK",
+  "native.emptyTitle": "Ancora niente qui",
+  "native.emptyBody": "Ripristina un backup fatto con Hearth sul web o su un altro telefono per vedere qui il diario della salute della tua famiglia.",
+  "native.firstLaunchStorage": "Tutto ciò che importo resta su questo telefono. Hearth non ha account né copie dei miei dati su un server; se disinstallo l’app senza fare un backup, i dati sono persi.",
+  "native.notBackup": "Questo file non è un backup di Hearth che questa app può aprire. Scegli un file .hearth salvato con la versione attuale di Hearth.",
+  "native.damaged": "Questo backup è danneggiato e non è stato possibile leggerlo. Non è stato modificato nulla.",
+  "native.error": "Qualcosa è andato storto: {error}"
 }

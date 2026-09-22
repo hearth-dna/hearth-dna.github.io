@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Debug only: the native app beside the web view, under its own icon (ADR 0010, "Staging"). -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application>
+        <activity
+            android:name=".NativeActivity"
+            android:exported="true"
+            android:label="Hearth native"
+            android:taskAffinity="com.hearth.native"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/Theme.Hearth">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>

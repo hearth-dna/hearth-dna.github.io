@@ -678,5 +678,17 @@
   "driveFolder.pickOne": "Wählen Sie einen Ordner: suchen oder unten „Meine Ablage“ öffnen.",
   "driveFolder.expand": "Ordner in {name} anzeigen",
   "backupCard.passphraseKept": "Auf diesem Gerät gespeichert, vom Telefon verschlüsselt, damit Sicherungen nach einem Neustart weiterlaufen.",
-  "restore.fetchingGenome": "Genom {n} von {total} wird abgerufen…"
+  "restore.fetchingGenome": "Genom {n} von {total} wird abgerufen…",
+  "native.intro": "Das Gesundheitsprotokoll und die Genome Ihrer Familie werden nur auf diesem Telefon gespeichert. Es gibt kein Konto und keine Kopie auf einem Server. Um Daten zwischen Geräten zu übertragen, verwenden Sie ein Backup.",
+  "native.restoreBackup": "Backup wiederherstellen…",
+  "native.restored": "{people} neue Personen und {entries} Gesundheitseinträge wiederhergestellt. Genome und angehängte Dateien unterstützt diese Version der App noch nicht.",
+  "native.encryptedTitle": "Dieses Backup ist verschlüsselt",
+  "native.open": "Öffnen",
+  "native.ok": "OK",
+  "native.emptyTitle": "Noch nichts hier",
+  "native.emptyBody": "Stellen Sie ein Backup wieder her, das mit Hearth im Web oder auf einem anderen Telefon erstellt wurde, um das Gesundheitsprotokoll Ihrer Familie hier zu sehen.",
+  "native.firstLaunchStorage": "Alles, was ich importiere, bleibt auf diesem Telefon. Hearth hat kein Konto und keine Kopie meiner Daten auf einem Server; deinstalliere ich die App ohne Backup, sind sie verloren.",
+  "native.notBackup": "Diese Datei ist kein Hearth-Backup, das diese App öffnen kann. Wählen Sie eine .hearth-Datei, die mit der aktuellen Version von Hearth gespeichert wurde.",
+  "native.damaged": "Dieses Backup ist beschädigt und konnte nicht gelesen werden. Es wurde nichts geändert.",
+  "native.error": "Etwas ist schiefgelaufen: {error}"
 }

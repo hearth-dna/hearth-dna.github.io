@@ -3,6 +3,7 @@ import java.util.Properties
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.kotlin.plugin.compose")
 }
 
 val versionProps = Properties().apply {
@@ -62,6 +63,7 @@ android {
 
     buildFeatures {
         buildConfig = true
+        compose = true
     }
 
     signingConfigs {
@@ -104,8 +106,14 @@ android {
 
     sourceSets {
         getByName("main") { java.srcDirs("src/main/kotlin") }
-        getByName("test") { java.srcDirs("src/test/kotlin") }
+        getByName("test") {
+            java.srcDirs("src/test/kotlin")
+            // The unit tests read the golden backups and the web's schema from the repository.
+            resources.srcDirs("../../fixtures")
+        }
+        getByName("debug") { java.srcDirs("src/debug/kotlin") }
     }
+
 
     // The .gitignore keeps the synced web build out of git; this keeps stale files out of the APK
     // when the frontend drops one.
@@ -121,6 +129,19 @@ dependencies {
     implementation(libs.androidx.webkit)
     implementation(libs.play.services.auth)
 
+    val composeBom = platform(libs.androidx.compose.bom)
+    implementation(composeBom)
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.material.icons.core)
+    implementation(libs.androidx.compose.ui.tooling.preview)
+    debugImplementation(libs.androidx.compose.ui.tooling)
 
     testImplementation(libs.junit)
+    // The real org.json for JVM tests; android.jar only carries stubs that throw.
+    testImplementation(libs.json)
+    // A real SQLite for the repository and restore tests, behind the same Sql interface as Db.
+    testImplementation(libs.sqlite.jdbc)
 }

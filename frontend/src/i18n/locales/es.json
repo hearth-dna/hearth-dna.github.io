@@ -678,5 +678,17 @@
   "driveFolder.pickOne": "Elige una carpeta: busca o abre Mi unidad abajo.",
   "driveFolder.expand": "Mostrar las carpetas de {name}",
   "backupCard.passphraseKept": "Se guarda en este dispositivo, cifrada por el teléfono, para que las copias continúen tras un reinicio.",
-  "restore.fetchingGenome": "Obteniendo genoma {n} de {total}…"
+  "restore.fetchingGenome": "Obteniendo genoma {n} de {total}…",
+  "native.intro": "El registro de salud y los genomas de tu familia se guardan solo en este teléfono. No hay cuenta ni copia en ningún servidor. Para pasar datos entre dispositivos, usa una copia de seguridad.",
+  "native.restoreBackup": "Restaurar una copia de seguridad…",
+  "native.restored": "Se restauraron {people} personas nuevas y {entries} entradas de salud. Los genomas y los archivos adjuntos aún no están en esta versión de la app.",
+  "native.encryptedTitle": "Esta copia de seguridad está cifrada",
+  "native.open": "Abrir",
+  "native.ok": "Aceptar",
+  "native.emptyTitle": "Aún no hay nada",
+  "native.emptyBody": "Restaura una copia de seguridad hecha con Hearth en la web o en otro teléfono para ver aquí el registro de salud de tu familia.",
+  "native.firstLaunchStorage": "Todo lo que importo se queda en este teléfono. Hearth no tiene cuentas ni copia de mis datos en ningún servidor; si desinstalo la app sin hacer una copia de seguridad, se pierde.",
+  "native.notBackup": "Este archivo no es una copia de seguridad de Hearth que esta app pueda abrir. Elige un archivo .hearth guardado con la versión actual de Hearth.",
+  "native.damaged": "Esta copia de seguridad está dañada y no se pudo leer. No se ha cambiado nada.",
+  "native.error": "Algo salió mal: {error}"
 }

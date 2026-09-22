@@ -2,15 +2,22 @@ import SwiftUI
 
 /// The whole iOS app: a local server for the bundled PWA, and a web view pointed at it.
 ///
-/// There is no native model layer, and there must not be one — the genome, the pedigree and every
-/// analysis live in the web app's SQLite database inside WebKit's storage
-/// (../../docs/decisions/0006-native-shells-around-the-pwa.md).
+/// The family's data lives in the web app's SQLite database inside WebKit's storage
+/// (../../docs/decisions/0006-native-shells-around-the-pwa.md). The native SwiftUI app that will
+/// replace the web view (../../docs/decisions/0010-native-apps.md) is built alongside it, in
+/// `Native/`, and until it reaches parity a debug build opens it only when launched with `-native`:
+/// it has its own, separate database, and a release build never shows it.
 @main
 struct HearthApp: App {
     private let server: LocalWebServer?
     private let failure: Failure?
 
     init() {
+        if HearthApp.native {
+            server = nil
+            failure = nil
+            return
+        }
         guard let root = LocalWebServer.bundledRoot() else {
             server = nil
             failure = .missingWebBundle
@@ -32,7 +39,9 @@ struct HearthApp: App {
 
     var body: some Scene {
         WindowGroup {
-            if let server {
+            if HearthApp.native {
+                NativeRootView()
+            } else if let server {
                 // Edge to edge, keyboard included: the page pads itself with env(safe-area-inset-*),
                 // and WKWebView scrolls a focused field above the keyboard on its own.
                 WebAppView(url: server.url)
@@ -42,6 +51,16 @@ struct HearthApp: App {
                 FailureView(failure: failure)
             }
         }
+    }
+
+    /// Whether this launch is the native app (ADR 0010, staging step 1). Debug builds only: in
+    /// Xcode, tick `-native` under the scheme's Run arguments, or pass it to `simctl launch`.
+    private static var native: Bool {
+        #if DEBUG
+        return CommandLine.arguments.contains("-native")
+        #else
+        return false
+        #endif
     }
 
     enum Failure {

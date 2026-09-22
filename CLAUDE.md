@@ -35,8 +35,10 @@ under `.dev/`; `make dev-stop` stops it; `make test` runs the suite.
 - `frontend/src/ask` — local retrieval, context packs, prompt templates (design §6.3).
 - `frontend/src/export` — dump v1: JSON → gzip (CompressionStream) → optional AES-GCM.
 - `frontend/src/consent` — consent records (design §13).
-- `mobile/android`, `mobile/ios` — native shells around the same web build; no data logic lives
-  there (ADR 0006). `make mobile-web` copies `frontend/dist/` into both.
+- `mobile/android`, `mobile/ios` — becoming native apps (Compose, SwiftUI), each with its own
+  data layer, screen by screen beside the old web-view shell (ADR 0010, supersedes 0006 at
+  parity). Spec: `docs/architecture/native-apps.md`. Backups are the contract: `mobile/fixtures/`
+  golden files are opened by all three. Strings stay in `frontend/src/i18n` (`make mobile-i18n`).
 
 ## Conventions
 

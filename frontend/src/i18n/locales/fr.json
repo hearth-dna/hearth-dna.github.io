@@ -678,5 +678,17 @@
   "driveFolder.pickOne": "Choisissez un dossier : recherchez, ou ouvrez Mon Drive ci-dessous.",
   "driveFolder.expand": "Afficher les dossiers de {name}",
   "backupCard.passphraseKept": "Conservée sur cet appareil, chiffrée par le téléphone, pour que les sauvegardes continuent après un redémarrage.",
-  "restore.fetchingGenome": "Récupération du génome {n} sur {total}…"
+  "restore.fetchingGenome": "Récupération du génome {n} sur {total}…",
+  "native.intro": "Le journal de santé et les génomes de votre famille sont stockés uniquement sur ce téléphone. Il n’y a ni compte ni copie sur un serveur. Pour transférer des données entre appareils, utilisez une sauvegarde.",
+  "native.restoreBackup": "Restaurer une sauvegarde…",
+  "native.restored": "{people} nouvelles personnes et {entries} entrées de santé restaurées. Les génomes et les fichiers joints ne sont pas encore pris en charge dans cette version de l’app.",
+  "native.encryptedTitle": "Cette sauvegarde est chiffrée",
+  "native.open": "Ouvrir",
+  "native.ok": "OK",
+  "native.emptyTitle": "Rien pour l’instant",
+  "native.emptyBody": "Restaurez une sauvegarde faite avec Hearth sur le web ou sur un autre téléphone pour voir ici le journal de santé de votre famille.",
+  "native.firstLaunchStorage": "Tout ce que j’importe reste sur ce téléphone. Hearth n’a ni compte ni copie de mes données sur un serveur ; si je désinstalle l’app sans faire de sauvegarde, tout est perdu.",
+  "native.notBackup": "Ce fichier n’est pas une sauvegarde Hearth que cette app peut ouvrir. Choisissez un fichier .hearth enregistré avec la version actuelle de Hearth.",
+  "native.damaged": "Cette sauvegarde est endommagée et n’a pas pu être lue. Rien n’a été modifié.",
+  "native.error": "Une erreur s’est produite : {error}"
 }

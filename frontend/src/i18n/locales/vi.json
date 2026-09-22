@@ -678,5 +678,17 @@
   "driveFolder.pickOne": "Chọn một thư mục: tìm kiếm, hoặc mở Drive của tôi bên dưới.",
   "driveFolder.expand": "Hiện các thư mục trong {name}",
   "backupCard.passphraseKept": "Được lưu trên thiết bị này, do điện thoại mã hóa, nên việc sao lưu vẫn tiếp tục sau khi khởi động lại.",
-  "restore.fetchingGenome": "Đang lấy bộ gen {n}/{total}…"
+  "restore.fetchingGenome": "Đang lấy bộ gen {n}/{total}…",
+  "native.intro": "Nhật ký sức khỏe và bộ gen của gia đình bạn chỉ được lưu trên điện thoại này. Không có tài khoản và không có bản sao trên máy chủ. Để chuyển dữ liệu giữa các thiết bị, hãy dùng bản sao lưu.",
+  "native.restoreBackup": "Khôi phục bản sao lưu…",
+  "native.restored": "Đã khôi phục {people} người mới và {entries} mục sức khỏe. Phiên bản ứng dụng này chưa có bộ gen và tệp đính kèm.",
+  "native.encryptedTitle": "Bản sao lưu này đã được mã hóa",
+  "native.open": "Mở",
+  "native.ok": "OK",
+  "native.emptyTitle": "Chưa có gì ở đây",
+  "native.emptyBody": "Khôi phục một bản sao lưu tạo bằng Hearth trên web hoặc trên điện thoại khác để xem nhật ký sức khỏe của gia đình bạn tại đây.",
+  "native.firstLaunchStorage": "Mọi thứ tôi nhập đều ở lại trên điện thoại này. Hearth không có tài khoản và không có bản sao dữ liệu của tôi trên máy chủ; nếu gỡ ứng dụng mà không sao lưu, dữ liệu sẽ mất.",
+  "native.notBackup": "Tệp này không phải bản sao lưu Hearth mà ứng dụng này mở được. Hãy chọn tệp .hearth được lưu bằng phiên bản Hearth hiện tại.",
+  "native.damaged": "Bản sao lưu này bị hỏng và không đọc được. Không có gì bị thay đổi.",
+  "native.error": "Đã xảy ra lỗi: {error}"
 }

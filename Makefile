@@ -2,7 +2,7 @@
 	frontend-install frontend-run frontend-build frontend-build-archive frontend-build-pages \
 	frontend-preview-pages frontend-test frontend-lint pages-deploy \
 	kb-build \
-	mobile-web android android-build android-install android-test android-lint android-logs android-clean \
+	mobile-i18n mobile-web android android-build android-install android-test android-lint android-logs android-clean \
 	android-keystore android-bundle android-verify android-publish _android-release-ready \
 	ios ios-generate ios-build ios-test ios-clean ios-archive ios-ipa ios-verify ios-testflight \
 	ios-testflight-status _ios-release-ready \
@@ -72,6 +72,8 @@ ANDROID_DIR := $(MOBILE_DIR)/android
 IOS_DIR := $(MOBILE_DIR)/ios
 ANDROID_WEB := $(ANDROID_DIR)/app/src/main/assets/web
 IOS_WEB := $(IOS_DIR)/Hearth/Web
+ANDROID_I18N := $(ANDROID_DIR)/app/src/main/assets/i18n
+IOS_I18N := $(IOS_DIR)/Hearth/I18n
 # Android Studio's bundled JDK, the same default as ../sentio. Override on a machine that keeps
 # its JDK elsewhere: `make android ANDROID_JAVA_HOME=/path/to/jdk`.
 ANDROID_JAVA_HOME ?= $(HOME)/tools/mobile/android-studio/jbr
@@ -129,7 +131,10 @@ define require_var
 	fi
 endef
 
-mobile-web: frontend-build ## Build the PWA and copy it into both app bundles
+mobile-i18n: ## Copy the web's strings into both native apps (ADR 0010)
+	@node $(FRONTEND_DIR)/scripts/mobile-i18n.mjs $(ANDROID_I18N) $(IOS_I18N)
+
+mobile-web: frontend-build mobile-i18n ## Build the PWA and copy it into both app bundles
 	@rm -rf $(ANDROID_WEB) $(IOS_WEB)
 	@mkdir -p $(ANDROID_WEB) $(IOS_WEB)
 	@cp -R $(FRONTEND_DIR)/dist/. $(ANDROID_WEB)/
