@@ -1,11 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Every other string comes from the web's catalogue in assets/i18n (make mobile-i18n). -->
     <string name="app_name">Hearth</string>
-    <!--
-      The web app carries 14 languages of its own; these four strings are the only text the shell
-      draws, and they are only ever seen when the web app cannot run or a save failed.
-    -->
-    <string name="webview_too_old">Hearth needs a newer Android System WebView (this device has %1$d, Hearth needs %2$d or later). Update it from the Play Store, then reopen Hearth.</string>
-    <string name="saved_to_downloads">Saved %1$s to Downloads</string>
-    <string name="save_failed">Could not save the file</string>
 </resources>

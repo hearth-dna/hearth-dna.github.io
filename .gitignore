@@ -28,16 +28,14 @@ terraform/**/*.tfvars
 # Knowledge-base build output (kb/build_kb.py); the committed source is kb/reviewed/
 kb/out/
 
-# Mobile shells (mobile/) — the web build is copied in by `make mobile-web`, never committed, and
-# the Xcode project is generated from project.yml.
-mobile/android/app/src/main/assets/web/
+# Mobile apps (mobile/) — the strings and the knowledge base are copied in by `make mobile-assets`,
+# never committed, and the Xcode project is generated from project.yml.
 mobile/android/app/src/main/assets/i18n/
 mobile/android/app/src/main/assets/kb.json
 mobile/android/app/build/
 mobile/android/build/
 mobile/android/.gradle/
 mobile/android/local.properties
-mobile/ios/Hearth/Web/
 mobile/ios/Hearth/I18n/
 mobile/ios/Hearth/Resources/kb.json
 mobile/ios/Hearth.xcodeproj/

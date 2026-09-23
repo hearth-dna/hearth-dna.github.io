@@ -7,9 +7,10 @@ Guidance for Claude Code in this repository. Kept short; detail lives in `/docs`
 - **Root stays clean:** only `README.md`, `CLAUDE.md`, `AGENTS.md`, `Makefile`, `.env.example`
   and dotfiles. Everything else goes under `frontend/`, `mobile/`, `kb/`, `landing/`, `docs/`.
 - **There is no server.** Every network call in the frontend goes through
-  `frontend/src/egress/egress.ts`; a Vitest test asserts nothing else calls `fetch`. The only
-  destinations are our own origin for static assets, the provider the user brings a key for, and
-  the cloud drive the user signs in to for backups (ADR 0009: provider API hosts only, checked there).
+  `frontend/src/egress/egress.ts`, and in the phone apps through `Egress.kt` / `Egress.swift`; a
+  test in each asserts nothing else opens a connection. The only destinations are our own origin
+  for static assets, the provider the user brings a key for, and (phones only) the cloud drive the
+  user signs in to for backups (ADR 0009: provider API hosts only, checked there).
   Nothing server-side may be added back without a new ADR superseding 0007.
 - **Never create a root `package.json`.** Frontend deps live in `frontend/`.
 - No dead code, minimal deps, simple over clever.
@@ -35,10 +36,10 @@ under `.dev/`; `make dev-stop` stops it; `make test` runs the suite.
 - `frontend/src/ask` — local retrieval, context packs, prompt templates (design §6.3).
 - `frontend/src/export` — dump v1: JSON → gzip (CompressionStream) → optional AES-GCM.
 - `frontend/src/consent` — consent records (design §13).
-- `mobile/android`, `mobile/ios` — becoming native apps (Compose, SwiftUI), each with its own
-  data layer, screen by screen beside the old web-view shell (ADR 0010, supersedes 0006 at
-  parity). Spec: `docs/architecture/native-apps.md`. Backups are the contract: `mobile/fixtures/`
-  golden files are opened by all three. Strings stay in `frontend/src/i18n` (`make mobile-i18n`).
+- `mobile/android`, `mobile/ios` — native apps (Compose, SwiftUI), each with its own data layer
+  (ADR 0010). Spec: `docs/architecture/native-apps.md`. The web app is the reference for
+  behaviour; backups are the contract: `mobile/fixtures/` golden files are opened by all three.
+  Strings and kb.json stay in `frontend/` (`make mobile-assets`).
 
 ## Conventions
 

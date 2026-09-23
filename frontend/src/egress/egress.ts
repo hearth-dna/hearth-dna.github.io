@@ -1,11 +1,9 @@
 /**
  * The only module allowed to call `fetch` (docs/design.md §13.2; egress.test.ts enforces it).
- * Three destinations exist: our own origin for static assets (kb.json, service worker), the
- * provider the user brings a key for, and the cloud drive the user signs in to for backups
- * (ADR 0009). There is no server of ours in between (ADR 0007). Every personal-data egress to a
- * model must go through `sendContext`, which requires an explicit per-request confirmation token
- * from the UI; a cloud backup goes through `cloudRequest`, which reaches the provider's API hosts
- * and nothing else.
+ * Two destinations exist: our own origin for static assets (kb.json, service worker) and the
+ * provider the user brings a key for. There is no server of ours in between (ADR 0007). Every
+ * personal-data egress to a model must go through `sendContext`, which requires an explicit
+ * per-request confirmation token from the UI.
  */
 
 export interface AskTarget {
@@ -104,42 +102,4 @@ export async function sendContext(
       .join(''),
     model: body.model,
   }
-}
-
-// ---- cloud backups (ADR 0009) ----------------------------------------------------------------
-
-export type CloudProvider = 'google' | 'dropbox'
-
-/** The only hosts a cloud backup may reach, per provider. Kept in step with the CSP. */
-const CLOUD_HOSTS: Record<CloudProvider, string[]> = {
-  google: ['www.googleapis.com'],
-  dropbox: ['api.dropboxapi.com', 'content.dropboxapi.com'],
-}
-
-export interface CloudRequest {
-  provider: CloudProvider
-  /** A short-lived access token from the native shell; never a refresh token. */
-  token: string
-  method: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE'
-  url: string
-  headers?: Record<string, string>
-  /** Metadata (names, folder ids) as a string, or file content: a snapshot or a document. */
-  body?: string | Uint8Array
-}
-
-/**
- * One call to the user's own cloud drive, and only to that provider's API hosts. What goes there is
- * a backup, encrypted when the user set a passphrase: the same choice, and the same warning, as a
- * folder the user picks (ADR 0009).
- */
-export async function cloudRequest(req: CloudRequest): Promise<Response> {
-  const url = new URL(req.url)
-  if (url.protocol !== 'https:' || !CLOUD_HOSTS[req.provider]?.includes(url.host))
-    throw new Error(`refusing to contact ${url.host} for a ${req.provider} backup`)
-  if (!req.token) throw new Error('not signed in')
-  return fetch(url, {
-    method: req.method,
-    headers: { ...req.headers, authorization: `Bearer ${req.token}` },
-    body: req.body as BodyInit | undefined,
-  })
 }

@@ -22,7 +22,7 @@ Browsers without the directory picker (Firefox, Safari, mobile browsers) see the
 line: "Your browser cannot write to a folder on its own; use Export dump and Import dump" and the
 existing buttons. Feature detection is `'showDirectoryPicker' in window`.
 
-**The phone apps** (ADR 0008) have no directory picker either, so the shells lend the system one.
+**The phone apps** (ADR 0008, 0010) use the system document picker.
 Above it, when the build is set up for them, sit **Google Drive**, **Dropbox** and **iCloud Drive**
 buttons (ADR 0009): the same folder layout, reached through the providers' APIs or the iCloud
 container; encrypted when a passphrase is set, and following the backup already there when not.
@@ -30,9 +30,9 @@ The card offers *Choose folder…*, *Create backup file…* and *Open backup fil
 Android, where the picker lists Google Drive, Dropbox and OneDrive (behind its ☰ menu) only for
 files, and folder first on iOS, where iCloud Drive lends folders. A folder behaves
 exactly as below; a single file — what Google Drive and Dropbox on Android lend — holds only the
-snapshot, with no rotations and no attachments. `folder.ts` hides the difference
-behind one `Dir` interface; `native.ts` is the channel to the shell (`Files.kt`,
-`NativeFiles.swift`).
+snapshot, with no rotations and no attachments. The native apps write the same files as
+`folder.ts`, behind the same `Dir` shape (`backup/Dir.kt` with `Saf.kt` and `CloudDir.kt` on
+Android; `Backup/` on iOS).
 
 ## Layout in the folder
 
@@ -150,15 +150,14 @@ backup files in the folder (best effort, then tells the user to check the stick)
 - In the browser the passphrase lives in `sessionStorage` (this tab, until it closes); autosave
   requires it to have been entered once since launch. If it has not, the card shows *Enter
   passphrase to resume backups* instead of silently doing nothing. In the phone apps, where the OS
-  ends the app in the background at will, the shell keeps it across restarts: sealed with an
-  Android Keystore key (`Secrets.kt`) or in the iOS Keychain, on this device only; *Forget* clears
-  it. It protects the copy that leaves the device; the data on the device is the app's own.
+  ends the app in the background at will, it is kept across restarts: sealed with an Android
+  Keystore key (`Secrets.kt`) or in the iOS Keychain, on this device only; *Forget* clears it. It protects the copy that leaves the device; the data on the device is the app's own.
 
 ## As built
 
 - `backup/naming.ts` (pure, tested): file names, rotation plan, `hasNewer`. `backup/folder.ts`: picker, IndexedDB place store, permissions, read/write/rotate,
-  over a `Dir` that is a browser handle or a native place. `backup/native.ts` (+ test against an
-  in-memory shell): the phones' picker and chunked file calls.
+  over a `Dir` backed by a browser directory handle. The phones' equivalents are their own code
+  (ADR 0010), tested against an in-memory `Dir` (`DirTest.kt`).
   `backup/scheduler.ts`: the app-wide `backups` singleton the card renders.
 - `attachments/{sidecar,crypto,mirror}.ts`: sidecar naming and the diff (pure, tested), the
   per-run seal/open, and the push/pull the scheduler calls after a snapshot and after a restore.

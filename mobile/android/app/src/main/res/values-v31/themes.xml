@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Android 12+ draws its own splash screen; this gives it the web app's background, so the
-         splash, the first frame and the page are one colour instead of a system-grey flash. -->
-    <style name="Theme.Hearth" parent="Theme.AppCompat.DayNight.NoActionBar">
+    <!-- Android 12+ draws its own splash screen; this gives it the app's background, so the splash
+         and the first frame are one colour instead of a system-grey flash. -->
+    <style name="Theme.Hearth" parent="@android:style/Theme.DeviceDefault.DayNight">
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
         <item name="android:windowBackground">@color/window_background</item>
         <item name="android:windowSplashScreenBackground">@color/window_background</item>
     </style>

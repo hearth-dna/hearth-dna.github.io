@@ -3,16 +3,15 @@ import { defineConfig, type Plugin } from 'vitest/config'
 import { VitePWA } from 'vite-plugin-pwa'
 
 // "Nothing but our own origin" (docs/design.md §2, §13.2), enforced in the page itself because
-// GitHub Pages serves no custom headers (ADR 0005). The two model hosts are the BYOK Ask and
-// document-reading endpoints, the other three the cloud backups the user signs in to (ADR 0009),
-// all in src/egress/egress.ts; nothing else may be contacted.
+// GitHub Pages serves no custom headers (ADR 0005). The two provider hosts are the BYOK Ask and
+// document-reading endpoints in src/egress/egress.ts; nothing else may be contacted.
 const CSP = [
   "default-src 'self'",
   "script-src 'self' 'wasm-unsafe-eval'",
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob:",
   "font-src 'self'",
-  "connect-src 'self' https://api.anthropic.com https://generativelanguage.googleapis.com https://www.googleapis.com https://api.dropboxapi.com https://content.dropboxapi.com",
+  "connect-src 'self' https://api.anthropic.com https://generativelanguage.googleapis.com",
   "worker-src 'self' blob:",
   "base-uri 'self'",
   "form-action 'self'",

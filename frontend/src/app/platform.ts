@@ -3,9 +3,8 @@
  * Android (Material 3 navigation bar). Read once at start-up and put on `<html data-platform>`,
  * where only CSS looks at it — no behaviour depends on the answer.
  *
- * It covers the native shells (a WKWebView and an Android WebView both report their OS) and the
- * PWA in a phone browser alike. iPadOS reports itself as a Mac, so a touch screen is what tells
- * the two apart.
+ * It serves the PWA in a phone browser (the phone apps are native, ADR 0010). iPadOS reports
+ * itself as a Mac, so a touch screen is what tells the two apart.
  */
 export type Platform = 'ios' | 'android' | 'other'
 

@@ -1,57 +1,47 @@
 # mobile/ — the Android and iOS apps
 
-> **In transition.** [ADR 0010](../docs/decisions/0010-native-apps.md) replaces the web-view shells
-> described below with native apps (Compose on Android, SwiftUI on iOS), each with its own data
-> layer, built screen by screen beside the shell; the spec is
-> [native-apps.md](../docs/architecture/native-apps.md). Until parity, everything below still
-> describes what ships. The native screens run from a debug-only entry point: the **Hearth
-> native** launcher icon on Android, the `-native` launch argument on iOS. `make mobile-i18n`
-> copies the strings in; `mobile/fixtures/` holds the backups every restore test opens.
-
-Both apps are the same PWA in a native window: one `WebView` on Android, one `WKWebView` on iOS,
-each serving `frontend/dist/` from inside the app over a real, network-less origin. There is no
-native model layer on either side, and there must not be one — the genome, the pedigree, the health
-log and every analysis live in the web app's SQLite database, inside the web engine's own storage.
-The reasoning is [ADR 0006](../docs/decisions/0006-native-shells-around-the-pwa.md); read it before
+Two native apps: Kotlin with Jetpack Compose and Material 3 on Android, Swift with SwiftUI on iOS.
+Each has its own data layer, with the web's SQLite schema verbatim in an app-private database. The
+reasoning is [ADR 0010](../docs/decisions/0010-native-apps.md); the screens and the formats they
+must match are specified in [native-apps.md](../docs/architecture/native-apps.md). Read both before
 changing anything structural here.
 
-## The one structural rule
+## The rules that keep three apps one
 
-> **If it touches the family's data, it belongs in `frontend/`, not here.**
+- **The web app is the reference for behaviour.** Each Kotlin and Swift module ports one
+  `frontend/src` module, names it at the top, and has a test that mirrors the web's test.
+- **Backups are the contract.** A backup written by any of the three opens in the other two.
+  `fixtures/` holds golden files written by each writer, and every restore test opens them.
+- **One string catalogue.** Text is written and translated only in `frontend/src/i18n/`;
+  `make mobile-assets` copies it (and the knowledge base) into both apps.
+- **One door to the network.** Every connection goes through `Egress.kt` / `Egress.swift`, to the
+  model provider the user brings a key for and the cloud drive they sign in to, nothing else; a test
+  in each app fails if any other file opens a connection.
 
-What is left for a shell is small, and each piece has a reason it cannot be done in the page:
-
-| | `android/` | `ios/` |
+| | `android/app/src/main/kotlin/com/hearth/` | `ios/Hearth/Native/` |
 | --- | --- | --- |
-| Serving the app | `WebViewAssetLoader`, `https://appassets.androidplatform.net/` | `LocalWebServer.swift`, `http://127.0.0.1:17800/` |
-| Picking a file to import | `WebChromeClient.onShowFileChooser` | nothing — WKWebView does it |
-| Saving an export | `Downloads.kt` → MediaStore | `WKDownload` → the share sheet |
-| Backup place | `Files.kt` → Storage Access Framework (folder or single file) | `NativeFiles.swift` → Files picker, security-scoped bookmarks, the iCloud container |
-| Cloud sign-in | `Cloud.kt` → Play services (Google), PKCE in the browser (Dropbox) | `Cloud.swift` → PKCE in `ASWebAuthenticationSession`, Keychain |
-| Screen fit | edge to edge; insets (bars, cutout, keyboard) pad the container, painted in the web app's bar colour | edge to edge; the page pads itself with `env(safe-area-inset-*)` |
-| Links off-origin | `shouldOverrideUrlLoading` → browser | `decidePolicyFor` → Safari |
-
-## Look and feel
-
-The native feel is web work, in `frontend/src/styles.css` (the phone layer at ≤ 640px): a compact
-top bar, a bottom tab bar (`components/TabBar.tsx`), 44pt/48dp touch targets, dialogs as bottom
-sheets. `app/platform.ts` puts `data-platform="ios|android"` on `<html>`, so the same build draws a
-translucent iOS tab bar on an iPhone and a Material 3 navigation bar on Android. The shells' only
-part is to get out of the way: draw edge to edge, and match the bars and launch colours.
+| Database, repository | `data/` | `Data/` |
+| Genome import | `genome/` | `Genome/` |
+| Knowledge base, family, ask | `kb/`, `family/`, `ask/` | `Kb/`, `Family/`, `Ask/` |
+| Documents, attachments | `documents/`, `attachments/` | `Documents/`, `Attachments/` |
+| Dump v2 (and v1), backups | `backup/` | `Backup/` |
+| Open formats | `export/` | `Export/` |
+| Screens | `ui/` | `UI/` |
+| Network | `Egress.kt`, cloud sign-in in `Cloud.kt` | `Egress.swift`, `Cloud.swift` |
 
 ## Build and run
 
 ```bash
-make mobile-web       # build the PWA and copy it into both app bundles — nothing builds without it
+make mobile-assets    # copy the strings and kb.json into both apps (the build targets do it too)
 make android          # build + install the debug APK on a connected device or emulator
-make android-test     # the shell's unit tests (JVM, no device)
+make android-test     # unit tests (JVM, no device), including the fixtures and the egress check
 make android-logs     # follow the app's logs
 make ios              # build and run on a simulator (macOS + Xcode + xcodegen)
-make ios-test         # the shell's unit tests (simulator)
+make ios-test         # unit tests on a simulator
 ```
 
-Neither `app/src/main/assets/web/` (Android) nor `Hearth/Web/` (iOS) is in git: both are copies of
-`frontend/dist/`, made by `make mobile-web`. Nor is `Hearth.xcodeproj` — it is generated from
+The copied assets (`app/src/main/assets/i18n/`, `app/src/main/assets/kb.json`, `Hearth/I18n/`,
+`Hearth/Resources/kb.json`) are not in git, nor is `Hearth.xcodeproj`, generated from
 `ios/project.yml` by `make ios-generate`.
 
 ## Publishing
@@ -77,11 +67,11 @@ Set the real id **before the first upload to either store**: Play and App Store 
 identifier permanently at that point, and a published app can only be replaced by a new listing
 with no installs, reviews or upgrade path.
 
-## What the shells deliberately do not have
+## What the apps deliberately do not have
 
-No push notifications, no background work, no native sync (the backup place is file I/O through the
-system picker, driven by the web app — ADR 0008; cloud sign-in hands the web app tokens and nothing
-else — ADR 0009), no analytics, no crash reporter, and no third-party SDK beyond Play services'
-sign-in client (ADR 0009). Android asks for exactly one permission (`INTERNET`, for the web app's
-BYOK Ask call and cloud backups) and turns off `allowBackup` so that Android's own cloud backup
-cannot copy the database off the device.
+No account, no server of ours, no push notifications, no background work beyond a debounced backup
+while the app is open, no analytics, no crash reporter, and no third-party SDK beyond Play services'
+sign-in client (ADR 0009). Android asks for exactly one permission (`INTERNET`, for reading a
+document with the user's own key and for cloud backups) and turns off `allowBackup`; iOS keeps the
+database out of iCloud and device backups. The only copy that leaves the phone is the backup the
+user sets up, encrypted with their passphrase unless they choose otherwise.

@@ -11,7 +11,7 @@ encrypted snapshot, the provider moves the bytes. Properties:
 - Restore on a second PC is "install Drive, open Hearth, choose the folder".
 - Works identically for a USB stick, so one code path serves both.
 
-On the phones the provider's app plays the desktop client's part: the shells open the system
+On the phones the provider's app plays the desktop client's part: the apps open the system
 document picker, and whatever the user picks there — an iCloud Drive folder, a Google Drive file —
 is written to through the provider (ADR 0008). Same properties: no provider code, no OAuth, and
 encryption decided by the passphrase, as for any folder.
@@ -23,13 +23,13 @@ through Drive's web UI by hand, which also works and needs nothing from us.
 
 ## The phone apps: Drive and Dropbox APIs (ADR 0009)
 
-The trade-offs below are the browser's. Inside the native shells they change: sign-in is an
+The trade-offs below are the browser's. In the native apps they change: sign-in is an
 installed-app OAuth flow with PKCE and no secret, the refresh token stays in the Keychain or the
-app's private storage, and no provider script touches the page. So the phone apps have **Google
-Drive** and **Dropbox** buttons (and **iCloud Drive** on iPhone): `frontend/src/backup/cloud.ts`
-over `cloudRequest` in `egress.ts`, which accepts only the providers' API hosts and only encrypted
-envelopes as file content, with the user choosing the Drive folder (full `drive` scope); `mobile/android/.../Cloud.kt` and `mobile/ios/Hearth/Cloud.swift` for
-sign-in. Setup per deployment: `docs/runbook/cloud-backups.md`.
+app's private storage, and there is no page for a provider script to touch. So the phone apps have
+**Google Drive** and **Dropbox** buttons (and **iCloud Drive** on iPhone): the apps' own REST
+clients (`backup/CloudDir.kt`, `Backup/` on iOS) through `Egress.kt` / `Egress.swift`, which accept
+only the providers' API hosts, with the user choosing the Drive folder (full `drive` scope);
+`mobile/android/.../Cloud.kt` and `mobile/ios/Hearth/Cloud.swift` for sign-in. Setup per deployment: `docs/runbook/cloud-backups.md`.
 
 ## Considered and deferred: Google Drive API from the browser
 

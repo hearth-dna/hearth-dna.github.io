@@ -4,11 +4,10 @@ import { Database } from '../db/db'
 import { countAttachments, getMeta } from '../db/repo'
 import { readHeader } from '../export/container'
 import { type Progress, type RestoreResult, restoreBytes } from '../export/restore'
-import { folderSnapshot, snapshotBytes } from '../export/snapshot'
+import { folderSnapshot } from '../export/snapshot'
 import * as folder from './folder'
 import { genomeLoader, mirrorGenomes } from './genomes'
 import { attachmentsDirName, baseName, genomesDirName, hasNewer } from './naming'
-import * as native from './native'
 
 /**
  * App-wide backup state: the remembered folder, the passphrase, a debounced autosave after every
@@ -77,13 +76,6 @@ class Backups {
     this.profile = Database.profile()
     if (!folder.supported()) return this.set({ state: 'unsupported' })
     this.saved = await folder.loadSaved(this.profile)
-    // The phone apps keep the passphrase in the shell's own secure storage (Keystore, Keychain):
-    // Android ends a background app at will, and a session-only passphrase would pause every backup
-    // after each restart. The browser keeps it for the tab's session, as before.
-    if (native.available() && !this.passphrase()) {
-      const kept = await native.secretGet(PASS_KEY(this.profile)).catch(() => null)
-      if (kept) this.cachePassphrase(kept)
-    }
     db.onChange(() => this.request())
     // Back in the foreground: another device may have written meanwhile.
     document.addEventListener('visibilitychange', () => {
@@ -113,24 +105,14 @@ class Backups {
     return this.saved ? folder.placeName(this.saved.place) : ''
   }
 
-  /** The place is one file (the phones' Drive/Dropbox route): no rotations, no documents beside it. */
-  get single(): boolean {
-    return this.saved?.place.kind === 'native' && this.saved.place.single
-  }
-
   /** Where every read and write goes. */
   private get dir(): folder.Dir {
     if (!this.saved) throw new Error('no folder chosen')
-    return folder.open(this.saved.place, baseName(this.profile))
+    return folder.open(this.saved.place)
   }
 
   get plain(): boolean {
     return this.saved?.plain ?? false
-  }
-
-  /** A cloud drive (or Hearth's iCloud folder) rather than a folder or file the user manages. */
-  get cloud(): boolean {
-    return this.saved !== null && folder.isCloud(this.saved.place)
   }
 
   get auto(): boolean {
@@ -159,20 +141,13 @@ class Backups {
     }
   }
 
+  /** Kept for the tab's session only. */
   setPassphrase(p: string): void {
-    this.cachePassphrase(p)
-    if (native.available()) {
-      if (p) void native.secretSet(PASS_KEY(this.profile), p).catch(() => {})
-      else void native.secretDelete(PASS_KEY(this.profile)).catch(() => {})
-    }
-    void this.refresh()
-  }
-
-  private cachePassphrase(p: string): void {
     try {
       if (p) sessionStorage.setItem(PASS_KEY(this.profile), p)
       else sessionStorage.removeItem(PASS_KEY(this.profile))
     } catch {}
+    void this.refresh()
   }
 
   async setPlain(plain: boolean): Promise<void> {
@@ -230,7 +205,7 @@ class Backups {
       pending: this.timer !== null,
       dirty,
       lastAt: this.saved.lastAt ?? null,
-      attachmentsPending: this.single ? 0 : Math.max(0, blobs - (this.saved.mirrored ?? 0)),
+      attachmentsPending: Math.max(0, blobs - (this.saved.mirrored ?? 0)),
       attachmentsMissing: (await missingLocally(this.db)).length,
     })
     // Changes made while the folder was unreachable (or before a reload) go out without waiting
@@ -245,25 +220,18 @@ class Backups {
     return !seen || seen.device !== device || generation > seen.generation
   }
 
-  /** Choose (or replace) the folder or file. Must run from a click; backing out changes nothing. */
-  async choose(
-    mode: native.PickMode = 'folder',
-    chooseDriveFolder?: folder.ChooseDriveFolder,
-  ): Promise<void> {
-    const place = await folder.pick(mode, baseName(this.profile), chooseDriveFolder)
+  /** Choose (or replace) the folder. Must run from a click; backing out changes nothing. */
+  async choose(): Promise<void> {
+    const place = await folder.pick()
     if (!place) return
-    // Picking the same file, folder or account again hands back the same grant; releasing it would
-    // undo it.
-    const old = this.saved?.place
-    if (old && !folder.samePlace(old, place)) await folder.release(old)
     this.saved = { place, lastSeen: null, plain: false, auto: true }
     await folder.save(this.profile, this.saved)
     await this.refresh()
   }
 
-  async reconnect(chooseDriveFolder?: folder.ChooseDriveFolder): Promise<void> {
+  async reconnect(): Promise<void> {
     if (!this.saved) return
-    const place = await folder.reconnect(this.saved.place, baseName(this.profile), chooseDriveFolder)
+    const place = await folder.reconnect(this.saved.place)
     if (!place) return
     this.saved.place = place
     await folder.save(this.profile, this.saved)
@@ -274,14 +242,13 @@ class Backups {
   async forget(deleteFiles: boolean): Promise<{ snapshots: number; attachments: number }> {
     let n = 0
     let files = 0
-    const place = this.saved?.place
     if (this.saved && deleteFiles) {
       n = await folder.deleteSnapshots(this.dir, baseName(this.profile))
       files = await folder.removeDir(this.dir, attachmentsDirName(this.profile))
       n += await folder.removeDir(this.dir, genomesDirName(this.profile))
     }
     this.saved = null
-    await folder.forget(this.profile, place)
+    await folder.forget(this.profile)
     this.setPassphrase('')
     this.set({ state: 'none' })
     return { snapshots: n, attachments: files }
@@ -361,19 +328,11 @@ class Backups {
       const base = baseName(this.profile)
       const dir = this.dir
       const key = this.plain ? undefined : pass
-      let bytes: Uint8Array
-      if (dir.single) {
-        // One file holds everything, genomes included.
-        bytes = await snapshotBytes(this.db, this.appVersion, key)
-        this.set({ state: 'writing', name, step: 'writing' })
-      } else {
-        // Genomes beside the snapshot, written once; after an edit this uploads the journal alone.
-        const snap = await folderSnapshot(this.db, this.appVersion, key)
-        bytes = snap.bytes
-        this.set({ state: 'writing', name, step: 'writing' })
-        await mirrorGenomes(dir, this.db, this.profile, snap.files, key ?? null)
-      }
-      await folder.writeSnapshot(dir, base, bytes, location.origin)
+      // Genomes beside the snapshot, written once; after an edit this writes the journal alone.
+      const snap = await folderSnapshot(this.db, this.appVersion, key)
+      this.set({ state: 'writing', name, step: 'writing' })
+      await mirrorGenomes(dir, this.db, this.profile, snap.files, key ?? null)
+      await folder.writeSnapshot(dir, base, snap.bytes, location.origin)
       this.saved.lastSeen = { device, generation: Number((await getMeta(this.db, 'generation')) ?? 0) }
       this.saved.lastAt = new Date().toISOString()
       await folder.save(this.profile, this.saved)
@@ -393,7 +352,7 @@ class Backups {
    * written by this point, and a folder that refuses a file must not cost the user the snapshot.
    */
   private async mirror(): Promise<void> {
-    if (!this.saved || this.single) return
+    if (!this.saved) return
     try {
       const dir = this.dir
       const r = await withTimeout(

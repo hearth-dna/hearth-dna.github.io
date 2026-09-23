@@ -294,8 +294,9 @@ kb fields at tier 0, so the user gets a decision frame even without any LLM.
 - Optional app lock: passphrase-derived key wraps a random data key; SQLite pages stay plain in OPFS
   in v1 (OPFS is origin-private), with an option to encrypt the DB file at rest in v2.
 - Strict CSP; no third-party origins except the user-configured LLM endpoint.
-- On phones the same build runs inside the shells in `mobile/`, which exist to give it a real
-  origin (so OPFS survives), a file picker and a way to save a dump — ADR 0006.
+- On phones Hearth is two native apps in `mobile/` (Compose, SwiftUI) with the same schema, the
+  same backup format and the same strings as this web app — ADR 0010 (it superseded the web-view
+  shells of ADR 0006).
 
 ## 7. Comparison with codegen.eu
 

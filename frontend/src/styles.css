@@ -183,9 +183,8 @@ main { padding-bottom: calc(1rem + env(safe-area-inset-bottom)); }
 body:not(:has(header.top)) #root { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
 
 /* ---------------------------------------------------------------------------------------------
- * Phones. The same app runs in a browser tab, in the Android shell and in the iOS shell
- * (docs/decisions/0006-native-shells-around-the-pwa.md), so everything that makes it feel native
- * lives here: a compact top bar, a bottom tab bar, thumb-sized targets, bottom sheets for dialogs
+ * Phones. The PWA in a phone browser (the phone apps are native, ADR 0010) gets its phone feel
+ * here: a compact top bar, a bottom tab bar, thumb-sized targets, bottom sheets for dialogs
  * and the safe areas. `data-platform` (app/platform.ts) picks iOS or Material 3 detailing.
  * ------------------------------------------------------------------------------------------- */
 .tabbar { display: none; }

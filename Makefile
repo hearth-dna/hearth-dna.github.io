@@ -2,7 +2,7 @@
 	frontend-install frontend-run frontend-build frontend-build-archive frontend-build-pages \
 	frontend-preview-pages frontend-test frontend-lint pages-deploy \
 	kb-build \
-	mobile-i18n mobile-kb mobile-web android android-build android-install android-test android-lint android-logs android-clean \
+	mobile-assets mobile-i18n mobile-kb android android-build android-install android-test android-lint android-logs android-clean \
 	android-keystore android-bundle android-verify android-publish _android-release-ready \
 	ios ios-generate ios-build ios-test ios-clean ios-archive ios-ipa ios-verify ios-testflight \
 	ios-testflight-status _ios-release-ready \
@@ -61,17 +61,14 @@ pages-deploy: ## Trigger the GitHub Pages deploy workflow
 kb-build: ## Build frontend/public/kb.json from kb/reviewed/*.json
 	python3 kb/build_kb.py
 
-# Mobile shells
-# =============
-# Both apps are the same PWA in a native window, not a port: one WebView on Android, one WKWebView
-# on iOS, each serving `frontend/dist/` from inside the app over a real origin
-# (docs/decisions/0006-native-shells-around-the-pwa.md). So the web build is the step neither can
-# skip, and `mobile-web` is a prerequisite of every build target below.
+# Mobile apps
+# ===========
+# Native apps: Compose on Android, SwiftUI on iOS, each with its own data layer
+# (docs/decisions/0010-native-apps.md). They share the web's string catalogue and knowledge base,
+# copied in by `mobile-assets`, a prerequisite of every build target below.
 MOBILE_DIR := mobile
 ANDROID_DIR := $(MOBILE_DIR)/android
 IOS_DIR := $(MOBILE_DIR)/ios
-ANDROID_WEB := $(ANDROID_DIR)/app/src/main/assets/web
-IOS_WEB := $(IOS_DIR)/Hearth/Web
 ANDROID_I18N := $(ANDROID_DIR)/app/src/main/assets/i18n
 IOS_I18N := $(IOS_DIR)/Hearth/I18n
 ANDROID_KB := $(ANDROID_DIR)/app/src/main/assets/kb.json
@@ -141,16 +138,11 @@ mobile-kb: ## Copy the knowledge base (frontend/public/kb.json) into both native
 	@cp $(FRONTEND_DIR)/public/kb.json $(ANDROID_KB)
 	@cp $(FRONTEND_DIR)/public/kb.json $(IOS_KB)
 
-mobile-web: frontend-build mobile-i18n mobile-kb ## Build the PWA and copy it into both app bundles
-	@rm -rf $(ANDROID_WEB) $(IOS_WEB)
-	@mkdir -p $(ANDROID_WEB) $(IOS_WEB)
-	@cp -R $(FRONTEND_DIR)/dist/. $(ANDROID_WEB)/
-	@cp -R $(FRONTEND_DIR)/dist/. $(IOS_WEB)/
-	@echo "Web build copied into $(ANDROID_WEB) and $(IOS_WEB)"
+mobile-assets: mobile-i18n mobile-kb ## Copy the strings and the knowledge base into both apps
 
 android: android-install ## Alias for android-install
 
-android-build: mobile-web ## Build the debug APK without installing
+android-build: mobile-assets ## Build the debug APK without installing
 	cd $(ANDROID_DIR) && HEARTH_APPLICATION_ID=$(ANDROID_APP_ID) $(CLOUD_ENV) $(GRADLE) :app:assembleDebug
 	@echo "APK: $(ANDROID_DIR)/app/build/outputs/apk/debug/app-debug.apk"
 
@@ -161,7 +153,7 @@ android-install: android-build ## Build and install the debug app on a connected
 	{ adb shell monkey -p $(ANDROID_APP_ID).debug -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1 || \
 	  { echo "Error: installed, but could not launch $(ANDROID_APP_ID).debug"; exit 1; }; }
 
-android-test: ## Run the shell's unit tests (JVM, no device, no web build needed)
+android-test: ## Run the unit tests (JVM, no device needed)
 	cd $(ANDROID_DIR) && $(GRADLE) :app:testDebugUnitTest
 
 android-lint: ## Run Android Lint on the shell
@@ -171,9 +163,9 @@ android-logs: ## Follow the app's logs (requires a connected device)
 	@$(adb_device); \
 	adb logcat --pid=$$(adb shell pidof -s $(ANDROID_APP_ID).debug)
 
-android-clean: ## Clean Android build artifacts and the copied web build
+android-clean: ## Clean Android build artifacts and the copied assets
 	cd $(ANDROID_DIR) && $(GRADLE) clean
-	rm -rf $(ANDROID_WEB)
+	rm -rf $(ANDROID_I18N) $(ANDROID_KB)
 
 # The iOS targets need macOS and Xcode; on Linux they say so instead of failing obscurely.
 define require_macos
@@ -187,7 +179,7 @@ ios-generate: ## Regenerate mobile/ios/Hearth.xcodeproj from project.yml (macOS)
 	@command -v xcodegen >/dev/null 2>&1 || { echo "Error: xcodegen not found (brew install xcodegen)"; exit 1; }
 	cd $(IOS_DIR) && xcodegen generate
 
-ios-build: mobile-web ios-generate ## Build and run the app on a simulator (macOS)
+ios-build: mobile-assets ios-generate ## Build and run the app on a simulator (macOS)
 	$(call require_macos,ios-build)
 	xcodebuild build -project $(IOS_DIR)/Hearth.xcodeproj -scheme Hearth \
 		-destination "platform=iOS Simulator,name=iPhone 16" -quiet \
@@ -199,8 +191,8 @@ ios-test: ios-generate ## Run the iOS unit tests on a simulator (macOS)
 		-destination "platform=iOS Simulator,name=iPhone 16" -quiet \
 		$(IOS_CLOUD_SETTINGS)
 
-ios-clean: ## Clean iOS build artifacts and the copied web build
-	rm -rf $(IOS_DIR)/Hearth.xcodeproj $(IOS_DIR)/build $(IOS_WEB)
+ios-clean: ## Clean iOS build artifacts and the copied assets
+	rm -rf $(IOS_DIR)/Hearth.xcodeproj $(IOS_DIR)/build $(IOS_I18N) $(IOS_KB)
 
 # Store releases
 # --------------
@@ -231,14 +223,14 @@ android-keystore: ## Create the Play upload keystore (once, outside the repo)
 	@echo "Back it up somewhere you will still have in ten years: without it the published app"
 	@echo "can never be updated, only replaced by a new listing."
 
-# The credentials are checked before `mobile-web` rather than after it, so a missing variable costs
-# a message instead of a full Vite build.
+# The credentials are checked before `mobile-assets` rather than after it, so a missing variable
+# costs a message instead of a build.
 _android-release-ready:
 	$(call require_var,HEARTH_APPLICATION_ID,$(HEARTH_APPLICATION_ID))
 	$(call require_var,ANDROID_KEYSTORE_PASSWORD,$(ANDROID_KEYSTORE_PASSWORD))
 	@test -f "$(ANDROID_KEYSTORE_PATH)" || { echo "Error: no keystore at $(ANDROID_KEYSTORE_PATH) — run 'make android-keystore'"; exit 1; }
 
-android-bundle: _android-release-ready mobile-web ## Build the signed release AAB for Play
+android-bundle: _android-release-ready mobile-assets ## Build the signed release AAB for Play
 	cd $(ANDROID_DIR) && $(ANDROID_RELEASE_ENV) $(GRADLE) :app:bundleRelease
 	@$(MAKE) android-verify
 
@@ -284,8 +276,8 @@ IOS_ASC_ENV = HEARTH_APPLICATION_ID=$(HEARTH_APPLICATION_ID) \
 IOS_AUTH_ARGS = $(if $(ASC_KEY_PATH),-authenticationKeyPath "$(abspath $(ASC_KEY_PATH))" \
 	-authenticationKeyID $(ASC_KEY_ID) -authenticationKeyIssuerID $(ASC_ISSUER_ID),)
 
-# Credentials are checked before `mobile-web`, so a missing variable costs a message rather than a
-# full Vite build and an Xcode archive. Mirrors _android-release-ready.
+# Credentials are checked before `mobile-assets`, so a missing variable costs a message rather than
+# an Xcode archive. Mirrors _android-release-ready.
 _ios-release-ready:
 	$(call require_macos,ios release)
 	$(call require_var,HEARTH_APPLICATION_ID,$(HEARTH_APPLICATION_ID))
@@ -293,7 +285,7 @@ _ios-release-ready:
 	@case "$(HEARTH_APPLICATION_ID)" in example.*) \
 		echo "Error: the placeholder id $(HEARTH_APPLICATION_ID) cannot be published. Set HEARTH_APPLICATION_ID."; exit 1;; esac
 
-ios-archive: _ios-release-ready mobile-web ios-generate ## Archive the app for distribution (macOS)
+ios-archive: _ios-release-ready mobile-assets ios-generate ## Archive the app for distribution (macOS)
 	xcodebuild archive -project $(IOS_DIR)/Hearth.xcodeproj -scheme Hearth \
 		-destination "generic/platform=iOS" -archivePath $(IOS_ARCHIVE) \
 		PRODUCT_BUNDLE_IDENTIFIER=$(HEARTH_APPLICATION_ID) DEVELOPMENT_TEAM=$(APPLE_TEAM_ID) \
@@ -322,9 +314,9 @@ ios-verify: ## Check the built .ipa before it goes anywhere near App Store Conne
 		: "otherwise pass and be uploaded to the wrong listing"; \
 		test "$$id" = "$(HEARTH_APPLICATION_ID)" \
 			|| { echo "Error: $(IOS_IPA) carries $$id, not $(HEARTH_APPLICATION_ID) — rebuild with 'make ios-ipa'"; exit 1; }; \
-		: "a build with no web app in it installs, launches and shows the cannot-start screen"; \
-		test -f "$$app/Web/index.html" \
-			|| { echo "Error: no web app inside the bundle — 'make mobile-web' did not run"; exit 1; }; \
+		: "a build without the string catalogue shows raw keys, and one without the kb finds nothing"; \
+		test -f "$$app/I18n/en.json" && test -f "$$app/kb.json" \
+			|| { echo "Error: strings or kb.json missing from the bundle — 'make mobile-assets' did not run"; exit 1; }; \
 		test -f "$$app/PrivacyInfo.xcprivacy" \
 			|| { echo "Error: PrivacyInfo.xcprivacy is missing — the upload would be rejected by email hours later (ITMS-91053)"; exit 1; }; \
 		: "without this key every TestFlight build waits on the export-compliance questionnaire"; \

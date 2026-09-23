@@ -1,6 +1,6 @@
 # ADR 0006: the mobile apps are native shells around the PWA
 
-**Date:** 2026-09-19 · **Status:** Accepted · **Amends:** [design.md §1, §6.6](../design.md) · **Amended by:** [0008](0008-cloud-backups-on-the-phones.md)
+**Date:** 2026-09-19 · **Status:** Superseded by [0010](0010-native-apps.md) (2026-09-23) · **Amends:** [design.md §1, §6.6](../design.md) · **Amended by:** [0008](0008-cloud-backups-on-the-phones.md)
 
 ## Context
 

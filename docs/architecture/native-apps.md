@@ -11,15 +11,46 @@ page is out of date.
 | --- | --- | --- |
 | Database | `data/Db.kt`: framework `SQLiteOpenHelper`, `user.db` in app-private storage | `Data/Db.swift`: `libsqlite3`, `user.db` in Application Support, excluded from iCloud backup |
 | Schema | `data/Schema.kt`: `SCHEMA_SQL` copied verbatim from `frontend/src/db/schema.ts`; a unit test compares them | `Data/Schema.swift`, same test |
-| SQL seam | `data/Sql.kt`: the interface `Db` implements on the phone and a JDBC SQLite implements in JVM tests | — |
-| Repository | `data/Repo.kt`: persons, health log, attachments (metadata), consents | `Data/Repo.swift` |
-| Backup restore | `backup/Container.kt` (zip, AES-GCM envelope), `backup/Restore.kt` | `Backup/Container.swift`, `Backup/Restore.swift` |
-| Pure logic | `health/HealthLog.kt`, `health/Presets.kt`: ports of `health/log.ts` and `health/presets.ts` | `Health/HealthLog.swift` |
-| Strings | `i18n/Strings.kt`: reads the web JSON from assets | `I18n/Strings.swift`: reads the web JSON from the bundle |
-| Screens | `ui/…` Compose + Material 3; entry point `NativeActivity` in `src/debug/` | `UI/…` SwiftUI |
+| SQL seam | `data/Sql.kt`: the interface `Db` implements on the phone and a JDBC SQLite implements in JVM tests | — (tests use an in-memory `Db`) |
+| Repository | `data/Repo.kt`: people, pedigree, genotypes, health log, attachments, consents, sharing log, meta; every write that changes rows bumps `meta.generation` | `Data/Repo.swift` |
+| Files beside the database | `data/Blobs.kt`: genome originals (`genome-<sha>.gz`), rebuilt genomes, attachments (`att-<sha>.bin`) | `Data/Blobs.swift` |
+| Pure logic | `genome/`, `kb/`, `family/`, `ask/`, `health/`, `documents/`, `attachments/`, `export/`: one file per `frontend/src` module, each tested like it | the same groups, capitalised |
+| Backups | `backup/`: dump v2 read and write, v1 read, restore, `Dir` places (SAF, Drive, Dropbox), the scheduler | `Backup/` (plus iCloud) |
+| Network | `Egress.kt`, the only file that opens a connection (`EgressTest`) | `Egress.swift` (`EgressTests`) |
+| Strings | `i18n/Strings.kt`: the web JSON from assets, a language chosen in Settings | `I18n/Strings.swift` |
+| Screens | `ui/…` Compose + Material 3; `MainActivity` | `UI/…` SwiftUI |
 
-Nothing in these layers talks to the network yet. When something does, it goes through one
-`Egress` type per platform (ADR 0010).
+## Screens
+
+Five tabs, the web's (TabBar.tsx): **People**, **Lookup**, **Health**, **Ask**, **Settings**.
+
+- **People** (PeoplePage.tsx): cards, table or pedigree tree; add and edit a person; parent links;
+  import a DNA file for one person or several at once, behind the `import_genome` consent (and
+  `import_minor` with the guardian statement for someone under 18). A person's **report**
+  (PersonPage.tsx) shows their files, the Mendelian check against each parent and the trio, a way
+  into their health log, and the knowledge-base findings, sortable.
+- **Lookup** (FamilyPage.tsx): search the kb by gene, drug, condition or rsid; every person's
+  genotype at it, and who inherited which allele (the pedigree with the allele on each line, risk
+  alleles marked, ambiguous lines dashed, impossible ones red).
+- **Health**: the log below, plus a quick measurement row, attachments (kept in the app, viewed in
+  the app, never handed to another app) and **Read a document** with the user's own Gemini key
+  (key in the Keystore / Keychain, the `read_document_byok` consent, a confirmation per send, a
+  sharing-log row with metadata only; the reply is a draft for the add form).
+- **Ask** (AskPage.tsx): the question classified on the phone, suggested records with reasons,
+  search for more, the context pack previewed exactly as copied (character for character the
+  web's), copy to the clipboard after a confirmation, logged in the sharing log.
+- **Settings** (SettingsPage.tsx): language; full dump export and import; the backup place;
+  open formats (CSV, JSON Lines); the Gemini key; consents with revoke (revoking deletes what the
+  consent covered); the sharing log; erase everything. A sync status sits in the top bars.
+
+### Backups
+
+The web's rules (`frontend/src/backup/scheduler.ts`, `docs/architecture/storage/backup-folder.md`):
+the snapshot after every change (debounced 5 s), newer data in the place loaded first (at start,
+on returning to the foreground, before every backup), genomes and sealed document copies beside a
+folder snapshot, rotations where the place does not version files itself. Places: a folder or a
+single file from the system picker, Google Drive or Dropbox (ADR 0009), and iCloud Drive on iOS.
+The passphrase is kept in the Keystore / Keychain under the name the web shell used.
 
 ## Formats the native code must match exactly
 
@@ -41,12 +72,13 @@ Nothing in these layers talks to the network yet. When something does, it goes t
   the allowlists in `frontend/src/export/restore.ts` and never from the file. Health rows get the
   defaults from `withDefaults()`. An attachment row whose entry is absent is skipped, and a consent
   is inserted only when no row with the same `(kind, version, subject)` exists.
-- **Not in the first slice**: genomes (they need the import parsers) and attachment bytes (they
-  come from the backup folder). Restore skips both and says so.
+- **Genomes and documents**: a restore loads a genome only for someone with no genotypes yet, and
+  keeps an original as a blob; attachment bytes travel beside a folder backup, never inside the
+  snapshot, and are fetched from it.
 - **Fixtures**: `mobile/fixtures/` (see its README). Every restore test opens `plain.hearth` and
   `encrypted.hearth` and compares the database with `journal.json`.
 
-## Health log screen (first slice)
+## Health log screen
 
 The same features on both platforms, each drawn with its own platform's components:
 

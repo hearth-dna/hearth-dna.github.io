@@ -6,10 +6,9 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 
 /**
- * `user.db` in the app's private storage: the native app's own database (ADR 0010), with the web
- * schema. It is not the web view's database; a backup moves data between the two. Android's
- * backup is off for the whole app (allowBackup="false"), so this file never leaves the phone
- * except as a backup the user makes.
+ * `user.db` in the app's private storage, with the web's schema (ADR 0010). Android's backup is
+ * off for the whole app (allowBackup="false"), so this file never leaves the phone except as a
+ * backup the user makes.
  */
 class Db private constructor(context: Context) :
     SQLiteOpenHelper(context, "user.db", null, SCHEMA_VERSION), Sql {

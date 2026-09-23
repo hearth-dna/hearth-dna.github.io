@@ -1,29 +1,21 @@
 # Every dependency version for the Android app, in one place (the idiom is ../../../sentio's).
-# The app is moving from a web-view shell to native Compose screens
-# (../../docs/decisions/0010-native-apps.md). Keep the list short: Compose and Material 3 are the
-# UI; the database is the framework's SQLite, the backup crypto is javax.crypto, zip is java.util.
+# A native Compose app (../../docs/decisions/0010-native-apps.md). Keep the list short: Compose and
+# Material 3 are the UI; the database is the framework's SQLite, the backup crypto is javax.crypto,
+# zip and gzip are java.util.zip, the network is HttpURLConnection behind Egress.kt.
 
 [versions]
 agp = "8.13.2"
 kotlin = "2.2.21"
 
-# SDK levels. minSdk 29 (Android 10), for one concrete reason: saving an export goes through
-# MediaStore's Downloads collection, which below 29 does not exist and is replaced by a
-# WRITE_EXTERNAL_STORAGE permission over the whole shared store. An app that holds raw genomes
-# asking for the entire SD card, so that it can write one file the user asked for, is not a
-# trade worth two OS versions of reach.
-#
-# The OS is not the real floor anyway: the WebView engine is, it updates independently of the
-# system, and MainActivity checks it at runtime (OPFS synchronous access handles need Chromium
-# 108+).
+# SDK levels. minSdk 29 (Android 10): the platform DayNight theme the window starts in, and
+# scoped storage everywhere, so every file the app reads or writes outside its own is one the user
+# picked in the system picker, with no storage permission at all.
 compileSdk = "36"
 minSdk = "29"
 targetSdk = "36"
 
 activity = "1.9.3"
-appcompat = "1.7.0"
 coreKtx = "1.15.0"
-webkit = "1.12.1"
 playServicesAuth = "21.3.0"
 # The Compose BOM and lifecycle are held where ../../../sentio holds them: the 2026.x BOMs and
 # current lifecycle/activity releases declare an AAR-metadata floor of compileSdk 37.
@@ -36,14 +28,9 @@ sqliteJdbc = "3.41.2.2"
 
 [libraries]
 androidx-activity = { module = "androidx.activity:activity", version.ref = "activity" }
-androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
-# The asset loader and the WebView feature checks. This is what lets the app serve its own files
-# over https://appassets.androidplatform.net/ instead of file://, which is the whole reason OPFS
-# and the service worker work at all.
-androidx-webkit = { module = "androidx.webkit:webkit", version.ref = "webkit" }
 # Google sign-in for the Drive backup button (Cloud.kt): the authorization client, which needs no
-# client id or secret in the app. The one dependency the shell has that is not AndroidX.
+# client id or secret in the app. The one dependency that is not AndroidX.
 play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
 
 # Compose is a BOM: the androidx.compose artifacts are version-less and take theirs from it.
@@ -54,7 +41,7 @@ androidx-compose-material-icons-core = { module = "androidx.compose.material:mat
 androidx-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
 androidx-compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity" }
-androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
+androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
 
 junit = { module = "junit:junit", version.ref = "junit" }
 json = { module = "org.json:json", version.ref = "json" }

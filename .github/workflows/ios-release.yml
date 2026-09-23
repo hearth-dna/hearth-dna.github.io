@@ -54,17 +54,14 @@ jobs:
             exit 1
           fi
 
+      # Node runs frontend/scripts/mobile-i18n.mjs (built-ins only, no npm install): the apps take
+      # their strings from the web's catalogue.
       - uses: actions/setup-node@v6
         with:
           node-version: '22'
-          cache: npm
-          cache-dependency-path: frontend/package-lock.json
 
       - name: Install xcodegen
         run: brew install xcodegen
-
-      - name: Install frontend dependencies
-        run: cd frontend && npm ci
 
       # A keychain of its own, unlocked for this job and deleted in the cleanup step: importing a
       # distribution certificate into the runner's login keychain would leave it readable by every

@@ -1,6 +1,6 @@
 # ADR 0009: Cloud drive buttons — Hearth signs in to Google Drive and Dropbox itself
 
-**Date:** 2026-09-21 · **Status:** Accepted · **Supersedes:** the "no cloud storage API" part of [0004](0004-files-are-the-sync-layer.md) · **Amends:** [0008](0008-cloud-backups-on-the-phones.md)
+**Date:** 2026-09-21 · **Status:** Accepted; amended by [0010](0010-native-apps.md) · **Supersedes:** the "no cloud storage API" part of [0004](0004-files-are-the-sync-layer.md) · **Amends:** [0008](0008-cloud-backups-on-the-phones.md)
 
 ## Context
 
@@ -62,3 +62,17 @@ the picker, which stays for everything else (a USB drive, OneDrive, a local fold
   verification and a yearly third-party security assessment (CASA) for restricted scopes.
 - **Real-provider checks are manual.** The request shapes are tested against in-memory fakes of
   both APIs; sign-in needs real credentials and a device, and was not exercised in this commit.
+
+## Update (2026-09-23): native apps
+
+With the shells gone (ADR 0010) there is no page asking a shell for tokens: the native app signs
+in, keeps the grant and talks to the drive itself. What changes:
+
+- **The one door is `Egress.kt` / `Egress.swift`,** not `cloudRequest` in `egress.ts`. Each
+  refuses any host outside its list and anything but HTTPS, and a test in each app fails if any
+  other source file opens a connection. The web app keeps no cloud code: a browser never had the
+  buttons, and it backs up to a folder (ADR 0004).
+- **Hosts:** `www.googleapis.com`, `api.dropboxapi.com` and `content.dropboxapi.com` as before, the
+  Gemini host for reading documents, and on iOS `oauth2.googleapis.com` too: iOS signs in to Google
+  with PKCE and exchanges and refreshes the grant there, where Android uses Play services.
+- Consent `cloud_backup`, the folder choice, *store unencrypted* and *Forget* are unchanged.

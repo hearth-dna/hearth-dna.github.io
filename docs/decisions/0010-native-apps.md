@@ -1,6 +1,6 @@
 # ADR 0010: the mobile apps become native apps
 
-**Date:** 2026-09-21 · **Status:** Accepted · **Supersedes:** [0006](0006-native-shells-around-the-pwa.md) (once the port reaches parity; until then both stand, see *Staging*)
+**Date:** 2026-09-21 · **Status:** Accepted · **Supersedes:** [0006](0006-native-shells-around-the-pwa.md) (since 2026-09-23, see *Outcome*)
 
 ## Context
 
@@ -67,3 +67,19 @@ The port goes screen by screen, and the current app keeps working throughout:
   through Xcode and the tests there.
 - **Revisit if** keeping the three in step costs more than it buys: the Kotlin Multiplatform core
   is the fallback, and would replace the two native data layers without touching either UI.
+
+## Outcome (2026-09-23)
+
+The port reached parity screen by screen: People and genome import, the person report, Family
+lookup, Ask, attachments and document reading, Settings with export, open formats and backups to a
+folder, a file or a cloud drive. The HTML archive export was left out on purpose: it is a way to
+carry the web app itself.
+
+- **No migration.** There were no users of the web-view apps, so the first-launch
+  backup-and-restore in *Staging* step 3 was not built. The web view, its asset server, the JS
+  bridges and `make mobile-web` are deleted; the native activity and scene are the apps.
+- **The contract held.** Backups written by the web, by Android and (once built on a Mac) by iOS
+  open in the other two; `mobile/fixtures/` carries a file from each writer, and a folder backup
+  written on the Android emulator was read back by the web code.
+- **iOS is unverified** until it has been built and tested in Xcode; everything Swift in the port
+  was written without a Mac.

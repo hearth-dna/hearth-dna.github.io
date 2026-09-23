@@ -22,10 +22,10 @@ val releaseKeystoreFile: File? = buildProp("RELEASE_KEYSTORE_PATH")?.let { path 
     listOf(file(path), rootProject.file(path)).firstOrNull { it.exists() }
 }
 
-// The web build is copied in by `make mobile-web` and is not tracked in git (see .gitignore).
-// Warn rather than fail: a clean checkout must still be able to run `gradle test`.
-if (!file("src/main/assets/web/index.html").exists()) {
-    logger.warn("mobile/android: src/main/assets/web/ is empty - run `make mobile-web` before building an APK")
+// The strings and the knowledge base are copied in by `make mobile-i18n mobile-kb` and are not
+// tracked in git (see .gitignore). Warn rather than fail: a clean checkout must still run tests.
+if (!file("src/main/assets/kb.json").exists() || !file("src/main/assets/i18n/en.json").exists()) {
+    logger.warn("mobile/android: assets missing - run `make mobile-i18n mobile-kb` before building an APK")
 }
 
 android {
@@ -82,9 +82,8 @@ android {
             applicationIdSuffix = ".debug"
         }
         release {
-            // R8 on a single Activity buys little and can only break the JavascriptInterface
-            // bridge, whose method names are reached from JavaScript by string. Shrinking the
-            // resources is where the size actually is, and that is safe.
+            // Not minified yet: turning R8 on needs a pass over reflection in Play services and
+            // org.json keep rules, checked on a release build, which is its own change.
             isMinifyEnabled = false
             isShrinkResources = false
             if (releaseKeystoreFile != null) {
@@ -111,12 +110,8 @@ android {
             // The unit tests read the golden backups and the web's schema from the repository.
             resources.srcDirs("../../fixtures")
         }
-        getByName("debug") { java.srcDirs("src/debug/kotlin") }
     }
 
-
-    // The .gitignore keeps the synced web build out of git; this keeps stale files out of the APK
-    // when the frontend drops one.
     packaging {
         resources.excludes += setOf("META-INF/*.version")
     }
@@ -125,14 +120,12 @@ android {
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.webkit)
     implementation(libs.play.services.auth)
 
     val composeBom = platform(libs.androidx.compose.bom)
     implementation(composeBom)
     implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material.icons.core)

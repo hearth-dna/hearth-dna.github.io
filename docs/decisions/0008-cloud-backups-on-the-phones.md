@@ -1,6 +1,6 @@
 # ADR 0008: Cloud backups on the phones — the system document picker, not cloud APIs
 
-**Date:** 2026-09-21 · **Status:** Accepted · **Amends:** [0004](0004-files-are-the-sync-layer.md), [0006](0006-native-shells-around-the-pwa.md) · **Amended by:** [0009](0009-cloud-drive-buttons.md) (Drive, Dropbox and iCloud buttons; the picker stays for everything else)
+**Date:** 2026-09-21 · **Status:** Accepted; mechanism superseded by [0010](0010-native-apps.md) · **Amends:** [0004](0004-files-are-the-sync-layer.md), [0006](0006-native-shells-around-the-pwa.md) · **Amended by:** [0009](0009-cloud-drive-buttons.md) (Drive, Dropbox and iCloud buttons; the picker stays for everything else)
 
 ## Context
 
@@ -60,3 +60,12 @@ encryption and the conflict rule stay in `frontend/`.
 - **Not exercised on real providers in this commit.** Android builds and its unit tests pass; the
   iOS side was written without a Mac. Both need a manual run against iCloud Drive, Google Drive and
   Dropbox before a store release.
+
+## Update (2026-09-23): native apps
+
+ADR 0010 replaced the shells with native apps, so there is no page to lend the picker to and no
+message channel. The decision stands in substance: the system picker, the two kinds of place (a
+folder with rotations and sidecars, or a single file holding the snapshot only) and grants rather
+than paths. The file calls are now the native apps' own backup code (`backup/Saf.kt` on Android, the
+bookmark-based places on iOS), behind the same `Dir` shape as `frontend/src/backup/folder.ts`, and
+they write the same files the web does.

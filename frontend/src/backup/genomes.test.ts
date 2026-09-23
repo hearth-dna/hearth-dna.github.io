@@ -11,8 +11,6 @@ function memoryDir(name = 'root'): Dir & { files: Map<string, Uint8Array>; write
   let writes = 0
   return {
     name,
-    single: false,
-    versioned: false,
     files,
     writes: () => writes + [...subs.values()].reduce((n, s) => n + s.writes(), 0),
     names: async () => [...files.keys(), ...subs.keys()],

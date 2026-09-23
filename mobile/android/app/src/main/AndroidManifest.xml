@@ -2,16 +2,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!--
-      The only permission. It is for the web app's outbound paths in frontend/src/egress/egress.ts:
-      the BYOK Ask call the user makes with their own API key, and the encrypted cloud backup the
-      user signs in to. The shell's own network use is signing in to that backup (Cloud.kt) and
-      nothing else; the whole database is local.
+      The only permission. Every connection goes through Egress.kt, to two kinds of place only:
+      the model provider the user brings a key for (reading a document), and the cloud drive the
+      user signs in to for backups. The whole database is local.
     -->
     <uses-permission android:name="android.permission.INTERNET" />
 
     <!--
-      allowBackup="false" is a privacy decision, not an oversight: the WebView's storage is where
-      the raw genomes live, and Android's own backup would copy that to Google Drive. There is one
+      allowBackup="false" is a privacy decision, not an oversight: user.db and the files beside it
+      hold the raw genomes, and Android's own backup would copy them to Google Drive. There is one
       backup path in this app, the one the user drives from Settings.
     -->
     <application
@@ -28,7 +27,7 @@
             android:exported="true"
             android:launchMode="singleTask"
             android:windowSoftInputMode="adjustResize"
-            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|uiMode|density|fontScale|layoutDirection">
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|density">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
