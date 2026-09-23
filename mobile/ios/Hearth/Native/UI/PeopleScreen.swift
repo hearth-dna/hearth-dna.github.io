@@ -68,6 +68,7 @@ enum PeopleLayout: String {
 struct PeopleScreen: View {
     @ObservedObject var store: PeopleStore
     let kb: Kb
+    @ObservedObject var backups: Backups
     /// Opens the Health tab scoped to this person id.
     let onHealthLog: (String) -> Void
 
@@ -137,6 +138,9 @@ struct PeopleScreen: View {
 
     @ToolbarContentBuilder
     private var toolbar: some ToolbarContent {
+        ToolbarItem(placement: .topBarLeading) {
+            SyncButton(backups: backups)
+        }
         ToolbarItemGroup(placement: .topBarTrailing) {
             Menu {
                 Button {

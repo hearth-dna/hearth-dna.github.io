@@ -65,6 +65,10 @@ final class Db {
     private var depth = 0
     private var innerFailed = false
 
+    /// Called after every write that changed user data (db.ts `onChange`), on the writing thread
+    /// and inside the database's lock: the backup schedules itself on it, and must only enqueue.
+    var onChange: (() -> Void)?
+
     /// Opens (creating if needed) the database at `path`; `":memory:"` gives a private in-memory one.
     init(path: String) throws {
         var opened: OpaquePointer?
@@ -158,6 +162,7 @@ final class Db {
         guard Db.isWrite(sql) else { return }
         try step(Db.bump, [])
         if Db.touchesGenotypes(sql) { try step(Db.dropGenotypeCounts, []) }
+        onChange?()
     }
 
     private func step(_ sql: String, _ params: [SQLValue]) throws -> Int {

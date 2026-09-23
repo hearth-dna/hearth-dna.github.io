@@ -16,7 +16,8 @@ import UIKit
 /// (Dropbox), set at build time from the gitignored .env. Drive asks for the full `drive` scope so
 /// the user can choose any folder (Hearth reads and writes only there); Dropbox keeps to an app folder.
 final class Cloud: NSObject, ASWebAuthenticationPresentationContextProviding {
-    typealias Reply = NativeFiles.Reply
+    /// The answer to a sign-in or token request: a value, or an error message.
+    typealias Reply = (Any?, String?) -> Void
 
     struct Provider {
         let authorize: URL

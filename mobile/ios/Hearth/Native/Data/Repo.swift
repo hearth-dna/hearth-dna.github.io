@@ -384,6 +384,76 @@ final class Repo {
         }
     }
 
+    /// Bookkeeping in meta (a cached hash, say): not user data, so no generation bump.
+    func setMeta(_ key: String, _ value: String) throws {
+        try db.run("INSERT OR REPLACE INTO meta(key, value) VALUES (?, ?)", [.text(key), .text(value)])
+    }
+
+    // MARK: - Consents, the sharing log, erasing
+
+    struct ConsentRecord: Identifiable, Equatable {
+        let kind: String
+        let version: Int
+        let subject: String
+        let grantedAt: String
+
+        var id: String { "\(kind):\(version):\(subject)" }
+    }
+
+    func listConsents() throws -> [ConsentRecord] {
+        try db.query("SELECT kind, version, subject, granted_at FROM consent ORDER BY id DESC").map {
+            ConsentRecord(kind: $0.text("kind"), version: $0.int("version") ?? 0, subject: $0.text("subject"), grantedAt: $0.text("granted_at"))
+        }
+    }
+
+    /// Revoking is deletion (consent.ts `revokeConsent`): the record goes, and so does what it
+    /// covered. A genome consent takes the person's genotypes and source files; the document
+    /// consent their health log and its documents; the provider consent the Gemini key, which the
+    /// caller removes from the Keychain. The person, their notes and the pedigree stay.
+    func revokeConsent(kind: String, subject: String) throws {
+        try db.transaction {
+            if kind == ConsentKind.importDocument.rawValue {
+                try db.run("DELETE FROM health_log WHERE person_id=?", [.text(subject)])
+            }
+            if kind == ConsentKind.importGenome.rawValue || kind == ConsentKind.importMinor.rawValue {
+                try db.run("DELETE FROM genotype WHERE person_id=?", [.text(subject)])
+                try db.run("DELETE FROM source_file WHERE person_id=?", [.text(subject)])
+                try db.run("DELETE FROM consent WHERE kind IN ('import_genome','import_minor') AND subject=?", [.text(subject)])
+            } else {
+                try db.run("DELETE FROM consent WHERE kind=? AND subject=?", [.text(kind), .text(subject)])
+            }
+        }
+        try pruneBlobs()
+    }
+
+    struct Shared: Identifiable, Equatable {
+        let id: Int
+        let kind: String
+        let destination: String
+        let payload: String
+        let createdAt: String
+    }
+
+    func listSharing() throws -> [Shared] {
+        try db.query("SELECT * FROM sharing_log ORDER BY id DESC LIMIT 200").map {
+            Shared(id: $0.int("id") ?? 0, kind: $0.text("kind"), destination: $0.text("destination"),
+                   payload: $0.text("payload"), createdAt: $0.text("created_at"))
+        }
+    }
+
+    /// Everything the user put in, gone; the device id and schema version stay (repo.ts
+    /// `eraseEverything`).
+    func eraseEverything() throws {
+        try db.transaction {
+            for table in ["sharing_log", "chat", "note", "consent", "attachment", "health_log", "genotype", "source_file", "relationship", "person"] {
+                try db.run("DELETE FROM \(table)")
+            }
+            try db.run("DELETE FROM meta WHERE key NOT IN ('schema_version', 'device')")
+            try db.run("INSERT OR IGNORE INTO meta(key, value) VALUES ('generation', '0')")
+        }
+        try pruneBlobs()
+    }
+
     func getMeta(_ key: String) throws -> String? {
         guard let row = try db.query("SELECT value FROM meta WHERE key=?", [.text(key)]).first else { return nil }
         if case .text(let value)? = row["value"] { return value }

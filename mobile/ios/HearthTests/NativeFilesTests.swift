@@ -1,10 +1,10 @@
 import XCTest
 @testable import Hearth
 
-/// The pure half of NativeFiles: which names the page may send, and how iCloud's placeholders read.
-/// The picker and the coordinated file calls need a device and a provider.
+/// The pure half of NativeFiles: which names a backup place accepts, and how iCloud's placeholders
+/// read. The picker and the coordinated file calls need a device and a provider.
 final class NativeFilesTests: XCTestCase {
-    func testAcceptsTheNamesTheWebAppUses() throws {
+    func testAcceptsTheNamesABackupUses() throws {
         for name in ["hearth-backup.hearth", "hearth-backup.hearth.1", "README.txt", "attachments"] {
             XCTAssertEqual(try NativeFiles.checkedName(name), name)
         }

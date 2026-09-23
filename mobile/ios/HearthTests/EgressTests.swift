@@ -13,13 +13,8 @@ final class EgressTests: XCTestCase {
     /// sheet (ASWebAuthenticationSession) is not our connection and is allowed.
     private static let network = try! NSRegularExpression(pattern: #"URLSession|NSURLConnection|dataTask|URLRequest\("#)
 
-    /// Files allowed to match besides Egress.swift.
-    private static let allowed: Set<String> = [
-        "Egress.swift",
-        // The web-view shell, whose WKWebView loads its local page with a URLRequest:
-        // deleted at cutover (Phase 8).
-        "WebAppView.swift",
-    ]
+    /// The one file allowed to match.
+    private static let allowed: Set<String> = ["Egress.swift"]
 
     func testNothingButEgressOpensAConnection() throws {
         let files = try XCTUnwrap(FileManager.default.enumerator(at: EgressTests.appSources, includingPropertiesForKeys: nil))

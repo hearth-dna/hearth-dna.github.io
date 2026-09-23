@@ -19,7 +19,46 @@ struct Strings {
         self.english = english
     }
 
-    static let shared = Strings.load(bundle: .main, preferred: Locale.preferredLanguages)
+    /// The strings every screen reads through `t()`. Replaced when the user picks a language in
+    /// Settings (then the root view is rebuilt); read from any thread, written on the main one.
+    private(set) static var shared = Strings.load(bundle: .main, preferred: chosenFirst(Locale.preferredLanguages))
+
+    /// Where the language picked in Settings is remembered; absent means "follow the phone".
+    static let languageKey = "hearth.language"
+
+    private static func chosenFirst(_ preferred: [String]) -> [String] {
+        (UserDefaults.standard.string(forKey: languageKey).map { [$0] } ?? []) + preferred
+    }
+
+    /// Switches the app's language and remembers the choice.
+    static func choose(_ code: String) {
+        UserDefaults.standard.set(code, forKey: languageKey)
+        shared = load(bundle: .main, preferred: [code] + Locale.preferredLanguages)
+    }
+
+    /// The 20 UI languages (languages.ts), by endonym; `rtl` for right-to-left scripts.
+    struct Language: Identifiable {
+        let code: String
+        let name: String
+        var rtl = false
+        var id: String { code }
+    }
+
+    static let languages: [Language] = [
+        Language(code: "en", name: "English"), Language(code: "zh", name: "中文（简体）"),
+        Language(code: "hi", name: "हिन्दी"), Language(code: "es", name: "Español"),
+        Language(code: "ar", name: "العربية", rtl: true), Language(code: "fr", name: "Français"),
+        Language(code: "bn", name: "বাংলা"), Language(code: "pt", name: "Português"),
+        Language(code: "ru", name: "Русский"), Language(code: "ur", name: "اردو", rtl: true),
+        Language(code: "id", name: "Bahasa Indonesia"), Language(code: "de", name: "Deutsch"),
+        Language(code: "ja", name: "日本語"), Language(code: "tr", name: "Türkçe"),
+        Language(code: "ko", name: "한국어"), Language(code: "vi", name: "Tiếng Việt"),
+        Language(code: "it", name: "Italiano"), Language(code: "pl", name: "Polski"),
+        Language(code: "uk", name: "Українська"), Language(code: "nl", name: "Nederlands"),
+    ]
+
+    /// Whether the app's language is written right to left.
+    var rightToLeft: Bool { Strings.languages.first { $0.code == language }?.rtl ?? false }
 
     /// The first of the user's languages that ships, matched on the primary subtag as the web's
     /// `detectLanguage` does (`pt-BR` → `pt`, `zh-Hans-CN` → `zh`).

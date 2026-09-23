@@ -10,6 +10,7 @@ enum HealthLayout: String {
 /// removable filter chips, a sort menu, and the log as day-grouped cards or a table.
 struct HealthLogScreen: View {
     @ObservedObject var store: HealthStore
+    @ObservedObject var backups: Backups
     /// A person id to scope the log to, set when a person's report opens their health log; taken
     /// (and cleared) as the tab shows it.
     @Binding var scopeRequest: String?
@@ -153,6 +154,7 @@ struct HealthLogScreen: View {
                 .accessibilityValue(count > 0 ? String(count) : "")
             }
             ToolbarItemGroup(placement: .topBarTrailing) {
+                SyncButton(backups: backups)
                 displayMenu
                 Button {
                     adding = true

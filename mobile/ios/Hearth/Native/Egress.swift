@@ -83,6 +83,47 @@ enum Egress {
         }.resume()
     }
 
+    /// What a provider answered: status, headers (lower-cased names) and body.
+    struct Response {
+        let status: Int
+        let headers: [String: String]
+        let body: Data
+
+        var ok: Bool { (200..<300).contains(status) }
+        var text: String { String(decoding: body, as: UTF8.self) }
+    }
+
+    /// One HTTPS request to an allowed host, whatever the status: the cloud drives answer "not
+    /// there" and "sign in again" with statuses the caller acts on. Blocks until the answer is in,
+    /// so it is for background queues only (the backup's); never call it on the main thread.
+    static func call(
+        _ method: String, _ url: URL, headers: [String: String] = [:], body: Data? = nil, timeout: TimeInterval = 120
+    ) throws -> Response {
+        precondition(!Thread.isMainThread, "Egress.call blocks; use it off the main thread")
+        try check(url)
+        var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: timeout)
+        request.httpMethod = method
+        for (k, v) in headers { request.setValue(v, forHTTPHeaderField: k) }
+        request.httpBody = body
+        let done = DispatchSemaphore(value: 0)
+        var outcome: Result<Response, Error> = .failure(Failure.empty)
+        session.dataTask(with: request) { data, response, error in
+            if let error {
+                outcome = .failure(error)
+            } else {
+                let http = response as? HTTPURLResponse
+                var fields: [String: String] = [:]
+                for (k, v) in http?.allHeaderFields ?? [:] {
+                    if let k = k as? String { fields[k.lowercased()] = "\(v)" }
+                }
+                outcome = .success(Response(status: http?.statusCode ?? 0, headers: fields, body: data ?? Data()))
+            }
+            done.signal()
+        }.resume()
+        done.wait()
+        return try outcome.get()
+    }
+
     /// `request` for async callers.
     static func request(
         _ method: String, _ url: URL, headers: [String: String] = [:], body: Data? = nil, timeout: TimeInterval = 120

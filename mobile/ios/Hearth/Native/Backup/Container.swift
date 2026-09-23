@@ -59,7 +59,24 @@ enum BackupError: Error, Equatable {
 }
 
 /// An opened dump v2: what restore needs from `frontend/src/export/container.ts`'s `Container`.
+/// A dump v2 `header.json`: the plaintext part a folder check reads without opening the rest.
+struct DumpHeader: Decodable, Equatable {
+    let format: String
+    let version: Int
+    let exportedAt: String?
+    /// Which device wrote it, and its write counter then: how a backup place tells snapshots apart.
+    let device: String?
+    let generation: Int64?
+    let encrypted: Bool?
+
+    enum CodingKeys: String, CodingKey {
+        case format, version, device, generation, encrypted
+        case exportedAt = "exported_at"
+    }
+}
+
 struct Dump {
+    let header: DumpHeader
     let exportedAt: String
     let encrypted: Bool
     /// `journal.json`: table name → rows.
@@ -152,6 +169,7 @@ enum Container {
             genomeFiles[genome.path] = file
         }
         return Dump(
+            header: header,
             exportedAt: header.exportedAt ?? "",
             encrypted: encrypted,
             journal: journal,
@@ -167,16 +185,6 @@ enum Container {
 
     // MARK: - Private
 
-    private struct Header: Decodable {
-        let format: String
-        let version: Int
-        let exportedAt: String?
-
-        enum CodingKeys: String, CodingKey {
-            case format, version
-            case exportedAt = "exported_at"
-        }
-    }
 
     private struct Manifest: Decodable {
         struct Genome: Decodable {
@@ -201,8 +209,8 @@ enum Container {
         }
     }
 
-    private static func parseHeader(_ data: Data) throws -> Header {
-        guard let header = try? JSONDecoder().decode(Header.self, from: data),
+    static func parseHeader(_ data: Data) throws -> DumpHeader {
+        guard let header = try? JSONDecoder().decode(DumpHeader.self, from: data),
               header.format == "hearth-dump", header.version == 2
         else { throw BackupError.notABackup }
         return header
@@ -247,7 +255,7 @@ enum Container {
 
     /// WebCrypto's `deriveKey({ name: 'PBKDF2', hash: 'SHA-256', iterations }, …, AES-GCM 256)`:
     /// the passphrase's UTF-8 bytes, unnormalised, as `TextEncoder` gives them.
-    private static func deriveKey(_ passphrase: String, salt: [UInt8]) throws -> SymmetricKey {
+    static func deriveKey(_ passphrase: String, salt: [UInt8]) throws -> SymmetricKey {
         let password = Array(passphrase.utf8)
         var derived = [UInt8](repeating: 0, count: 32)
         let status = password.withUnsafeBufferPointer { pw -> Int32 in

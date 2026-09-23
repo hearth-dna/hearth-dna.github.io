@@ -54,9 +54,13 @@ enum Restore {
     ]
 
     /// `onProgress` gets an i18n key from `restore.json` and its placeholders, on the calling thread.
+    ///
+    /// `loadGenome` fetches a genome a folder snapshot keeps beside itself (nil when the place does
+    /// not have it yet); each is checked against the manifest's sha256 like an embedded one.
     static func run(
         _ dump: Dump, into repo: Repo,
-        onProgress: ((String, [String: CustomStringConvertible]) -> Void)? = nil
+        onProgress: ((String, [String: CustomStringConvertible]) -> Void)? = nil,
+        loadGenome: ((GenomeEntry) throws -> Data?)? = nil
     ) throws -> RestoreResult {
         let db = repo.db
         return try db.transaction { () throws -> RestoreResult in
@@ -100,7 +104,12 @@ enum Restore {
             var genomes = 0
             for g in dump.genomes where !hadGenotypes.contains(g.personId) {
                 // A folder backup keeps its genomes beside it; one not there yet loads next time.
-                guard let gz = dump.genomeFiles[g.path] else { continue }
+                var loaded = dump.genomeFiles[g.path]
+                if loaded == nil, let fetched = try loadGenome?(g) {
+                    guard sha256Hex(fetched) == g.sha256 else { throw BackupError.damaged }
+                    loaded = fetched
+                }
+                guard let gz = loaded else { continue }
                 let text: String
                 do {
                     text = GenomeImport.decode(try Gzip.decompress(gz))
@@ -194,5 +203,16 @@ enum Restore {
 
     private static func count(_ db: Db, _ table: String) throws -> Int {
         try db.query("SELECT COUNT(*) AS n FROM \(table)").first?.int("n") ?? 0
+    }
+
+    /// Any Hearth backup this app reads (restore.ts `restoreBytes`): dump v2, plain or sealed, or an
+    /// older dump v1. Slow: call it off the main thread.
+    static func bytes(
+        _ data: Data, passphrase: String?, into repo: Repo,
+        onProgress: ((String, [String: CustomStringConvertible]) -> Void)? = nil,
+        loadGenome: ((GenomeEntry) throws -> Data?)? = nil
+    ) throws -> RestoreResult {
+        if DumpV1.isV1(data) { return try DumpV1.restore(DumpV1.open(data, passphrase: passphrase), into: repo) }
+        return try run(Container.open(data, passphrase: passphrase), into: repo, onProgress: onProgress, loadGenome: loadGenome)
     }
 }

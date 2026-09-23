@@ -12,9 +12,8 @@ options:
   # identifiers are first-come and permanent once submitted.
   bundleIdPrefix: example.hearth
   deploymentTarget:
-    # iOS 17: the first WebKit with OPFS synchronous access handles, which the app's SQLite VFS
-    # needs (docs/decisions/0002-sqlite-wasm-on-opfs.md). On anything older the database would fall
-    # back to memory and every import would vanish when the app closed.
+    # iOS 17: the SwiftUI the screens use (ContentUnavailableView, navigationDestination(item:),
+    # the two-parameter onChange).
     iOS: "17.0"
   generateEmptyDirectories: false
   createIntermediateGroups: true
@@ -46,22 +45,14 @@ targets:
           - "**/.DS_Store"
           # Bundled, not compiled — listed below so the build phase is explicit.
           - "PrivacyInfo.xcprivacy"
-          - "Web/**"
           - "I18n/**"
           - "Resources/**"
       - path: Hearth/PrivacyInfo.xcprivacy
         buildPhase: resources
-      # The PWA build, copied in by `make mobile-web`. A folder reference, not a group: the file
-      # names inside are Vite's hashed output and change every build, and the directory structure
-      # has to survive into the bundle for LocalWebServer to serve it.
-      - path: Hearth/Web
-        type: folder
-        buildPhase: resources
-        optional: true
       # The web app's string catalogue for the native screens (ADR 0010), copied in by
-      # `make mobile-i18n` as one <code>.json per language. A folder reference for the same reason
-      # as Web: Strings.swift looks for the files under I18n/ in the bundle, and lists that folder
-      # to learn which languages ship.
+      # `make mobile-i18n` as one <code>.json per language. A folder reference, not a group:
+      # Strings.swift looks for the files under I18n/ in the bundle, and lists that folder to learn
+      # which languages ship.
       - path: Hearth/I18n
         type: folder
         buildPhase: resources
@@ -83,9 +74,8 @@ targets:
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         LSApplicationCategoryType: public.app-category.medical
-        # Hearth ships no cryptography of its own: the dump's AES-GCM is WebCrypto, inside WebKit,
-        # and the native restore opens it with CryptoKit and CommonCrypto — all of it Apple's, the
-        # exempt category. Declaring it spares every upload the export-compliance questionnaire.
+        # Hearth ships no cryptography of its own: the backups' AES-GCM, PBKDF2 and SHA-256 are
+        # CryptoKit and CommonCrypto — all of it Apple's, the exempt category. Declaring it spares every upload the export-compliance questionnaire.
         ITSAppUsesNonExemptEncryption: false
         UILaunchScreen:
           UIColorName: LaunchBackground
@@ -100,12 +90,6 @@ targets:
           - UIInterfaceOrientationPortraitUpsideDown
           - UIInterfaceOrientationLandscapeLeft
           - UIInterfaceOrientationLandscapeRight
-        # The app talks to one server: its own, on 127.0.0.1, over plain HTTP, because that is the
-        # only way to give the web app a trustworthy origin (see LocalWebServer.swift). This is the
-        # narrow key — it permits cleartext to local hosts only and leaves the public internet
-        # still requiring HTTPS, which is what the BYOK Ask call uses.
-        NSAppTransportSecurity:
-          NSAllowsLocalNetworking: true
         # The cloud backup buttons (Cloud.swift, docs/runbook/cloud-backups.md). Filled from the
         # gitignored .env through build settings; empty means the button is not offered. Both are
         # public identifiers (an iOS OAuth client id, a Dropbox app key), but still account
@@ -149,10 +133,6 @@ targets:
     scheme:
       testTargets:
         - HearthTests
-      # Off by default: tick it in the scheme editor to launch the native SwiftUI app instead of
-      # the web view (debug builds only; see HearthApp.swift and ADR 0010).
-      commandLineArguments:
-        "-native": false
 
   HearthTests:
     type: bundle.unit-test

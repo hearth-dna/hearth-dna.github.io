@@ -3,9 +3,10 @@
 <!--
   Apple's privacy manifest. Every list here is empty, and that is the accurate answer rather than a
   stub: Hearth collects nothing, tracks nothing, and contacts no third-party server of its own
-  (docs/decisions/0001-local-first-no-personal-data-on-the-server.md). The one outbound call the app
-  can make is the BYOK Ask request the user configures with their own API key, to their own
-  provider — the user's relationship, not the app's.
+  (docs/decisions/0001-local-first-no-personal-data-on-the-server.md). The only outbound calls the
+  app makes are the document reading the user sets up with their own API key, to their own provider,
+  and the backups they choose to keep in their own cloud drive: the user's relationships, not the
+  app's.
 
   This is not the same thing as the App Store Connect privacy label, which is filled in separately
   and must say the same.
@@ -18,10 +19,19 @@
     <array/>
     <key>NSPrivacyCollectedDataTypes</key>
     <array/>
-    <!-- No required-reason API is used: no UserDefaults, no file timestamps, no disk-space checks,
-         no active-keyboard or system-boot-time reads. The shell is a web view and a loopback
-         socket. -->
+    <!-- UserDefaults holds the app's own settings (language, the chosen backup place), read and
+         written only by this app: reason CA92.1. No file timestamps, disk-space checks,
+         active-keyboard or system-boot-time reads. -->
     <key>NSPrivacyAccessedAPITypes</key>
-    <array/>
+    <array>
+        <dict>
+            <key>NSPrivacyAccessedAPIType</key>
+            <string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+            <key>NSPrivacyAccessedAPITypeReasons</key>
+            <array>
+                <string>CA92.1</string>
+            </array>
+        </dict>
+    </array>
 </dict>
 </plist>

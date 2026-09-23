@@ -111,44 +111,72 @@ final class HealthStore: ObservableObject {
 struct NativeRootView: View {
     @StateObject private var database = NativeDatabase()
     @State private var consented = false
+    /// Bumped when the language changes, so every screen is built again in it.
+    @State private var language = Strings.shared.language
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
-        switch database.opened {
-        case .success(let opened):
-            if consented || ((try? opened.repo.hasConsent(.firstLaunch)) ?? false) {
-                NativeTabs(health: opened.health, people: opened.people)
-            } else {
-                FirstLaunchView {
-                    try opened.repo.grantConsent(.firstLaunch)
-                    consented = true
+        Group {
+            switch database.opened {
+            case .success(let opened):
+                if consented || ((try? opened.repo.hasConsent(.firstLaunch)) ?? false) {
+                    NativeTabs(
+                        health: opened.health, people: opened.people, backups: opened.backups,
+                        onLanguage: { code in
+                            Strings.choose(code)
+                            language = Strings.shared.language
+                        },
+                        onErased: {
+                            // Erased, or the first-launch consent withdrawn: back behind the gate.
+                            consented = false
+                            try? opened.health.reload()
+                            try? opened.people.reload()
+                        }
+                    )
+                    .onChange(of: scenePhase) { _, phase in
+                        // Back in the foreground: another device may have written to the backup meanwhile.
+                        if phase == .active { opened.backups.refreshSoon() }
+                    }
+                } else {
+                    FirstLaunchView {
+                        try opened.repo.grantConsent(.firstLaunch)
+                        consented = true
+                    }
                 }
+            case .failure(let error):
+                Text(t("app.startFailed", ["error": error.localizedDescription]))
+                    .multilineTextAlignment(.center)
+                    .padding(32)
             }
-        case .failure(let error):
-            Text(t("app.startFailed", ["error": error.localizedDescription]))
-                .multilineTextAlignment(.center)
-                .padding(32)
         }
+        .id(language)
+        .environment(\.layoutDirection, Strings.shared.rightToLeft ? .rightToLeft : .leftToRight)
+        .environment(\.locale, Locale(identifier: language))
     }
 }
 
 /// Opens the database once for the life of the scene: a `@StateObject` is created once, where a
 /// view's own properties are rebuilt on every update.
 private final class NativeDatabase: ObservableObject {
-    let opened: Result<(repo: Repo, health: HealthStore, people: PeopleStore), Error> = Result {
+    let opened: Result<(repo: Repo, health: HealthStore, people: PeopleStore, backups: Backups), Error> = Result {
         let repo = try Repo(db: Db.openDefault(), blobs: Blobs.openDefault())
-        return (repo, try HealthStore(repo: repo), PeopleStore(repo: repo))
+        return (repo, try HealthStore(repo: repo), PeopleStore(repo: repo), Backups(repo: repo, cloud: Cloud()))
     }
 }
 
-/// The web's top-level pages as a tab bar, in TabBar.tsx's order (People, Lookup, Health, Ask), each tab
-/// with its own navigation stack. Health is where the app opens, as on Android. A person's report is
-/// pushed on People; its health-log row switches to Health scoped to that person.
+/// The web's top-level pages as a tab bar, in TabBar.tsx's order (People, Lookup, Health, Ask,
+/// Settings), each tab with its own navigation stack. Health is where the app opens, as on
+/// Android. A person's report is pushed on People; its health-log row switches to Health scoped to
+/// that person.
 private struct NativeTabs: View {
     @ObservedObject var health: HealthStore
     @ObservedObject var people: PeopleStore
+    @ObservedObject var backups: Backups
+    let onLanguage: (String) -> Void
+    let onErased: () -> Void
 
     private enum Tab: Hashable {
-        case people, family, health, ask
+        case people, family, health, ask, settings
     }
 
     @State private var tab = Tab.health
@@ -156,7 +184,7 @@ private struct NativeTabs: View {
 
     var body: some View {
         TabView(selection: $tab) {
-            PeopleScreen(store: people, kb: Kb.bundled) { personId in
+            PeopleScreen(store: people, kb: Kb.bundled, backups: backups) { personId in
                 healthScope = personId
                 tab = .health
             }
@@ -165,12 +193,20 @@ private struct NativeTabs: View {
             FamilyScreen(repo: people.repo, kb: Kb.bundled)
                 .tabItem { Label(t("app.tabFamily"), systemImage: "magnifyingglass") }
                 .tag(Tab.family)
-            HealthLogScreen(store: health, scopeRequest: $healthScope)
+            HealthLogScreen(store: health, backups: backups, scopeRequest: $healthScope)
                 .tabItem { Label(t("app.navHealth"), systemImage: "heart.text.square") }
                 .tag(Tab.health)
             AskScreen(repo: people.repo, kb: Kb.bundled)
                 .tabItem { Label(t("app.navAsk"), systemImage: "bubble.left.and.bubble.right") }
                 .tag(Tab.ask)
+            SettingsScreen(repo: people.repo, kb: Kb.bundled, backups: backups, onLanguage: onLanguage, onErased: onErased)
+                .tabItem { Label(t("app.tabSettings"), systemImage: "gearshape") }
+                .tag(Tab.settings)
+        }
+        // Data loaded from the backup place: the lists read again.
+        .onChange(of: backups.pulled) {
+            try? health.reload()
+            try? people.reload()
         }
     }
 }
