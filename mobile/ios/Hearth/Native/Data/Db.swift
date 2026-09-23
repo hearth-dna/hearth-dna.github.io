@@ -53,10 +53,17 @@ private let transient = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
 /// Every statement is prepared and every value bound; nothing is ever spliced into SQL text except
 /// table and column names that are constants in the calling code.
 ///
-/// Not thread-safe by design: the app uses it from the main thread only, and the one slow step of a
-/// restore (the key derivation) happens before the database is touched.
+/// One connection, used from any thread one caller at a time: every call takes a recursive lock,
+/// and a transaction holds it from BEGIN to COMMIT. The slow work (a genome import, a restore that
+/// loads genomes) runs on a background queue behind a sheet the user cannot dismiss, so the main
+/// thread never waits on it in practice; if it did, it would wait rather than interleave.
 final class Db {
     private let handle: OpaquePointer
+    private let lock = NSRecursiveLock()
+    /// How many `transaction` calls are open on this connection. Only the outermost begins, commits
+    /// or rolls back; an inner one that throws marks the whole transaction failed.
+    private var depth = 0
+    private var innerFailed = false
 
     /// Opens (creating if needed) the database at `path`; `":memory:"` gives a private in-memory one.
     init(path: String) throws {
@@ -100,6 +107,8 @@ final class Db {
 
     /// Runs SQL text with no parameters, possibly several statements (the schema).
     func execScript(_ sql: String) throws {
+        lock.lock()
+        defer { lock.unlock() }
         var error: UnsafeMutablePointer<CChar>?
         let rc = sqlite3_exec(handle, sql, nil, nil, &error)
         if rc != SQLITE_OK {
@@ -109,13 +118,46 @@ final class Db {
         }
     }
 
-    /// Runs one statement; returns how many rows it changed. A write to user data also bumps
-    /// meta.generation, as the web's worker does, so no code path can forget it.
+    /// Runs one statement; returns how many rows it changed. A write that changed user data also
+    /// bumps meta.generation, and one that can change how many genotypes someone has drops the
+    /// cached counts, as the web's worker does, so no code path can forget either.
     @discardableResult
     func run(_ sql: String, _ params: [SQLValue] = []) throws -> Int {
+        lock.lock()
+        defer { lock.unlock() }
         let changed = try step(sql, params)
-        if Db.isWrite(sql) { try step(Db.bump, []) }
+        if changed > 0 { try afterWrite(sql) }
         return changed
+    }
+
+    /// Runs one prepared statement for each of `count` rows, compiled once and inside one
+    /// transaction (joining the caller's if there is one): the genome import's hundreds of
+    /// thousands of rows. `row(i)` gives the i-th row's parameters; `onProgress` gets the count
+    /// done every 50 000 rows, on the calling thread. The generation and the counts cache are
+    /// touched once at the end, not per row.
+    func insertMany(
+        _ sql: String, count: Int, onProgress: ((Int) -> Void)? = nil, row: (Int) -> [SQLValue]
+    ) throws {
+        lock.lock()
+        defer { lock.unlock() }
+        try transaction {
+            let statement = try prepare(sql)
+            defer { sqlite3_finalize(statement) }
+            for i in 0..<count {
+                try bind(statement, row(i))
+                guard sqlite3_step(statement) == SQLITE_DONE else { throw DbError(message: lastError) }
+                sqlite3_reset(statement)
+                if (i + 1) % 50_000 == 0 { onProgress?(i + 1) }
+            }
+            if count > 0 { try afterWrite(sql) }
+        }
+    }
+
+    /// The worker's bookkeeping after a write that changed rows.
+    private func afterWrite(_ sql: String) throws {
+        guard Db.isWrite(sql) else { return }
+        try step(Db.bump, [])
+        if Db.touchesGenotypes(sql) { try step(Db.dropGenotypeCounts, []) }
     }
 
     private func step(_ sql: String, _ params: [SQLValue]) throws -> Int {
@@ -134,11 +176,24 @@ final class Db {
         return verb && s.range(of: #"\bMETA\b"#, options: .regularExpression) == nil
     }
 
+    /// The worker's `touchesGenotypes`: a write naming the genotype table, or deleting a person
+    /// (their rows cascade), can change how many genotypes someone has.
+    static func touchesGenotypes(_ sql: String) -> Bool {
+        guard isWrite(sql) else { return false }
+        let s = sql.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+        return s.range(of: #"\bGENOTYPE\b"#, options: .regularExpression) != nil
+            || s.range(of: #"^DELETE\s+FROM\s+PERSON\b"#, options: .regularExpression) != nil
+    }
+
+    private static let dropGenotypeCounts = "DELETE FROM meta WHERE key = 'genotype_counts'"
+
     private static let bump =
         "INSERT INTO meta(key, value) VALUES ('generation', '1') ON CONFLICT(key) DO UPDATE SET value = CAST(value AS INTEGER) + 1"
 
     /// Runs one query and returns every row.
     func query(_ sql: String, _ params: [SQLValue] = []) throws -> [Row] {
+        lock.lock()
+        defer { lock.unlock() }
         let statement = try prepare(sql, params)
         defer { sqlite3_finalize(statement) }
         var rows: [Row] = []
@@ -157,11 +212,34 @@ final class Db {
 
     /// `body` inside one transaction: all of it lands or none of it does. A restore that fails half
     /// way must leave the database as it was, not half merged.
+    ///
+    /// Re-entrant, like Android's: a transaction opened inside another joins it (SQLite has no
+    /// nested BEGIN). Only the outermost commits, and it rolls back instead when any inner one
+    /// threw, even if the caller caught that error.
     @discardableResult
     func transaction<T>(_ body: () throws -> T) throws -> T {
+        lock.lock()
+        defer { lock.unlock() }
+        if depth > 0 {
+            depth += 1
+            defer { depth -= 1 }
+            do {
+                return try body()
+            } catch {
+                innerFailed = true
+                throw error
+            }
+        }
         try execScript("BEGIN IMMEDIATE")
+        depth = 1
+        innerFailed = false
+        defer {
+            depth = 0
+            innerFailed = false
+        }
         do {
             let result = try body()
+            if innerFailed { throw DbError(message: "a nested transaction failed") }
             try execScript("COMMIT")
             return result
         } catch {
@@ -173,10 +251,27 @@ final class Db {
     private var lastError: String { String(cString: sqlite3_errmsg(handle)) }
 
     private func prepare(_ sql: String, _ params: [SQLValue]) throws -> OpaquePointer {
+        let statement = try prepare(sql)
+        do {
+            try bind(statement, params)
+        } catch {
+            sqlite3_finalize(statement)
+            throw error
+        }
+        return statement
+    }
+
+    private func prepare(_ sql: String) throws -> OpaquePointer {
         var prepared: OpaquePointer?
         guard sqlite3_prepare_v2(handle, sql, -1, &prepared, nil) == SQLITE_OK, let statement = prepared else {
             throw DbError(message: lastError)
         }
+        return statement
+    }
+
+    /// Binds every parameter, replacing whatever the statement held before (`insertMany` rebinds
+    /// the same statement per row, and every row has every column).
+    private func bind(_ statement: OpaquePointer, _ params: [SQLValue]) throws {
         for (offset, value) in params.enumerated() {
             let index = Int32(offset + 1)
             let rc: Int32
@@ -186,13 +281,8 @@ final class Db {
             case .real(let d): rc = sqlite3_bind_double(statement, index, d)
             case .text(let s): rc = sqlite3_bind_text(statement, index, s, -1, transient)
             }
-            if rc != SQLITE_OK {
-                let message = lastError
-                sqlite3_finalize(statement)
-                throw DbError(message: message)
-            }
+            if rc != SQLITE_OK { throw DbError(message: lastError) }
         }
-        return statement
     }
 
     private func column(_ statement: OpaquePointer, _ i: Int32) -> SQLValue {

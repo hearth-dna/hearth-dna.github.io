@@ -681,7 +681,6 @@
   "restore.fetchingGenome": "Récupération du génome {n} sur {total}…",
   "native.intro": "Le journal de santé et les génomes de votre famille sont stockés uniquement sur ce téléphone. Il n’y a ni compte ni copie sur un serveur. Pour transférer des données entre appareils, utilisez une sauvegarde.",
   "native.restoreBackup": "Restaurer une sauvegarde…",
-  "native.restored": "{people} nouvelles personnes et {entries} entrées de santé restaurées. Les génomes et les fichiers joints ne sont pas encore pris en charge dans cette version de l’app.",
   "native.encryptedTitle": "Cette sauvegarde est chiffrée",
   "native.open": "Ouvrir",
   "native.ok": "OK",
@@ -690,5 +689,10 @@
   "native.firstLaunchStorage": "Tout ce que j’importe reste sur ce téléphone. Hearth n’a ni compte ni copie de mes données sur un serveur ; si je désinstalle l’app sans faire de sauvegarde, tout est perdu.",
   "native.notBackup": "Ce fichier n’est pas une sauvegarde Hearth que cette app peut ouvrir. Choisissez un fichier .hearth enregistré avec la version actuelle de Hearth.",
   "native.damaged": "Cette sauvegarde est endommagée et n’a pas pu être lue. Rien n’a été modifié.",
-  "native.error": "Une erreur s’est produite : {error}"
+  "native.error": "Une erreur s’est produite : {error}",
+  "native.importAccepted": "Acceptés : texte brut, CSV ou VCF, ou un .zip / .gz qui en contient un. Tout est lu ici, sur ce téléphone.",
+  "native.chooseFile": "Choisir un fichier…",
+  "native.chooseFiles": "Choisir des fichiers…",
+  "native.keyNotice": "Pour lire une photo, un scan ou un PDF, Hearth l’envoie depuis ce téléphone à Google Gemini avec une clé qui vous appartient. Vous devez ajouter cette clé une fois.",
+  "native.keyWarning": "Traitez la clé comme un mot de passe : quiconque la possède peut utiliser le service de Google avec votre compte. Elle est stockée uniquement sur ce téléphone, protégée par le trousseau du téléphone, et n’est jamais incluse dans les sauvegardes. Vous pouvez la supprimer à tout moment depuis la même page Google."
 }

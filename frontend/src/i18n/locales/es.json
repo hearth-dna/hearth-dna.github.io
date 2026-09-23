@@ -681,7 +681,6 @@
   "restore.fetchingGenome": "Obteniendo genoma {n} de {total}…",
   "native.intro": "El registro de salud y los genomas de tu familia se guardan solo en este teléfono. No hay cuenta ni copia en ningún servidor. Para pasar datos entre dispositivos, usa una copia de seguridad.",
   "native.restoreBackup": "Restaurar una copia de seguridad…",
-  "native.restored": "Se restauraron {people} personas nuevas y {entries} entradas de salud. Los genomas y los archivos adjuntos aún no están en esta versión de la app.",
   "native.encryptedTitle": "Esta copia de seguridad está cifrada",
   "native.open": "Abrir",
   "native.ok": "Aceptar",
@@ -690,5 +689,10 @@
   "native.firstLaunchStorage": "Todo lo que importo se queda en este teléfono. Hearth no tiene cuentas ni copia de mis datos en ningún servidor; si desinstalo la app sin hacer una copia de seguridad, se pierde.",
   "native.notBackup": "Este archivo no es una copia de seguridad de Hearth que esta app pueda abrir. Elige un archivo .hearth guardado con la versión actual de Hearth.",
   "native.damaged": "Esta copia de seguridad está dañada y no se pudo leer. No se ha cambiado nada.",
-  "native.error": "Algo salió mal: {error}"
+  "native.error": "Algo salió mal: {error}",
+  "native.importAccepted": "Se acepta: texto sin procesar, CSV o VCF, o un .zip / .gz que contenga uno. Todo se lee aquí, en este teléfono.",
+  "native.chooseFile": "Elegir archivo…",
+  "native.chooseFiles": "Elegir archivos…",
+  "native.keyNotice": "Para leer una foto, un escaneo o un PDF, Hearth lo envía desde este teléfono a Google Gemini con una clave que te pertenece. Tienes que añadir esa clave una vez.",
+  "native.keyWarning": "Trata la clave como una contraseña: quien la tenga puede usar el servicio de Google con tu cuenta. Se guarda solo en este teléfono, protegida por el almacén de claves del teléfono, y nunca se incluye en las copias de seguridad. Puedes eliminarla cuando quieras desde la misma página de Google."
 }

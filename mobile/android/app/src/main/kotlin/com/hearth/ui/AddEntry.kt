@@ -1,5 +1,17 @@
 package com.hearth.ui
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.ui.platform.LocalContext
+import com.hearth.attachments.ACCEPT
+import com.hearth.attachments.AttachmentException
+import com.hearth.attachments.MAX_FILE_BYTES
+import com.hearth.attachments.MAX_PER_ENTRY
+import com.hearth.attachments.Rejection
+import com.hearth.attachments.addAttachment
+import com.hearth.documents.HealthDraft
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -90,14 +102,32 @@ private fun numeric(s: String) = s.trim().replace(',', '.').toDoubleOrNull()?.ta
  */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-fun AddEntry(repo: Repo, persons: List<Person>, personId: String, tagSuggestions: List<String>, onDismiss: () -> Unit, onSaved: () -> Unit) {
+fun AddEntry(
+    repo: Repo,
+    persons: List<Person>,
+    personId: String,
+    tagSuggestions: List<String>,
+    onDismiss: () -> Unit,
+    /** A document the model read, for review; [source] names the model and the files. */
+    draft: HealthDraft? = null,
+    source: String = "",
+    /** Files to keep with the entry, picked here or passed on from the document reader. */
+    initialFiles: List<Picked> = emptyList(),
+    /** Called with a message per file that could not be kept (the entry itself is saved). */
+    onSaved: (List<String>) -> Unit,
+) {
     val t = LocalStrings.current
+    val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    var kind by remember { mutableStateOf<HealthKind?>(null) }
+    var kind by remember { mutableStateOf(draft?.kind) }
     var person by remember { mutableStateOf(personId) }
     var preset by remember { mutableStateOf<HealthPreset?>(null) }
-    var title by remember { mutableStateOf("") }
-    var date by remember { mutableStateOf(localDate()) }
+    var title by remember { mutableStateOf(draft?.title ?: "") }
+    var date by remember { mutableStateOf(draft?.date ?: localDate()) }
+    val files = remember { mutableStateListOf(*initialFiles.toTypedArray()) }
+    val filePicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
+        scope.launch { files.addAll(withContext(Dispatchers.IO) { uris.map { context.readPicked(it) } }) }
+    }
     var time by remember { mutableStateOf("") }
     var value by remember { mutableStateOf("") }
     var value2 by remember { mutableStateOf("") }
@@ -105,7 +135,7 @@ fun AddEntry(repo: Repo, persons: List<Person>, personId: String, tagSuggestions
     var bodyPart by remember { mutableStateOf("") }
     var severity by remember { mutableStateOf(0) }
     var tags by remember { mutableStateOf("") }
-    var body by remember { mutableStateOf("") }
+    var body by remember { mutableStateOf(draft?.body ?: "") }
     var asking by remember { mutableStateOf(false) }
 
     val k = kind
@@ -120,8 +150,8 @@ fun AddEntry(repo: Repo, persons: List<Person>, personId: String, tagSuggestions
             asking = true
             return@launch
         }
-        withContext(Dispatchers.IO) {
-            repo.addHealthEntry(
+        val failures = withContext(Dispatchers.IO) {
+            val entry = repo.addHealthEntry(
                 NewHealthEntry(
                     personId = person,
                     date = date,
@@ -135,10 +165,27 @@ fun AddEntry(repo: Repo, persons: List<Person>, personId: String, tagSuggestions
                     value = if (k.hasValue()) numeric(value) else null,
                     value2 = if (pair != null) numeric(value2) else null,
                     unit = if (k.hasValue()) unit.trim() else "",
+                    source = source,
                 ),
             )
+            // The entry is saved first; a file that cannot be kept is reported, not lost silently.
+            files.mapIndexedNotNull { i, f ->
+                try {
+                    addAttachment(repo, entry.id, person, f.bytes, f.name, i)
+                    null
+                } catch (e: AttachmentException) {
+                    when (e.reason) {
+                        Rejection.TYPE -> t("attachments.badType", "name" to f.name)
+                        Rejection.SIZE -> t("attachments.tooBig", "name" to f.name, "max" to MAX_FILE_BYTES / 1024 / 1024)
+                        Rejection.COUNT -> t("attachments.tooMany", "max" to MAX_PER_ENTRY)
+                        Rejection.SPACE -> t("attachments.noSpace")
+                    }
+                } catch (e: Exception) {
+                    t("attachments.saveFailed", "name" to f.name)
+                }
+            }
         }
-        onSaved()
+        onSaved(failures)
     }
 
     fun pick(p: HealthPreset?) {
@@ -260,6 +307,22 @@ fun AddEntry(repo: Repo, persons: List<Person>, personId: String, tagSuggestions
                     minLines = 4,
                     modifier = Modifier.fillMaxWidth(),
                 )
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    OutlinedButton(onClick = { filePicker.launch(ACCEPT) }) {
+                        Icon(HearthIcons.Attach, contentDescription = null, Modifier.size(18.dp))
+                        Text("  " + t("attachments.add"))
+                    }
+                    Text(t("attachments.addHint"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    for (f in files.toList()) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(f.name, Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium, maxLines = 1)
+                            IconButton(onClick = { files.remove(f) }) { Icon(Icons.Filled.Close, contentDescription = t("attachments.remove")) }
+                        }
+                    }
+                }
+                if (source.isNotEmpty()) {
+                    Text(t("healthLog.transcribedBy", "model" to source.substringBefore(':')), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
                 TextButton(onClick = { kind = null; preset = null }) { Text(t("healthForm.changeType").cap()) }
                 Spacer(Modifier.size(24.dp))
             }

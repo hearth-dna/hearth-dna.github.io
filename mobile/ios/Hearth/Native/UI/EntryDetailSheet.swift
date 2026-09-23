@@ -1,15 +1,23 @@
 import SwiftUI
 
-/// Everything about one entry: each field, the full text, the attached documents by name, who
+/// Everything about one entry: each field, the full text, the attached documents (opened in the
+/// app, removable behind a confirmation, marked when only their metadata is on this phone), who
 /// transcribed it, and Delete behind a confirmation.
 struct EntryDetailSheet: View {
     let entry: HealthEntry
     let personName: String
     let attachments: [Attachment]
+    /// Whether an attachment's bytes are on this device (cheap: no file is read).
+    let hasBytes: (Attachment) -> Bool
+    /// An attachment's bytes, read when it is opened; nil when they are not on this device.
+    let bytes: (Attachment) -> Data?
+    let onRemoveAttachment: (Attachment) -> Void
     let onDelete: () -> Void
 
     @Environment(\.dismiss) private var dismiss
     @State private var confirmingDelete = false
+    @State private var viewing: ViewedAttachment?
+    @State private var removing: Attachment?
 
     var body: some View {
         NavigationStack {
@@ -48,7 +56,7 @@ struct EntryDetailSheet: View {
                 if !attachments.isEmpty {
                     Section {
                         ForEach(attachments) { attachment in
-                            Label(attachment.name, systemImage: attachment.mime == "application/pdf" ? "doc.richtext" : "photo")
+                            attachmentRow(attachment)
                         }
                     } header: {
                         Text(t("healthTable.hasAttachments", ["n": attachments.count]))
@@ -79,8 +87,44 @@ struct EntryDetailSheet: View {
                 Button(t("common.delete"), role: .destructive, action: onDelete)
                 Button(t("common.cancel"), role: .cancel) {}
             }
+            .confirmationDialog(
+                removing.map { t("attachments.confirmDelete", ["name": $0.name]) } ?? "",
+                isPresented: Binding(get: { removing != nil }, set: { if !$0 { removing = nil } }),
+                titleVisibility: .visible,
+                presenting: removing
+            ) { a in
+                Button(t("attachments.remove"), role: .destructive) { onRemoveAttachment(a) }
+                Button(t("common.cancel"), role: .cancel) {}
+            }
+            .sheet(item: $viewing) { v in AttachmentViewer(attachment: v.attachment, data: v.data) }
         }
         .presentationDetents([.medium, .large])
+    }
+
+    /// Opens in the app when the bytes are here; says so when only the metadata is.
+    private func attachmentRow(_ a: Attachment) -> some View {
+        let here = hasBytes(a)
+        return HStack {
+            Button {
+                if let data = bytes(a) { viewing = ViewedAttachment(attachment: a, data: data) }
+            } label: {
+                Label(a.name, systemImage: a.mime == "application/pdf" ? "doc.richtext" : "photo")
+                    .lineLimit(1)
+            }
+            .disabled(!here)
+            .buttonStyle(.borderless)
+            Spacer()
+            if !here {
+                Text(t("attachments.missingBytes")).font(.caption).foregroundStyle(.secondary)
+            }
+            Button {
+                removing = a
+            } label: {
+                Image(systemName: "xmark.circle.fill").foregroundStyle(.secondary)
+            }
+            .buttonStyle(.borderless)
+            .accessibilityLabel(t("attachments.remove"))
+        }
     }
 
     /// The model from a `source` such as `gemini-2.5-flash:2026-07-01`, as the web shows it.

@@ -5,13 +5,13 @@ import SwiftUI
 /// is loaded whole, as the web's Health page loads it: a family's log is thousands of rows at
 /// most, and filtering and sorting in memory keeps them exactly the web's.
 ///
-/// Used from the main thread only, like the database under it.
+/// Used from the main thread only; the one slow operation, a restore, runs its work off it.
 final class HealthStore: ObservableObject {
     @Published private(set) var persons: [Person] = []
     @Published private(set) var entries: [HealthEntry] = []
     @Published private(set) var attachments: [String: [Attachment]] = [:]
 
-    private let repo: Repo
+    let repo: Repo
 
     init(repo: Repo) throws {
         self.repo = repo
@@ -30,9 +30,45 @@ final class HealthStore: ObservableObject {
         persons.first { $0.id == id }?.displayName ?? id
     }
 
-    func add(_ entry: HealthEntry) throws {
-        try repo.addHealthEntry(entry)
+    @discardableResult
+    func add(_ entry: HealthEntry) throws -> HealthEntry {
+        let saved = try repo.addHealthEntry(entry)
         try reload()
+        return saved
+    }
+
+    /// Keeps the files with a saved entry, each on its own: a file that cannot be kept is reported
+    /// (one message each), never lost silently, and the entry stays saved either way.
+    func attach(_ files: [PickedFile], to entry: HealthEntry) -> [String] {
+        var failures: [String] = []
+        let already = attachments[entry.id]?.count ?? 0
+        for (i, f) in files.enumerated() {
+            do {
+                try Attachments.add(
+                    repo, healthLogId: entry.id, personId: entry.personId, data: f.data, name: f.name, already: already + i
+                )
+            } catch {
+                failures.append(Attachments.message(error, name: f.name))
+            }
+        }
+        try? reload()
+        return failures
+    }
+
+    /// The row, then the file when no other entry holds the same document.
+    func removeAttachment(_ a: Attachment) throws {
+        try repo.deleteAttachment(id: a.id)
+        try reload()
+    }
+
+    /// Whether the file behind an attachment is on this phone, without reading it.
+    func hasAttachmentData(_ a: Attachment) -> Bool {
+        repo.blobs.list().contains(Repo.attachmentBlobName(a.sha256))
+    }
+
+    /// The bytes behind an attachment, or nil when only its metadata is on this phone.
+    func attachmentData(_ a: Attachment) -> Data? {
+        Attachments.bytes(repo, a)
     }
 
     func delete(_ entry: HealthEntry) throws {
@@ -48,18 +84,21 @@ final class HealthStore: ObservableObject {
         try repo.grantConsent(.importDocument, subject: personId)
     }
 
-    /// Opens and merges a backup. The file is opened on a background queue, because deriving the
-    /// key of an encrypted one takes a noticeable moment by design; the merge itself runs back on
-    /// the main thread, where the database lives.
+    /// Opens and merges a backup on a background queue: deriving the key of an encrypted file
+    /// takes a noticeable moment by design, and loading its genomes takes seconds. `Db` serialises
+    /// access, and the screen shows only a progress indicator meanwhile. The completion and the
+    /// reload run back on the main thread.
     func restore(_ data: Data, passphrase: String?, completion: @escaping (Result<RestoreResult, Error>) -> Void) {
+        let repo = self.repo
         DispatchQueue.global(qos: .userInitiated).async {
-            let opened = Result { try Container.open(data, passphrase: passphrase) }
+            let result = Result { () throws -> RestoreResult in
+                try Restore.run(Container.open(data, passphrase: passphrase), into: repo)
+            }
             DispatchQueue.main.async {
-                completion(opened.flatMap { dump in
+                completion(result.flatMap { restored in
                     Result { () throws -> RestoreResult in
-                        let result = try Restore.run(dump, into: self.repo.db)
                         try self.reload()
-                        return result
+                        return restored
                     }
                 })
             }
@@ -77,7 +116,7 @@ struct NativeRootView: View {
         switch database.opened {
         case .success(let opened):
             if consented || ((try? opened.repo.hasConsent(.firstLaunch)) ?? false) {
-                HealthLogScreen(store: opened.store)
+                NativeTabs(health: opened.health, people: opened.people)
             } else {
                 FirstLaunchView {
                     try opened.repo.grantConsent(.firstLaunch)
@@ -95,9 +134,44 @@ struct NativeRootView: View {
 /// Opens the database once for the life of the scene: a `@StateObject` is created once, where a
 /// view's own properties are rebuilt on every update.
 private final class NativeDatabase: ObservableObject {
-    let opened: Result<(repo: Repo, store: HealthStore), Error> = Result {
-        let repo = try Repo(db: Db.openDefault())
-        return (repo, try HealthStore(repo: repo))
+    let opened: Result<(repo: Repo, health: HealthStore, people: PeopleStore), Error> = Result {
+        let repo = try Repo(db: Db.openDefault(), blobs: Blobs.openDefault())
+        return (repo, try HealthStore(repo: repo), PeopleStore(repo: repo))
+    }
+}
+
+/// The web's top-level pages as a tab bar, in TabBar.tsx's order (People, Lookup, Health, Ask), each tab
+/// with its own navigation stack. Health is where the app opens, as on Android. A person's report is
+/// pushed on People; its health-log row switches to Health scoped to that person.
+private struct NativeTabs: View {
+    @ObservedObject var health: HealthStore
+    @ObservedObject var people: PeopleStore
+
+    private enum Tab: Hashable {
+        case people, family, health, ask
+    }
+
+    @State private var tab = Tab.health
+    @State private var healthScope: String?
+
+    var body: some View {
+        TabView(selection: $tab) {
+            PeopleScreen(store: people, kb: Kb.bundled) { personId in
+                healthScope = personId
+                tab = .health
+            }
+            .tabItem { Label(t("app.navPeople"), systemImage: "person.2") }
+            .tag(Tab.people)
+            FamilyScreen(repo: people.repo, kb: Kb.bundled)
+                .tabItem { Label(t("app.tabFamily"), systemImage: "magnifyingglass") }
+                .tag(Tab.family)
+            HealthLogScreen(store: health, scopeRequest: $healthScope)
+                .tabItem { Label(t("app.navHealth"), systemImage: "heart.text.square") }
+                .tag(Tab.health)
+            AskScreen(repo: people.repo, kb: Kb.bundled)
+                .tabItem { Label(t("app.navAsk"), systemImage: "bubble.left.and.bubble.right") }
+                .tag(Tab.ask)
+        }
     }
 }
 
@@ -105,7 +179,7 @@ private final class NativeDatabase: ObservableObject {
 /// Statement 1 is about where data lives, which on a phone is not a browser, so it has its own text.
 struct FirstLaunchView: View {
     let onAgree: () throws -> Void
-    @State private var ticked = Array(repeating: false, count: ConsentKind.firstLaunch.statementKeys.count)
+    @State private var ticked = ConsentChecks.unticked(.firstLaunch)
     @State private var failure: String?
 
     var body: some View {
@@ -114,18 +188,12 @@ struct FirstLaunchView: View {
                 Section {
                     Text(t("native.intro")).foregroundStyle(.secondary)
                 }
-                Section {
-                    ForEach(ticked.indices, id: \.self) { i in
-                        Toggle(isOn: $ticked[i]) { Text(t(key(i))) }
-                    }
-                } footer: {
-                    Text(t("consentForm.recorded", ["version": ConsentKind.firstLaunch.version]))
-                }
+                ConsentChecks(kind: .firstLaunch, ticked: $ticked, statementKey: key)
                 Section {
                     Button(t("consentGate.start")) {
                         do { try onAgree() } catch { failure = t("native.error", ["error": error.localizedDescription]) }
                     }
-                    .disabled(!ticked.allSatisfy { $0 })
+                    .disabled(!ConsentChecks.allTicked(ticked, .firstLaunch))
                 }
                 if let failure {
                     Section { Text(failure).foregroundStyle(.red) }
@@ -135,7 +203,8 @@ struct FirstLaunchView: View {
         }
     }
 
-    private func key(_ i: Int) -> String {
-        i == 0 ? "native.firstLaunchStorage" : ConsentKind.firstLaunch.statementKeys[i]
+    /// Statement 1 is about where data lives, which on a phone is not a browser.
+    private func key(_ i: Int, _ key: String) -> String {
+        i == 0 ? "native.firstLaunchStorage" : key
     }
 }

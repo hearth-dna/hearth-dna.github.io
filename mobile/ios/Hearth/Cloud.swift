@@ -6,9 +6,9 @@ import UIKit
 
 /// Signing in to Google Drive and Dropbox for backups (docs/decisions/0009-cloud-drive-buttons.md).
 ///
-/// This is the shell's only network code, and it touches nothing but credentials: it signs the user
-/// in, keeps the long-lived grant in the Keychain, and hands the page short-lived access tokens on
-/// request. The backup itself (encrypted when the user set a passphrase) goes from the page through
+/// It touches nothing but credentials, and its requests go through Native/Egress.swift, the app's
+/// one network gateway: it signs the user in, keeps the long-lived grant in the Keychain, and hands
+/// the page short-lived access tokens on request. The backup itself (encrypted when the user set a passphrase) goes from the page through
 /// `frontend/src/egress/egress.ts`, so the one place that decides what leaves the device stays one.
 ///
 /// Both providers use OAuth with PKCE in `ASWebAuthenticationSession`, the system's sign-in sheet:
@@ -165,10 +165,7 @@ final class Cloud: NSObject, ASWebAuthenticationPresentationContextProviding {
             } else {
                 token(name, account: account, stale: nil) { access, _ in
                     guard let access = access as? String else { return }
-                    var request = URLRequest(url: provider.revoke)
-                    request.httpMethod = "POST"
-                    request.setValue("Bearer \(access)", forHTTPHeaderField: "Authorization")
-                    URLSession.shared.dataTask(with: request).resume()
+                    Egress.request("POST", provider.revoke, headers: ["Authorization": "Bearer \(access)"]) { _ in }
                 }
             }
         }
@@ -236,24 +233,28 @@ final class Cloud: NSObject, ASWebAuthenticationPresentationContextProviding {
         var errorDescription: String? { "the provider answered \(status)" }
     }
 
-    /// A form POST; the JSON answer of a 2xx, delivered on the main thread.
+    /// A form POST through the app's one network gateway (Native/Egress.swift); the JSON answer of
+    /// a 2xx, delivered on the main thread.
     private func post(_ url: URL, form: [String: String], done: @escaping (Result<[String: Any], Error>) -> Void) {
-        var request = URLRequest(url: url, timeoutInterval: 30)
-        request.httpMethod = "POST"
-        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-        request.httpBody = Self.formBody(form).data(using: .utf8)
-        URLSession.shared.dataTask(with: request) { data, response, error in
-            let status = (response as? HTTPURLResponse)?.statusCode ?? 0
+        Egress.request(
+            "POST", url,
+            headers: ["Content-Type": "application/x-www-form-urlencoded"],
+            body: Self.formBody(form).data(using: .utf8),
+            timeout: 30
+        ) { outcome in
             let result: Result<[String: Any], Error>
-            if let error {
-                result = .failure(error)
-            } else if !(200..<300).contains(status) {
-                result = .failure(HTTPError(status: status))
-            } else {
-                result = .success((data.flatMap { try? JSONSerialization.jsonObject(with: $0) } as? [String: Any]) ?? [:])
+            switch outcome {
+            case .success(let data):
+                result = .success(((try? JSONSerialization.jsonObject(with: data)) as? [String: Any]) ?? [:])
+            case .failure(let error):
+                if case .http(let status, _)? = error as? Egress.Failure {
+                    result = .failure(HTTPError(status: status))
+                } else {
+                    result = .failure(error)
+                }
             }
             DispatchQueue.main.async { done(result) }
-        }.resume()
+        }
     }
 
     static func formBody(_ fields: [String: String]) -> String {

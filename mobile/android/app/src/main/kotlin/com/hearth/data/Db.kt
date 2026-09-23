@@ -54,6 +54,25 @@ class Db private constructor(context: Context) :
         }
     }
 
+    override fun insertMany(sql: String, rows: List<List<Any?>>, onProgress: (Int) -> Unit) {
+        writableDatabase.compileStatement(sql).use { st ->
+            rows.forEachIndexed { n, row ->
+                st.clearBindings()
+                row.forEachIndexed { i, v ->
+                    when (v) {
+                        null -> st.bindNull(i + 1)
+                        is Long -> st.bindLong(i + 1, v)
+                        is Int -> st.bindLong(i + 1, v.toLong())
+                        is Double -> st.bindDouble(i + 1, v)
+                        else -> st.bindString(i + 1, v.toString())
+                    }
+                }
+                st.executeInsert()
+                if ((n + 1) % 50_000 == 0) onProgress(n + 1)
+            }
+        }
+    }
+
     private fun Cursor.value(i: Int): Any? = when (getType(i)) {
         Cursor.FIELD_TYPE_NULL -> null
         Cursor.FIELD_TYPE_INTEGER -> getLong(i)

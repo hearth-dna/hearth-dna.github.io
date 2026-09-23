@@ -32,12 +32,14 @@ kb/out/
 # the Xcode project is generated from project.yml.
 mobile/android/app/src/main/assets/web/
 mobile/android/app/src/main/assets/i18n/
+mobile/android/app/src/main/assets/kb.json
 mobile/android/app/build/
 mobile/android/build/
 mobile/android/.gradle/
 mobile/android/local.properties
 mobile/ios/Hearth/Web/
 mobile/ios/Hearth/I18n/
+mobile/ios/Hearth/Resources/kb.json
 mobile/ios/Hearth.xcodeproj/
 mobile/ios/build/
 mobile/ios/Configuration/Local.xcconfig

@@ -33,7 +33,8 @@ let BODY_PARTS = [
     "fingers", "legs", "knees", "ankles", "feet", "skin", "joints", "muscles", "whole body",
 ]
 
-struct Person: Identifiable, Equatable {
+/// Hashable so a person's report can be a navigation destination.
+struct Person: Identifiable, Hashable {
     let id: String
     let label: String
     let displayName: String

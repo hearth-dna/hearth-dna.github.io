@@ -3,8 +3,15 @@ import SwiftUI
 /// Add one entry, type first, like the web's HealthEntryForm: pick what it is, then fill only the
 /// fields that make sense for that type, with its presets as one-tap chips. The first entry for a
 /// person asks for the document consent (design §13.1) and records it as the web does.
+///
+/// A document the model read arrives as a draft to review, with `source` naming the model and the
+/// files; picked files (or the pages the reader kept) are attached once the entry is saved.
 struct AddEntrySheet: View {
     @ObservedObject var store: HealthStore
+    /// The model and files a draft came from; "" for an entry typed here.
+    private let source: String
+    /// Called after saving with one message per file that could not be kept.
+    private let onSaved: ([String]) -> Void
     @Environment(\.dismiss) private var dismiss
 
     @State private var personId: String
@@ -25,10 +32,24 @@ struct AddEntrySheet: View {
     @State private var tags = ""
     @State private var text = ""
     @State private var failure: String?
+    @State private var files: [PickedFile]
+    @State private var pickingFiles = false
 
-    init(store: HealthStore, personId: String) {
+    init(
+        store: HealthStore, personId: String, draft: HealthDraft? = nil, source: String = "",
+        initialFiles: [PickedFile] = [], onSaved: @escaping ([String]) -> Void = { _ in }
+    ) {
         _store = ObservedObject(wrappedValue: store)
         _personId = State(initialValue: personId)
+        self.source = source
+        self.onSaved = onSaved
+        _files = State(initialValue: initialFiles)
+        if let draft {
+            _kind = State(initialValue: draft.kind)
+            _title = State(initialValue: draft.title)
+            _text = State(initialValue: draft.body)
+            _date = State(initialValue: HealthLog.parseDate(draft.date) ?? Date())
+        }
     }
 
     /// Kinds usually recorded as they happen; the others mostly come from paper with no time on it.
@@ -83,6 +104,20 @@ struct AddEntrySheet: View {
                 }
             }
             .onChange(of: personId, initial: true) { checkConsent() }
+            .fileImporter(isPresented: $pickingFiles, allowedContentTypes: documentTypes, allowsMultipleSelection: true) { result in
+                switch result {
+                case .success(let urls):
+                    for url in urls {
+                        do {
+                            files.append(try PickedFile.read(url))
+                        } catch {
+                            failure = t("attachments.saveFailed", ["name": url.lastPathComponent])
+                        }
+                    }
+                case .failure(let error):
+                    failure = t("native.error", ["error": error.localizedDescription])
+                }
+            }
             .alert(failure ?? "", isPresented: failureShown) {
                 Button(t("common.close"), role: .cancel) {}
             }
@@ -265,6 +300,34 @@ struct AddEntrySheet: View {
         } header: {
             Text(t("healthForm.details.\(kind.rawValue)"))
         }
+        Section {
+            Button {
+                pickingFiles = true
+            } label: {
+                Label(t("attachments.add"), systemImage: "paperclip")
+            }
+            ForEach(files) { f in
+                HStack {
+                    Label(f.name, systemImage: f.mime == "application/pdf" ? "doc.richtext" : "photo")
+                        .lineLimit(1)
+                    Spacer()
+                    Button {
+                        files.removeAll { $0.id == f.id }
+                    } label: {
+                        Image(systemName: "xmark.circle.fill").foregroundStyle(.secondary)
+                    }
+                    .buttonStyle(.borderless)
+                    .accessibilityLabel(t("attachments.remove"))
+                }
+            }
+        } footer: {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(t("attachments.addHint"))
+                if !source.isEmpty {
+                    Text(t("healthLog.transcribedBy", ["model": source.split(separator: ":").first.map { String($0) } ?? source]))
+                }
+            }
+        }
     }
 
     private func valueLabel(_ pairName: String?) -> String {
@@ -339,7 +402,7 @@ struct AddEntrySheet: View {
             kind: kind,
             title: title.trimmingCharacters(in: .whitespacesAndNewlines),
             body: text,
-            source: "",
+            source: source,
             bodyPart: fields.bodyPart ? bodyPart.trimmingCharacters(in: .whitespacesAndNewlines) : "",
             severity: fields.severity ? severity : nil,
             tags: HealthLog.parseTags(tags),
@@ -349,8 +412,11 @@ struct AddEntrySheet: View {
             createdAt: ""
         )
         do {
-            try store.add(entry)
+            let saved = try store.add(entry)
+            // The entry is saved first; a file that cannot be kept is reported, not lost silently.
+            let failures = store.attach(files, to: saved)
             dismiss()
+            onSaved(failures)
         } catch {
             failure = t("native.error", ["error": error.localizedDescription])
         }

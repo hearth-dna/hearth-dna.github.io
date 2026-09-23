@@ -681,7 +681,6 @@
   "restore.fetchingGenome": "Genoom {n} van {total} ophalen…",
   "native.intro": "Het gezondheidslogboek en de genomen van je familie worden alleen op deze telefoon bewaard. Er is geen account en geen kopie op een server. Gebruik een back-up om gegevens tussen apparaten over te zetten.",
   "native.restoreBackup": "Back-up terugzetten…",
-  "native.restored": "{people} nieuwe personen en {entries} gezondheidsnotities teruggezet. Genomen en bijgevoegde bestanden zitten nog niet in deze versie van de app.",
   "native.encryptedTitle": "Deze back-up is versleuteld",
   "native.open": "Openen",
   "native.ok": "OK",
@@ -690,5 +689,10 @@
   "native.firstLaunchStorage": "Alles wat ik importeer blijft op deze telefoon. Hearth heeft geen account en geen kopie van mijn gegevens op een server; verwijder ik de app zonder back-up, dan is het weg.",
   "native.notBackup": "Dit bestand is geen Hearth-back-up die deze app kan openen. Kies een .hearth-bestand dat met de huidige versie van Hearth is opgeslagen.",
   "native.damaged": "Deze back-up is beschadigd en kon niet worden gelezen. Er is niets gewijzigd.",
-  "native.error": "Er ging iets mis: {error}"
+  "native.error": "Er ging iets mis: {error}",
+  "native.importAccepted": "Geaccepteerd: ruwe tekst, CSV of VCF, of een .zip / .gz met een daarvan. Alles wordt hier op deze telefoon gelezen.",
+  "native.chooseFile": "Bestand kiezen…",
+  "native.chooseFiles": "Bestanden kiezen…",
+  "native.keyNotice": "Om een foto, scan of pdf te lezen, stuurt Hearth die vanaf deze telefoon naar Google Gemini met een sleutel die van jou is. Die sleutel voeg je één keer toe.",
+  "native.keyWarning": "Behandel de sleutel als een wachtwoord: wie hem heeft, kan de dienst van Google op jouw account gebruiken. Hij wordt alleen op deze telefoon bewaard, beveiligd door de sleutelopslag van de telefoon, en nooit in back-ups opgenomen. Je kunt hem altijd verwijderen op dezelfde Google-pagina."
 }

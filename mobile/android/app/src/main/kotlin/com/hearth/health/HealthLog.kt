@@ -160,3 +160,15 @@ fun groupByDate(entries: List<HealthEntry>): List<Pair<String, List<HealthEntry>
     }
     return out
 }
+
+/**
+ * The entry on one line, as shown in lists and in the Ask context pack (log.ts `describeEntry`):
+ * `2026-09-14 · Symptom · Pain in both hands (hands; severity 6/10; arthritis)`. It goes to a model
+ * in a context pack, so it must never mention an entry's attachments: a file name would leave the
+ * phone with it.
+ */
+fun describeEntry(e: HealthEntry): String {
+    val value = formatValue(e)
+    val extra = listOf(e.bodyPart, e.severity?.let { "severity $it/10" } ?: "", formatTags(e.tags)).filter { it.isNotEmpty() }
+    return "${whenOf(e)} · ${e.kind.label} · ${e.title}${if (value.isNotEmpty()) " $value" else ""}${if (extra.isNotEmpty()) " (${extra.joinToString("; ")})" else ""}"
+}

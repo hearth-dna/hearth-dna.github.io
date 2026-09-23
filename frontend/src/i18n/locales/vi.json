@@ -681,7 +681,6 @@
   "restore.fetchingGenome": "Đang lấy bộ gen {n}/{total}…",
   "native.intro": "Nhật ký sức khỏe và bộ gen của gia đình bạn chỉ được lưu trên điện thoại này. Không có tài khoản và không có bản sao trên máy chủ. Để chuyển dữ liệu giữa các thiết bị, hãy dùng bản sao lưu.",
   "native.restoreBackup": "Khôi phục bản sao lưu…",
-  "native.restored": "Đã khôi phục {people} người mới và {entries} mục sức khỏe. Phiên bản ứng dụng này chưa có bộ gen và tệp đính kèm.",
   "native.encryptedTitle": "Bản sao lưu này đã được mã hóa",
   "native.open": "Mở",
   "native.ok": "OK",
@@ -690,5 +689,10 @@
   "native.firstLaunchStorage": "Mọi thứ tôi nhập đều ở lại trên điện thoại này. Hearth không có tài khoản và không có bản sao dữ liệu của tôi trên máy chủ; nếu gỡ ứng dụng mà không sao lưu, dữ liệu sẽ mất.",
   "native.notBackup": "Tệp này không phải bản sao lưu Hearth mà ứng dụng này mở được. Hãy chọn tệp .hearth được lưu bằng phiên bản Hearth hiện tại.",
   "native.damaged": "Bản sao lưu này bị hỏng và không đọc được. Không có gì bị thay đổi.",
-  "native.error": "Đã xảy ra lỗi: {error}"
+  "native.error": "Đã xảy ra lỗi: {error}",
+  "native.importAccepted": "Chấp nhận: văn bản thô, CSV hoặc VCF, hoặc tệp .zip / .gz chứa một trong số đó. Mọi thứ được đọc ngay trên điện thoại này.",
+  "native.chooseFile": "Chọn tệp…",
+  "native.chooseFiles": "Chọn các tệp…",
+  "native.keyNotice": "Để đọc ảnh, bản quét hoặc PDF, Hearth gửi nó từ điện thoại này đến Google Gemini bằng một khóa thuộc về bạn. Bạn chỉ cần thêm khóa đó một lần.",
+  "native.keyWarning": "Hãy giữ khóa như mật khẩu: ai có nó đều có thể dùng dịch vụ của Google bằng tài khoản của bạn. Khóa chỉ được lưu trên điện thoại này, được kho khóa của điện thoại bảo vệ, và không bao giờ nằm trong bản sao lưu. Bạn có thể xóa nó bất cứ lúc nào trên cùng trang Google."
 }

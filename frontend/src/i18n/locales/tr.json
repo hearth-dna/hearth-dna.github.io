@@ -681,7 +681,6 @@
   "restore.fetchingGenome": "Genom {n}/{total} alınıyor…",
   "native.intro": "Ailenizin sağlık günlüğü ve genomları yalnızca bu telefonda saklanır. Hesap yoktur, sunucuda kopya yoktur. Verileri cihazlar arasında taşımak için yedek kullanın.",
   "native.restoreBackup": "Yedeği geri yükle…",
-  "native.restored": "{people} yeni kişi ve {entries} sağlık kaydı geri yüklendi. Genomlar ve ekli dosyalar uygulamanın bu sürümünde henüz yok.",
   "native.encryptedTitle": "Bu yedek şifreli",
   "native.open": "Aç",
   "native.ok": "Tamam",
@@ -690,5 +689,10 @@
   "native.firstLaunchStorage": "İçe aktardığım her şey bu telefonda kalır. Hearth'in hesabı ve sunucuda verilerimin kopyası yoktur; yedek almadan uygulamayı kaldırırsam veriler kaybolur.",
   "native.notBackup": "Bu dosya, bu uygulamanın açabileceği bir Hearth yedeği değil. Hearth'in güncel sürümüyle kaydedilmiş bir .hearth dosyası seçin.",
   "native.damaged": "Bu yedek bozuk ve okunamadı. Hiçbir şey değiştirilmedi.",
-  "native.error": "Bir şeyler ters gitti: {error}"
+  "native.error": "Bir şeyler ters gitti: {error}",
+  "native.importAccepted": "Kabul edilenler: ham metin, CSV veya VCF ya da bunlardan birini içeren bir .zip / .gz. Her şey bu telefonda okunur.",
+  "native.chooseFile": "Dosya seç…",
+  "native.chooseFiles": "Dosyaları seç…",
+  "native.keyNotice": "Bir fotoğrafı, taramayı veya PDF’i okumak için Hearth onu bu telefondan size ait bir anahtarla Google Gemini’ye gönderir. Bu anahtarı bir kez eklemeniz gerekir.",
+  "native.keyWarning": "Anahtara parola gibi davranın: ona sahip olan herkes Google hizmetini sizin hesabınızla kullanabilir. Yalnızca bu telefonda, telefonun anahtar deposuyla korunarak saklanır ve yedeklere hiçbir zaman dahil edilmez. Aynı Google sayfasından istediğiniz zaman silebilirsiniz."
 }

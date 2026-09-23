@@ -63,27 +63,63 @@ final class RestoreTests: XCTestCase {
 
     /// Restore merges: a second run adds nothing and changes nothing.
     func testRestoringTwiceDoesNotDuplicate() throws {
-        let db = try Db(path: ":memory:")
+        let repo = try makeTestRepo()
         let dump = try Container.open(fixture("plain.hearth"), passphrase: nil)
-        let first = try Restore.run(dump, into: db)
-        XCTAssertEqual(first.people, 2)
-        XCTAssertEqual(first.entries, 4)
-        XCTAssertEqual(first.genomesSkipped, 0)
-        XCTAssertEqual(first.attachmentFilesSkipped, 1)
-        XCTAssertEqual(first.exportedAt, "2026-09-21T00:00:00.000Z")
+        let first = try Restore.run(dump, into: repo)
+        XCTAssertEqual(first, RestoreResult(
+            persons: 2, healthEntries: 4, genomes: 0, skippedAttachmentFiles: 1,
+            exportedAt: "2026-09-21T00:00:00.000Z"
+        ))
 
-        let second = try Restore.run(dump, into: db)
-        XCTAssertEqual(second.people, 0)
-        XCTAssertEqual(second.entries, 0)
-        try assertTables(db, match: journal())
+        let second = try Restore.run(dump, into: repo)
+        XCTAssertEqual(second, RestoreResult(
+            persons: 0, healthEntries: 0, genomes: 0, skippedAttachmentFiles: 1, exportedAt: first.exportedAt
+        ))
+        try assertTables(repo.db, match: journal())
+    }
+
+    /// The genome fixture: both genomes load, the originals are kept under the hash of their text
+    /// (which the source_file rows name), and a second restore loads nothing again.
+    func testRestoresBothGenomesAndKeepsTheOriginals() throws {
+        let repo = try makeTestRepo()
+        let dump = try Container.open(fixture("genomes.hearth"), passphrase: nil)
+        XCTAssertEqual(dump.genomeFiles.count, 2)
+        XCTAssertEqual(try Restore.run(dump, into: repo).genomes, 2)
+        XCTAssertEqual(try repo.genotypeCounts(), ["p-alex": 7, "p-sam": 7])
+        let sam = try XCTUnwrap(repo.familyAt("rs429358").first { $0.personId == "p-sam" }).call
+        XCTAssertEqual([sam.a1, sam.a2], ["T", "T"])
+
+        let shas = try Set(repo.sourceFiles().map(\.sha256))
+        XCTAssertEqual(Set(shas.map(Repo.genomeBlobName)), Set(repo.blobs.list()))
+        for name in repo.blobs.list() {
+            let text = try GenomeImport.decode(Gzip.decompress(XCTUnwrap(repo.blobs.get(name))))
+            XCTAssertEqual(name, Repo.genomeBlobName(sha256Hex(text)))
+        }
+
+        XCTAssertEqual(try Restore.run(dump, into: repo).genomes, 0)
+        // Sam's rs4680 is AA against Alex's GG: one violation among the six autosomal calls.
+        let m = try repo.mendelian(childId: "p-sam", parentA: "p-alex")
+        XCTAssertEqual(m, Mendelian(compared: 6, violations: 1))
+    }
+
+    /// A genome whose bytes do not match the manifest refuses the whole file.
+    func testRefusesATamperedGenome() throws {
+        let data = try fixture("genomes.hearth")
+        let path = try XCTUnwrap(Container.open(data, passphrase: nil).genomes.first?.path)
+        // Flip a byte inside the first genome's stored zip entry, just past its local header's name.
+        let at = try XCTUnwrap(data.range(of: Data(path.utf8))).upperBound + 20
+        var broken = data
+        broken[at] ^= 1
+        XCTAssertThrowsError(try Container.open(broken, passphrase: nil)) { error in
+            XCTAssertEqual(error as? BackupError, .damaged)
+        }
     }
 
     /// What the screens read back is the same data: tags parsed, the value as a number, an
     /// untimed entry with no time, the attachment under its entry.
     func testTheRepositoryReadsRestoredRows() throws {
-        let db = try Db(path: ":memory:")
-        _ = try Restore.run(Container.open(fixture("plain.hearth"), passphrase: nil), into: db)
-        let repo = Repo(db: db)
+        let repo = try makeTestRepo()
+        _ = try Restore.run(Container.open(fixture("plain.hearth"), passphrase: nil), into: repo)
         XCTAssertEqual(try repo.persons().map(\.displayName), ["Alex", "Sam"])
         let log = try repo.healthLog()
         XCTAssertEqual(log.map(\.id), ["h-1", "h-2", "h-3", "h-4"])
@@ -97,9 +133,8 @@ final class RestoreTests: XCTestCase {
     }
 
     func testAddingAndDeletingAnEntry() throws {
-        let db = try Db(path: ":memory:")
-        _ = try Restore.run(Container.open(fixture("plain.hearth"), passphrase: nil), into: db)
-        let repo = Repo(db: db)
+        let repo = try makeTestRepo()
+        _ = try Restore.run(Container.open(fixture("plain.hearth"), passphrase: nil), into: repo)
         let added = try repo.addHealthEntry(HealthEntry(
             id: "", personId: "p-sam", date: "2026-09-20", time: "7:05", kind: .symptom, title: "Cough",
             body: "", source: "", bodyPart: " Lungs ", severity: 3, tags: ["Cold", "cold "], value: nil,
@@ -113,11 +148,11 @@ final class RestoreTests: XCTestCase {
 
         // Deleting h-4 takes its attachment row with it (foreign keys are on).
         try repo.deleteHealthEntry(id: "h-4")
-        XCTAssertEqual(try db.query("SELECT COUNT(*) AS n FROM attachment").first?.int("n"), 0)
+        XCTAssertEqual(try repo.db.query("SELECT COUNT(*) AS n FROM attachment").first?.int("n"), 0)
     }
 
     func testGrantingConsentIsIdempotent() throws {
-        let repo = try Repo(db: Db(path: ":memory:"))
+        let repo = try makeTestRepo()
         try repo.grantConsent(.importDocument, subject: "p")
         try repo.grantConsent(.importDocument, subject: "p")
         XCTAssertTrue(try repo.hasConsent(.importDocument, subject: "p"))
@@ -125,24 +160,67 @@ final class RestoreTests: XCTestCase {
     }
 
     func testEveryUserDataWriteBumpsTheGeneration() throws {
-        let db = try Db(path: ":memory:")
+        let repo = try makeTestRepo()
+        let db = repo.db
         let generation = { try db.query("SELECT value FROM meta WHERE key='generation'").first?.text("value") }
         XCTAssertEqual(try generation(), "0")
-        let repo = Repo(db: db)
         try repo.grantConsent(.firstLaunch)
         try repo.grantConsent(.firstLaunch) // already there: nothing written, nothing bumped
+        XCTAssertEqual(try generation(), "1")
+        // A write that changes nothing is not a change, as in the web's worker.
+        try db.run("DELETE FROM health_log WHERE id = ?", [.text("absent")])
         XCTAssertEqual(try generation(), "1")
         XCTAssertTrue(Db.isWrite("  insert into person(id) values (?)"))
         XCTAssertFalse(Db.isWrite("INSERT INTO meta(key, value) VALUES ('x', 'y')"))
         XCTAssertFalse(Db.isWrite("SELECT * FROM person"))
     }
 
+    /// Writes that can change someone's genotype count drop the cached counts; others keep them.
+    func testGenotypeWritesDropTheCachedCounts() throws {
+        XCTAssertTrue(Db.touchesGenotypes("INSERT OR REPLACE INTO genotype(person_id) VALUES (?)"))
+        XCTAssertTrue(Db.touchesGenotypes(" delete from person where id = ?"))
+        XCTAssertFalse(Db.touchesGenotypes("DELETE FROM health_log WHERE id=?"))
+        XCTAssertFalse(Db.touchesGenotypes("SELECT * FROM genotype"))
+
+        let repo = try makeTestRepo()
+        let p = try repo.addPerson(label: "a", displayName: "A", sex: .unknown, birthYear: nil)
+        XCTAssertEqual(try repo.genotypeCounts(), [:])
+        XCTAssertNotNil(try repo.getMeta("genotype_counts"))
+        try repo.storeCalls(personId: p.id, calls: [
+            Call(rsid: "rs2", chromosome: "1", position: 20, a1: "A", a2: "G"),
+            Call(rsid: "rs1", chromosome: "1", position: 10, a1: "C", a2: "C"),
+        ])
+        XCTAssertNil(try repo.getMeta("genotype_counts"))
+        XCTAssertEqual(try repo.genotypeCounts(), [p.id: 2])
+        try repo.grantConsent(.importGenome, subject: p.id)
+        XCTAssertNotNil(try repo.getMeta("genotype_counts"))
+        try repo.deletePerson(id: p.id)
+        XCTAssertEqual(try repo.genotypeCounts(), [:])
+    }
+
+    /// A transaction inside another joins it: one commit, and an inner failure undoes both.
+    func testNestedTransactionsCommitAndRollBackTogether() throws {
+        let db = try Db(path: ":memory:")
+        let insert = "INSERT INTO person(id,label,display_name,sex,created_at) VALUES (?,?,?,'unknown','2026-01-01T00:00:00.000Z')"
+        let count = { try db.query("SELECT COUNT(*) AS n FROM person").first?.int("n") }
+        try db.transaction {
+            try db.transaction { try db.run(insert, [.text("a"), .text("a"), .text("A")]) }
+        }
+        XCTAssertEqual(try count(), 1)
+        XCTAssertThrowsError(try db.transaction {
+            try db.run(insert, [.text("b"), .text("b"), .text("B")])
+            // Caught here, but the outer transaction must not commit half of the work.
+            try? db.transaction { () throws -> Void in throw DbError(message: "inner") }
+        })
+        XCTAssertEqual(try count(), 1)
+    }
+
     // MARK: - Comparison with journal.json
 
     private func assertRestoresExactly(_ dump: Dump, file: StaticString = #filePath, line: UInt = #line) throws {
-        let db = try Db(path: ":memory:")
-        _ = try Restore.run(dump, into: db)
-        try assertTables(db, match: journal(), file: file, line: line)
+        let repo = try makeTestRepo()
+        _ = try Restore.run(dump, into: repo)
+        try assertTables(repo.db, match: journal(), file: file, line: line)
     }
 
     /// Every table the journal fills, row for row and column for column. Health rows the file wrote

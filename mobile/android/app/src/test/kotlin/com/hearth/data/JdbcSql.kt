@@ -31,16 +31,29 @@ class JdbcSql : Sql {
         }
     }
 
-    /** Real BEGIN/COMMIT/ROLLBACK, so a test sees a failed restore leave nothing behind. */
+    override fun insertMany(sql: String, rows: List<List<Any?>>, onProgress: (Int) -> Unit) {
+        c.prepareStatement(sql).use { st ->
+            rows.forEachIndexed { n, row ->
+                row.forEachIndexed { i, a -> st.setObject(i + 1, a) }
+                st.addBatch()
+                if ((n + 1) % 50_000 == 0) { st.executeBatch(); onProgress(n + 1) }
+            }
+            st.executeBatch()
+        }
+    }
+
+    private var depth = 0
+
+    /** Real BEGIN/COMMIT/ROLLBACK, nesting like Android's: only the outermost one commits. */
     override fun <T> transaction(block: () -> T): T {
-        c.autoCommit = false
+        if (depth++ == 0) c.autoCommit = false
         try {
-            return block().also { c.commit() }
+            return block().also { if (depth == 1) c.commit() }
         } catch (e: Throwable) {
-            c.rollback()
+            if (depth == 1) c.rollback()
             throw e
         } finally {
-            c.autoCommit = true
+            if (--depth == 0) c.autoCommit = true
         }
     }
 }

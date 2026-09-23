@@ -12,7 +12,8 @@ enum ZipError: Error {
 
 /// Just enough of a zip reader for a Hearth backup (the web writes it with fflate's `zipSync`):
 /// the central directory, then each entry through its local header, stored (method 0) or deflated
-/// (method 8). There is no writer and no streaming; a backup is read whole.
+/// (method 8). There is no writer and no streaming; a backup is read whole. A zipped genome export
+/// from a DNA provider is read the same way.
 ///
 /// Every offset comes from the file, so every read is bounds-checked and throws instead of
 /// trapping: a damaged backup is an error message, never a crash.
@@ -29,8 +30,16 @@ struct ZipReader {
     /// deflated, so a real backup stays far below it; a crafted "zip bomb" does not.
     private static let maxInflated = 1 << 30
 
+    /// A file in the archive as its central directory lists it: the name and the inflated size.
+    struct File: Equatable {
+        let name: String
+        let size: Int
+    }
+
     private let bytes: [UInt8]
     private let entries: [String: Entry]
+    /// Every entry, in the central directory's order (folders included, as names ending in "/").
+    let files: [File]
 
     init(_ data: Data) throws {
         let bytes = [UInt8](data)
@@ -44,6 +53,7 @@ struct ZipReader {
         guard directoryStart + directorySize <= end else { throw ZipError.malformed }
 
         var entries: [String: Entry] = [:]
+        var files: [File] = []
         var p = directoryStart
         for _ in 0..<count {
             guard try ZipReader.u32(bytes, p) == 0x0201_4b50 else { throw ZipError.malformed }
@@ -61,11 +71,15 @@ struct ZipReader {
                 localHeader: ZipReader.u32(bytes, p + 42)
             )
             // The first of two same-named entries wins; the web never writes two.
-            if entries[name] == nil { entries[name] = entry }
+            if entries[name] == nil {
+                entries[name] = entry
+                files.append(File(name: name, size: entry.size))
+            }
             p = nameEnd + extraLength + commentLength
         }
         self.bytes = bytes
         self.entries = entries
+        self.files = files
     }
 
     /// The bytes of the entry called `name`, or nil when the zip has no such entry.

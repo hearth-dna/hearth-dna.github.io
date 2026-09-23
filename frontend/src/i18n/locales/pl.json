@@ -681,7 +681,6 @@
   "restore.fetchingGenome": "Pobieranie genomu {n} z {total}…",
   "native.intro": "Dziennik zdrowia i genomy Twojej rodziny są przechowywane tylko na tym telefonie. Nie ma konta ani kopii na żadnym serwerze. Aby przenieść dane między urządzeniami, użyj kopii zapasowej.",
   "native.restoreBackup": "Przywróć kopię zapasową…",
-  "native.restored": "Przywrócono nowe osoby ({people}) i wpisy zdrowotne ({entries}). Genomy i załączone pliki nie są jeszcze obsługiwane w tej wersji aplikacji.",
   "native.encryptedTitle": "Ta kopia zapasowa jest zaszyfrowana",
   "native.open": "Otwórz",
   "native.ok": "OK",
@@ -690,5 +689,10 @@
   "native.firstLaunchStorage": "Wszystko, co importuję, zostaje na tym telefonie. Hearth nie ma kont ani kopii moich danych na serwerze; jeśli odinstaluję aplikację bez kopii zapasowej, dane przepadną.",
   "native.notBackup": "Ten plik nie jest kopią zapasową Hearth, którą ta aplikacja może otworzyć. Wybierz plik .hearth zapisany w bieżącej wersji Hearth.",
   "native.damaged": "Ta kopia zapasowa jest uszkodzona i nie dało się jej odczytać. Nic nie zostało zmienione.",
-  "native.error": "Coś poszło nie tak: {error}"
+  "native.error": "Coś poszło nie tak: {error}",
+  "native.importAccepted": "Akceptowane: surowy tekst, CSV lub VCF albo .zip / .gz z jednym z nich. Wszystko jest odczytywane tutaj, na tym telefonie.",
+  "native.chooseFile": "Wybierz plik…",
+  "native.chooseFiles": "Wybierz pliki…",
+  "native.keyNotice": "Aby odczytać zdjęcie, skan lub PDF, Hearth wysyła go z tego telefonu do Google Gemini za pomocą Twojego własnego klucza. Klucz trzeba dodać raz.",
+  "native.keyWarning": "Traktuj klucz jak hasło: każdy, kto go ma, może korzystać z usługi Google na Twoim koncie. Jest przechowywany tylko na tym telefonie, chroniony magazynem kluczy telefonu, i nigdy nie trafia do kopii zapasowych. Możesz go w każdej chwili usunąć na tej samej stronie Google."
 }

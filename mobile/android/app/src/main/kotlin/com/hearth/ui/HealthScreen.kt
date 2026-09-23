@@ -74,7 +74,9 @@ import com.hearth.data.Attachment
 import com.hearth.data.HealthEntry
 import com.hearth.data.HealthKind
 import com.hearth.data.Person
+import com.hearth.attachments.attachmentBytes
 import com.hearth.data.Repo
+import com.hearth.documents.HealthDraft
 import com.hearth.health.HealthFilter
 import com.hearth.health.SortDir
 import com.hearth.health.SortKey
@@ -87,6 +89,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 enum class LogView { CARDS, TABLE }
+
 
 private const val PREFS = "hearth.native"
 private const val VIEW_KEY = "healthView"
@@ -110,7 +113,7 @@ val SortKey.labelKey: String
  */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class, ExperimentalLayoutApi::class)
 @Composable
-fun HealthScreen(repo: Repo) {
+fun HealthScreen(repo: Repo, onlyPerson: String = "") {
     val t = LocalStrings.current
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -129,13 +132,16 @@ fun HealthScreen(repo: Repo) {
     }
     LaunchedEffect(Unit) { reload() }
 
-    var filter by remember { mutableStateOf(HealthFilter()) }
+    var filter by remember(onlyPerson) { mutableStateOf(HealthFilter(person = onlyPerson)) }
     var sortKey by remember { mutableStateOf(SortKey.DATE) }
     var sortDir by remember { mutableStateOf(SortDir.DESC) }
     var view by remember { mutableStateOf(runCatching { LogView.valueOf(prefs.getString(VIEW_KEY, null)!!) }.getOrDefault(LogView.CARDS)) }
     var openEntry by remember { mutableStateOf<HealthEntry?>(null) }
     var filtersOpen by remember { mutableStateOf(false) }
     var adding by remember { mutableStateOf(false) }
+    var reading by remember { mutableStateOf(false) }
+    var drafted by remember { mutableStateOf<Drafted?>(null) }
+    var viewing by remember { mutableStateOf<Pair<Attachment, ByteArray>?>(null) }
     var menu by remember { mutableStateOf(false) }
     val snackbar = remember { SnackbarHostState() }
     val restore = rememberRestore(repo, snackbar) { reload() }
@@ -170,6 +176,9 @@ fun HealthScreen(repo: Repo) {
                     Box {
                         IconButton(onClick = { menu = true }) { Icon(Icons.Filled.MoreVert, contentDescription = null) }
                         DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
+                            if (persons.isNotEmpty()) {
+                                DropdownMenuItem(text = { Text(t("healthLog.readDocument")) }, onClick = { menu = false; reading = true })
+                            }
                             DropdownMenuItem(text = { Text(t("native.restoreBackup")) }, onClick = { menu = false; restore() })
                         }
                     }
@@ -199,6 +208,7 @@ fun HealthScreen(repo: Repo) {
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(top = padding.calculateTopPadding(), bottom = padding.calculateBottomPadding() + 96.dp),
         ) {
+            item(key = "quick") { QuickMeasurement(repo, persons, filter.person.ifEmpty { if (persons.size == 1) persons[0].id else "" }, entries) { reload() } }
             item(key = "search") { SearchField(filter.text) { set(filter.copy(text = it)) } }
             if (persons.size > 1) {
                 item(key = "people") {
@@ -297,6 +307,14 @@ fun HealthScreen(repo: Repo) {
             entry = e,
             person = name(e.personId),
             attachments = attachments[e.id].orEmpty(),
+            hasBytes = { a -> repo.blobs.list().contains(Repo.attachmentBlobName(a.sha256)) },
+            onOpen = { a -> scope.launch { withContext(Dispatchers.IO) { attachmentBytes(repo, a) }?.let { viewing = a to it } } },
+            onRemove = { a ->
+                scope.launch {
+                    withContext(Dispatchers.IO) { repo.deleteAttachment(a.id) }
+                    reload()
+                }
+            },
             onDismiss = { openEntry = null },
             onDelete = {
                 scope.launch {
@@ -316,17 +334,37 @@ fun HealthScreen(repo: Repo) {
             onDismiss = { filtersOpen = false },
         )
     }
-    if (adding) {
+    viewing?.let { (a, bytes) -> AttachmentViewer(a, bytes) { viewing = null } }
+    val scopedPerson = filter.person.ifEmpty { if (persons.size == 1) persons[0].id else "" }
+    if (adding || drafted != null) {
+        val d = drafted
         AddEntry(
             repo = repo,
             persons = persons,
-            personId = filter.person.ifEmpty { if (persons.size == 1) persons[0].id else "" },
+            personId = d?.personId ?: scopedPerson,
             tagSuggestions = remember(entries) { entries.flatMap { it.tags }.distinct().sorted() },
-            onDismiss = { adding = false },
-            onSaved = { adding = false; reload() },
+            onDismiss = { adding = false; drafted = null },
+            draft = d?.draft,
+            source = d?.source ?: "",
+            initialFiles = d?.files ?: emptyList(),
+            onSaved = { failures ->
+                adding = false
+                drafted = null
+                reload()
+                if (failures.isNotEmpty()) scope.launch { snackbar.showSnackbar(failures.joinToString("\n")) }
+            },
         )
     }
+    if (reading) {
+        ReadDocumentSheet(repo, persons, scopedPerson, onDismiss = { reading = false }) { p, draft, source, files ->
+            reading = false
+            drafted = Drafted(p.id, draft, source, files)
+        }
+    }
 }
+
+/** What the document reader handed to the add form. */
+private class Drafted(val personId: String, val draft: HealthDraft, val source: String, val files: List<Picked>)
 
 @Composable
 private fun SearchField(text: String, onChange: (String) -> Unit) {

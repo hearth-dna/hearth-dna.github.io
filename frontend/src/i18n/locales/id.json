@@ -681,7 +681,6 @@
   "restore.fetchingGenome": "Mengambil genom {n} dari {total}…",
   "native.intro": "Catatan kesehatan dan genom keluarga Anda hanya disimpan di ponsel ini. Tidak ada akun dan tidak ada salinan di server. Untuk memindahkan data antarperangkat, gunakan cadangan.",
   "native.restoreBackup": "Pulihkan cadangan…",
-  "native.restored": "{people} orang baru dan {entries} catatan kesehatan dipulihkan. Genom dan file lampiran belum ada di versi aplikasi ini.",
   "native.encryptedTitle": "Cadangan ini terenkripsi",
   "native.open": "Buka",
   "native.ok": "OK",
@@ -690,5 +689,10 @@
   "native.firstLaunchStorage": "Semua yang saya impor tetap di ponsel ini. Hearth tidak punya akun dan tidak menyimpan salinan data saya di server; jika saya mencopot aplikasi tanpa membuat cadangan, data itu hilang.",
   "native.notBackup": "File ini bukan cadangan Hearth yang dapat dibuka aplikasi ini. Pilih file .hearth yang disimpan dengan versi Hearth saat ini.",
   "native.damaged": "Cadangan ini rusak dan tidak dapat dibaca. Tidak ada yang diubah.",
-  "native.error": "Terjadi kesalahan: {error}"
+  "native.error": "Terjadi kesalahan: {error}",
+  "native.importAccepted": "Diterima: teks mentah, CSV, atau VCF, atau .zip / .gz yang berisi salah satunya. Semuanya dibaca di ponsel ini.",
+  "native.chooseFile": "Pilih file…",
+  "native.chooseFiles": "Pilih file-file…",
+  "native.keyNotice": "Untuk membaca foto, pindaian, atau PDF, Hearth mengirimkannya dari ponsel ini ke Google Gemini menggunakan kunci milik Anda. Anda perlu menambahkan kunci itu sekali.",
+  "native.keyWarning": "Perlakukan kunci seperti kata sandi: siapa pun yang memilikinya dapat memakai layanan Google atas akun Anda. Kunci hanya disimpan di ponsel ini, dikunci oleh keystore ponsel, dan tidak pernah disertakan dalam cadangan. Anda dapat menghapusnya kapan saja dari halaman Google yang sama."
 }

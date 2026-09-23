@@ -681,7 +681,6 @@
   "restore.fetchingGenome": "유전체 {n}/{total} 가져오는 중…",
   "native.intro": "가족의 건강 기록과 유전체는 이 휴대전화에만 저장됩니다. 계정도 없고 서버에 사본도 없습니다. 기기 간에 데이터를 옮기려면 백업을 사용하세요.",
   "native.restoreBackup": "백업 복원…",
-  "native.restored": "새로운 사람 {people}명과 건강 기록 {entries}개를 복원했습니다. 유전체와 첨부 파일은 이 버전의 앱에서 아직 지원하지 않습니다.",
   "native.encryptedTitle": "이 백업은 암호화되어 있습니다",
   "native.open": "열기",
   "native.ok": "확인",
@@ -690,5 +689,10 @@
   "native.firstLaunchStorage": "내가 가져온 모든 것은 이 휴대전화에 남습니다. Hearth에는 계정이 없고 서버에 내 데이터 사본도 없습니다. 백업 없이 앱을 삭제하면 데이터는 사라집니다.",
   "native.notBackup": "이 파일은 이 앱에서 열 수 있는 Hearth 백업이 아닙니다. 현재 버전의 Hearth로 저장한 .hearth 파일을 선택하세요.",
   "native.damaged": "이 백업은 손상되어 읽을 수 없습니다. 아무것도 변경되지 않았습니다.",
-  "native.error": "문제가 발생했습니다: {error}"
+  "native.error": "문제가 발생했습니다: {error}",
+  "native.importAccepted": "지원 형식: 원시 텍스트, CSV 또는 VCF, 또는 이를 담은 .zip / .gz. 모든 처리는 이 휴대폰에서 이루어집니다.",
+  "native.chooseFile": "파일 선택…",
+  "native.chooseFiles": "파일 여러 개 선택…",
+  "native.keyNotice": "사진, 스캔 또는 PDF를 읽을 때 Hearth는 이 휴대폰에서 사용자 본인의 키로 Google Gemini에 보냅니다. 키는 한 번만 추가하면 됩니다.",
+  "native.keyWarning": "키는 비밀번호처럼 다루세요. 키를 가진 사람은 누구나 사용자 계정으로 Google 서비스를 쓸 수 있습니다. 키는 이 휴대폰에만 휴대폰 키 저장소로 보호되어 저장되며 백업에는 절대 포함되지 않습니다. 같은 Google 페이지에서 언제든 삭제할 수 있습니다."
 }

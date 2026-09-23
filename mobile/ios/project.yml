@@ -48,6 +48,7 @@ targets:
           - "PrivacyInfo.xcprivacy"
           - "Web/**"
           - "I18n/**"
+          - "Resources/**"
       - path: Hearth/PrivacyInfo.xcprivacy
         buildPhase: resources
       # The PWA build, copied in by `make mobile-web`. A folder reference, not a group: the file
@@ -65,6 +66,16 @@ targets:
         type: folder
         buildPhase: resources
         optional: true
+      # The knowledge base for the native screens (Native/Kb/Kb.swift), copied from
+      # frontend/public/kb.json by `make mobile-kb` and gitignored like the other copies. Bundled at
+      # the top level, where Bundle.main finds "kb.json"; a build without it has an empty kb.
+      - path: Hearth/Resources/kb.json
+        buildPhase: resources
+        optional: true
+    dependencies:
+      # The system zlib, for gzip in the native genome import and restore (Native/Genome/Gzip.swift):
+      # `import zlib` finds the header module, and this links the library whatever autolinking does.
+      - sdk: libz.tbd
     info:
       path: Hearth/Info.plist
       properties:

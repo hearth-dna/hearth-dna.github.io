@@ -93,6 +93,19 @@ private val ALL_PRESETS = MEASUREMENT_PRESETS + SYMPTOM_PRESETS + EVENT_PRESETS
 
 fun findPreset(id: String): HealthPreset? = ALL_PRESETS.firstOrNull { it.id == id }
 
+/**
+ * The measurement presets with the ones this person already records first, in the order they
+ * last used them (presets.ts `measurementOrder`); [entries] newest first.
+ */
+fun measurementOrder(entries: List<com.hearth.data.HealthEntry>): List<HealthPreset> {
+    val used = LinkedHashSet<HealthPreset>()
+    for (e in entries) {
+        if (e.kind != HealthKind.MEASUREMENT) continue
+        MEASUREMENT_PRESETS.firstOrNull { it.title.lowercase() == e.title.trim().lowercase() }?.let { used.add(it) }
+    }
+    return used.toList() + MEASUREMENT_PRESETS.filter { it !in used }
+}
+
 /** Presets that start an entry of this kind, in list order, for the chips above the form. */
 fun presetsFor(kind: HealthKind): List<HealthPreset> = ALL_PRESETS.filter { it.kind == kind }
 

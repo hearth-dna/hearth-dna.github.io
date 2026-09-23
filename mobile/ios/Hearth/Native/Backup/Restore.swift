@@ -3,14 +3,14 @@ import Foundation
 /// What a restore did, for the message the user sees afterwards.
 struct RestoreResult: Equatable {
     /// People that were not here before.
-    let people: Int
+    let persons: Int
     /// Health log entries that were not here before.
-    let entries: Int
-    /// Genomes the file carries that this build cannot load yet.
-    let genomesSkipped: Int
+    let healthEntries: Int
+    /// Genomes loaded: only for people who had no genotypes here yet.
+    let genomes: Int
     /// Attachment rows restored or already here, whose files a backup file does not carry (they
     /// travel in the backup folder, which this build does not read yet).
-    let attachmentFilesSkipped: Int
+    let skippedAttachmentFiles: Int
     let exportedAt: String
 }
 
@@ -23,13 +23,16 @@ struct RestoreResult: Equatable {
 /// - health rows get `withDefaults()` for columns an older file lacks;
 /// - an attachment row whose entry is absent is skipped, a consent is added only when no row with
 ///   the same kind, version and subject exists, and a sharing-log row only when no row with the same
-///   kind, destination and time does.
+///   kind, destination and time does;
+/// - genotypes load only for people who have none yet, parsed with the manifest's provider for an
+///   original file and as generic text otherwise; an original is kept as a blob so this phone's own
+///   backups ship it too.
 ///
 /// Unlike the web, everything happens in one transaction: a row that breaks a constraint (a
 /// damaged file) rolls the whole restore back instead of leaving it half merged.
 ///
-/// Genomes (they need the import parsers) and attachment bytes (they come from the backup folder)
-/// are not in this slice; the result counts what was left out so the screen can say so.
+/// Attachment bytes come from the backup folder, which this build does not read; the result counts
+/// them so the screen can say so. Slow with genomes in the file: call it off the main thread.
 enum Restore {
     static let personCols = ["id", "label", "display_name", "sex", "birth_year", "notes", "created_at"]
     static let sourceFileCols = [
@@ -50,8 +53,14 @@ enum Restore {
         "tags": .string(""), "value": .null, "value2": .null, "unit": .string(""),
     ]
 
-    static func run(_ dump: Dump, into db: Db) throws -> RestoreResult {
-        try db.transaction { () throws -> RestoreResult in
+    /// `onProgress` gets an i18n key from `restore.json` and its placeholders, on the calling thread.
+    static func run(
+        _ dump: Dump, into repo: Repo,
+        onProgress: ((String, [String: CustomStringConvertible]) -> Void)? = nil
+    ) throws -> RestoreResult {
+        let db = repo.db
+        return try db.transaction { () throws -> RestoreResult in
+            let hadGenotypes = try Set(db.query("SELECT DISTINCT person_id FROM genotype").map { $0.text("person_id") })
             let peopleBefore = try count(db, "person")
             let entriesBefore = try count(db, "health_log")
 
@@ -85,11 +94,32 @@ enum Restore {
                 )
             }
 
+            let persons = try count(db, "person") - peopleBefore
+            let healthEntries = try count(db, "health_log") - entriesBefore
+
+            var genomes = 0
+            for g in dump.genomes where !hadGenotypes.contains(g.personId) {
+                // A folder backup keeps its genomes beside it; one not there yet loads next time.
+                guard let gz = dump.genomeFiles[g.path] else { continue }
+                let text: String
+                do {
+                    text = GenomeImport.decode(try Gzip.decompress(gz))
+                } catch {
+                    throw BackupError.damaged
+                }
+                onProgress?("restore.parsingGenome", ["n": genomes + 1, "total": dump.genomes.count])
+                let parsed = GenomeParser.parseRawText(text, forced: g.original ? Provider.of(g.provider) : .generic)
+                onProgress?("restore.storingCalls", ["n": parsed.calls.count])
+                try repo.storeCalls(personId: g.personId, calls: parsed.calls)
+                if g.original { try repo.blobs.put(Repo.genomeBlobName(sha256Hex(text)), gz) }
+                genomes += 1
+            }
+
             return RestoreResult(
-                people: try count(db, "person") - peopleBefore,
-                entries: try count(db, "health_log") - entriesBefore,
-                genomesSkipped: dump.genomeCount,
-                attachmentFilesSkipped: attachments.count,
+                persons: persons,
+                healthEntries: healthEntries,
+                genomes: genomes,
+                skippedAttachmentFiles: attachments.count,
                 exportedAt: dump.exportedAt
             )
         }

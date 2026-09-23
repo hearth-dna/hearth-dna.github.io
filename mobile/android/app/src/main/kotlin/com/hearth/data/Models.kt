@@ -60,3 +60,51 @@ data class Attachment(
     val name: String,
     val createdAt: String,
 )
+
+/** `Sex` in types.ts, as stored in `person.sex`. */
+enum class Sex(val id: String) {
+    UNKNOWN("unknown"), MALE("male"), FEMALE("female");
+
+    companion object {
+        fun of(id: String): Sex = entries.firstOrNull { it.id == id } ?: UNKNOWN
+    }
+}
+
+/** The raw-data formats Hearth reads (`Provider` and `PROVIDER_LABELS` in types.ts). */
+enum class Provider(val id: String, val label: String) {
+    ANCESTRYDNA("ancestrydna", "AncestryDNA"),
+    TWENTYTHREEANDME("23andme", "23andMe"),
+    MYHERITAGE("myheritage", "MyHeritage"),
+    FAMILYTREEDNA("familytreedna", "FamilyTreeDNA"),
+    LIVINGDNA("livingdna", "Living DNA"),
+    GENOTEK_VCF("genotek-vcf", "Genotek (VCF)"),
+    GENERIC("generic", "Generic rsid/chr/pos/genotype text");
+
+    companion object {
+        fun of(id: String): Provider = entries.firstOrNull { it.id == id } ?: GENERIC
+    }
+}
+
+/** One genotype call: alleles on the forward strand, '-' for no call. */
+data class Call(val rsid: String, val chromosome: String, val position: Long, val a1: String, val a2: String)
+
+/** A call with the person it belongs to (the web's `FamilyCall`). */
+data class FamilyCall(val personId: String, val call: Call)
+
+data class SourceFile(
+    val id: String,
+    val personId: String,
+    val provider: Provider,
+    val build: String,
+    val sha256: String,
+    val originalName: String,
+    val rowCount: Int,
+    val importedAt: String,
+)
+
+data class Relationship(val parentId: String, val childId: String)
+
+/** `mendelianSql`'s result: how many autosomal calls were compared and how many broke the rules. */
+data class Mendelian(val compared: Int, val violations: Int) {
+    val rate: Double get() = if (compared == 0) 0.0 else violations.toDouble() / compared
+}

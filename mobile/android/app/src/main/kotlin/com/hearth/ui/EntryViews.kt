@@ -1,5 +1,7 @@
 package com.hearth.ui
 
+import androidx.compose.material3.IconButton
+import androidx.compose.material.icons.filled.Close
 import android.text.format.DateFormat
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.ScrollState
@@ -244,9 +246,20 @@ fun LazyListScope.entryTable(
 /** Everything about one entry, its full text and documents, and Delete behind a confirmation. */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-fun EntrySheet(entry: HealthEntry, person: String, attachments: List<Attachment>, onDismiss: () -> Unit, onDelete: () -> Unit) {
+fun EntrySheet(
+    entry: HealthEntry,
+    person: String,
+    attachments: List<Attachment>,
+    /** Whether this phone has a document's bytes, or only its row (restored from a backup). */
+    hasBytes: (Attachment) -> Boolean,
+    onOpen: (Attachment) -> Unit,
+    onRemove: (Attachment) -> Unit,
+    onDismiss: () -> Unit,
+    onDelete: () -> Unit,
+) {
     val t = LocalStrings.current
     var confirm by remember { mutableStateOf(false) }
+    var removing by remember { mutableStateOf<Attachment?>(null) }
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)) {
         Column(
             Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(start = 24.dp, end = 24.dp, bottom = 32.dp),
@@ -297,10 +310,22 @@ fun EntrySheet(entry: HealthEntry, person: String, attachments: List<Attachment>
             if (attachments.isNotEmpty()) {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     for (a in attachments) {
-                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        val here = hasBytes(a)
+                        Row(
+                            Modifier.fillMaxWidth().clickable(enabled = here) { onOpen(a) },
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
                             Icon(HearthIcons.Attach, contentDescription = null, Modifier.size(20.dp))
-                            Text(a.name, Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
-                            Text(t("attachments.missingBytes"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(
+                                a.name,
+                                Modifier.weight(1f),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                color = if (here) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                            )
+                            if (!here) Text(t("attachments.missingBytes"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            IconButton(onClick = { removing = a }) { Icon(Icons.Filled.Close, contentDescription = t("attachments.remove")) }
                         }
                     }
                 }
@@ -322,6 +347,14 @@ fun EntrySheet(entry: HealthEntry, person: String, attachments: List<Attachment>
                 Text(t("common.delete").cap())
             }
         }
+    }
+    removing?.let { a ->
+        AlertDialog(
+            onDismissRequest = { removing = null },
+            text = { Text(t("attachments.confirmDelete", "name" to a.name)) },
+            confirmButton = { TextButton(onClick = { removing = null; onRemove(a) }) { Text(t("attachments.remove"), color = MaterialTheme.colorScheme.error) } },
+            dismissButton = { TextButton(onClick = { removing = null }) { Text(t("common.cancel")) } },
+        )
     }
     if (confirm) {
         AlertDialog(

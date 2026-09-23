@@ -18,8 +18,6 @@ import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.CommonStatusCodes
 import com.google.android.gms.common.api.Scope
 import java.io.IOException
-import java.net.HttpURLConnection
-import java.net.URL
 import java.net.URLEncoder
 import java.security.MessageDigest
 import java.security.SecureRandom
@@ -315,28 +313,17 @@ class Cloud(private val activity: ComponentActivity) {
         fun form(vararg fields: Pair<String, String>): String =
             fields.joinToString("&") { (k, v) -> "${URLEncoder.encode(k, "UTF-8")}=${URLEncoder.encode(v, "UTF-8")}" }
 
-        /** A form post (or a JSON one with a bearer token); the body of a 2xx, else [HttpError]. */
+        /** A form post (or a JSON one with a bearer token), through [Egress]; the body of a 2xx, else [HttpError]. */
         private fun post(url: String, body: String, bearer: String? = null): String {
-            val conn = URL(url).openConnection() as HttpURLConnection
-            try {
-                conn.requestMethod = "POST"
-                conn.doOutput = true
-                conn.connectTimeout = 15_000
-                conn.readTimeout = 30_000
-                if (bearer != null) {
-                    conn.setRequestProperty("Authorization", "Bearer $bearer")
-                    conn.setRequestProperty("Content-Type", "application/json")
-                } else {
-                    conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded")
-                }
-                conn.outputStream.use { it.write(body.toByteArray()) }
-                val code = conn.responseCode
-                val stream = if (code in 200..299) conn.inputStream else conn.errorStream
-                val text = stream?.bufferedReader()?.use { it.readText() }.orEmpty()
-                if (code !in 200..299) throw HttpError(code, text)
-                return text
-            } finally {
-                conn.disconnect()
+            val headers = if (bearer != null) {
+                mapOf("Authorization" to "Bearer $bearer", "Content-Type" to "application/json")
+            } else {
+                mapOf("Content-Type" to "application/x-www-form-urlencoded")
+            }
+            return try {
+                Egress.request("POST", url, headers, body.toByteArray()).decodeToString()
+            } catch (e: Egress.HttpError) {
+                throw HttpError(e.code, e.message.orEmpty())
             }
         }
     }

@@ -10,6 +10,9 @@ enum HealthLayout: String {
 /// removable filter chips, a sort menu, and the log as day-grouped cards or a table.
 struct HealthLogScreen: View {
     @ObservedObject var store: HealthStore
+    /// A person id to scope the log to, set when a person's report opens their health log; taken
+    /// (and cleared) as the tab shows it.
+    @Binding var scopeRequest: String?
 
     @State private var filter = HealthFilter()
     @State private var sortKey: HealthSortKey = .date
@@ -18,6 +21,10 @@ struct HealthLogScreen: View {
     @State private var showingFilters = false
     @State private var adding = false
     @State private var opened: HealthEntry?
+    @State private var reading = false
+    /// A draft from the document reader, waiting for its sheet to close before the form opens.
+    @State private var pendingDraft: Drafted?
+    @State private var drafted: Drafted?
     /// A message for an alert: a failure, or what a restore did.
     @State private var notice: String?
 
@@ -36,13 +43,37 @@ struct HealthLogScreen: View {
                 HealthFiltersSheet(store: store, filter: $filter, shownCount: shown.count)
             }
             .sheet(isPresented: $adding) {
-                AddEntrySheet(store: store, personId: defaultPerson)
+                AddEntrySheet(store: store, personId: defaultPerson, onSaved: reportFailures)
+            }
+            .sheet(isPresented: $reading, onDismiss: {
+                drafted = pendingDraft
+                pendingDraft = nil
+            }) {
+                ReadDocumentSheet(repo: store.repo, persons: store.persons, initialPerson: defaultPerson) { person, draft, source, files in
+                    pendingDraft = Drafted(personId: person.id, draft: draft, source: source, files: files)
+                    reading = false
+                }
+            }
+            .sheet(item: $drafted) { d in
+                AddEntrySheet(
+                    store: store, personId: d.personId, draft: d.draft, source: d.source, initialFiles: d.files,
+                    onSaved: reportFailures
+                )
             }
             .sheet(item: $opened) { entry in
                 EntryDetailSheet(
                     entry: entry,
                     personName: store.personName(entry.personId),
-                    attachments: store.attachments[entry.id] ?? []
+                    attachments: store.attachments[entry.id] ?? [],
+                    hasBytes: store.hasAttachmentData,
+                    bytes: store.attachmentData,
+                    onRemoveAttachment: { a in
+                        do {
+                            try store.removeAttachment(a)
+                        } catch {
+                            notice = t("native.error", ["error": error.localizedDescription])
+                        }
+                    }
                 ) {
                     opened = nil
                     do {
@@ -55,6 +86,19 @@ struct HealthLogScreen: View {
             .alert(notice ?? "", isPresented: noticeShown) {
                 Button(t("common.close"), role: .cancel) {}
             }
+        }
+        // People may have been added, renamed or deleted on the People tab meanwhile.
+        .onAppear {
+            do {
+                try store.reload()
+            } catch {
+                notice = t("native.error", ["error": error.localizedDescription])
+            }
+        }
+        .onChange(of: scopeRequest, initial: true) { _, requested in
+            guard let requested else { return }
+            filter = HealthFilter(person: requested)
+            scopeRequest = nil
         }
     }
 
@@ -142,6 +186,13 @@ struct HealthLogScreen: View {
                 Label(t("healthTable.viewCards"), systemImage: "rectangle.grid.1x2").tag(HealthLayout.cards)
                 Label(t("healthTable.viewTable"), systemImage: "tablecells").tag(HealthLayout.table)
             }
+            Section {
+                Button {
+                    reading = true
+                } label: {
+                    Label(t("healthLog.readDocument"), systemImage: "doc.text.viewfinder")
+                }
+            }
         } label: {
             Label(t("healthTable.sortBy"), systemImage: "arrow.up.arrow.down.circle")
         }
@@ -154,6 +205,8 @@ struct HealthLogScreen: View {
         return ScrollView {
             LazyVStack(alignment: .leading, spacing: 12, pinnedViews: [.sectionHeaders]) {
                 scopeChips
+                QuickMeasurement(store: store, initialPerson: defaultPerson)
+                    .padding(.horizontal)
                 if store.entries.isEmpty {
                     Text(t("healthTable.empty"))
                         .foregroundStyle(.secondary)
@@ -348,9 +401,16 @@ struct HealthLogScreen: View {
         return day.formatted(style.locale(Locale(identifier: Strings.shared.language)))
     }
 
-    /** One line for every platform: what came across, and that genomes and files do not yet. */
+    /// Files that could not be kept with a saved entry, one line each.
+    private func reportFailures(_ failures: [String]) {
+        guard !failures.isEmpty else { return }
+        // After the form's sheet has gone: an alert cannot show over a sheet that is closing.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { notice = failures.joined(separator: "\n") }
+    }
+
+    /// The web's own message after a restore: who and which genomes came across, from which file.
     private func restoredMessage(_ r: RestoreResult) -> String {
-        t("native.restored", ["people": r.people, "entries": r.entries])
+        t("settingsPage.imported", ["people": r.persons, "genomes": r.genomes, "version": 2, "exportedAt": r.exportedAt])
     }
 }
 
@@ -563,4 +623,13 @@ struct HealthTableView: View {
             }
         }
     }
+}
+
+/// What the document reader handed to the add form.
+struct Drafted: Identifiable {
+    let id = UUID()
+    let personId: String
+    let draft: HealthDraft
+    let source: String
+    let files: [PickedFile]
 }

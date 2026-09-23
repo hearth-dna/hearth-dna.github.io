@@ -681,7 +681,6 @@
   "restore.fetchingGenome": "ゲノム {n}/{total} を取得中…",
   "native.intro": "ご家族の健康記録とゲノムは、この電話にのみ保存されます。アカウントもサーバー上のコピーもありません。端末間でデータを移すにはバックアップを使ってください。",
   "native.restoreBackup": "バックアップを復元…",
-  "native.restored": "新しい人物 {people} 人と健康記録 {entries} 件を復元しました。ゲノムと添付ファイルは、このバージョンのアプリではまだ扱えません。",
   "native.encryptedTitle": "このバックアップは暗号化されています",
   "native.open": "開く",
   "native.ok": "OK",
@@ -690,5 +689,10 @@
   "native.firstLaunchStorage": "取り込んだものはすべてこの電話に残ります。Hearth にはアカウントがなく、サーバーにデータのコピーもありません。バックアップを作らずにアプリを削除すると、データは失われます。",
   "native.notBackup": "このファイルは、このアプリで開ける Hearth のバックアップではありません。現在のバージョンの Hearth で保存した .hearth ファイルを選んでください。",
   "native.damaged": "このバックアップは破損していて読み込めませんでした。何も変更されていません。",
-  "native.error": "問題が発生しました: {error}"
+  "native.error": "問題が発生しました: {error}",
+  "native.importAccepted": "対応形式: 生テキスト、CSV、VCF、またはそれらを含む .zip / .gz。すべてこのスマートフォン上で読み込まれます。",
+  "native.chooseFile": "ファイルを選択…",
+  "native.chooseFiles": "ファイルを選択…",
+  "native.keyNotice": "写真・スキャン・PDF を読み取るとき、Hearth はそれをこのスマートフォンから、あなた自身のキーを使って Google Gemini に送ります。キーの追加は一度だけです。",
+  "native.keyWarning": "キーはパスワードと同じように扱ってください。持っている人は誰でもあなたのアカウントで Google のサービスを使えます。キーはこのスマートフォンにのみ、端末のキーストアで保護して保存され、バックアップには含まれません。同じ Google のページからいつでも削除できます。"
 }

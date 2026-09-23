@@ -1,7 +1,10 @@
 package com.hearth.backup
 
+import com.hearth.data.Blobs
 import com.hearth.data.JdbcSql
 import com.hearth.data.Repo
+import com.hearth.genome.sha256Hex
+import java.nio.file.Files
 import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
@@ -33,12 +36,15 @@ class RestoreTest {
         assertThrows(BackupException::class.java) { openContainer("not a zip".toByteArray()) }
     }
 
+    private fun newRepo() = Repo(JdbcSql(), Blobs(Files.createTempDirectory("blobs").toFile()))
+
     @Test fun `restores every row, and a second restore changes nothing`() {
-        val sql = JdbcSql()
+        val repo = newRepo()
+        val sql = repo.sql
         val c = openContainer(fixture("plain.hearth"))
-        val first = restore(sql, c)
-        assertEquals(RestoreResult(persons = 2, healthEntries = 4, skippedGenomes = 0, skippedAttachmentFiles = 1), first)
-        assertEquals(RestoreResult(0, 0, 0, 1), restore(sql, c))
+        val first = restore(repo, c)
+        assertEquals(RestoreResult(persons = 2, healthEntries = 4, genomes = 0, skippedAttachmentFiles = 1, exportedAt = "2026-09-21T00:00:00.000Z"), first)
+        assertEquals(first.copy(persons = 0, healthEntries = 0), restore(repo, c))
 
         fun rows(table: String, order: String) = sql.query("SELECT * FROM $table ORDER BY $order")
         assertSame(journal.getJSONArray("persons"), rows("person", "created_at"))
@@ -53,12 +59,43 @@ class RestoreTest {
         assertEquals("", h4["tags"])
         assertEquals(null, h4["value"])
 
-        val repo = Repo(sql)
         val bp = repo.listHealthLog().first { it.id == "h-1" }
         assertEquals(128.0, bp.value)
         assertEquals(84.0, bp.value2)
         assertEquals(listOf("arthritis", "flare"), repo.listHealthLog().first { it.id == "h-2" }.tags)
         assertTrue(repo.hasConsent(com.hearth.data.ConsentKind.IMPORT_DOCUMENT, "p-alex"))
+    }
+
+    @Test fun `restores both genomes, keeps the originals, and does not load them twice`() {
+        val repo = newRepo()
+        val c = openContainer(fixture("genomes.hearth"))
+        assertEquals(2, c.genomes.size)
+        assertEquals(2, restore(repo, c).genomes)
+        assertEquals(mapOf("p-alex" to 7, "p-sam" to 7), repo.genotypeCounts())
+        val sam = repo.familyAt("rs429358").first { it.personId == "p-sam" }.call
+        assertEquals("T" to "T", sam.a1 to sam.a2)
+        // The originals are kept under the hash of their text, which the source_file rows name.
+        val shas = repo.listSourceFiles().map { it.sha256 }.toSet()
+        assertEquals(shas.map { Repo.genomeBlobName(it) }.toSet(), repo.blobs.list().toSet())
+        for (name in repo.blobs.list()) {
+            val text = com.hearth.genome.decode(com.hearth.genome.gunzip(repo.blobs.get(name)!!))
+            assertEquals(name, Repo.genomeBlobName(sha256Hex(text)))
+        }
+        assertEquals(0, restore(repo, c).genomes)
+        // Sam's rs4680 is AA against Alex's GG: one violation among the six autosomal calls.
+        val m = repo.mendelian("p-sam", "p-alex")
+        assertEquals(6, m.compared)
+        assertEquals(1, m.violations)
+    }
+
+    @Test fun `refuses a genome whose bytes do not match the manifest`() {
+        val bytes = fixture("genomes.hearth")
+        val c = openContainer(bytes)
+        val path = c.genomeEntries.first().path
+        // Flip a byte inside the stored (uncompressed) zip entry of the first genome.
+        val at = String(bytes, Charsets.ISO_8859_1).indexOf(path) + path.length + 20
+        val broken = bytes.copyOf().also { it[at] = (it[at].toInt() xor 1).toByte() }
+        assertThrows(BackupException::class.java) { openContainer(broken) }
     }
 
     /** JSON as plain Kotlin values, numbers as Double, so two documents compare by content. */

@@ -1,7 +1,6 @@
 {
   "native.intro": "Your family's health log and genomes are stored only on this phone. There is no account and no server-side copy. To move data between devices, use a backup.",
   "native.restoreBackup": "Restore a backup…",
-  "native.restored": "Restored {people} new people and {entries} health entries. Genomes and attached files are not in this version of the app yet.",
   "native.encryptedTitle": "This backup is encrypted",
   "native.open": "Open",
   "native.ok": "OK",
@@ -10,5 +9,10 @@
   "native.firstLaunchStorage": "Everything I import stays on this phone. Hearth has no account and no server-side copy of my data; if I uninstall the app without making a backup, it is gone.",
   "native.notBackup": "This file is not a Hearth backup this app can open. Choose a .hearth file saved by the current version of Hearth.",
   "native.damaged": "This backup is damaged and could not be read. Nothing was changed.",
-  "native.error": "Something went wrong: {error}"
+  "native.error": "Something went wrong: {error}",
+  "native.importAccepted": "Accepted: raw text, CSV or VCF, or a .zip / .gz containing one. Everything is read here on this phone.",
+  "native.chooseFile": "Choose file…",
+  "native.chooseFiles": "Choose files…",
+  "native.keyNotice": "To read a photo, scan or PDF, Hearth sends it from this phone to Google Gemini using a key that belongs to you. You need to add that key once.",
+  "native.keyWarning": "Treat the key like a password: anyone who has it can use Google's service on your account. It is stored only on this phone, locked by the phone's keystore, and never included in backups. You can delete it at any time from the same Google page."
 }

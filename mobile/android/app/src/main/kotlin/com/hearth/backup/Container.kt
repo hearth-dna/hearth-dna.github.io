@@ -1,5 +1,6 @@
 package com.hearth.backup
 
+import com.hearth.genome.sha256Hex
 import org.json.JSONObject
 import java.io.ByteArrayInputStream
 import java.util.zip.ZipInputStream
@@ -11,12 +12,35 @@ import javax.crypto.spec.SecretKeySpec
 
 /**
  * Reads a dump v2 backup (docs/architecture/storage/dump-v2.md, frontend/src/export/container.ts):
- * a zip of header.json, manifest.json and journal.json, optionally inside the `HRTH2` envelope,
- * which is the magic, a 2-byte big-endian header length, the plaintext header, a 16-byte salt, a
- * 12-byte nonce and the AES-256-GCM ciphertext of the zip. Genome entries are not read yet (ADR
- * 0010 staging): the native app has no genome import to hand them to.
+ * a zip of header.json, manifest.json and journal.json plus the gzipped genomes the manifest
+ * lists, optionally inside the `HRTH2` envelope, which is the magic, a 2-byte big-endian header
+ * length, the plaintext header, a 16-byte salt, a 12-byte nonce and the AES-256-GCM ciphertext of
+ * the zip. [genomes] maps a manifest path to its bytes, each checked against the manifest's sha256.
  */
-class Container(val header: JSONObject, val manifest: JSONObject, val journal: JSONObject)
+class Container(
+    val header: JSONObject,
+    val manifest: JSONObject,
+    val journal: JSONObject,
+    val genomes: Map<String, ByteArray> = emptyMap(),
+) {
+    /** The manifest's genome entries (`GenomeEntry` in container.ts). */
+    val genomeEntries: List<GenomeEntry>
+        get() {
+            val a = manifest.optJSONArray("genomes") ?: return emptyList()
+            return (0 until a.length()).map { i ->
+                val g = a.getJSONObject(i)
+                GenomeEntry(
+                    path = g.getString("path"),
+                    sha256 = g.getString("sha256"),
+                    personId = g.getString("person_id"),
+                    provider = g.optString("provider", "generic"),
+                    original = g.optString("kind") == "original",
+                )
+            }
+        }
+}
+
+data class GenomeEntry(val path: String, val sha256: String, val personId: String, val provider: String, val original: Boolean)
 
 /** Why a file would not open, as the i18n key of the message to show. */
 class BackupException(val key: String) : Exception(key)
@@ -32,12 +56,23 @@ fun openContainer(bytes: ByteArray, passphrase: String? = null): Container {
     val zip = if (isEncrypted(bytes)) decrypt(bytes, passphrase) else bytes
     if (zip.size < 2 || zip[0] != 'P'.code.toByte() || zip[1] != 'K'.code.toByte())
         throw BackupException("native.notBackup")
-    val entries = unzip(zip, setOf("header.json", "manifest.json", "journal.json"))
+    val entries = unzip(zip)
     fun json(name: String) = JSONObject(entries[name]?.toString(Charsets.UTF_8) ?: throw BackupException("native.damaged"))
     val header = json("header.json")
     if (header.optString("format") != "hearth-dump" || header.optInt("version") != 2)
         throw BackupException("native.notBackup")
-    return Container(header, json("manifest.json"), json("journal.json"))
+    val c = Container(header, json("manifest.json"), json("journal.json"))
+    val external = c.manifest.optBoolean("external_genomes")
+    val genomes = mutableMapOf<String, ByteArray>()
+    for (g in c.genomeEntries) {
+        val data = entries[g.path]
+        if (data == null && external) continue
+        // A missing or altered genome refuses the whole file, as on the web: half a family is worse
+        // than an error the user can act on.
+        if (data == null || sha256Hex(data) != g.sha256) throw BackupException("native.damaged")
+        genomes[g.path] = data
+    }
+    return Container(c.header, c.manifest, c.journal, genomes)
 }
 
 private fun decrypt(bytes: ByteArray, passphrase: String?): ByteArray {
@@ -83,13 +118,17 @@ fun pbkdf2Sha256(passphrase: String, salt: ByteArray, iterations: Int, bytes: In
     return out
 }
 
-private fun unzip(zip: ByteArray, wanted: Set<String>): Map<String, ByteArray> {
+private fun unzip(zip: ByteArray): Map<String, ByteArray> {
     val out = mutableMapOf<String, ByteArray>()
-    ZipInputStream(ByteArrayInputStream(zip)).use { z ->
-        while (true) {
-            val e = z.nextEntry ?: break
-            if (e.name in wanted) out[e.name] = z.readBytes()
+    try {
+        ZipInputStream(ByteArrayInputStream(zip)).use { z ->
+            while (true) {
+                val e = z.nextEntry ?: break
+                if (!e.isDirectory) out[e.name] = z.readBytes()
+            }
         }
+    } catch (_: java.util.zip.ZipException) {
+        throw BackupException("native.damaged")
     }
     return out
 }

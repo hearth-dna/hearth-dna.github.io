@@ -64,9 +64,11 @@ struct Dump {
     let encrypted: Bool
     /// `journal.json`: table name → rows.
     let journal: [String: JSONValue]
-    /// Genomes the manifest lists. Their files were checked like the web checks them, but this
-    /// build does not import genotypes yet.
-    let genomeCount: Int
+    /// The genomes the manifest lists (`GenomeEntry` in container.ts).
+    let genomes: [GenomeEntry]
+    /// The gzipped genome files the zip carries, by manifest path, each checked against the
+    /// manifest's sha256. A folder backup's may be absent (`external_genomes`).
+    let genomeFiles: [String: Data]
 
     /// The rows under `key`; none when the journal has no such key (older files have no
     /// `attachments`). An element that is not an object is a damaged file.
@@ -78,6 +80,16 @@ struct Dump {
             return row
         }
     }
+}
+
+/// One genome the manifest lists: where its file is, whose it is, and whether it is the file as
+/// imported (`original`, parsed with its provider's parser) or rebuilt as generic text.
+struct GenomeEntry: Equatable {
+    let path: String
+    let sha256: String
+    let personId: String
+    let provider: String
+    let original: Bool
 }
 
 /// Opens a dump v2 file (docs/architecture/storage/dump-v2.md):
@@ -128,20 +140,28 @@ enum Container {
         } catch {
             throw BackupError.damaged
         }
-        // The web refuses a file whose genome entries are missing or altered, before restoring
-        // anything; so does this, even though it does not load them yet.
+        // A missing or altered genome refuses the whole file before anything is restored, as on
+        // the web: half a family is worse than an error the user can act on.
+        var genomeFiles: [String: Data] = [:]
         for genome in manifest.genomes {
             guard let file = try entry(reader, genome.path) else {
                 if manifest.externalGenomes == true { continue }
                 throw BackupError.damaged
             }
             guard sha256Hex(file) == genome.sha256 else { throw BackupError.damaged }
+            genomeFiles[genome.path] = file
         }
         return Dump(
             exportedAt: header.exportedAt ?? "",
             encrypted: encrypted,
             journal: journal,
-            genomeCount: manifest.genomes.count
+            genomes: manifest.genomes.map { g in
+                GenomeEntry(
+                    path: g.path, sha256: g.sha256, personId: g.personId, provider: g.provider ?? "generic",
+                    original: g.kind == "original"
+                )
+            },
+            genomeFiles: genomeFiles
         )
     }
 
@@ -162,6 +182,14 @@ enum Container {
         struct Genome: Decodable {
             let path: String
             let sha256: String
+            let personId: String
+            let provider: String?
+            let kind: String?
+
+            enum CodingKeys: String, CodingKey {
+                case path, sha256, provider, kind
+                case personId = "person_id"
+            }
         }
 
         let genomes: [Genome]
@@ -241,9 +269,5 @@ enum Container {
         }
         guard status == Int32(kCCSuccess) else { throw BackupError.wrongPassphrase }
         return SymmetricKey(data: derived)
-    }
-
-    private static func sha256Hex(_ data: Data) -> String {
-        SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
     }
 }

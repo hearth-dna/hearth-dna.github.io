@@ -9,7 +9,7 @@ class RepoTest {
     private val sql = JdbcSql().apply {
         exec("INSERT INTO person(id,label,display_name,sex,created_at) VALUES ('p','p','P','unknown','2026-01-01T00:00:00.000Z')")
     }
-    private val repo = Repo(sql)
+    private val repo = Repo(sql, Blobs(java.nio.file.Files.createTempDirectory("blobs").toFile()))
     private fun generation() = sql.query("SELECT value FROM meta WHERE key='generation'").firstOrNull()?.get("value")
 
     @Test fun `stores entries the way the web does`() {
@@ -54,6 +54,18 @@ class RepoTest {
             }
         }
         assertEquals(1, sql.query("SELECT * FROM person").size)
+    }
+
+    @Test fun `only a write that changed rows bumps the generation`() {
+        val q = repo.addPerson("q", "Q", Sex.UNKNOWN, null)
+        val g = generation()
+        repo.setParent("p", q.id)
+        assertEquals((g!!.toString().toInt() + 1).toString(), generation())
+        repo.setParent("p", q.id) // already there
+        repo.deleteHealthEntry("nothing-by-this-id")
+        repo.grantConsent(ConsentKind.FIRST_LAUNCH)
+        repo.grantConsent(ConsentKind.FIRST_LAUNCH)
+        assertEquals((g.toString().toInt() + 2).toString(), generation())
     }
 
     @Test fun `records a consent once, at the current version`() {

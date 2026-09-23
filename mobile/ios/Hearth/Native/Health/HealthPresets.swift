@@ -87,6 +87,17 @@ enum HealthPresets {
 
     static let all = measurements + symptoms + events
 
+    /// The measurement presets with the ones this person already records first, in the order they
+    /// last used them (presets.ts `measurementOrder`); `entries` newest first.
+    static func measurementOrder(_ entries: [HealthEntry]) -> [HealthPreset] {
+        var used: [HealthPreset] = []
+        for e in entries where e.kind == .measurement {
+            let title = e.title.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+            if let p = measurements.first(where: { $0.title.lowercased() == title }), !used.contains(p) { used.append(p) }
+        }
+        return used + measurements.filter { !used.contains($0) }
+    }
+
     static func find(_ id: String) -> HealthPreset? {
         all.first { $0.id == id }
     }

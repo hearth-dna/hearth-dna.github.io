@@ -1,20 +1,30 @@
 package com.hearth.backup
 
+import com.hearth.data.Provider
+import com.hearth.data.Repo
 import com.hearth.data.Sql
+import com.hearth.data.str
+import com.hearth.genome.decode
+import com.hearth.genome.gunzip
+import com.hearth.genome.parseRawText
+import com.hearth.genome.sha256Hex
 import org.json.JSONArray
 import org.json.JSONObject
 
 /**
- * Merges a backup's journal into the database the way frontend/src/export/restore.ts does:
- * `INSERT OR IGNORE` row by row, column names from the allowlists below and never from the file,
- * so restoring the same file twice changes nothing and a file cannot name a column. Genomes and
- * attachment bytes are left for later slices (ADR 0010) and counted as skipped.
+ * Merges a backup into the database the way frontend/src/export/restore.ts does: `INSERT OR IGNORE`
+ * row by row, column names from the allowlists below and never from the file, so restoring the
+ * same file twice changes nothing and a file cannot name a column. Genotypes load only for people
+ * who have none yet, and an original genome is kept so this phone's own backups ship it too.
+ * Attachment bytes travel beside a backup, not in it (attachments/mirror.ts), so their rows arrive
+ * without files; [skippedAttachmentFiles] counts them.
  */
 data class RestoreResult(
     val persons: Int,
     val healthEntries: Int,
-    val skippedGenomes: Int,
+    val genomes: Int,
     val skippedAttachmentFiles: Int,
+    val exportedAt: String,
 )
 
 private val PERSON_COLS = listOf("id", "label", "display_name", "sex", "birth_year", "notes", "created_at")
@@ -33,8 +43,12 @@ private val HEALTH_DEFAULTS = mapOf<String, Any?>(
     "value" to null, "value2" to null, "unit" to "",
 )
 
-fun restore(sql: Sql, c: Container): RestoreResult = sql.transaction {
+/** [onProgress] gets an i18n key from `restore.json` and its placeholders. */
+fun restore(repo: Repo, c: Container, onProgress: (String, Map<String, Any>) -> Unit = { _, _ -> }): RestoreResult = repo.sql.transaction {
+    val sql = repo.sql
     val j = c.journal
+    val hadGenotypes = sql.query("SELECT DISTINCT person_id FROM genotype").map { it.str("person_id") }.toSet()
+    val mark = repo.totalChanges()
     val personsBefore = count(sql, "person")
     val healthBefore = count(sql, "health_log")
     insertRows(sql, "person", PERSON_COLS, rows(j, "persons"))
@@ -68,14 +82,27 @@ fun restore(sql: Sql, c: Container): RestoreResult = sql.transaction {
             listOf(s["kind"], s["destination"], s["payload"], s["created_at"], s["kind"], s["destination"], s["created_at"]),
         )
     }
-    sql.exec(
-        "INSERT INTO meta(key, value) VALUES ('generation', '1') ON CONFLICT(key) DO UPDATE SET value = CAST(value AS INTEGER) + 1",
-    )
+    repo.touch(since = mark)
+    val entries = c.genomeEntries
+    var genomes = 0
+    for (g in entries) {
+        if (g.personId in hadGenotypes) continue
+        // A folder backup keeps its genomes beside it; one not there yet loads on the next restore.
+        val gz = c.genomes[g.path] ?: continue
+        val text = decode(gunzip(gz))
+        onProgress("restore.parsingGenome", mapOf("n" to genomes + 1, "total" to entries.size))
+        val r = parseRawText(text, if (g.original) Provider.of(g.provider) else Provider.GENERIC)
+        onProgress("restore.storingCalls", mapOf("n" to r.calls.size))
+        repo.storeCalls(g.personId, r.calls)
+        if (g.original) repo.blobs.put(Repo.genomeBlobName(sha256Hex(text)), gz)
+        genomes++
+    }
     RestoreResult(
         persons = count(sql, "person") - personsBefore,
         healthEntries = count(sql, "health_log") - healthBefore,
-        skippedGenomes = c.manifest.optJSONArray("genomes")?.length() ?: 0,
+        genomes = genomes,
         skippedAttachmentFiles = attachments.size,
+        exportedAt = c.header.optString("exported_at"),
     )
 }
 
@@ -94,3 +121,10 @@ private fun rows(journal: JSONObject, key: String): List<Map<String, Any?>> {
         o.keys().asSequence().associateWith { k -> o.opt(k).takeUnless { it == JSONObject.NULL } }
     }
 }
+
+/**
+ * Any Hearth backup this app reads (restore.ts `restoreBytes`): dump v2, plain or sealed, or an
+ * older dump v1. Throws [BackupException] naming the message to show.
+ */
+fun restoreBytes(repo: Repo, bytes: ByteArray, passphrase: String?, onProgress: (String, Map<String, Any>) -> Unit = { _, _ -> }): RestoreResult =
+    if (isV1(bytes)) restoreV1(repo, openV1(bytes, passphrase)) else restore(repo, openContainer(bytes, passphrase), onProgress)

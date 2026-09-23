@@ -681,7 +681,6 @@
   "restore.fetchingGenome": "正在获取第 {n}/{total} 个基因组…",
   "native.intro": "您家人的健康日志和基因组只保存在这部手机上。没有账户，服务器上也没有副本。要在设备之间转移数据，请使用备份。",
   "native.restoreBackup": "恢复备份…",
-  "native.restored": "已恢复 {people} 位新成员和 {entries} 条健康记录。此版本的应用暂不支持基因组和附件。",
   "native.encryptedTitle": "此备份已加密",
   "native.open": "打开",
   "native.ok": "确定",
@@ -690,5 +689,10 @@
   "native.firstLaunchStorage": "我导入的所有内容都留在这部手机上。Hearth 没有账户，服务器上也没有我的数据副本；如果不先备份就卸载应用，数据将会丢失。",
   "native.notBackup": "此文件不是本应用能打开的 Hearth 备份。请选择用当前版本 Hearth 保存的 .hearth 文件。",
   "native.damaged": "此备份已损坏，无法读取。未做任何更改。",
-  "native.error": "出错了：{error}"
+  "native.error": "出错了：{error}",
+  "native.importAccepted": "支持：原始文本、CSV 或 VCF，或包含其中之一的 .zip / .gz。所有内容都在这部手机上读取。",
+  "native.chooseFile": "选择文件…",
+  "native.chooseFiles": "选择文件…",
+  "native.keyNotice": "为了读取照片、扫描件或 PDF，Hearth 会用属于你自己的密钥，从这部手机直接发送给 Google Gemini。这个密钥只需添加一次。",
+  "native.keyWarning": "请像对待密码一样对待这个密钥：拿到它的人都可以用你的账号使用 Google 的服务。它只保存在这部手机上，由手机的密钥库保护，永远不会包含在备份中。你可以随时在同一个 Google 页面删除它。"
 }
