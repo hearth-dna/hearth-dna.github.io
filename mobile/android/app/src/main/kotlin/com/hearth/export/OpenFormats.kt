@@ -36,7 +36,7 @@ fun csvCell(v: Cell): String {
 fun csvLine(cells: List<Cell>) = cells.joinToString(",") { csvCell(it) }
 
 /** UTF-8 BOM so Excel opens accented text correctly. */
-const val CSV_BOM = "﻿"
+const val CSV_BOM = "\uFEFF"
 
 /** A value as JSON.stringify writes it: numbers the JavaScript way, strings with its escapes. */
 fun jsonValue(v: Cell): String = when (v) {

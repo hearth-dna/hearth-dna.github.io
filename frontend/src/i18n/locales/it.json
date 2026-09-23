@@ -694,5 +694,12 @@
   "native.chooseFile": "Scegli file…",
   "native.chooseFiles": "Scegli i file…",
   "native.keyNotice": "Per leggere una foto, una scansione o un PDF, Hearth lo invia da questo telefono a Google Gemini usando una chiave che appartiene a te. Devi aggiungere la chiave una volta.",
-  "native.keyWarning": "Tratta la chiave come una password: chi la possiede può usare il servizio di Google con il tuo account. È salvata solo su questo telefono, protetta dal portachiavi del telefono, e non viene mai inclusa nei backup. Puoi eliminarla in qualsiasi momento dalla stessa pagina di Google."
+  "native.keyWarning": "Tratta la chiave come una password: chi la possiede può usare il servizio di Google con il tuo account. È salvata solo su questo telefono, protetta dal portachiavi del telefono, e non viene mai inclusa nei backup. Puoi eliminarla in qualsiasi momento dalla stessa pagina di Google.",
+  "native.fullDumpIntro": "Tutto: persone, albero genealogico, i file del genoma originali, consensi, registro sanitario, note, chat, registro delle condivisioni. Un unico file .hearth; aggiungi una passphrase per cifrarlo con AES-GCM. Hearth non conserva copie da nessuna parte. L’importazione accetta file .hearth e i vecchi dump .json.gz.",
+  "native.providerRefuses": "Questo provider non permette ad altre app di scrivere qui; scegli un altro posto.",
+  "native.keepFiles": "Conserva i file",
+  "native.driveDefault": "Usa una cartella Hearth in Il mio Drive",
+  "native.saved": "{name} salvato: {rows} righe, {mb} MB.",
+  "native.documentReadingIntro": "Facoltativo. Consente a «Leggi un documento» di inviare una foto, una scansione o un PDF direttamente da questo telefono a Google Gemini per la trascrizione. La chiave è conservata solo su questo telefono, protetta dal suo portachiavi, e non fa mai parte di un backup. Nulla viene inviato finché non confermi ogni documento.",
+  "native.eraseIntro": "Elimina da questo telefono tutte le persone, i genotipi, i consensi, le note e i registri. Hearth non conserva copie da nessuna parte, quindi poi non c’è nulla da recuperare, a meno che tu non abbia esportato un dump."
 }

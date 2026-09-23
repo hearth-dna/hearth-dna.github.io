@@ -694,5 +694,12 @@
   "native.chooseFile": "파일 선택…",
   "native.chooseFiles": "파일 여러 개 선택…",
   "native.keyNotice": "사진, 스캔 또는 PDF를 읽을 때 Hearth는 이 휴대폰에서 사용자 본인의 키로 Google Gemini에 보냅니다. 키는 한 번만 추가하면 됩니다.",
-  "native.keyWarning": "키는 비밀번호처럼 다루세요. 키를 가진 사람은 누구나 사용자 계정으로 Google 서비스를 쓸 수 있습니다. 키는 이 휴대폰에만 휴대폰 키 저장소로 보호되어 저장되며 백업에는 절대 포함되지 않습니다. 같은 Google 페이지에서 언제든 삭제할 수 있습니다."
+  "native.keyWarning": "키는 비밀번호처럼 다루세요. 키를 가진 사람은 누구나 사용자 계정으로 Google 서비스를 쓸 수 있습니다. 키는 이 휴대폰에만 휴대폰 키 저장소로 보호되어 저장되며 백업에는 절대 포함되지 않습니다. 같은 Google 페이지에서 언제든 삭제할 수 있습니다.",
+  "native.fullDumpIntro": "전부: 사람, 가계도, 원본 유전체 파일, 동의, 건강 기록, 메모, 채팅, 공유 기록. 하나의 .hearth 파일이며, 암호 문구를 추가하면 AES-GCM으로 암호화됩니다. Hearth는 어디에도 사본을 두지 않습니다. 가져오기는 .hearth 파일과 이전 .json.gz 덤프를 지원합니다.",
+  "native.providerRefuses": "이 제공자는 다른 앱이 여기에 쓰는 것을 허용하지 않습니다. 다른 위치를 고르세요.",
+  "native.keepFiles": "파일 유지",
+  "native.driveDefault": "내 드라이브의 Hearth 폴더 사용",
+  "native.saved": "{name} 저장됨: {rows}행, {mb}MB.",
+  "native.documentReadingIntro": "선택 사항. \"문서 읽기\"로 사진, 스캔 또는 PDF를 이 휴대폰에서 바로 Google Gemini에 보내 텍스트로 옮깁니다. 키는 이 휴대폰에만 키 저장소로 보호되어 보관되며 백업에는 절대 포함되지 않습니다. 문서마다 확인하기 전에는 아무것도 전송되지 않습니다.",
+  "native.eraseIntro": "이 휴대폰에서 모든 사람, 유전자형, 동의, 메모, 기록을 삭제합니다. Hearth는 어디에도 사본을 두지 않으므로, 덤프를 내보내 두지 않았다면 나중에 복구할 수 없습니다."
 }

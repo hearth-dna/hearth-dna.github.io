@@ -694,5 +694,12 @@
   "native.chooseFile": "选择文件…",
   "native.chooseFiles": "选择文件…",
   "native.keyNotice": "为了读取照片、扫描件或 PDF，Hearth 会用属于你自己的密钥，从这部手机直接发送给 Google Gemini。这个密钥只需添加一次。",
-  "native.keyWarning": "请像对待密码一样对待这个密钥：拿到它的人都可以用你的账号使用 Google 的服务。它只保存在这部手机上，由手机的密钥库保护，永远不会包含在备份中。你可以随时在同一个 Google 页面删除它。"
+  "native.keyWarning": "请像对待密码一样对待这个密钥：拿到它的人都可以用你的账号使用 Google 的服务。它只保存在这部手机上，由手机的密钥库保护，永远不会包含在备份中。你可以随时在同一个 Google 页面删除它。",
+  "native.fullDumpIntro": "全部内容：人员、家谱、原始基因组文件、同意记录、健康日志、笔记、对话、分享日志。一个 .hearth 文件；添加口令即可用 AES-GCM 加密。Hearth 不在任何地方保留副本。导入支持 .hearth 文件和旧的 .json.gz 导出。",
+  "native.providerRefuses": "该服务不允许其他应用在此写入，请选择其他位置。",
+  "native.keepFiles": "保留文件",
+  "native.driveDefault": "使用\"我的云端硬盘\"中的 Hearth 文件夹",
+  "native.saved": "已保存 {name}：{rows} 行，{mb} MB。",
+  "native.documentReadingIntro": "可选。让\"读取文档\"把照片、扫描件或 PDF 直接从这部手机发送给 Google Gemini 转录。密钥只保存在这部手机上，由其密钥库保护，永远不会包含在备份中。每份文档确认之前不会发送任何内容。",
+  "native.eraseIntro": "从这部手机删除所有人员、基因型、同意记录、笔记和日志。Hearth 不在任何地方保留副本，除非你已导出，否则之后无法恢复任何内容。"
 }

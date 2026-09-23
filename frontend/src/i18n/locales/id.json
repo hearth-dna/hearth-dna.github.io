@@ -694,5 +694,12 @@
   "native.chooseFile": "Pilih file…",
   "native.chooseFiles": "Pilih file-file…",
   "native.keyNotice": "Untuk membaca foto, pindaian, atau PDF, Hearth mengirimkannya dari ponsel ini ke Google Gemini menggunakan kunci milik Anda. Anda perlu menambahkan kunci itu sekali.",
-  "native.keyWarning": "Perlakukan kunci seperti kata sandi: siapa pun yang memilikinya dapat memakai layanan Google atas akun Anda. Kunci hanya disimpan di ponsel ini, dikunci oleh keystore ponsel, dan tidak pernah disertakan dalam cadangan. Anda dapat menghapusnya kapan saja dari halaman Google yang sama."
+  "native.keyWarning": "Perlakukan kunci seperti kata sandi: siapa pun yang memilikinya dapat memakai layanan Google atas akun Anda. Kunci hanya disimpan di ponsel ini, dikunci oleh keystore ponsel, dan tidak pernah disertakan dalam cadangan. Anda dapat menghapusnya kapan saja dari halaman Google yang sama.",
+  "native.fullDumpIntro": "Semuanya: orang, silsilah, file genom asli, persetujuan, log kesehatan, catatan, obrolan, log berbagi. Satu file .hearth; tambahkan frasa sandi untuk mengenkripsinya dengan AES-GCM. Hearth tidak menyimpan salinan di mana pun. Impor menerima file .hearth dan dump .json.gz lama.",
+  "native.providerRefuses": "Penyedia ini tidak mengizinkan aplikasi lain menulis di sini; pilih tempat lain.",
+  "native.keepFiles": "Simpan file",
+  "native.driveDefault": "Gunakan folder Hearth di Drive Saya",
+  "native.saved": "{name} disimpan: {rows} baris, {mb} MB.",
+  "native.documentReadingIntro": "Opsional. Memungkinkan \"Baca dokumen\" mengirim foto, pindaian, atau PDF langsung dari ponsel ini ke Google Gemini untuk ditranskripsi. Kunci hanya disimpan di ponsel ini, dikunci oleh keystore-nya, dan tidak pernah menjadi bagian dari cadangan. Tidak ada yang dikirim sebelum Anda mengonfirmasi setiap dokumen.",
+  "native.eraseIntro": "Menghapus semua orang, genotipe, persetujuan, catatan, dan log dari ponsel ini. Hearth tidak menyimpan salinan di mana pun, jadi tidak ada yang bisa dipulihkan setelahnya kecuali Anda telah mengekspor dump."
 }

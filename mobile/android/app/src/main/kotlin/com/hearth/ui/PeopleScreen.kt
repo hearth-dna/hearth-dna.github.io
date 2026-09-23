@@ -69,6 +69,7 @@ import androidx.compose.ui.unit.dp
 import com.hearth.data.Person
 import com.hearth.data.Provider
 import com.hearth.data.Relationship
+import com.hearth.backup.Backups
 import com.hearth.data.Repo
 import com.hearth.data.Sex
 import kotlinx.coroutines.Dispatchers
@@ -91,7 +92,7 @@ fun Int.grouped(): String = NumberFormat.getIntegerInstance().format(this)
  */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-fun PeopleScreen(repo: Repo, onOpen: (Person) -> Unit) {
+fun PeopleScreen(repo: Repo, backups: Backups, onOpen: (Person) -> Unit) {
     val t = LocalStrings.current
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -148,6 +149,7 @@ fun PeopleScreen(repo: Repo, onOpen: (Person) -> Unit) {
                     scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
                 ),
                 actions = {
+                    SyncAction(backups)
                     Box {
                         IconButton(onClick = { menu = true }) { Icon(Icons.Filled.MoreVert, contentDescription = null) }
                         DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {

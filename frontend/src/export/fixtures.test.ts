@@ -260,7 +260,7 @@ describe('mobile fixtures', () => {
       const canon = (r: unknown) => JSON.stringify(Object.fromEntries(Object.entries(r as object).sort()))
       const sorted = (rows: unknown[]) => rows.map(canon).sort()
       for (const table of ['persons', 'health_log', 'attachments', 'notes', 'source_files'] as const)
-        expect(sorted(c.journal[table]), table).toEqual(sorted(want[table]))
+        expect(sorted(c.journal[table] ?? []), table).toEqual(sorted(want[table] ?? []))
       expect(c.journal.relationships).toEqual(want.relationships)
       expect(Object.keys(c.genomes)).toHaveLength(2)
     })

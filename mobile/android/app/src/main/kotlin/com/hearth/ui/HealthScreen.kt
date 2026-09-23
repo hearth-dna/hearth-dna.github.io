@@ -75,6 +75,7 @@ import com.hearth.data.HealthEntry
 import com.hearth.data.HealthKind
 import com.hearth.data.Person
 import com.hearth.attachments.attachmentBytes
+import com.hearth.backup.Backups
 import com.hearth.data.Repo
 import com.hearth.documents.HealthDraft
 import com.hearth.health.HealthFilter
@@ -113,7 +114,7 @@ val SortKey.labelKey: String
  */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class, ExperimentalLayoutApi::class)
 @Composable
-fun HealthScreen(repo: Repo, onlyPerson: String = "") {
+fun HealthScreen(repo: Repo, backups: Backups, onlyPerson: String = "") {
     val t = LocalStrings.current
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -173,6 +174,7 @@ fun HealthScreen(repo: Repo, onlyPerson: String = "") {
                     scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
                 ),
                 actions = {
+                    SyncAction(backups)
                     Box {
                         IconButton(onClick = { menu = true }) { Icon(Icons.Filled.MoreVert, contentDescription = null) }
                         DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {

@@ -26,28 +26,52 @@ object Egress {
 
     class HttpError(val code: Int, body: String) : IOException("the provider answered $code: ${body.take(200)}")
 
-    /** One HTTPS request to an allowed host; the body of a 2xx, else [HttpError]. Call off the main thread. */
-    fun request(method: String, url: String, headers: Map<String, String> = emptyMap(), body: ByteArray? = null): ByteArray {
+    /** What a provider answered: status, headers (lower-cased names) and body. */
+    class Response(val code: Int, val headers: Map<String, String>, val body: ByteArray) {
+        val ok get() = code in 200..299
+        fun text() = body.decodeToString()
+    }
+
+    /**
+     * One HTTPS request to an allowed host, whatever the status: the cloud drives answer "not
+     * there" and "sign in again" with statuses the caller acts on. Call off the main thread.
+     */
+    fun call(method: String, url: String, headers: Map<String, String> = emptyMap(), body: ByteArray? = null): Response {
         val u = URL(url)
         require(u.protocol == "https" && u.host in HOSTS) { "refusing to contact ${u.host}" }
         val conn = u.openConnection() as HttpURLConnection
         try {
-            conn.requestMethod = method
+            // HttpURLConnection knows no PATCH; Drive takes the override header instead.
+            if (method == "PATCH") {
+                conn.requestMethod = "POST"
+                conn.setRequestProperty("X-HTTP-Method-Override", "PATCH")
+            } else {
+                conn.requestMethod = method
+            }
             conn.connectTimeout = 15_000
             conn.readTimeout = 120_000
             conn.instanceFollowRedirects = false
+            conn.useCaches = false
             for ((k, v) in headers) conn.setRequestProperty(k, v)
             if (body != null) {
                 conn.doOutput = true
+                conn.setFixedLengthStreamingMode(body.size)
                 conn.outputStream.use { it.write(body) }
             }
             val code = conn.responseCode
             val bytes = (if (code in 200..299) conn.inputStream else conn.errorStream)?.use { it.readBytes() } ?: ByteArray(0)
-            if (code !in 200..299) throw HttpError(code, bytes.decodeToString())
-            return bytes
+            val names = conn.headerFields.keys.filterNotNull()
+            return Response(code, names.associate { it.lowercase() to (conn.getHeaderField(it) ?: "") }, bytes)
         } finally {
             conn.disconnect()
         }
+    }
+
+    /** [call] for when only success will do: the body of a 2xx, else [HttpError]. */
+    fun request(method: String, url: String, headers: Map<String, String> = emptyMap(), body: ByteArray? = null): ByteArray {
+        val r = call(method, url, headers, body)
+        if (!r.ok) throw HttpError(r.code, r.text())
+        return r.body
     }
 
     /** One page of a document: its type and bytes. */

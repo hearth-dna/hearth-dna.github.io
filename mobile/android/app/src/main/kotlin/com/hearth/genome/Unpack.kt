@@ -35,7 +35,7 @@ fun fileToText(bytes: ByteArray, fileName: String): Unpacked {
 }
 
 /** TextDecoder's defaults: UTF-8, malformed bytes replaced, a leading byte-order mark dropped. */
-fun decode(bytes: ByteArray): String = String(bytes, Charsets.UTF_8).removePrefix("﻿")
+fun decode(bytes: ByteArray): String = String(bytes, Charsets.UTF_8).removePrefix("\uFEFF")
 
 fun gunzip(bytes: ByteArray): ByteArray = GZIPInputStream(ByteArrayInputStream(bytes)).use { it.readBytes() }
 

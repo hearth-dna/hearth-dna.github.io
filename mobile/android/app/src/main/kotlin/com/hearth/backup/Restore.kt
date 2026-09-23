@@ -44,7 +44,13 @@ private val HEALTH_DEFAULTS = mapOf<String, Any?>(
 )
 
 /** [onProgress] gets an i18n key from `restore.json` and its placeholders. */
-fun restore(repo: Repo, c: Container, onProgress: (String, Map<String, Any>) -> Unit = { _, _ -> }): RestoreResult = repo.sql.transaction {
+fun restore(
+    repo: Repo,
+    c: Container,
+    onProgress: (String, Map<String, Any>) -> Unit = { _, _ -> },
+    /** Fetches a genome a folder snapshot keeps beside itself; null when the place does not have it (yet). */
+    loadGenome: (GenomeEntry) -> ByteArray? = { null },
+): RestoreResult = repo.sql.transaction {
     val sql = repo.sql
     val j = c.journal
     val hadGenotypes = sql.query("SELECT DISTINCT person_id FROM genotype").map { it.str("person_id") }.toSet()
@@ -88,7 +94,9 @@ fun restore(repo: Repo, c: Container, onProgress: (String, Map<String, Any>) -> 
     for (g in entries) {
         if (g.personId in hadGenotypes) continue
         // A folder backup keeps its genomes beside it; one not there yet loads on the next restore.
-        val gz = c.genomes[g.path] ?: continue
+        val gz = c.genomes[g.path] ?: loadGenome(g)?.also {
+            if (sha256Hex(it) != g.sha256) throw BackupException("native.damaged")
+        } ?: continue
         val text = decode(gunzip(gz))
         onProgress("restore.parsingGenome", mapOf("n" to genomes + 1, "total" to entries.size))
         val r = parseRawText(text, if (g.original) Provider.of(g.provider) else Provider.GENERIC)
@@ -126,5 +134,11 @@ private fun rows(journal: JSONObject, key: String): List<Map<String, Any?>> {
  * Any Hearth backup this app reads (restore.ts `restoreBytes`): dump v2, plain or sealed, or an
  * older dump v1. Throws [BackupException] naming the message to show.
  */
-fun restoreBytes(repo: Repo, bytes: ByteArray, passphrase: String?, onProgress: (String, Map<String, Any>) -> Unit = { _, _ -> }): RestoreResult =
-    if (isV1(bytes)) restoreV1(repo, openV1(bytes, passphrase)) else restore(repo, openContainer(bytes, passphrase), onProgress)
+fun restoreBytes(
+    repo: Repo,
+    bytes: ByteArray,
+    passphrase: String?,
+    onProgress: (String, Map<String, Any>) -> Unit = { _, _ -> },
+    loadGenome: (GenomeEntry) -> ByteArray? = { null },
+): RestoreResult =
+    if (isV1(bytes)) restoreV1(repo, openV1(bytes, passphrase)) else restore(repo, openContainer(bytes, passphrase), onProgress, loadGenome)

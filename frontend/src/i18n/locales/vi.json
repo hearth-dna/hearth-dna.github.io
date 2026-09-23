@@ -694,5 +694,12 @@
   "native.chooseFile": "Chọn tệp…",
   "native.chooseFiles": "Chọn các tệp…",
   "native.keyNotice": "Để đọc ảnh, bản quét hoặc PDF, Hearth gửi nó từ điện thoại này đến Google Gemini bằng một khóa thuộc về bạn. Bạn chỉ cần thêm khóa đó một lần.",
-  "native.keyWarning": "Hãy giữ khóa như mật khẩu: ai có nó đều có thể dùng dịch vụ của Google bằng tài khoản của bạn. Khóa chỉ được lưu trên điện thoại này, được kho khóa của điện thoại bảo vệ, và không bao giờ nằm trong bản sao lưu. Bạn có thể xóa nó bất cứ lúc nào trên cùng trang Google."
+  "native.keyWarning": "Hãy giữ khóa như mật khẩu: ai có nó đều có thể dùng dịch vụ của Google bằng tài khoản của bạn. Khóa chỉ được lưu trên điện thoại này, được kho khóa của điện thoại bảo vệ, và không bao giờ nằm trong bản sao lưu. Bạn có thể xóa nó bất cứ lúc nào trên cùng trang Google.",
+  "native.fullDumpIntro": "Mọi thứ: người, cây phả hệ, các tệp bộ gen gốc, sự đồng ý, nhật ký sức khỏe, ghi chú, trò chuyện, nhật ký chia sẻ. Một tệp .hearth; thêm cụm mật khẩu để mã hóa bằng AES-GCM. Hearth không giữ bản sao ở đâu cả. Nhập chấp nhận tệp .hearth và các bản kết xuất .json.gz cũ.",
+  "native.providerRefuses": "Nhà cung cấp này không cho ứng dụng khác ghi vào đây; hãy chọn nơi khác.",
+  "native.keepFiles": "Giữ tệp",
+  "native.driveDefault": "Dùng thư mục Hearth trong Drive của tôi",
+  "native.saved": "Đã lưu {name}: {rows} hàng, {mb} MB.",
+  "native.documentReadingIntro": "Không bắt buộc. Cho phép \"Đọc tài liệu\" gửi ảnh, bản quét hoặc PDF trực tiếp từ điện thoại này đến Google Gemini để chép lại. Khóa chỉ được lưu trên điện thoại này, được kho khóa bảo vệ, và không bao giờ nằm trong bản sao lưu. Không có gì được gửi cho đến khi bạn xác nhận từng tài liệu.",
+  "native.eraseIntro": "Xóa khỏi điện thoại này mọi người, kiểu gen, sự đồng ý, ghi chú và nhật ký. Hearth không giữ bản sao ở đâu cả, nên sau đó không khôi phục được gì trừ khi bạn đã xuất bản kết xuất."
 }

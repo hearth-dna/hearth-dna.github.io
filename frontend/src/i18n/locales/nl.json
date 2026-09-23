@@ -694,5 +694,12 @@
   "native.chooseFile": "Bestand kiezen…",
   "native.chooseFiles": "Bestanden kiezen…",
   "native.keyNotice": "Om een foto, scan of pdf te lezen, stuurt Hearth die vanaf deze telefoon naar Google Gemini met een sleutel die van jou is. Die sleutel voeg je één keer toe.",
-  "native.keyWarning": "Behandel de sleutel als een wachtwoord: wie hem heeft, kan de dienst van Google op jouw account gebruiken. Hij wordt alleen op deze telefoon bewaard, beveiligd door de sleutelopslag van de telefoon, en nooit in back-ups opgenomen. Je kunt hem altijd verwijderen op dezelfde Google-pagina."
+  "native.keyWarning": "Behandel de sleutel als een wachtwoord: wie hem heeft, kan de dienst van Google op jouw account gebruiken. Hij wordt alleen op deze telefoon bewaard, beveiligd door de sleutelopslag van de telefoon, en nooit in back-ups opgenomen. Je kunt hem altijd verwijderen op dezelfde Google-pagina.",
+  "native.fullDumpIntro": "Alles: personen, stamboom, de originele genoombestanden, toestemmingen, gezondheidslogboek, notities, chats, deellogboek. Eén .hearth-bestand; voeg een wachtwoordzin toe om het met AES-GCM te versleutelen. Hearth bewaart nergens een kopie. Importeren accepteert .hearth-bestanden en oudere .json.gz-dumps.",
+  "native.providerRefuses": "Deze aanbieder laat andere apps hier niet schrijven; kies een andere plek.",
+  "native.keepFiles": "Bestanden bewaren",
+  "native.driveDefault": "Een Hearth-map in Mijn Drive gebruiken",
+  "native.saved": "{name} opgeslagen: {rows} rijen, {mb} MB.",
+  "native.documentReadingIntro": "Optioneel. Hiermee stuurt \"Document lezen\" een foto, scan of pdf rechtstreeks van deze telefoon naar Google Gemini om te laten uitschrijven. De sleutel staat alleen op deze telefoon, beveiligd door de sleutelopslag, en zit nooit in een back-up. Er wordt niets verstuurd voordat je elk document bevestigt.",
+  "native.eraseIntro": "Verwijdert alle personen, genotypen, toestemmingen, notities en logboeken van deze telefoon. Hearth bewaart nergens een kopie, dus daarna valt er niets terug te halen, tenzij je een dump hebt geëxporteerd."
 }

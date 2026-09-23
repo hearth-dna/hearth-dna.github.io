@@ -694,5 +694,12 @@
   "native.chooseFile": "Escolher ficheiro…",
   "native.chooseFiles": "Escolher ficheiros…",
   "native.keyNotice": "Para ler uma fotografia, digitalização ou PDF, o Hearth envia-o deste telemóvel para o Google Gemini com uma chave que lhe pertence. Tem de adicionar essa chave uma vez.",
-  "native.keyWarning": "Trate a chave como uma palavra-passe: quem a tiver pode usar o serviço da Google na sua conta. Fica guardada apenas neste telemóvel, protegida pelo cofre de chaves do telemóvel, e nunca é incluída nas cópias de segurança. Pode apagá-la a qualquer momento na mesma página da Google."
+  "native.keyWarning": "Trate a chave como uma palavra-passe: quem a tiver pode usar o serviço da Google na sua conta. Fica guardada apenas neste telemóvel, protegida pelo cofre de chaves do telemóvel, e nunca é incluída nas cópias de segurança. Pode apagá-la a qualquer momento na mesma página da Google.",
+  "native.fullDumpIntro": "Tudo: pessoas, árvore genealógica, os ficheiros de genoma originais, consentimentos, registo de saúde, notas, conversas, registo de partilhas. Um único ficheiro .hearth; adicione uma frase-passe para o cifrar com AES-GCM. O Hearth não guarda cópia em lado nenhum. A importação aceita ficheiros .hearth e exportações .json.gz antigas.",
+  "native.providerRefuses": "Este fornecedor não deixa outras apps escreverem aqui; escolha outro local.",
+  "native.keepFiles": "Manter ficheiros",
+  "native.driveDefault": "Usar uma pasta Hearth em O meu disco",
+  "native.saved": "{name} guardado: {rows} linhas, {mb} MB.",
+  "native.documentReadingIntro": "Opcional. Permite que «Ler um documento» envie uma fotografia, digitalização ou PDF diretamente deste telemóvel para o Google Gemini para transcrição. A chave fica apenas neste telemóvel, protegida pelo cofre de chaves, e nunca faz parte de uma cópia de segurança. Nada é enviado antes de confirmar cada documento.",
+  "native.eraseIntro": "Apaga deste telemóvel todas as pessoas, genótipos, consentimentos, notas e registos. O Hearth não guarda cópia em lado nenhum, por isso depois não há nada a recuperar, a menos que tenha exportado uma cópia."
 }

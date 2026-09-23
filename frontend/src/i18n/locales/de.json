@@ -694,5 +694,12 @@
   "native.chooseFile": "Datei auswählen…",
   "native.chooseFiles": "Dateien auswählen…",
   "native.keyNotice": "Um ein Foto, einen Scan oder ein PDF zu lesen, sendet Hearth es von diesem Telefon an Google Gemini – mit einem Schlüssel, der Ihnen gehört. Diesen Schlüssel müssen Sie einmal hinzufügen.",
-  "native.keyWarning": "Behandeln Sie den Schlüssel wie ein Passwort: Wer ihn hat, kann den Google-Dienst über Ihr Konto nutzen. Er wird nur auf diesem Telefon gespeichert, durch den Schlüsselspeicher des Telefons geschützt, und nie in Backups aufgenommen. Sie können ihn jederzeit auf derselben Google-Seite löschen."
+  "native.keyWarning": "Behandeln Sie den Schlüssel wie ein Passwort: Wer ihn hat, kann den Google-Dienst über Ihr Konto nutzen. Er wird nur auf diesem Telefon gespeichert, durch den Schlüsselspeicher des Telefons geschützt, und nie in Backups aufgenommen. Sie können ihn jederzeit auf derselben Google-Seite löschen.",
+  "native.fullDumpIntro": "Alles: Personen, Stammbaum, die Original-Genomdateien, Einwilligungen, Gesundheitsprotokoll, Notizen, Chats, Weitergabeprotokoll. Eine .hearth-Datei; mit einer Passphrase wird sie mit AES-GCM verschlüsselt. Hearth behält nirgends eine Kopie. Der Import akzeptiert .hearth-Dateien und ältere .json.gz-Dumps.",
+  "native.providerRefuses": "Dieser Anbieter lässt andere Apps hier nicht schreiben; wählen Sie einen anderen Ort.",
+  "native.keepFiles": "Dateien behalten",
+  "native.driveDefault": "Einen Hearth-Ordner in „Meine Ablage“ verwenden",
+  "native.saved": "{name} gespeichert: {rows} Zeilen, {mb} MB.",
+  "native.documentReadingIntro": "Optional. „Dokument lesen“ sendet damit ein Foto, einen Scan oder ein PDF direkt von diesem Telefon zur Transkription an Google Gemini. Der Schlüssel wird nur auf diesem Telefon gespeichert, durch dessen Schlüsselspeicher geschützt, und ist nie Teil eines Backups. Nichts wird gesendet, bevor Sie jedes Dokument bestätigen.",
+  "native.eraseIntro": "Löscht alle Personen, Genotypen, Einwilligungen, Notizen und Protokolle von diesem Telefon. Hearth behält nirgends eine Kopie; ohne vorher exportierten Dump lässt sich danach nichts wiederherstellen."
 }

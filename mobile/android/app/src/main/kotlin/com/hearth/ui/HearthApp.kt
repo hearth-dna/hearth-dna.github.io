@@ -1,5 +1,6 @@
 package com.hearth.ui
 
+import android.content.Context
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -18,6 +19,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
@@ -32,6 +34,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -45,6 +48,14 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.hearth.Cloud
+import com.hearth.backup.Backups
+import com.hearth.i18n.LANGUAGES
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -75,18 +86,32 @@ fun String.cap(): String = replaceFirstChar { it.titlecase() }
  * writes go to the app's own database on the IO dispatcher; the screens only ever see lists.
  */
 @Composable
-fun HearthApp() {
+fun HearthApp(cloud: Cloud? = null) {
     val context = LocalContext.current
-    val strings = remember { Strings.load(context) }
+    val prefs = remember { context.getSharedPreferences("hearth.native", Context.MODE_PRIVATE) }
+    var language by remember { mutableStateOf(prefs.getString("language", null)) }
+    val strings = remember(language) { Strings.load(context, language) }
     val repo = remember { Repo(Db.get(context), Blobs(File(context.filesDir, "blobs"))) }
+    val backups = remember { Backups(context.applicationContext, repo, cloud) }
     var consented by remember { mutableStateOf<Boolean?>(null) }
     LaunchedEffect(Unit) { consented = withContext(Dispatchers.IO) { repo.hasConsent(ConsentKind.FIRST_LAUNCH) } }
+    // Back in the foreground: another device may have written to the backup meanwhile.
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
+    DisposableEffect(lifecycle) {
+        val observer = LifecycleEventObserver { _, e -> if (e == Lifecycle.Event.ON_RESUME) backups.refreshSoon() }
+        lifecycle.addObserver(observer)
+        onDispose { lifecycle.removeObserver(observer) }
+    }
+    val rtl = LANGUAGES.firstOrNull { it.code == strings.language }?.rtl ?: false
 
-    CompositionLocalProvider(LocalStrings provides strings) {
+    CompositionLocalProvider(LocalStrings provides strings, LocalLayoutDirection provides if (rtl) LayoutDirection.Rtl else LayoutDirection.Ltr) {
         when (consented) {
             null -> Unit
             false -> FirstLaunch { withContext(Dispatchers.IO) { repo.grantConsent(ConsentKind.FIRST_LAUNCH) }; consented = true }
-            true -> Tabs(repo)
+            true -> Tabs(repo, backups, cloud, strings.language, onLanguage = { code ->
+                prefs.edit().putString("language", code).apply()
+                language = code
+            }) { consented = false }
         }
     }
 }
@@ -97,10 +122,11 @@ private enum class Tab(val labelKey: String) {
     FAMILY("app.tabFamily"),
     HEALTH("app.navHealth"),
     ASK("app.navAsk"),
+    SETTINGS("app.tabSettings"),
 }
 
 @Composable
-private fun Tabs(repo: Repo) {
+private fun Tabs(repo: Repo, backups: Backups, cloud: Cloud?, language: String, onLanguage: (String) -> Unit, onErased: () -> Unit) {
     val t = LocalStrings.current
     val context = LocalContext.current
     val kb = remember { Kb.parse(context.assets.open("kb.json").use { it.readBytes().decodeToString() }) }
@@ -132,10 +158,11 @@ private fun Tabs(repo: Repo) {
                     open = null
                     tab = Tab.HEALTH
                 }
-                tab == Tab.PEOPLE -> PeopleScreen(repo, onOpen = { open = it })
+                tab == Tab.PEOPLE -> PeopleScreen(repo, backups, onOpen = { open = it })
                 tab == Tab.FAMILY -> FamilyScreen(repo, kb)
-                tab == Tab.HEALTH -> HealthScreen(repo, healthScope)
+                tab == Tab.HEALTH -> HealthScreen(repo, backups, healthScope)
                 tab == Tab.ASK -> AskScreen(repo, kb)
+                tab == Tab.SETTINGS -> SettingsScreen(repo, kb, backups, cloud, language, onLanguage, onErased)
             }
         }
     }
@@ -146,6 +173,7 @@ private val Tab.icon
         Tab.PEOPLE -> HearthIcons.Group
         Tab.FAMILY -> Icons.Filled.Search
         Tab.ASK -> HearthIcons.Chat
+        Tab.SETTINGS -> Icons.Filled.Settings
         Tab.HEALTH -> Icons.Filled.FavoriteBorder
     }
 

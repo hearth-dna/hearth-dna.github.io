@@ -14,5 +14,12 @@
   "native.chooseFile": "Choose file…",
   "native.chooseFiles": "Choose files…",
   "native.keyNotice": "To read a photo, scan or PDF, Hearth sends it from this phone to Google Gemini using a key that belongs to you. You need to add that key once.",
-  "native.keyWarning": "Treat the key like a password: anyone who has it can use Google's service on your account. It is stored only on this phone, locked by the phone's keystore, and never included in backups. You can delete it at any time from the same Google page."
+  "native.keyWarning": "Treat the key like a password: anyone who has it can use Google's service on your account. It is stored only on this phone, locked by the phone's keystore, and never included in backups. You can delete it at any time from the same Google page.",
+  "native.fullDumpIntro": "Everything: people, pedigree, the original genome files, consents, health log, notes, chats, sharing log. One .hearth file; add a passphrase to encrypt it with AES-GCM. Hearth keeps no copy anywhere. Import accepts .hearth files and older .json.gz dumps.",
+  "native.providerRefuses": "This provider does not let other apps write here; pick another place.",
+  "native.keepFiles": "Keep files",
+  "native.driveDefault": "Use a Hearth folder in My Drive",
+  "native.saved": "Saved {name}: {rows} rows, {mb} MB.",
+  "native.documentReadingIntro": "Optional. Lets \"Read a document\" send a photo, scan or PDF straight from this phone to Google Gemini for transcription. The key is kept only on this phone, locked by its keystore, and is never part of a backup. Nothing is sent until you confirm each document.",
+  "native.eraseIntro": "Deletes all people, genotypes, consents, notes and logs from this phone. Hearth keeps no copy anywhere, so there is nothing to recover afterwards unless you exported a dump."
 }

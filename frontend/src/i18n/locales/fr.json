@@ -694,5 +694,12 @@
   "native.chooseFile": "Choisir un fichier…",
   "native.chooseFiles": "Choisir des fichiers…",
   "native.keyNotice": "Pour lire une photo, un scan ou un PDF, Hearth l’envoie depuis ce téléphone à Google Gemini avec une clé qui vous appartient. Vous devez ajouter cette clé une fois.",
-  "native.keyWarning": "Traitez la clé comme un mot de passe : quiconque la possède peut utiliser le service de Google avec votre compte. Elle est stockée uniquement sur ce téléphone, protégée par le trousseau du téléphone, et n’est jamais incluse dans les sauvegardes. Vous pouvez la supprimer à tout moment depuis la même page Google."
+  "native.keyWarning": "Traitez la clé comme un mot de passe : quiconque la possède peut utiliser le service de Google avec votre compte. Elle est stockée uniquement sur ce téléphone, protégée par le trousseau du téléphone, et n’est jamais incluse dans les sauvegardes. Vous pouvez la supprimer à tout moment depuis la même page Google.",
+  "native.fullDumpIntro": "Tout : les personnes, l’arbre généalogique, les fichiers de génome d’origine, les consentements, le journal de santé, les notes, les discussions, le journal de partage. Un seul fichier .hearth ; ajoutez une phrase secrète pour le chiffrer en AES-GCM. Hearth ne garde aucune copie nulle part. L’import accepte les fichiers .hearth et les anciens exports .json.gz.",
+  "native.providerRefuses": "Ce fournisseur ne laisse pas les autres applications écrire ici ; choisissez un autre emplacement.",
+  "native.keepFiles": "Garder les fichiers",
+  "native.driveDefault": "Utiliser un dossier Hearth dans Mon Drive",
+  "native.saved": "{name} enregistré : {rows} lignes, {mb} Mo.",
+  "native.documentReadingIntro": "Facultatif. Permet à « Lire un document » d’envoyer une photo, un scan ou un PDF directement depuis ce téléphone à Google Gemini pour transcription. La clé n’est conservée que sur ce téléphone, protégée par son trousseau, et ne fait jamais partie d’une sauvegarde. Rien n’est envoyé avant que vous confirmiez chaque document.",
+  "native.eraseIntro": "Supprime de ce téléphone toutes les personnes, génotypes, consentements, notes et journaux. Hearth ne garde aucune copie nulle part : rien ne pourra être récupéré ensuite, sauf si vous avez exporté une sauvegarde."
 }

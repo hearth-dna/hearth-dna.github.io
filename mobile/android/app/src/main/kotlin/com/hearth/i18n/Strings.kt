@@ -9,6 +9,17 @@ import java.util.Locale
  * en.json holds every key, <code>.json each translation. Same rules as the web's translate():
  * missing keys fall back to English, then to the key itself, and `{name}` is interpolated.
  */
+/** The 20 UI languages (languages.ts), by endonym; `rtl` for right-to-left scripts. */
+data class Language(val code: String, val name: String, val rtl: Boolean = false)
+
+val LANGUAGES = listOf(
+    Language("en", "English"), Language("zh", "中文（简体）"), Language("hi", "हिन्दी"), Language("es", "Español"),
+    Language("ar", "العربية", rtl = true), Language("fr", "Français"), Language("bn", "বাংলা"), Language("pt", "Português"),
+    Language("ru", "Русский"), Language("ur", "اردو", rtl = true), Language("id", "Bahasa Indonesia"), Language("de", "Deutsch"),
+    Language("ja", "日本語"), Language("tr", "Türkçe"), Language("ko", "한국어"), Language("vi", "Tiếng Việt"),
+    Language("it", "Italiano"), Language("pl", "Polski"), Language("uk", "Українська"), Language("nl", "Nederlands"),
+)
+
 class Strings(private val dict: Map<String, String>, private val en: Map<String, String>, val language: String) {
 
     /** For formatting dates and numbers in the chosen language. */
@@ -18,13 +29,17 @@ class Strings(private val dict: Map<String, String>, private val en: Map<String,
         interpolate(dict[key] ?: en[key] ?: key, params.toMap())
 
     companion object {
-        /** The phone's first preferred language that ships, matched on the primary subtag. */
-        fun load(context: Context): Strings {
+        /**
+         * [chosen] when the user picked a language in Settings, else the phone's first preferred
+         * language that ships, matched on the primary subtag.
+         */
+        fun load(context: Context, chosen: String? = null): Strings {
             val shipped = context.assets.list("i18n").orEmpty().map { it.removeSuffix(".json") }.toSet()
             val locales = context.resources.configuration.locales
             // Android still reports Indonesian by its legacy ISO 639 code.
-            val lang = (0 until locales.size()).map { locales[it].language.replace(Regex("^in$"), "id") }
-                .firstOrNull { it in shipped } ?: "en"
+            val lang = chosen?.takeIf { it in shipped }
+                ?: (0 until locales.size()).map { locales[it].language.replace(Regex("^in$"), "id") }.firstOrNull { it in shipped }
+                ?: "en"
             fun read(code: String): Map<String, String> =
                 if (code !in shipped) emptyMap()
                 else parse(context.assets.open("i18n/$code.json").bufferedReader().use { it.readText() })

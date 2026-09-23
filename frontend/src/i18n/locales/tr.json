@@ -694,5 +694,12 @@
   "native.chooseFile": "Dosya seç…",
   "native.chooseFiles": "Dosyaları seç…",
   "native.keyNotice": "Bir fotoğrafı, taramayı veya PDF’i okumak için Hearth onu bu telefondan size ait bir anahtarla Google Gemini’ye gönderir. Bu anahtarı bir kez eklemeniz gerekir.",
-  "native.keyWarning": "Anahtara parola gibi davranın: ona sahip olan herkes Google hizmetini sizin hesabınızla kullanabilir. Yalnızca bu telefonda, telefonun anahtar deposuyla korunarak saklanır ve yedeklere hiçbir zaman dahil edilmez. Aynı Google sayfasından istediğiniz zaman silebilirsiniz."
+  "native.keyWarning": "Anahtara parola gibi davranın: ona sahip olan herkes Google hizmetini sizin hesabınızla kullanabilir. Yalnızca bu telefonda, telefonun anahtar deposuyla korunarak saklanır ve yedeklere hiçbir zaman dahil edilmez. Aynı Google sayfasından istediğiniz zaman silebilirsiniz.",
+  "native.fullDumpIntro": "Her şey: kişiler, soy ağacı, özgün genom dosyaları, onaylar, sağlık günlüğü, notlar, sohbetler, paylaşım günlüğü. Tek bir .hearth dosyası; AES-GCM ile şifrelemek için bir parola ifadesi ekleyin. Hearth hiçbir yerde kopya tutmaz. İçe aktarma .hearth dosyalarını ve eski .json.gz dökümlerini kabul eder.",
+  "native.providerRefuses": "Bu sağlayıcı diğer uygulamaların buraya yazmasına izin vermiyor; başka bir yer seçin.",
+  "native.keepFiles": "Dosyaları sakla",
+  "native.driveDefault": "Drive’ım’da bir Hearth klasörü kullan",
+  "native.saved": "{name} kaydedildi: {rows} satır, {mb} MB.",
+  "native.documentReadingIntro": "İsteğe bağlı. \"Belge oku\" ile bir fotoğraf, tarama veya PDF doğrudan bu telefondan yazıya dökülmek üzere Google Gemini’ye gönderilir. Anahtar yalnızca bu telefonda, anahtar deposuyla korunarak saklanır ve hiçbir zaman bir yedeğin parçası olmaz. Her belgeyi onaylayana kadar hiçbir şey gönderilmez.",
+  "native.eraseIntro": "Bu telefondan tüm kişileri, genotipleri, onayları, notları ve günlükleri siler. Hearth hiçbir yerde kopya tutmaz; bir döküm dışa aktarmadıysanız sonradan kurtarılacak bir şey kalmaz."
 }

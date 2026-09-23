@@ -694,5 +694,12 @@
   "native.chooseFile": "Elegir archivo…",
   "native.chooseFiles": "Elegir archivos…",
   "native.keyNotice": "Para leer una foto, un escaneo o un PDF, Hearth lo envía desde este teléfono a Google Gemini con una clave que te pertenece. Tienes que añadir esa clave una vez.",
-  "native.keyWarning": "Trata la clave como una contraseña: quien la tenga puede usar el servicio de Google con tu cuenta. Se guarda solo en este teléfono, protegida por el almacén de claves del teléfono, y nunca se incluye en las copias de seguridad. Puedes eliminarla cuando quieras desde la misma página de Google."
+  "native.keyWarning": "Trata la clave como una contraseña: quien la tenga puede usar el servicio de Google con tu cuenta. Se guarda solo en este teléfono, protegida por el almacén de claves del teléfono, y nunca se incluye en las copias de seguridad. Puedes eliminarla cuando quieras desde la misma página de Google.",
+  "native.fullDumpIntro": "Todo: personas, árbol genealógico, los archivos de genoma originales, consentimientos, registro de salud, notas, chats, registro de compartidos. Un único archivo .hearth; añade una contraseña para cifrarlo con AES-GCM. Hearth no guarda ninguna copia en ningún sitio. La importación acepta archivos .hearth y volcados .json.gz antiguos.",
+  "native.providerRefuses": "Este proveedor no deja que otras apps escriban aquí; elige otro lugar.",
+  "native.keepFiles": "Conservar archivos",
+  "native.driveDefault": "Usar una carpeta Hearth en Mi unidad",
+  "native.saved": "{name} guardado: {rows} filas, {mb} MB.",
+  "native.documentReadingIntro": "Opcional. Permite que «Leer un documento» envíe una foto, un escaneo o un PDF directamente desde este teléfono a Google Gemini para transcribirlo. La clave solo se guarda en este teléfono, protegida por su almacén de claves, y nunca forma parte de una copia de seguridad. No se envía nada hasta que confirmes cada documento.",
+  "native.eraseIntro": "Borra de este teléfono todas las personas, genotipos, consentimientos, notas y registros. Hearth no guarda ninguna copia en ningún sitio, así que después no hay nada que recuperar salvo que hayas exportado un volcado."
 }

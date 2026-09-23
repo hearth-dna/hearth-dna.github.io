@@ -694,5 +694,12 @@
   "native.chooseFile": "Wybierz plik…",
   "native.chooseFiles": "Wybierz pliki…",
   "native.keyNotice": "Aby odczytać zdjęcie, skan lub PDF, Hearth wysyła go z tego telefonu do Google Gemini za pomocą Twojego własnego klucza. Klucz trzeba dodać raz.",
-  "native.keyWarning": "Traktuj klucz jak hasło: każdy, kto go ma, może korzystać z usługi Google na Twoim koncie. Jest przechowywany tylko na tym telefonie, chroniony magazynem kluczy telefonu, i nigdy nie trafia do kopii zapasowych. Możesz go w każdej chwili usunąć na tej samej stronie Google."
+  "native.keyWarning": "Traktuj klucz jak hasło: każdy, kto go ma, może korzystać z usługi Google na Twoim koncie. Jest przechowywany tylko na tym telefonie, chroniony magazynem kluczy telefonu, i nigdy nie trafia do kopii zapasowych. Możesz go w każdej chwili usunąć na tej samej stronie Google.",
+  "native.fullDumpIntro": "Wszystko: osoby, drzewo rodowe, oryginalne pliki genomu, zgody, dziennik zdrowia, notatki, czaty, dziennik udostępnień. Jeden plik .hearth; dodaj hasło, aby zaszyfrować go AES-GCM. Hearth nigdzie nie przechowuje kopii. Import przyjmuje pliki .hearth i starsze zrzuty .json.gz.",
+  "native.providerRefuses": "Ten dostawca nie pozwala innym aplikacjom tu zapisywać; wybierz inne miejsce.",
+  "native.keepFiles": "Zachowaj pliki",
+  "native.driveDefault": "Użyj folderu Hearth na Moim dysku",
+  "native.saved": "Zapisano {name}: {rows} wierszy, {mb} MB.",
+  "native.documentReadingIntro": "Opcjonalne. Pozwala funkcji „Odczytaj dokument” wysłać zdjęcie, skan lub PDF prosto z tego telefonu do Google Gemini do transkrypcji. Klucz jest przechowywany tylko na tym telefonie, chroniony jego magazynem kluczy, i nigdy nie trafia do kopii zapasowej. Nic nie jest wysyłane, dopóki nie potwierdzisz każdego dokumentu.",
+  "native.eraseIntro": "Usuwa z tego telefonu wszystkie osoby, genotypy, zgody, notatki i dzienniki. Hearth nigdzie nie przechowuje kopii, więc potem nie da się niczego odzyskać, chyba że wyeksportowano zrzut."
 }

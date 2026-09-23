@@ -336,6 +336,50 @@ class Repo(val sql: Sql, val blobs: Blobs) {
         }
     }
 
+    data class ConsentRecord(val kind: String, val version: Int, val subject: String, val grantedAt: String)
+
+    fun listConsents(): List<ConsentRecord> = sql.query("SELECT kind, version, subject, granted_at FROM consent ORDER BY id DESC").map {
+        ConsentRecord(it.str("kind"), it.long("version")?.toInt() ?: 0, it.str("subject"), it.str("granted_at"))
+    }
+
+    /**
+     * Revoking is deletion (consent.ts `revokeConsent`): the record goes, and so does what it
+     * covered. A genome consent takes the person's genotypes and source files; the document
+     * consent their health log and its documents; the provider consent the Gemini key, which the
+     * caller removes from the keystore. The person, their notes and the pedigree stay.
+     */
+    fun revokeConsent(kind: String, subject: String) {
+        sql.transaction {
+            val mark = totalChanges()
+            if (kind == "import_document") sql.exec("DELETE FROM health_log WHERE person_id=?", listOf(subject))
+            if (kind == "import_genome" || kind == "import_minor") {
+                sql.exec("DELETE FROM genotype WHERE person_id=?", listOf(subject))
+                sql.exec("DELETE FROM source_file WHERE person_id=?", listOf(subject))
+                sql.exec("DELETE FROM consent WHERE kind IN ('import_genome','import_minor') AND subject=?", listOf(subject))
+            } else {
+                sql.exec("DELETE FROM consent WHERE kind=? AND subject=?", listOf(kind, subject))
+            }
+            touch(genotypes = true, since = mark)
+        }
+        pruneBlobs()
+    }
+
+    data class Shared(val id: Long, val kind: String, val destination: String, val payload: String, val createdAt: String)
+
+    fun listSharing(): List<Shared> = sql.query("SELECT * FROM sharing_log ORDER BY id DESC LIMIT 200").map {
+        Shared(it.long("id") ?: 0, it.str("kind"), it.str("destination"), it.str("payload"), it.str("created_at"))
+    }
+
+    /** Everything the user put in, gone; the device id and schema version stay (repo.ts `eraseEverything`). */
+    fun eraseEverything() {
+        sql.transaction {
+            for (t in listOf("sharing_log", "chat", "note", "consent", "attachment", "health_log", "genotype", "source_file", "relationship", "person")) sql.exec("DELETE FROM $t")
+            sql.exec("DELETE FROM meta WHERE key NOT IN ('schema_version', 'device')")
+            sql.exec("INSERT OR IGNORE INTO meta(key, value) VALUES ('generation', '0')")
+        }
+        pruneBlobs()
+    }
+
     /** Merges a backup into this database (see [com.hearth.backup.restore]). */
     fun restore(c: Container, onProgress: (String, Map<String, Any>) -> Unit = { _, _ -> }): RestoreResult =
         com.hearth.backup.restore(this, c, onProgress)
@@ -351,7 +395,11 @@ class Repo(val sql: Sql, val blobs: Blobs) {
         if (!changed) return
         sql.exec("INSERT INTO meta(key, value) VALUES ('generation', '1') ON CONFLICT(key) DO UPDATE SET value = CAST(value AS INTEGER) + 1")
         if (genotypes) sql.exec("DELETE FROM meta WHERE key = 'genotype_counts'")
+        onChange?.invoke()
     }
+
+    /** Called after every write that changed user data (db.ts `onChange`): the backup schedules itself on it. */
+    @Volatile var onChange: (() -> Unit)? = null
 
     internal fun totalChanges(): Long = sql.query("SELECT total_changes() AS n").first().long("n") ?: 0
 

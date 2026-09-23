@@ -111,7 +111,7 @@ rs3131972	1	752721	GA"""
     }
 
     @Test fun `unpacks zip, gzip and plain text the way the browser does`() {
-        val text = "﻿$ttm\n"
+        val text = "\uFEFF$ttm\n"
         val zip = ByteArrayOutputStream().also { out ->
             ZipOutputStream(out).use { z ->
                 z.putNextEntry(ZipEntry("__MACOSX/._big.txt")); z.write(ByteArray(10_000)); z.closeEntry()
