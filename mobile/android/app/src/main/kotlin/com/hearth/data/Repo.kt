@@ -393,7 +393,10 @@ class Repo(val sql: Sql, val blobs: Blobs) {
     internal fun touch(genotypes: Boolean = false, since: Long? = null) {
         val changed = if (since != null) totalChanges() > since else (sql.query("SELECT changes() AS n").first().long("n") ?: 0) > 0
         if (!changed) return
-        sql.exec("INSERT INTO meta(key, value) VALUES ('generation', '1') ON CONFLICT(key) DO UPDATE SET value = CAST(value AS INTEGER) + 1")
+        // Some Android 10 devices ship SQLite without UPSERT support. Both statements run
+        // inside the caller's write transaction, including when the counter is missing.
+        sql.exec("INSERT OR IGNORE INTO meta(key, value) VALUES ('generation', '0')")
+        sql.exec("UPDATE meta SET value = CAST(value AS INTEGER) + 1 WHERE key = 'generation'")
         if (genotypes) sql.exec("DELETE FROM meta WHERE key = 'genotype_counts'")
         onChange?.invoke()
     }

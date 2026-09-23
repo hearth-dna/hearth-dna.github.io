@@ -68,6 +68,17 @@ class RepoTest {
         assertEquals((g.toString().toInt() + 2).toString(), generation())
     }
 
+    @Test fun `consent recreates a missing generation counter and increments it on later writes`() {
+        sql.exec("DELETE FROM meta WHERE key='generation'")
+        repo.grantConsent(ConsentKind.FIRST_LAUNCH)
+        assertTrue(repo.hasConsent(ConsentKind.FIRST_LAUNCH))
+        assertEquals("1", generation())
+        repo.grantConsent(ConsentKind.FIRST_LAUNCH)
+        assertEquals("1", generation())
+        repo.grantConsent(ConsentKind.IMPORT_DOCUMENT, "p")
+        assertEquals("2", generation())
+    }
+
     @Test fun `records a consent once, at the current version`() {
         assertFalse(repo.hasConsent(ConsentKind.IMPORT_DOCUMENT, "p"))
         repo.grantConsent(ConsentKind.IMPORT_DOCUMENT, "p")
