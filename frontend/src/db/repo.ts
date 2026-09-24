@@ -1,5 +1,5 @@
 import { formatTags, normTime, parseTags } from '../health/log'
-import type { Call, HealthEntry, HealthKind, Person, Provider, Sex, SourceFile } from '../types'
+import type { BodySide, Call, HealthEntry, HealthKind, Person, Provider, Sex, SourceFile } from '../types'
 import type { Database, Row } from './db'
 
 export function newId(): string {
@@ -305,6 +305,7 @@ function rowToHealthEntry(r: Row): HealthEntry {
     body: r.body as string,
     source: r.source as string,
     bodyPart: r.body_part as string,
+    side: ((r.side as string) ?? '') as BodySide,
     severity: (r.severity as number | null) ?? null,
     tags: parseTags(r.tags as string),
     value: (r.value as number | null) ?? null,
@@ -325,6 +326,7 @@ export async function addHealthEntry(
     body: string
     source?: string
     bodyPart?: string
+    side?: BodySide
     severity?: number | null
     tags?: string[]
     value?: number | null
@@ -338,6 +340,7 @@ export async function addHealthEntry(
     time: '',
     source: '',
     bodyPart: '',
+    side: '',
     severity: null,
     tags: [],
     value: null,
@@ -346,11 +349,12 @@ export async function addHealthEntry(
     ...e,
   }
   entry.bodyPart = entry.bodyPart.trim().toLowerCase()
+  if (!entry.bodyPart) entry.side = ''
   entry.tags = parseTags(formatTags(entry.tags))
   entry.unit = entry.unit.trim()
   entry.time = normTime(entry.time)
   await db.exec(
-    'INSERT INTO health_log(id,person_id,date,time,kind,title,body,source,body_part,severity,tags,value,value2,unit,created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+    'INSERT INTO health_log(id,person_id,date,time,kind,title,body,source,body_part,side,severity,tags,value,value2,unit,created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
     [
       entry.id,
       entry.personId,
@@ -361,6 +365,7 @@ export async function addHealthEntry(
       entry.body,
       entry.source,
       entry.bodyPart,
+      entry.side,
       entry.severity,
       formatTags(entry.tags),
       entry.value,

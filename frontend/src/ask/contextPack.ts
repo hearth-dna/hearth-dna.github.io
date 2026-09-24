@@ -1,4 +1,4 @@
-import { describeEntry, formatTags, formatValue, when } from '../health/log'
+import { describeEntry, formatTags, formatValue, when, where } from '../health/log'
 import type { Finding } from '../kb/kb'
 import type { Call, HealthEntry, Person } from '../types'
 import { ASSISTANT_INSTRUCTIONS, type PromptTemplate } from './prompts'
@@ -155,7 +155,7 @@ function compactPerson(pp: PackPerson, lines: string[]) {
     }
     const value = formatValue(h)
     const extra = [
-      h.bodyPart,
+      where(h),
       h.severity === null ? '' : `severity ${h.severity}/10`,
       formatTags(h.tags),
     ].filter(Boolean)

@@ -34,6 +34,12 @@ export function formatValue(e: Pick<HealthEntry, 'value' | 'value2' | 'unit'>): 
   return e.unit ? `${n} ${e.unit}` : n
 }
 
+/** Body part with its side: `knees`, `knees, left`, `knees, both sides`. */
+export function where(e: Pick<HealthEntry, 'bodyPart' | 'side'>): string {
+  if (!e.bodyPart || !e.side) return e.bodyPart
+  return `${e.bodyPart}, ${e.side === 'both' ? 'both sides' : e.side}`
+}
+
 /**
  * The entry on one line, as shown in the log and in the Ask context pack:
  * `2026-09-14 · Symptom · Pain in both hands (hands; severity 6/10; arthritis)`,
@@ -41,11 +47,9 @@ export function formatValue(e: Pick<HealthEntry, 'value' | 'value2' | 'unit'>): 
  */
 export function describeEntry(e: HealthEntry): string {
   const value = formatValue(e)
-  const extra = [
-    e.bodyPart,
-    e.severity === null ? '' : `severity ${e.severity}/10`,
-    formatTags(e.tags),
-  ].filter(Boolean)
+  const extra = [where(e), e.severity === null ? '' : `severity ${e.severity}/10`, formatTags(e.tags)].filter(
+    Boolean,
+  )
   return `${when(e)} · ${HEALTH_KIND_LABELS[e.kind]} · ${e.title}${value ? ` ${value}` : ''}${extra.length ? ` (${extra.join('; ')})` : ''}`
 }
 

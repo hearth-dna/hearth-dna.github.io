@@ -214,7 +214,10 @@ export function HealthTable({
                       {e.body && <span className="muted"> ¶</span>}
                     </td>
                     <td className="nowrap">{formatValue(e)}</td>
-                    <td>{e.bodyPart}</td>
+                    <td>
+                      {e.bodyPart}
+                      {e.bodyPart && e.side && <span className="muted"> · {t(`side.${e.side}`)}</span>}
+                    </td>
                     <td>{e.severity === null ? '' : `${e.severity}/10`}</td>
                     <td>
                       {e.tags.map((tag) => (
