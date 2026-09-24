@@ -6,7 +6,14 @@ import type { HealthDraft } from '../documents/draft'
 import { parseTags } from '../health/log'
 import { findPreset, presetsFor } from '../health/presets'
 import { useT } from '../i18n/context'
-import { BODY_PARTS, HEALTH_KIND_LABELS, type HealthKind, type Person } from '../types'
+import {
+  BODY_PARTS,
+  BODY_SIDES,
+  type BodySide,
+  HEALTH_KIND_LABELS,
+  type HealthKind,
+  type Person,
+} from '../types'
 import { ConsentForm } from './ConsentForm'
 
 /** Local date and time; toISOString() is UTC and gives yesterday's date late in the evening. */
@@ -43,6 +50,7 @@ const blank = (kind: HealthKind | null) => ({
   body: '',
   source: '',
   bodyPart: '',
+  side: '' as BodySide,
   severity: '',
   tags: '',
   value: '',
@@ -124,6 +132,7 @@ export function HealthEntryForm({
       body: form.body,
       source: form.source,
       bodyPart: fields.bodyPart ? form.bodyPart.trim() : '',
+      side: fields.bodyPart ? form.side : '',
       severity: fields.severity && form.severity !== '' ? Number(form.severity) : null,
       tags: parseTags(form.tags),
       value: fields.value ? Number(form.value) : null,
@@ -300,6 +309,23 @@ export function HealthEntryForm({
                 <option key={b} value={b} label={t(`bodyPart.${b}`)} />
               ))}
             </datalist>
+          </label>
+        )}
+        {fields.bodyPart && (
+          <label className="field">
+            {t('healthLog.side')}
+            <select
+              value={form.side}
+              disabled={form.bodyPart.trim() === ''}
+              onChange={(e) => setForm({ ...form, side: e.target.value as BodySide })}
+            >
+              <option value="">{t('healthLog.sideNone')}</option>
+              {BODY_SIDES.map((s) => (
+                <option key={s} value={s}>
+                  {t(`side.${s}`)}
+                </option>
+              ))}
+            </select>
           </label>
         )}
         {fields.severity && (

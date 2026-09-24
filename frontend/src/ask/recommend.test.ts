@@ -18,6 +18,7 @@ const h = (o: Partial<HealthEntry>): HealthEntry => ({
   body: '',
   source: '',
   bodyPart: '',
+  side: '',
   severity: null,
   tags: [],
   value: null,

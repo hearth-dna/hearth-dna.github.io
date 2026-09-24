@@ -97,6 +97,10 @@ export const BODY_PARTS = [
   'whole body',
 ] as const
 
+/** Which side of a paired body part; '' when not applicable or not recorded. */
+export const BODY_SIDES = ['left', 'right', 'both'] as const
+export type BodySide = (typeof BODY_SIDES)[number] | ''
+
 export interface HealthEntry {
   id: string
   personId: string
@@ -110,6 +114,8 @@ export interface HealthEntry {
   source: string
   /** Where on the body, free text ('' when not applicable). Filterable. */
   bodyPart: string
+  /** Left, right or both for a paired part (knees, hands…); '' otherwise. */
+  side: BodySide
   /** 1 (barely noticeable) to 10 (worst imaginable); null when not rated. */
   severity: number | null
   /** Conditions, diseases or free labels this entry relates to, e.g. ['arthritis', 'flare']. */

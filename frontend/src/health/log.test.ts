@@ -12,6 +12,7 @@ import {
   parseTags,
   sortHealthLog,
   when,
+  where,
 } from './log'
 import { findPreset, MEASUREMENT_PRESETS, measurementOrder, PRESET_GROUPS } from './presets'
 
@@ -25,6 +26,7 @@ const entry = (o: Partial<HealthEntry>): HealthEntry => ({
   body: '',
   source: '',
   bodyPart: '',
+  side: '',
   severity: null,
   tags: [],
   value: null,
@@ -53,6 +55,15 @@ describe('describeEntry', () => {
         entry({ title: 'Pain in both hands', bodyPart: 'hands', severity: 6, tags: ['arthritis'] }),
       ),
     ).toBe('2026-09-14 · Symptom · Pain in both hands (hands; severity 6/10; arthritis)')
+  })
+  it('names the side of a paired body part', () => {
+    expect(where({ bodyPart: 'knees', side: '' })).toBe('knees')
+    expect(where({ bodyPart: 'knees', side: 'left' })).toBe('knees, left')
+    expect(where({ bodyPart: 'knees', side: 'both' })).toBe('knees, both sides')
+    expect(where({ bodyPart: '', side: 'right' })).toBe('')
+    expect(describeEntry(entry({ title: 'Knee pain', bodyPart: 'knees', side: 'right', severity: 4 }))).toBe(
+      '2026-09-14 · Symptom · Knee pain (knees, right; severity 4/10)',
+    )
   })
   it('puts the measured value after the title', () => {
     expect(

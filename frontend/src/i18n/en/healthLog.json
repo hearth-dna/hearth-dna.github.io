@@ -21,6 +21,8 @@
   "healthLog.unitPlaceholder": "e.g. cm",
   "healthLog.bodyPart": "Body part",
   "healthLog.bodyPartPlaceholder": "e.g. hands",
+  "healthLog.side": "Side",
+  "healthLog.sideNone": "not specified",
   "healthLog.severity": "Severity",
   "healthLog.notRated": "not rated",
   "healthLog.outOfTen": "{n} / 10",
