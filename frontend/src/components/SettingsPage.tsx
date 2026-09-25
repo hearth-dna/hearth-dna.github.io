@@ -49,7 +49,13 @@ export function SettingsPage() {
       const r = await restoreBytes(db, bytes, pass || undefined, (key, params) => setMsg(t(key, params)))
       await refresh()
       await reload()
-      setMsg(t('settingsPage.imported', { ...r }))
+      const { people, genomes, version, exportedAt, missing } = r
+      const imported = t('settingsPage.imported', { people, genomes, version, exportedAt })
+      setMsg(
+        missing.length
+          ? `${imported} ${t('restore.missingGenomes', { names: missing.map((m) => m.name).join(', ') })}`
+          : imported,
+      )
     } catch (e) {
       setMsg(t('settingsPage.importFailed', { error: String(e) }))
     }

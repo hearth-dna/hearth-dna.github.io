@@ -67,7 +67,8 @@ export function BackupCard() {
   const loadFromFolder = async () => {
     const r = await backups.loadFromFolder((key, params) => setBusy(t(key, params)))
     await refresh()
-    return t('backupCard.loaded', { ...r, name: backups.name })
+    const { people, genomes, exportedAt } = r
+    return t('backupCard.loaded', { people, genomes, exportedAt, name: backups.name })
   }
   const load = () => run(loadFromFolder, t('backupCard.loading', { name: backups.name }))
   const backUp = (force = false) => {
@@ -182,6 +183,14 @@ export function BackupCard() {
           )}
           {status.state === 'error' && (
             <p className="danger">{t('backupCard.failed', { message: status.message })}</p>
+          )}
+          {status.state === 'ready' && status.missing.length > 0 && (
+            <p className="notice">
+              {t('backupCard.missingGenomes', {
+                name: status.name,
+                names: status.missing.map((m) => m.name).join(', '),
+              })}
+            </p>
           )}
           {status.state === 'ready' && status.newer && (
             <p className="notice">

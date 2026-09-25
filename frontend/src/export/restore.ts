@@ -20,6 +20,8 @@ export type Progress = (key: string, params?: Record<string, string | number>) =
 export interface RestoreResult {
   people: number
   genomes: number
+  /** People whose genome file the dump listed but did not carry, and this browser does not have. */
+  missing: { id: string; name: string }[]
   version: 1 | 2
   exportedAt: string
 }
@@ -112,7 +114,11 @@ function withDefaults(rows: Rows): Rows {
   }))
 }
 
-async function restoreContainer(db: Database, c: Container, onProgress: Progress): Promise<RestoreResult> {
+export async function restoreContainer(
+  db: Database,
+  c: Container,
+  onProgress: Progress = () => {},
+): Promise<RestoreResult> {
   const j = c.journal
   const hadGenotypes = await personsWithGenotypes(db)
   const before = await existingIds(db, 'person')
@@ -142,8 +148,13 @@ async function restoreContainer(db: Database, c: Container, onProgress: Progress
     )
   }
   let genomes = 0
+  const missing = new Set<string>()
   for (const g of c.manifest.genomes) {
     if (hadGenotypes.has(g.person_id)) continue
+    if (!c.genomes[g.path]) {
+      missing.add(g.person_id)
+      continue
+    }
     const text = strFromU8(gunzipSync(c.genomes[g.path]))
     onProgress('restore.parsingGenome', { n: genomes + 1, total: c.manifest.genomes.length })
     const r = await parseRawText(text, undefined, g.kind === 'original' ? g.provider : 'generic')
@@ -157,6 +168,9 @@ async function restoreContainer(db: Database, c: Container, onProgress: Progress
   return {
     people: after.size - before.size,
     genomes,
+    missing: (j.persons as Rows)
+      .filter((p) => missing.has(p.id as string))
+      .map((p) => ({ id: p.id as string, name: (p.display_name as string) || (p.label as string) })),
     version: 2,
     exportedAt: c.header.exported_at,
   }
@@ -195,5 +209,5 @@ async function restoreV1(db: Database, dump: DumpV1, onProgress: Progress): Prom
     withDefaults(((dump.health_log ?? []) as Rows).filter((h) => added.has(h.person_id as string))),
   )
   await insertConsents(db, dump.consents as Rows)
-  return { people: added.size, genomes: added.size, version: 1, exportedAt: dump.exported_at }
+  return { people: added.size, genomes: added.size, missing: [], version: 1, exportedAt: dump.exported_at }
 }

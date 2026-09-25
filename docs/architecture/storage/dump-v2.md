@@ -27,7 +27,9 @@ hearth-dump-<date>.hearth            ← zip, optionally inside the encryption e
   the person, source_file id, provider, build and whether it is the original or reconstructed. Import re-runs the provider parser, which is the same code as a first import, so a
   v2 restore is as trustworthy as the original upload and the tests already exist.
 - `journal.json` is deflated. It is the whole of v1 minus `snp_index`/`genotypes`.
-- `manifest.entries` hashes let a restore verify integrity before touching the database.
+- `manifest.entries` hashes let a restore verify integrity before touching the database. An entry
+  that is absent or fails its hash is left out, not fatal: the rest restores and the people without
+  a genome are reported (`missingGenomes`, `fillGenomes` in `container.ts`).
 
 ### Header for encrypted files
 

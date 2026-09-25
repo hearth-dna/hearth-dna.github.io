@@ -29,6 +29,22 @@ export function rotationPlan(
   return plan
 }
 
+/**
+ * Older copies (`base.1`, `base.2`…) then conflict files of this profile, the order to try them in
+ * when the current snapshot lacks a genome.
+ */
+export function spareNames(existing: string[], base: string): string[] {
+  const conflict = base.replace(/\.hearth$/, '.conflict-')
+  const rotated = existing
+    .filter((n) => n.startsWith(`${base}.`) && /^\d+$/.test(n.slice(base.length + 1)))
+    .sort((a, b) => Number(a.slice(base.length + 1)) - Number(b.slice(base.length + 1)))
+  const conflicts = existing
+    .filter((n) => n.startsWith(conflict))
+    .sort()
+    .reverse()
+  return [...rotated, ...conflicts]
+}
+
 export function conflictName(base: string, device: string, at: string): string {
   return `${base.replace(/\.hearth$/, '')}.conflict-${device.slice(0, 8)}-${at.slice(0, 19).replace(/[:T]/g, '-')}.hearth`
 }

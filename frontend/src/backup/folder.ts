@@ -128,6 +128,11 @@ export async function currentHeader(dir: Dir, base: string): Promise<Header | nu
 
 export const readCurrent = (dir: Dir, base: string) => readFile(dir, base)
 
+/** File names in the folder; the caller filters (see naming.spareNames). */
+export const list = (dir: Dir) => names(dir)
+
+export const readNamed = (dir: Dir, name: string) => readFile(dir, name)
+
 /**
  * Rotates the previous snapshots by copying (handles on removable media cannot be renamed
  * portably), then writes the new one over `base`. A crash mid-write leaves `base.1` intact.
