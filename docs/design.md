@@ -252,6 +252,13 @@ kb fields at tier 0, so the user gets a decision frame even without any LLM.
   (`kb/reviewed/labs/`) and forbids converting. Both paths go through `labs/normalise.ts` and a
   review table; each ticked row becomes one `lab` entry with its catalogue id, value and unit as
   printed, reference range and flag.
+- **Shipped fourth (charts):** a Charts page (`/charts`) draws numeric health-log readings over
+  time: pick people and tests or measurements, one panel per metric (never two y-axes), one line
+  per person in that person's fixed colour, every panel on one time range. Lab readings are
+  converted into the test's canonical unit so readings from different labs form one line; the
+  printed reference range is a band when every reading shares it. Pure grouping and conversion in
+  `charts/series.ts`; hand-drawn SVG in `components/TimeChart.tsx` with a crosshair tooltip, arrow
+  keys (a slider over the readings) and a table view.
 - Accept PDF, images, plain text. `pdf.js` extracts the text layer; `Tesseract.js` OCRs scans; both in
   a worker. Originals stored as blobs in OPFS, referenced from `document`.
 - Structured extraction into `observation` rows (lab values with units and reference ranges,

@@ -8,6 +8,7 @@ describe('routes', () => {
     { name: 'family' },
     { name: 'health', person: '' },
     { name: 'health', person: 'p 2' },
+    { name: 'charts' },
     { name: 'ask' },
     { name: 'settings' },
   ]

@@ -11,6 +11,7 @@ export type Page =
   | { name: 'family' }
   /** `person` is '' for the whole family. */
   | { name: 'health'; person: string }
+  | { name: 'charts' }
   | { name: 'ask' }
   | { name: 'settings' }
 
@@ -33,6 +34,7 @@ export function parseRoute(path: string): Page | null {
     case 'health-log':
       return { name: 'health', person: id ?? '' }
     case 'family':
+    case 'charts':
     case 'ask':
     case 'settings':
       return id === undefined ? { name: head } : null
