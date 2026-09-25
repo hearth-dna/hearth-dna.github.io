@@ -1,0 +1,15 @@
+{
+  "labReview.title": "Review {n} results",
+  "labReview.intro": "Check every row against the paper. Rows marked for checking are left out until you tick them. Values are saved as printed; conversions are only shown.",
+  "labReview.colSave": "Save",
+  "labReview.colTest": "Test",
+  "labReview.colValue": "Value",
+  "labReview.colRef": "Reference",
+  "labReview.colFlag": "Flag",
+  "labReview.notRecognised": "not recognised",
+  "labReview.save": "Save {n} results",
+  "labReview.issue.unknownAnalyte": "test not recognised",
+  "labReview.issue.unknownUnit": "unit not recognised",
+  "labReview.issue.implausible": "value looks wrong for this test",
+  "labReview.issue.unitMismatch": "unit does not fit this test"
+}

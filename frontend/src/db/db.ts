@@ -162,6 +162,11 @@ export class Database {
       "unit TEXT NOT NULL DEFAULT ''",
       "time TEXT NOT NULL DEFAULT ''",
       "side TEXT NOT NULL DEFAULT ''",
+      "analyte TEXT NOT NULL DEFAULT ''",
+      'ref_low REAL',
+      'ref_high REAL',
+      "flag TEXT NOT NULL DEFAULT ''",
+      "value_text TEXT NOT NULL DEFAULT ''",
     ]) {
       await ready.exec(`ALTER TABLE health_log ADD COLUMN ${col}`).catch(() => {})
     }

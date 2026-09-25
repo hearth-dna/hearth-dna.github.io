@@ -1,0 +1,3371 @@
+{
+ "analytes": [
+  {
+   "id": "glucose",
+   "names": {
+    "en": "Glucose",
+    "ru": "Глюкоза"
+   },
+   "synonyms": {
+    "en": [
+     "blood sugar",
+     "fasting glucose",
+     "blood glucose",
+     "glucose fasting",
+     "plasma glucose"
+    ],
+    "ru": [
+     "сахар крови",
+     "глюкоза натощак",
+     "глюкоза крови"
+    ]
+   },
+   "abbreviations": [
+    "GLU",
+    "GLUC"
+   ],
+   "loinc": [
+    "2345-7",
+    "1558-6",
+    "2339-0"
+   ],
+   "panels": [
+    "glucose",
+    "metabolic"
+   ],
+   "specimen": [
+    "serum",
+    "plasma",
+    "capillary blood"
+   ],
+   "unit": "mmol/L",
+   "units": {
+    "mg/dL": 0.0555
+   },
+   "plausible": [
+    0.5,
+    60
+   ],
+   "decimals": 1
+  },
+  {
+   "id": "glucose_2h",
+   "names": {
+    "en": "Glucose 2 h after load (OGTT)",
+    "ru": "Глюкоза через 2 часа (ГТТ)"
+   },
+   "synonyms": {
+    "en": [
+     "ogtt 2h",
+     "glucose tolerance test 2 h",
+     "2 hour glucose",
+     "oral glucose tolerance"
+    ],
+    "ru": [
+     "глюкозотолерантный тест",
+     "гтт",
+     "глюкоза через 2 ч"
+    ]
+   },
+   "abbreviations": [
+    "OGTT"
+   ],
+   "loinc": [
+    "1518-0"
+   ],
+   "panels": [
+    "glucose"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "mmol/L",
+   "units": {
+    "mg/dL": 0.0555
+   },
+   "plausible": [
+    0.5,
+    60
+   ],
+   "decimals": 1
+  },
+  {
+   "id": "hba1c",
+   "names": {
+    "en": "HbA1c",
+    "ru": "Гликированный гемоглобин"
+   },
+   "synonyms": {
+    "en": [
+     "glycated haemoglobin",
+     "glycated hemoglobin",
+     "hemoglobin a1c",
+     "haemoglobin a1c",
+     "glycohemoglobin",
+     "a1c"
+    ],
+    "ru": [
+     "гликозилированный гемоглобин",
+     "hba1c"
+    ]
+   },
+   "abbreviations": [
+    "HbA1c",
+    "A1C"
+   ],
+   "loinc": [
+    "4548-4",
+    "59261-8"
+   ],
+   "panels": [
+    "glucose"
+   ],
+   "specimen": [
+    "whole blood"
+   ],
+   "unit": "%",
+   "units": {
+    "mmol/mol": null
+   },
+   "plausible": [
+    3,
+    20
+   ],
+   "decimals": 1,
+   "convert": "hba1c"
+  },
+  {
+   "id": "insulin",
+   "names": {
+    "en": "Insulin",
+    "ru": "Инсулин"
+   },
+   "synonyms": {
+    "en": [
+     "fasting insulin"
+    ],
+    "ru": [
+     "инсулин натощак"
+    ]
+   },
+   "loinc": [
+    "20448-7"
+   ],
+   "panels": [
+    "glucose",
+    "hormones"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "mIU/L",
+   "units": {
+    "pmol/L": 0.144
+   },
+   "plausible": [
+    0,
+    1000
+   ],
+   "decimals": 1
+  },
+  {
+   "id": "c_peptide",
+   "names": {
+    "en": "C-peptide",
+    "ru": "С-пептид"
+   },
+   "synonyms": {
+    "en": [
+     "c peptide"
+    ],
+    "ru": [
+     "c-пептид",
+     "с пептид"
+    ]
+   },
+   "loinc": [
+    "1986-9"
+   ],
+   "panels": [
+    "glucose"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "ng/mL",
+   "units": {
+    "nmol/L": 3.02,
+    "pmol/L": 0.00302
+   },
+   "plausible": [
+    0,
+    50
+   ],
+   "decimals": 2
+  },
+  {
+   "id": "chol_total",
+   "names": {
+    "en": "Total cholesterol",
+    "ru": "Общий холестерин"
+   },
+   "synonyms": {
+    "en": [
+     "cholesterol",
+     "cholesterol total",
+     "total chol"
+    ],
+    "ru": [
+     "холестерин",
+     "холестерин общий"
+    ]
+   },
+   "abbreviations": [
+    "CHOL",
+    "TC"
+   ],
+   "loinc": [
+    "2093-3"
+   ],
+   "panels": [
+    "lipid",
+    "metabolic"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "mmol/L",
+   "units": {
+    "mg/dL": 0.02586
+   },
+   "plausible": [
+    0.5,
+    30
+   ],
+   "decimals": 2
+  },
+  {
+   "id": "ldl",
+   "names": {
+    "en": "LDL cholesterol",
+    "ru": "ЛПНП"
+   },
+   "synonyms": {
+    "en": [
+     "ldl",
+     "ldl-c",
+     "ldl cholesterol",
+     "low density lipoprotein",
+     "ldl calculated",
+     "ldl direct"
+    ],
+    "ru": [
+     "холестерин лпнп",
+     "липопротеины низкой плотности",
+     "лпнп"
+    ]
+   },
+   "abbreviations": [
+    "LDL",
+    "LDL-C"
+   ],
+   "loinc": [
+    "13457-7",
+    "18262-6"
+   ],
+   "panels": [
+    "lipid"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "mmol/L",
+   "units": {
+    "mg/dL": 0.02586
+   },
+   "plausible": [
+    0.1,
+    25
+   ],
+   "decimals": 2
+  },
+  {
+   "id": "hdl",
+   "names": {
+    "en": "HDL cholesterol",
+    "ru": "ЛПВП"
+   },
+   "synonyms": {
+    "en": [
+     "hdl",
+     "hdl-c",
+     "hdl cholesterol",
+     "high density lipoprotein"
+    ],
+    "ru": [
+     "холестерин лпвп",
+     "липопротеины высокой плотности",
+     "лпвп"
+    ]
+   },
+   "abbreviations": [
+    "HDL",
+    "HDL-C"
+   ],
+   "loinc": [
+    "2085-9"
+   ],
+   "panels": [
+    "lipid"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "mmol/L",
+   "units": {
+    "mg/dL": 0.02586
+   },
+   "plausible": [
+    0.1,
+    10
+   ],
+   "decimals": 2
+  },
+  {
+   "id": "non_hdl",
+   "names": {
+    "en": "Non-HDL cholesterol",
+    "ru": "Холестерин не-ЛПВП"
+   },
+   "synonyms": {
+    "en": [
+     "non-hdl",
+     "non hdl cholesterol"
+    ],
+    "ru": [
+     "не-лпвп",
+     "холестерин не лпвп"
+    ]
+   },
+   "loinc": [
+    "43396-1"
+   ],
+   "panels": [
+    "lipid"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "mmol/L",
+   "units": {
+    "mg/dL": 0.02586
+   },
+   "plausible": [
+    0.1,
+    30
+   ],
+   "decimals": 2
+  },
+  {
+   "id": "vldl",
+   "names": {
+    "en": "VLDL cholesterol",
+    "ru": "ЛПОНП"
+   },
+   "synonyms": {
+    "en": [
+     "vldl",
+     "very low density lipoprotein"
+    ],
+    "ru": [
+     "лпонп",
+     "липопротеины очень низкой плотности"
+    ]
+   },
+   "abbreviations": [
+    "VLDL"
+   ],
+   "loinc": [
+    "13458-5"
+   ],
+   "panels": [
+    "lipid"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "mmol/L",
+   "units": {
+    "mg/dL": 0.02586
+   },
+   "plausible": [
+    0,
+    20
+   ],
+   "decimals": 2
+  },
+  {
+   "id": "tg",
+   "names": {
+    "en": "Triglycerides",
+    "ru": "Триглицериды"
+   },
+   "synonyms": {
+    "en": [
+     "triglyceride",
+     "triglycerides",
+     "trig"
+    ],
+    "ru": [
+     "триглицериды",
+     "тг"
+    ]
+   },
+   "abbreviations": [
+    "TG",
+    "TRIG"
+   ],
+   "loinc": [
+    "2571-8"
+   ],
+   "panels": [
+    "lipid",
+    "metabolic"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "mmol/L",
+   "units": {
+    "mg/dL": 0.01129
+   },
+   "plausible": [
+    0.1,
+    100
+   ],
+   "decimals": 2
+  },
+  {
+   "id": "lpa",
+   "names": {
+    "en": "Lipoprotein(a)",
+    "ru": "Липопротеин(а)"
+   },
+   "synonyms": {
+    "en": [
+     "lp(a)",
+     "lpa",
+     "lipoprotein a"
+    ],
+    "ru": [
+     "лп(а)",
+     "липопротеин а"
+    ]
+   },
+   "abbreviations": [
+    "Lp(a)"
+   ],
+   "loinc": [
+    "10835-7"
+   ],
+   "panels": [
+    "lipid"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "nmol/L",
+   "units": {
+    "mg/dL": null
+   },
+   "plausible": [
+    0,
+    1000
+   ],
+   "decimals": 0
+  },
+  {
+   "id": "apob",
+   "names": {
+    "en": "Apolipoprotein B",
+    "ru": "Аполипопротеин B"
+   },
+   "synonyms": {
+    "en": [
+     "apo b",
+     "apob"
+    ],
+    "ru": [
+     "апо b",
+     "аполипопротеин в"
+    ]
+   },
+   "abbreviations": [
+    "ApoB"
+   ],
+   "loinc": [
+    "1884-6"
+   ],
+   "panels": [
+    "lipid"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "g/L",
+   "units": {
+    "mg/dL": 0.01
+   },
+   "plausible": [
+    0.1,
+    5
+   ],
+   "decimals": 2
+  },
+  {
+   "id": "apoa1",
+   "names": {
+    "en": "Apolipoprotein A1",
+    "ru": "Аполипопротеин A1"
+   },
+   "synonyms": {
+    "en": [
+     "apo a1",
+     "apoa1",
+     "apo a-i"
+    ],
+    "ru": [
+     "апо a1",
+     "аполипопротеин а1"
+    ]
+   },
+   "abbreviations": [
+    "ApoA1"
+   ],
+   "loinc": [
+    "1869-7"
+   ],
+   "panels": [
+    "lipid"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "g/L",
+   "units": {
+    "mg/dL": 0.01
+   },
+   "plausible": [
+    0.1,
+    5
+   ],
+   "decimals": 2
+  },
+  {
+   "id": "wbc",
+   "names": {
+    "en": "White blood cells",
+    "ru": "Лейкоциты"
+   },
+   "synonyms": {
+    "en": [
+     "white blood cell count",
+     "leukocytes",
+     "leucocytes",
+     "white cell count"
+    ],
+    "ru": [
+     "лейкоциты",
+     "лейк"
+    ]
+   },
+   "abbreviations": [
+    "WBC",
+    "LEU"
+   ],
+   "loinc": [
+    "6690-2"
+   ],
+   "panels": [
+    "cbc"
+   ],
+   "specimen": [
+    "whole blood"
+   ],
+   "unit": "10^9/L",
+   "units": {},
+   "plausible": [
+    0.1,
+    500
+   ],
+   "decimals": 1
+  },
+  {
+   "id": "rbc",
+   "names": {
+    "en": "Red blood cells",
+    "ru": "Эритроциты"
+   },
+   "synonyms": {
+    "en": [
+     "red blood cell count",
+     "erythrocytes",
+     "red cell count"
+    ],
+    "ru": [
+     "эритроциты",
+     "эр"
+    ]
+   },
+   "abbreviations": [
+    "RBC",
+    "ERY"
+   ],
+   "loinc": [
+    "789-8"
+   ],
+   "panels": [
+    "cbc"
+   ],
+   "specimen": [
+    "whole blood"
+   ],
+   "unit": "10^12/L",
+   "units": {},
+   "plausible": [
+    0.5,
+    10
+   ],
+   "decimals": 2
+  },
+  {
+   "id": "hb",
+   "names": {
+    "en": "Haemoglobin",
+    "ru": "Гемоглобин"
+   },
+   "synonyms": {
+    "en": [
+     "hemoglobin",
+     "haemoglobin",
+     "hgb"
+    ],
+    "ru": [
+     "гемоглобин"
+    ]
+   },
+   "abbreviations": [
+    "HGB",
+    "Hb"
+   ],
+   "loinc": [
+    "718-7"
+   ],
+   "panels": [
+    "cbc"
+   ],
+   "specimen": [
+    "whole blood"
+   ],
+   "unit": "g/L",
+   "units": {
+    "g/dL": 10,
+    "mmol/L": 16.11
+   },
+   "plausible": [
+    20,
+    250
+   ],
+   "decimals": 0
+  },
+  {
+   "id": "hct",
+   "names": {
+    "en": "Haematocrit",
+    "ru": "Гематокрит"
+   },
+   "synonyms": {
+    "en": [
+     "hematocrit",
+     "haematocrit",
+     "packed cell volume",
+     "pcv"
+    ],
+    "ru": [
+     "гематокрит"
+    ]
+   },
+   "abbreviations": [
+    "HCT",
+    "Ht"
+   ],
+   "loinc": [
+    "4544-3"
+   ],
+   "panels": [
+    "cbc"
+   ],
+   "specimen": [
+    "whole blood"
+   ],
+   "unit": "%",
+   "units": {
+    "L/L": 100
+   },
+   "plausible": [
+    5,
+    80
+   ],
+   "decimals": 1
+  },
+  {
+   "id": "mcv",
+   "names": {
+    "en": "Mean cell volume (MCV)",
+    "ru": "Средний объём эритроцита (MCV)"
+   },
+   "synonyms": {
+    "en": [
+     "mean corpuscular volume",
+     "mean cell volume"
+    ],
+    "ru": [
+     "средний объем эритроцита"
+    ]
+   },
+   "abbreviations": [
+    "MCV"
+   ],
+   "loinc": [
+    "787-2"
+   ],
+   "panels": [
+    "cbc"
+   ],
+   "specimen": [
+    "whole blood"
+   ],
+   "unit": "fL",
+   "units": {},
+   "plausible": [
+    40,
+    150
+   ],
+   "decimals": 1
+  },
+  {
+   "id": "mch",
+   "names": {
+    "en": "Mean cell haemoglobin (MCH)",
+    "ru": "Среднее содержание гемоглобина (MCH)"
+   },
+   "synonyms": {
+    "en": [
+     "mean corpuscular hemoglobin",
+     "mean cell hemoglobin"
+    ],
+    "ru": [
+     "среднее содержание гемоглобина в эритроците"
+    ]
+   },
+   "abbreviations": [
+    "MCH"
+   ],
+   "loinc": [
+    "785-6"
+   ],
+   "panels": [
+    "cbc"
+   ],
+   "specimen": [
+    "whole blood"
+   ],
+   "unit": "pg",
+   "units": {},
+   "plausible": [
+    10,
+    50
+   ],
+   "decimals": 1
+  },
+  {
+   "id": "mchc",
+   "names": {
+    "en": "Mean cell haemoglobin concentration (MCHC)",
+    "ru": "Средняя концентрация гемоглобина (MCHC)"
+   },
+   "synonyms": {
+    "en": [
+     "mean corpuscular hemoglobin concentration"
+    ],
+    "ru": [
+     "средняя концентрация гемоглобина в эритроците"
+    ]
+   },
+   "abbreviations": [
+    "MCHC"
+   ],
+   "loinc": [
+    "786-4"
+   ],
+   "panels": [
+    "cbc"
+   ],
+   "specimen": [
+    "whole blood"
+   ],
+   "unit": "g/L",
+   "units": {
+    "g/dL": 10
+   },
+   "plausible": [
+    200,
+    450
+   ],
+   "decimals": 0
+  },
+  {
+   "id": "rdw",
+   "names": {
+    "en": "Red cell distribution width (RDW)",
+    "ru": "Ширина распределения эритроцитов (RDW)"
+   },
+   "synonyms": {
+    "en": [
+     "red cell distribution width",
+     "rdw-cv"
+    ],
+    "ru": [
+     "ширина распределения эритроцитов"
+    ]
+   },
+   "abbreviations": [
+    "RDW",
+    "RDW-CV"
+   ],
+   "loinc": [
+    "788-0"
+   ],
+   "panels": [
+    "cbc"
+   ],
+   "specimen": [
+    "whole blood"
+   ],
+   "unit": "%",
+   "units": {},
+   "plausible": [
+    5,
+    40
+   ],
+   "decimals": 1
+  },
+  {
+   "id": "plt",
+   "names": {
+    "en": "Platelets",
+    "ru": "Тромбоциты"
+   },
+   "synonyms": {
+    "en": [
+     "platelet count",
+     "thrombocytes"
+    ],
+    "ru": [
+     "тромбоциты"
+    ]
+   },
+   "abbreviations": [
+    "PLT"
+   ],
+   "loinc": [
+    "777-3"
+   ],
+   "panels": [
+    "cbc"
+   ],
+   "specimen": [
+    "whole blood"
+   ],
+   "unit": "10^9/L",
+   "units": {},
+   "plausible": [
+    1,
+    2000
+   ],
+   "decimals": 0
+  },
+  {
+   "id": "mpv",
+   "names": {
+    "en": "Mean platelet volume (MPV)",
+    "ru": "Средний объём тромбоцита (MPV)"
+   },
+   "synonyms": {
+    "en": [
+     "mean platelet volume"
+    ],
+    "ru": [
+     "средний объем тромбоцитов"
+    ]
+   },
+   "abbreviations": [
+    "MPV"
+   ],
+   "loinc": [
+    "32623-1"
+   ],
+   "panels": [
+    "cbc"
+   ],
+   "specimen": [
+    "whole blood"
+   ],
+   "unit": "fL",
+   "units": {},
+   "plausible": [
+    3,
+    20
+   ],
+   "decimals": 1
+  },
+  {
+   "id": "neut_pct",
+   "names": {
+    "en": "Neutrophils %",
+    "ru": "Нейтрофилы %"
+   },
+   "synonyms": {
+    "en": [
+     "neutrophils",
+     "neutrophil",
+     "granulocytes"
+    ],
+    "ru": [
+     "нейтрофилы",
+     "нейтрофилы сегментоядерные",
+     "сегментоядерные"
+    ]
+   },
+   "abbreviations": [
+    "NEUT%",
+    "NE%"
+   ],
+   "loinc": [
+    "770-8"
+   ],
+   "panels": [
+    "cbc"
+   ],
+   "specimen": [
+    "whole blood"
+   ],
+   "unit": "%",
+   "units": {},
+   "plausible": [
+    0,
+    100
+   ],
+   "decimals": 1
+  },
+  {
+   "id": "neut_abs",
+   "names": {
+    "en": "Neutrophils (absolute)",
+    "ru": "Нейтрофилы (абс.)"
+   },
+   "synonyms": {
+    "en": [
+     "neutrophils",
+     "neutrophil",
+     "granulocytes"
+    ],
+    "ru": [
+     "нейтрофилы",
+     "нейтрофилы сегментоядерные",
+     "сегментоядерные"
+    ]
+   },
+   "abbreviations": [
+    "NEUT#",
+    "NE#"
+   ],
+   "loinc": [
+    "751-8"
+   ],
+   "panels": [
+    "cbc"
+   ],
+   "specimen": [
+    "whole blood"
+   ],
+   "unit": "10^9/L",
+   "units": {},
+   "plausible": [
+    0,
+    300
+   ],
+   "decimals": 2
+  },
+  {
+   "id": "lymph_pct",
+   "names": {
+    "en": "Lymphocytes %",
+    "ru": "Лимфоциты %"
+   },
+   "synonyms": {
+    "en": [
+     "lymphocytes",
+     "lymphocyte"
+    ],
+    "ru": [
+     "лимфоциты"
+    ]
+   },
+   "abbreviations": [
+    "LYMPH%",
+    "LY%"
+   ],
+   "loinc": [
+    "736-9"
+   ],
+   "panels": [
+    "cbc"
+   ],
+   "specimen": [
+    "whole blood"
+   ],
+   "unit": "%",
+   "units": {},
+   "plausible": [
+    0,
+    100
+   ],
+   "decimals": 1
+  },
+  {
+   "id": "lymph_abs",
+   "names": {
+    "en": "Lymphocytes (absolute)",
+    "ru": "Лимфоциты (абс.)"
+   },
+   "synonyms": {
+    "en": [
+     "lymphocytes",
+     "lymphocyte"
+    ],
+    "ru": [
+     "лимфоциты"
+    ]
+   },
+   "abbreviations": [
+    "LYMPH#",
+    "LY#"
+   ],
+   "loinc": [
+    "731-0"
+   ],
+   "panels": [
+    "cbc"
+   ],
+   "specimen": [
+    "whole blood"
+   ],
+   "unit": "10^9/L",
+   "units": {},
+   "plausible": [
+    0,
+    300
+   ],
+   "decimals": 2
+  },
+  {
+   "id": "mono_pct",
+   "names": {
+    "en": "Monocytes %",
+    "ru": "Моноциты %"
+   },
+   "synonyms": {
+    "en": [
+     "monocytes",
+     "monocyte"
+    ],
+    "ru": [
+     "моноциты"
+    ]
+   },
+   "abbreviations": [
+    "MONO%",
+    "MO%"
+   ],
+   "loinc": [
+    "5905-5"
+   ],
+   "panels": [
+    "cbc"
+   ],
+   "specimen": [
+    "whole blood"
+   ],
+   "unit": "%",
+   "units": {},
+   "plausible": [
+    0,
+    100
+   ],
+   "decimals": 1
+  },
+  {
+   "id": "mono_abs",
+   "names": {
+    "en": "Monocytes (absolute)",
+    "ru": "Моноциты (абс.)"
+   },
+   "synonyms": {
+    "en": [
+     "monocytes",
+     "monocyte"
+    ],
+    "ru": [
+     "моноциты"
+    ]
+   },
+   "abbreviations": [
+    "MONO#",
+    "MO#"
+   ],
+   "loinc": [
+    "742-7"
+   ],
+   "panels": [
+    "cbc"
+   ],
+   "specimen": [
+    "whole blood"
+   ],
+   "unit": "10^9/L",
+   "units": {},
+   "plausible": [
+    0,
+    300
+   ],
+   "decimals": 2
+  },
+  {
+   "id": "eos_pct",
+   "names": {
+    "en": "Eosinophils %",
+    "ru": "Эозинофилы %"
+   },
+   "synonyms": {
+    "en": [
+     "eosinophils",
+     "eosinophil"
+    ],
+    "ru": [
+     "эозинофилы"
+    ]
+   },
+   "abbreviations": [
+    "EOS%",
+    "EO%"
+   ],
+   "loinc": [
+    "713-8"
+   ],
+   "panels": [
+    "cbc"
+   ],
+   "specimen": [
+    "whole blood"
+   ],
+   "unit": "%",
+   "units": {},
+   "plausible": [
+    0,
+    100
+   ],
+   "decimals": 1
+  },
+  {
+   "id": "eos_abs",
+   "names": {
+    "en": "Eosinophils (absolute)",
+    "ru": "Эозинофилы (абс.)"
+   },
+   "synonyms": {
+    "en": [
+     "eosinophils",
+     "eosinophil"
+    ],
+    "ru": [
+     "эозинофилы"
+    ]
+   },
+   "abbreviations": [
+    "EOS#",
+    "EO#"
+   ],
+   "loinc": [
+    "711-2"
+   ],
+   "panels": [
+    "cbc"
+   ],
+   "specimen": [
+    "whole blood"
+   ],
+   "unit": "10^9/L",
+   "units": {},
+   "plausible": [
+    0,
+    300
+   ],
+   "decimals": 2
+  },
+  {
+   "id": "baso_pct",
+   "names": {
+    "en": "Basophils %",
+    "ru": "Базофилы %"
+   },
+   "synonyms": {
+    "en": [
+     "basophils",
+     "basophil"
+    ],
+    "ru": [
+     "базофилы"
+    ]
+   },
+   "abbreviations": [
+    "BASO%",
+    "BA%"
+   ],
+   "loinc": [
+    "706-2"
+   ],
+   "panels": [
+    "cbc"
+   ],
+   "specimen": [
+    "whole blood"
+   ],
+   "unit": "%",
+   "units": {},
+   "plausible": [
+    0,
+    100
+   ],
+   "decimals": 1
+  },
+  {
+   "id": "baso_abs",
+   "names": {
+    "en": "Basophils (absolute)",
+    "ru": "Базофилы (абс.)"
+   },
+   "synonyms": {
+    "en": [
+     "basophils",
+     "basophil"
+    ],
+    "ru": [
+     "базофилы"
+    ]
+   },
+   "abbreviations": [
+    "BASO#",
+    "BA#"
+   ],
+   "loinc": [
+    "704-7"
+   ],
+   "panels": [
+    "cbc"
+   ],
+   "specimen": [
+    "whole blood"
+   ],
+   "unit": "10^9/L",
+   "units": {},
+   "plausible": [
+    0,
+    300
+   ],
+   "decimals": 2
+  },
+  {
+   "id": "esr",
+   "names": {
+    "en": "Erythrocyte sedimentation rate (ESR)",
+    "ru": "СОЭ"
+   },
+   "synonyms": {
+    "en": [
+     "erythrocyte sedimentation rate",
+     "sed rate"
+    ],
+    "ru": [
+     "скорость оседания эритроцитов",
+     "соэ"
+    ]
+   },
+   "abbreviations": [
+    "ESR"
+   ],
+   "loinc": [
+    "4537-7",
+    "30341-2"
+   ],
+   "panels": [
+    "cbc",
+    "inflammation"
+   ],
+   "specimen": [
+    "whole blood"
+   ],
+   "unit": "mm/h",
+   "units": {},
+   "plausible": [
+    0,
+    200
+   ],
+   "decimals": 0
+  },
+  {
+   "id": "retic",
+   "names": {
+    "en": "Reticulocytes",
+    "ru": "Ретикулоциты"
+   },
+   "synonyms": {
+    "en": [
+     "reticulocyte count"
+    ],
+    "ru": [
+     "ретикулоциты"
+    ]
+   },
+   "abbreviations": [
+    "RET",
+    "RETIC"
+   ],
+   "loinc": [
+    "4679-7"
+   ],
+   "panels": [
+    "cbc"
+   ],
+   "specimen": [
+    "whole blood"
+   ],
+   "unit": "%",
+   "units": {},
+   "plausible": [
+    0,
+    40
+   ],
+   "decimals": 2
+  },
+  {
+   "id": "sodium",
+   "names": {
+    "en": "Sodium",
+    "ru": "Натрий"
+   },
+   "synonyms": {
+    "en": [
+     "na"
+    ],
+    "ru": [
+     "натрий"
+    ]
+   },
+   "abbreviations": [
+    "Na",
+    "Na+"
+   ],
+   "loinc": [
+    "2951-2"
+   ],
+   "panels": [
+    "metabolic",
+    "kidney"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "mmol/L",
+   "units": {},
+   "plausible": [
+    90,
+    200
+   ],
+   "decimals": 0
+  },
+  {
+   "id": "potassium",
+   "names": {
+    "en": "Potassium",
+    "ru": "Калий"
+   },
+   "synonyms": {
+    "en": [
+     "k"
+    ],
+    "ru": [
+     "калий"
+    ]
+   },
+   "abbreviations": [
+    "K",
+    "K+"
+   ],
+   "loinc": [
+    "2823-3"
+   ],
+   "panels": [
+    "metabolic",
+    "kidney"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "mmol/L",
+   "units": {},
+   "plausible": [
+    1,
+    10
+   ],
+   "decimals": 1
+  },
+  {
+   "id": "chloride",
+   "names": {
+    "en": "Chloride",
+    "ru": "Хлор"
+   },
+   "synonyms": {
+    "en": [
+     "cl"
+    ],
+    "ru": [
+     "хлориды",
+     "хлор"
+    ]
+   },
+   "abbreviations": [
+    "Cl",
+    "Cl-"
+   ],
+   "loinc": [
+    "2075-0"
+   ],
+   "panels": [
+    "metabolic",
+    "kidney"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "mmol/L",
+   "units": {},
+   "plausible": [
+    60,
+    150
+   ],
+   "decimals": 0
+  },
+  {
+   "id": "bicarbonate",
+   "names": {
+    "en": "Bicarbonate",
+    "ru": "Бикарбонат"
+   },
+   "synonyms": {
+    "en": [
+     "hco3",
+     "total co2",
+     "co2"
+    ],
+    "ru": [
+     "бикарбонаты"
+    ]
+   },
+   "abbreviations": [
+    "HCO3"
+   ],
+   "loinc": [
+    "1963-8"
+   ],
+   "panels": [
+    "metabolic",
+    "kidney"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "mmol/L",
+   "units": {},
+   "plausible": [
+    5,
+    50
+   ],
+   "decimals": 0
+  },
+  {
+   "id": "urea",
+   "names": {
+    "en": "Urea",
+    "ru": "Мочевина"
+   },
+   "synonyms": {
+    "en": [
+     "urea"
+    ],
+    "ru": [
+     "мочевина"
+    ]
+   },
+   "abbreviations": [
+    "UREA"
+   ],
+   "panels": [
+    "metabolic",
+    "kidney"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "mmol/L",
+   "units": {
+    "mg/dL": 0.1665
+   },
+   "plausible": [
+    0.5,
+    100
+   ],
+   "decimals": 1
+  },
+  {
+   "id": "bun",
+   "names": {
+    "en": "Blood urea nitrogen (BUN)",
+    "ru": "Азот мочевины"
+   },
+   "synonyms": {
+    "en": [
+     "blood urea nitrogen",
+     "urea nitrogen"
+    ],
+    "ru": [
+     "азот мочевины"
+    ]
+   },
+   "abbreviations": [
+    "BUN"
+   ],
+   "loinc": [
+    "3094-0"
+   ],
+   "panels": [
+    "metabolic",
+    "kidney"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "mg/dL",
+   "units": {
+    "mmol/L": 2.8
+   },
+   "plausible": [
+    1,
+    300
+   ],
+   "decimals": 0
+  },
+  {
+   "id": "creatinine",
+   "names": {
+    "en": "Creatinine",
+    "ru": "Креатинин"
+   },
+   "synonyms": {
+    "en": [
+     "creatinine serum"
+    ],
+    "ru": [
+     "креатинин"
+    ]
+   },
+   "abbreviations": [
+    "CREA",
+    "CREAT"
+   ],
+   "loinc": [
+    "2160-0"
+   ],
+   "panels": [
+    "metabolic",
+    "kidney"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "µmol/L",
+   "units": {
+    "mg/dL": 88.42
+   },
+   "plausible": [
+    10,
+    2500
+   ],
+   "decimals": 0
+  },
+  {
+   "id": "egfr",
+   "names": {
+    "en": "eGFR",
+    "ru": "СКФ"
+   },
+   "synonyms": {
+    "en": [
+     "estimated gfr",
+     "glomerular filtration rate",
+     "gfr",
+     "ckd-epi"
+    ],
+    "ru": [
+     "скорость клубочковой фильтрации",
+     "скф"
+    ]
+   },
+   "abbreviations": [
+    "eGFR"
+   ],
+   "loinc": [
+    "33914-3",
+    "62238-1"
+   ],
+   "panels": [
+    "kidney"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "mL/min/1.73m²",
+   "units": {},
+   "plausible": [
+    1,
+    200
+   ],
+   "decimals": 0
+  },
+  {
+   "id": "uric_acid",
+   "names": {
+    "en": "Uric acid",
+    "ru": "Мочевая кислота"
+   },
+   "synonyms": {
+    "en": [
+     "urate"
+    ],
+    "ru": [
+     "мочевая кислота"
+    ]
+   },
+   "abbreviations": [
+    "UA",
+    "URIC"
+   ],
+   "loinc": [
+    "3084-1"
+   ],
+   "panels": [
+    "metabolic"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "µmol/L",
+   "units": {
+    "mg/dL": 59.48
+   },
+   "plausible": [
+    30,
+    1500
+   ],
+   "decimals": 0
+  },
+  {
+   "id": "calcium",
+   "names": {
+    "en": "Calcium",
+    "ru": "Кальций"
+   },
+   "synonyms": {
+    "en": [
+     "total calcium",
+     "ca"
+    ],
+    "ru": [
+     "кальций",
+     "кальций общий"
+    ]
+   },
+   "abbreviations": [
+    "Ca"
+   ],
+   "loinc": [
+    "17861-6"
+   ],
+   "panels": [
+    "metabolic"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "mmol/L",
+   "units": {
+    "mg/dL": 0.2495
+   },
+   "plausible": [
+    0.5,
+    5
+   ],
+   "decimals": 2
+  },
+  {
+   "id": "magnesium",
+   "names": {
+    "en": "Magnesium",
+    "ru": "Магний"
+   },
+   "synonyms": {
+    "en": [
+     "mg"
+    ],
+    "ru": [
+     "магний"
+    ]
+   },
+   "abbreviations": [
+    "Mg"
+   ],
+   "loinc": [
+    "19123-9"
+   ],
+   "panels": [
+    "metabolic"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "mmol/L",
+   "units": {
+    "mg/dL": 0.4114
+   },
+   "plausible": [
+    0.1,
+    5
+   ],
+   "decimals": 2
+  },
+  {
+   "id": "phosphate",
+   "names": {
+    "en": "Phosphate",
+    "ru": "Фосфор"
+   },
+   "synonyms": {
+    "en": [
+     "phosphorus",
+     "inorganic phosphate"
+    ],
+    "ru": [
+     "фосфор",
+     "фосфор неорганический"
+    ]
+   },
+   "abbreviations": [
+    "PHOS",
+    "P"
+   ],
+   "loinc": [
+    "2777-1"
+   ],
+   "panels": [
+    "metabolic"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "mmol/L",
+   "units": {
+    "mg/dL": 0.3229
+   },
+   "plausible": [
+    0.1,
+    6
+   ],
+   "decimals": 2
+  },
+  {
+   "id": "total_protein",
+   "names": {
+    "en": "Total protein",
+    "ru": "Общий белок"
+   },
+   "synonyms": {
+    "en": [
+     "protein total"
+    ],
+    "ru": [
+     "белок общий",
+     "общий белок"
+    ]
+   },
+   "abbreviations": [
+    "TP"
+   ],
+   "loinc": [
+    "2885-2"
+   ],
+   "panels": [
+    "metabolic"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "g/L",
+   "units": {
+    "g/dL": 10
+   },
+   "plausible": [
+    20,
+    150
+   ],
+   "decimals": 0
+  },
+  {
+   "id": "albumin",
+   "names": {
+    "en": "Albumin",
+    "ru": "Альбумин"
+   },
+   "synonyms": {
+    "ru": [
+     "альбумин"
+    ]
+   },
+   "abbreviations": [
+    "ALB"
+   ],
+   "loinc": [
+    "1751-7"
+   ],
+   "panels": [
+    "metabolic",
+    "liver"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "g/L",
+   "units": {
+    "g/dL": 10
+   },
+   "plausible": [
+    5,
+    80
+   ],
+   "decimals": 0
+  },
+  {
+   "id": "alt",
+   "names": {
+    "en": "ALT",
+    "ru": "АЛТ"
+   },
+   "synonyms": {
+    "en": [
+     "alanine aminotransferase",
+     "alanine transaminase",
+     "sgpt",
+     "alat"
+    ],
+    "ru": [
+     "аланинаминотрансфераза",
+     "алат",
+     "алт"
+    ]
+   },
+   "abbreviations": [
+    "ALT",
+    "GPT"
+   ],
+   "loinc": [
+    "1742-6"
+   ],
+   "panels": [
+    "liver",
+    "metabolic"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "U/L",
+   "units": {
+    "µkat/L": 60
+   },
+   "plausible": [
+    0,
+    10000
+   ],
+   "decimals": 0
+  },
+  {
+   "id": "ast",
+   "names": {
+    "en": "AST",
+    "ru": "АСТ"
+   },
+   "synonyms": {
+    "en": [
+     "aspartate aminotransferase",
+     "aspartate transaminase",
+     "sgot",
+     "asat"
+    ],
+    "ru": [
+     "аспартатаминотрансфераза",
+     "асат",
+     "аст"
+    ]
+   },
+   "abbreviations": [
+    "AST",
+    "GOT"
+   ],
+   "loinc": [
+    "1920-8"
+   ],
+   "panels": [
+    "liver",
+    "metabolic"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "U/L",
+   "units": {
+    "µkat/L": 60
+   },
+   "plausible": [
+    0,
+    10000
+   ],
+   "decimals": 0
+  },
+  {
+   "id": "ggt",
+   "names": {
+    "en": "GGT",
+    "ru": "ГГТ"
+   },
+   "synonyms": {
+    "en": [
+     "gamma-glutamyl transferase",
+     "gamma gt",
+     "ggtp"
+    ],
+    "ru": [
+     "гамма-глутамилтрансфераза",
+     "гамма-гт",
+     "ггтп",
+     "ггт"
+    ]
+   },
+   "abbreviations": [
+    "GGT"
+   ],
+   "loinc": [
+    "2324-2"
+   ],
+   "panels": [
+    "liver",
+    "metabolic"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "U/L",
+   "units": {
+    "µkat/L": 60
+   },
+   "plausible": [
+    0,
+    5000
+   ],
+   "decimals": 0
+  },
+  {
+   "id": "alp",
+   "names": {
+    "en": "Alkaline phosphatase",
+    "ru": "Щелочная фосфатаза"
+   },
+   "synonyms": {
+    "en": [
+     "alp",
+     "alk phos"
+    ],
+    "ru": [
+     "щелочная фосфатаза",
+     "щф"
+    ]
+   },
+   "abbreviations": [
+    "ALP"
+   ],
+   "loinc": [
+    "6768-6"
+   ],
+   "panels": [
+    "liver",
+    "metabolic"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "U/L",
+   "units": {
+    "µkat/L": 60
+   },
+   "plausible": [
+    0,
+    5000
+   ],
+   "decimals": 0
+  },
+  {
+   "id": "bilirubin_total",
+   "names": {
+    "en": "Total bilirubin",
+    "ru": "Билирубин общий"
+   },
+   "synonyms": {
+    "en": [
+     "bilirubin",
+     "bilirubin total"
+    ],
+    "ru": [
+     "билирубин",
+     "общий билирубин"
+    ]
+   },
+   "abbreviations": [
+    "TBIL",
+    "BIL-T"
+   ],
+   "loinc": [
+    "1975-2"
+   ],
+   "panels": [
+    "liver",
+    "metabolic"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "µmol/L",
+   "units": {
+    "mg/dL": 17.1
+   },
+   "plausible": [
+    0,
+    800
+   ],
+   "decimals": 1
+  },
+  {
+   "id": "bilirubin_direct",
+   "names": {
+    "en": "Direct bilirubin",
+    "ru": "Билирубин прямой"
+   },
+   "synonyms": {
+    "en": [
+     "conjugated bilirubin",
+     "bilirubin direct"
+    ],
+    "ru": [
+     "прямой билирубин",
+     "билирубин связанный"
+    ]
+   },
+   "abbreviations": [
+    "DBIL",
+    "BIL-D"
+   ],
+   "loinc": [
+    "1968-7"
+   ],
+   "panels": [
+    "liver",
+    "metabolic"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "µmol/L",
+   "units": {
+    "mg/dL": 17.1
+   },
+   "plausible": [
+    0,
+    600
+   ],
+   "decimals": 1
+  },
+  {
+   "id": "ldh",
+   "names": {
+    "en": "LDH",
+    "ru": "ЛДГ"
+   },
+   "synonyms": {
+    "en": [
+     "lactate dehydrogenase"
+    ],
+    "ru": [
+     "лактатдегидрогеназа",
+     "лдг"
+    ]
+   },
+   "abbreviations": [
+    "LDH",
+    "LD"
+   ],
+   "loinc": [
+    "2532-0"
+   ],
+   "panels": [
+    "liver",
+    "metabolic"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "U/L",
+   "units": {
+    "µkat/L": 60
+   },
+   "plausible": [
+    0,
+    10000
+   ],
+   "decimals": 0
+  },
+  {
+   "id": "amylase",
+   "names": {
+    "en": "Amylase",
+    "ru": "Амилаза"
+   },
+   "synonyms": {
+    "en": [
+     "alpha-amylase"
+    ],
+    "ru": [
+     "альфа-амилаза",
+     "амилаза"
+    ]
+   },
+   "abbreviations": [
+    "AMY"
+   ],
+   "loinc": [
+    "1798-8"
+   ],
+   "panels": [
+    "metabolic"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "U/L",
+   "units": {
+    "µkat/L": 60
+   },
+   "plausible": [
+    0,
+    5000
+   ],
+   "decimals": 0
+  },
+  {
+   "id": "lipase",
+   "names": {
+    "en": "Lipase",
+    "ru": "Липаза"
+   },
+   "synonyms": {
+    "ru": [
+     "липаза"
+    ]
+   },
+   "abbreviations": [
+    "LIP"
+   ],
+   "loinc": [
+    "3040-3"
+   ],
+   "panels": [
+    "metabolic"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "U/L",
+   "units": {
+    "µkat/L": 60
+   },
+   "plausible": [
+    0,
+    10000
+   ],
+   "decimals": 0
+  },
+  {
+   "id": "ferritin",
+   "names": {
+    "en": "Ferritin",
+    "ru": "Ферритин"
+   },
+   "synonyms": {
+    "ru": [
+     "ферритин"
+    ]
+   },
+   "abbreviations": [
+    "FERR"
+   ],
+   "loinc": [
+    "2276-4"
+   ],
+   "panels": [
+    "iron"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "ng/mL",
+   "units": {},
+   "plausible": [
+    0,
+    100000
+   ],
+   "decimals": 0
+  },
+  {
+   "id": "iron",
+   "names": {
+    "en": "Iron",
+    "ru": "Железо"
+   },
+   "synonyms": {
+    "en": [
+     "serum iron"
+    ],
+    "ru": [
+     "железо сывороточное",
+     "сывороточное железо"
+    ]
+   },
+   "abbreviations": [
+    "Fe"
+   ],
+   "loinc": [
+    "2498-4"
+   ],
+   "panels": [
+    "iron"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "µmol/L",
+   "units": {
+    "µg/dL": 0.1791
+   },
+   "plausible": [
+    0.5,
+    150
+   ],
+   "decimals": 1
+  },
+  {
+   "id": "transferrin",
+   "names": {
+    "en": "Transferrin",
+    "ru": "Трансферрин"
+   },
+   "synonyms": {
+    "ru": [
+     "трансферрин"
+    ]
+   },
+   "abbreviations": [
+    "TRF"
+   ],
+   "loinc": [
+    "3034-6"
+   ],
+   "panels": [
+    "iron"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "g/L",
+   "units": {
+    "mg/dL": 0.01
+   },
+   "plausible": [
+    0.3,
+    8
+   ],
+   "decimals": 2
+  },
+  {
+   "id": "tibc",
+   "names": {
+    "en": "Total iron-binding capacity (TIBC)",
+    "ru": "ОЖСС"
+   },
+   "synonyms": {
+    "en": [
+     "total iron binding capacity"
+    ],
+    "ru": [
+     "общая железосвязывающая способность",
+     "ожсс"
+    ]
+   },
+   "abbreviations": [
+    "TIBC"
+   ],
+   "loinc": [
+    "2500-7"
+   ],
+   "panels": [
+    "iron"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "µmol/L",
+   "units": {
+    "µg/dL": 0.1791
+   },
+   "plausible": [
+    10,
+    200
+   ],
+   "decimals": 0
+  },
+  {
+   "id": "tsat",
+   "names": {
+    "en": "Transferrin saturation",
+    "ru": "Насыщение трансферрина"
+   },
+   "synonyms": {
+    "en": [
+     "iron saturation",
+     "tsat"
+    ],
+    "ru": [
+     "коэффициент насыщения трансферрина",
+     "кнт",
+     "насыщение трансферрина железом"
+    ]
+   },
+   "abbreviations": [
+    "TSAT"
+   ],
+   "loinc": [
+    "2502-3"
+   ],
+   "panels": [
+    "iron"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "%",
+   "units": {},
+   "plausible": [
+    1,
+    100
+   ],
+   "decimals": 0
+  },
+  {
+   "id": "b12",
+   "names": {
+    "en": "Vitamin B12",
+    "ru": "Витамин B12"
+   },
+   "synonyms": {
+    "en": [
+     "cobalamin",
+     "cyanocobalamin",
+     "b12"
+    ],
+    "ru": [
+     "витамин в12",
+     "кобаламин",
+     "b12"
+    ]
+   },
+   "abbreviations": [
+    "B12"
+   ],
+   "loinc": [
+    "2132-9"
+   ],
+   "panels": [
+    "vitamins"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "pmol/L",
+   "units": {
+    "pg/mL": 0.738
+   },
+   "plausible": [
+    20,
+    5000
+   ],
+   "decimals": 0
+  },
+  {
+   "id": "folate",
+   "names": {
+    "en": "Folate",
+    "ru": "Фолиевая кислота"
+   },
+   "synonyms": {
+    "en": [
+     "folic acid",
+     "serum folate"
+    ],
+    "ru": [
+     "фолат",
+     "фолиевая кислота"
+    ]
+   },
+   "abbreviations": [
+    "FOL"
+   ],
+   "loinc": [
+    "2284-8"
+   ],
+   "panels": [
+    "vitamins"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "nmol/L",
+   "units": {
+    "ng/mL": 2.266
+   },
+   "plausible": [
+    1,
+    200
+   ],
+   "decimals": 1
+  },
+  {
+   "id": "vitd_25oh",
+   "names": {
+    "en": "Vitamin D (25-OH)",
+    "ru": "Витамин D (25-OH)"
+   },
+   "synonyms": {
+    "en": [
+     "25-hydroxyvitamin d",
+     "25-oh vitamin d",
+     "vitamin d",
+     "calcidiol"
+    ],
+    "ru": [
+     "витамин д",
+     "25-oh витамин d",
+     "витамин d"
+    ]
+   },
+   "abbreviations": [
+    "25(OH)D"
+   ],
+   "loinc": [
+    "62292-8"
+   ],
+   "panels": [
+    "vitamins"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "nmol/L",
+   "units": {
+    "ng/mL": 2.496
+   },
+   "plausible": [
+    2,
+    600
+   ],
+   "decimals": 0
+  },
+  {
+   "id": "homocysteine",
+   "names": {
+    "en": "Homocysteine",
+    "ru": "Гомоцистеин"
+   },
+   "synonyms": {
+    "ru": [
+     "гомоцистеин"
+    ]
+   },
+   "abbreviations": [
+    "HCY"
+   ],
+   "loinc": [
+    "13965-9"
+   ],
+   "panels": [
+    "vitamins"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "µmol/L",
+   "units": {},
+   "plausible": [
+    1,
+    200
+   ],
+   "decimals": 1
+  },
+  {
+   "id": "tsh",
+   "names": {
+    "en": "TSH",
+    "ru": "ТТГ"
+   },
+   "synonyms": {
+    "en": [
+     "thyroid stimulating hormone",
+     "thyrotropin"
+    ],
+    "ru": [
+     "тиреотропный гормон",
+     "ттг"
+    ]
+   },
+   "abbreviations": [
+    "TSH"
+   ],
+   "loinc": [
+    "3016-3"
+   ],
+   "panels": [
+    "thyroid"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "mIU/L",
+   "units": {},
+   "plausible": [
+    0.001,
+    500
+   ],
+   "decimals": 2
+  },
+  {
+   "id": "ft4",
+   "names": {
+    "en": "Free T4",
+    "ru": "Т4 свободный"
+   },
+   "synonyms": {
+    "en": [
+     "free thyroxine",
+     "ft4",
+     "thyroxine free"
+    ],
+    "ru": [
+     "свободный т4",
+     "тироксин свободный",
+     "т4 св"
+    ]
+   },
+   "abbreviations": [
+    "FT4"
+   ],
+   "loinc": [
+    "3024-7"
+   ],
+   "panels": [
+    "thyroid"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "pmol/L",
+   "units": {
+    "ng/dL": 12.87
+   },
+   "plausible": [
+    1,
+    150
+   ],
+   "decimals": 1
+  },
+  {
+   "id": "ft3",
+   "names": {
+    "en": "Free T3",
+    "ru": "Т3 свободный"
+   },
+   "synonyms": {
+    "en": [
+     "free triiodothyronine",
+     "ft3"
+    ],
+    "ru": [
+     "свободный т3",
+     "трийодтиронин свободный",
+     "т3 св"
+    ]
+   },
+   "abbreviations": [
+    "FT3"
+   ],
+   "loinc": [
+    "3051-0"
+   ],
+   "panels": [
+    "thyroid"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "pmol/L",
+   "units": {
+    "pg/mL": 1.536
+   },
+   "plausible": [
+    0.5,
+    50
+   ],
+   "decimals": 1
+  },
+  {
+   "id": "anti_tpo",
+   "names": {
+    "en": "Anti-TPO antibodies",
+    "ru": "Антитела к ТПО"
+   },
+   "synonyms": {
+    "en": [
+     "thyroid peroxidase antibodies",
+     "tpo antibodies",
+     "anti-tpo"
+    ],
+    "ru": [
+     "ат-тпо",
+     "антитела к тиреопероксидазе"
+    ]
+   },
+   "abbreviations": [
+    "TPOAb"
+   ],
+   "loinc": [
+    "8099-4"
+   ],
+   "panels": [
+    "thyroid"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "IU/mL",
+   "units": {},
+   "plausible": [
+    0,
+    100000
+   ],
+   "decimals": 0
+  },
+  {
+   "id": "crp",
+   "names": {
+    "en": "C-reactive protein (CRP)",
+    "ru": "С-реактивный белок"
+   },
+   "synonyms": {
+    "en": [
+     "c-reactive protein",
+     "crp"
+    ],
+    "ru": [
+     "срб",
+     "с-реактивный белок"
+    ]
+   },
+   "abbreviations": [
+    "CRP"
+   ],
+   "loinc": [
+    "1988-5"
+   ],
+   "panels": [
+    "inflammation"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "mg/L",
+   "units": {
+    "mg/dL": 10
+   },
+   "plausible": [
+    0,
+    1000
+   ],
+   "decimals": 1
+  },
+  {
+   "id": "hs_crp",
+   "names": {
+    "en": "hs-CRP",
+    "ru": "hs-СРБ"
+   },
+   "synonyms": {
+    "en": [
+     "high-sensitivity crp",
+     "high sensitivity c-reactive protein",
+     "hscrp"
+    ],
+    "ru": [
+     "высокочувствительный срб",
+     "срб высокочувствительный"
+    ]
+   },
+   "abbreviations": [
+    "hsCRP"
+   ],
+   "loinc": [
+    "30522-7"
+   ],
+   "panels": [
+    "inflammation",
+    "cardiac"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "mg/L",
+   "units": {
+    "mg/dL": 10
+   },
+   "plausible": [
+    0,
+    100
+   ],
+   "decimals": 2
+  },
+  {
+   "id": "pt",
+   "names": {
+    "en": "Prothrombin time",
+    "ru": "Протромбиновое время"
+   },
+   "synonyms": {
+    "en": [
+     "prothrombin time",
+     "pt"
+    ],
+    "ru": [
+     "протромбиновое время",
+     "пв"
+    ]
+   },
+   "abbreviations": [
+    "PT"
+   ],
+   "loinc": [
+    "5902-2"
+   ],
+   "panels": [
+    "coagulation"
+   ],
+   "specimen": [
+    "plasma"
+   ],
+   "unit": "s",
+   "units": {},
+   "plausible": [
+    5,
+    200
+   ],
+   "decimals": 1
+  },
+  {
+   "id": "inr",
+   "names": {
+    "en": "INR",
+    "ru": "МНО"
+   },
+   "synonyms": {
+    "en": [
+     "international normalized ratio",
+     "international normalised ratio"
+    ],
+    "ru": [
+     "мно",
+     "международное нормализованное отношение"
+    ]
+   },
+   "abbreviations": [
+    "INR"
+   ],
+   "loinc": [
+    "6301-6"
+   ],
+   "panels": [
+    "coagulation"
+   ],
+   "specimen": [
+    "plasma"
+   ],
+   "unit": "ratio",
+   "units": {},
+   "plausible": [
+    0.5,
+    15
+   ],
+   "decimals": 2
+  },
+  {
+   "id": "aptt",
+   "names": {
+    "en": "APTT",
+    "ru": "АЧТВ"
+   },
+   "synonyms": {
+    "en": [
+     "activated partial thromboplastin time",
+     "ptt"
+    ],
+    "ru": [
+     "ачтв",
+     "активированное частичное тромбопластиновое время"
+    ]
+   },
+   "abbreviations": [
+    "APTT",
+    "aPTT"
+   ],
+   "loinc": [
+    "3173-2"
+   ],
+   "panels": [
+    "coagulation"
+   ],
+   "specimen": [
+    "plasma"
+   ],
+   "unit": "s",
+   "units": {},
+   "plausible": [
+    10,
+    250
+   ],
+   "decimals": 1
+  },
+  {
+   "id": "fibrinogen",
+   "names": {
+    "en": "Fibrinogen",
+    "ru": "Фибриноген"
+   },
+   "synonyms": {
+    "ru": [
+     "фибриноген"
+    ]
+   },
+   "abbreviations": [
+    "FIB"
+   ],
+   "loinc": [
+    "3255-7"
+   ],
+   "panels": [
+    "coagulation"
+   ],
+   "specimen": [
+    "plasma"
+   ],
+   "unit": "g/L",
+   "units": {
+    "mg/dL": 0.01
+   },
+   "plausible": [
+    0.2,
+    15
+   ],
+   "decimals": 2
+  },
+  {
+   "id": "d_dimer",
+   "names": {
+    "en": "D-dimer",
+    "ru": "Д-димер"
+   },
+   "synonyms": {
+    "en": [
+     "d dimer"
+    ],
+    "ru": [
+     "д-димер",
+     "d-димер"
+    ]
+   },
+   "abbreviations": [
+    "DD"
+   ],
+   "loinc": [
+    "48065-7"
+   ],
+   "panels": [
+    "coagulation"
+   ],
+   "specimen": [
+    "plasma"
+   ],
+   "unit": "µg/mL",
+   "units": {
+    "ng/mL": 0.001
+   },
+   "plausible": [
+    0,
+    100
+   ],
+   "decimals": 2
+  },
+  {
+   "id": "testosterone",
+   "names": {
+    "en": "Testosterone",
+    "ru": "Тестостерон"
+   },
+   "synonyms": {
+    "en": [
+     "total testosterone"
+    ],
+    "ru": [
+     "тестостерон общий",
+     "тестостерон"
+    ]
+   },
+   "abbreviations": [
+    "TESTO"
+   ],
+   "loinc": [
+    "2986-8"
+   ],
+   "panels": [
+    "hormones"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "nmol/L",
+   "units": {
+    "ng/dL": 0.0347
+   },
+   "plausible": [
+    0,
+    100
+   ],
+   "decimals": 2
+  },
+  {
+   "id": "estradiol",
+   "names": {
+    "en": "Estradiol",
+    "ru": "Эстрадиол"
+   },
+   "synonyms": {
+    "en": [
+     "oestradiol",
+     "e2"
+    ],
+    "ru": [
+     "эстрадиол"
+    ]
+   },
+   "abbreviations": [
+    "E2"
+   ],
+   "loinc": [
+    "2243-4"
+   ],
+   "panels": [
+    "hormones"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "pmol/L",
+   "units": {
+    "pg/mL": 3.671
+   },
+   "plausible": [
+    0,
+    20000
+   ],
+   "decimals": 0
+  },
+  {
+   "id": "cortisol",
+   "names": {
+    "en": "Cortisol",
+    "ru": "Кортизол"
+   },
+   "synonyms": {
+    "ru": [
+     "кортизол"
+    ]
+   },
+   "abbreviations": [
+    "CORT"
+   ],
+   "loinc": [
+    "2143-6"
+   ],
+   "panels": [
+    "hormones"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "nmol/L",
+   "units": {
+    "µg/dL": 27.59
+   },
+   "plausible": [
+    5,
+    3000
+   ],
+   "decimals": 0
+  },
+  {
+   "id": "prolactin",
+   "names": {
+    "en": "Prolactin",
+    "ru": "Пролактин"
+   },
+   "synonyms": {
+    "ru": [
+     "пролактин"
+    ]
+   },
+   "abbreviations": [
+    "PRL"
+   ],
+   "loinc": [
+    "2842-3"
+   ],
+   "panels": [
+    "hormones"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "mIU/L",
+   "units": {
+    "ng/mL": 21.2
+   },
+   "plausible": [
+    1,
+    20000
+   ],
+   "decimals": 0
+  },
+  {
+   "id": "psa",
+   "names": {
+    "en": "PSA",
+    "ru": "ПСА"
+   },
+   "synonyms": {
+    "en": [
+     "prostate specific antigen",
+     "total psa"
+    ],
+    "ru": [
+     "простатспецифический антиген",
+     "пса общий",
+     "пса"
+    ]
+   },
+   "abbreviations": [
+    "PSA"
+   ],
+   "loinc": [
+    "2857-1"
+   ],
+   "panels": [
+    "hormones"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "ng/mL",
+   "units": {},
+   "plausible": [
+    0,
+    10000
+   ],
+   "decimals": 2
+  },
+  {
+   "id": "troponin",
+   "names": {
+    "en": "Troponin",
+    "ru": "Тропонин"
+   },
+   "synonyms": {
+    "en": [
+     "troponin i",
+     "troponin t",
+     "hs-troponin",
+     "high-sensitivity troponin"
+    ],
+    "ru": [
+     "тропонин i",
+     "тропонин т",
+     "тропонин"
+    ]
+   },
+   "abbreviations": [
+    "TnI",
+    "TnT",
+    "hsTnT"
+   ],
+   "loinc": [
+    "10839-9"
+   ],
+   "panels": [
+    "cardiac"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "pg/mL",
+   "units": {
+    "ng/mL": 1000
+   },
+   "plausible": [
+    0,
+    100000
+   ],
+   "decimals": 0
+  },
+  {
+   "id": "nt_probnp",
+   "names": {
+    "en": "NT-proBNP",
+    "ru": "NT-proBNP"
+   },
+   "synonyms": {
+    "en": [
+     "nt probnp",
+     "n-terminal pro b-type natriuretic peptide"
+    ],
+    "ru": [
+     "нт-пробнп",
+     "мозговой натрийуретический пептид"
+    ]
+   },
+   "abbreviations": [
+    "NT-proBNP"
+   ],
+   "loinc": [
+    "33762-6"
+   ],
+   "panels": [
+    "cardiac"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "pg/mL",
+   "units": {
+    "pmol/L": 8.457
+   },
+   "plausible": [
+    0,
+    100000
+   ],
+   "decimals": 0
+  },
+  {
+   "id": "ttg_iga",
+   "names": {
+    "en": "Anti-tTG IgA",
+    "ru": "Антитела к тТГ IgA"
+   },
+   "synonyms": {
+    "en": [
+     "tissue transglutaminase iga",
+     "ttg iga",
+     "anti-ttg",
+     "transglutaminase"
+    ],
+    "ru": [
+     "антитела к тканевой трансглутаминазе",
+     "ттг iga"
+    ]
+   },
+   "abbreviations": [
+    "tTG-IgA"
+   ],
+   "loinc": [
+    "31017-7"
+   ],
+   "panels": [
+    "coeliac"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "IU/mL",
+   "units": {},
+   "plausible": [
+    0,
+    10000
+   ],
+   "decimals": 1
+  },
+  {
+   "id": "iga_total",
+   "names": {
+    "en": "Total IgA",
+    "ru": "IgA общий"
+   },
+   "synonyms": {
+    "en": [
+     "immunoglobulin a",
+     "iga"
+    ],
+    "ru": [
+     "иммуноглобулин а",
+     "iga"
+    ]
+   },
+   "abbreviations": [
+    "IgA"
+   ],
+   "loinc": [
+    "2458-8"
+   ],
+   "panels": [
+    "coeliac"
+   ],
+   "specimen": [
+    "serum",
+    "plasma"
+   ],
+   "unit": "g/L",
+   "units": {
+    "mg/dL": 0.01
+   },
+   "plausible": [
+    0,
+    20
+   ],
+   "decimals": 2
+  }
+ ]
+}

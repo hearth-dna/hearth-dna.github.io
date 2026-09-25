@@ -28,9 +28,11 @@ export function normTime(s: string): string {
 export const when = (e: Pick<HealthEntry, 'date' | 'time'>) => (e.time ? `${e.date} ${e.time}` : e.date)
 
 /** '37.8 °C', '120/80 mmHg', '72' (no unit); '' when the entry has no value. */
-export function formatValue(e: Pick<HealthEntry, 'value' | 'value2' | 'unit'>): string {
-  if (e.value === null) return ''
-  const n = e.value2 === null ? String(e.value) : `${e.value}/${e.value2}`
+export function formatValue(
+  e: Pick<HealthEntry, 'value' | 'value2' | 'unit'> & { valueText?: string },
+): string {
+  if (e.value === null && !e.valueText) return ''
+  const n = e.valueText || (e.value2 === null ? String(e.value) : `${e.value}/${e.value2}`)
   return e.unit ? `${n} ${e.unit}` : n
 }
 

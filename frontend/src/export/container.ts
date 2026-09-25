@@ -84,8 +84,12 @@ export async function serialiseContainer(c: Container, passphrase?: string): Pro
   }
   for (const [path, bytes] of Object.entries(c.genomes)) entries[path] = [bytes, { level: 0 }]
   const zip = zipSync(entries)
-  if (!passphrase) return zip
-  const head = json(header)
+  return passphrase ? seal(zip, header, passphrase) : zip
+}
+
+/** Wraps a zip in the AES-GCM envelope, the plaintext header in front. */
+export async function seal(zip: Uint8Array, header: Header, passphrase: string): Promise<Uint8Array> {
+  const head = json({ ...header, encrypted: true })
   if (head.length > 0xffff) throw new Error('header too large')
   const salt = crypto.getRandomValues(new Uint8Array(16))
   const nonce = crypto.getRandomValues(new Uint8Array(12))

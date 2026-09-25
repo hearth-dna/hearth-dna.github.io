@@ -311,29 +311,64 @@ function rowToHealthEntry(r: Row): HealthEntry {
     value: (r.value as number | null) ?? null,
     value2: (r.value2 as number | null) ?? null,
     unit: (r.unit as string) ?? '',
+    analyte: (r.analyte as string) ?? '',
+    refLow: (r.ref_low as number | null) ?? null,
+    refHigh: (r.ref_high as number | null) ?? null,
+    flag: ((r.flag as string) ?? '') as HealthEntry['flag'],
+    valueText: (r.value_text as string) ?? '',
     createdAt: r.created_at as string,
   }
 }
 
-export async function addHealthEntry(
-  db: Database,
-  e: {
-    personId: string
-    date: string
-    time?: string
-    kind: HealthKind
-    title: string
-    body: string
-    source?: string
-    bodyPart?: string
-    side?: BodySide
-    severity?: number | null
-    tags?: string[]
-    value?: number | null
-    value2?: number | null
-    unit?: string
-  },
-): Promise<HealthEntry> {
+/** What a caller supplies for a new health-log entry; everything else has a default. */
+export interface HealthEntryInput {
+  personId: string
+  date: string
+  time?: string
+  kind: HealthKind
+  title: string
+  body: string
+  source?: string
+  bodyPart?: string
+  side?: BodySide
+  severity?: number | null
+  tags?: string[]
+  value?: number | null
+  value2?: number | null
+  unit?: string
+  analyte?: string
+  refLow?: number | null
+  refHigh?: number | null
+  flag?: HealthEntry['flag']
+  valueText?: string
+}
+
+const HEALTH_INSERT_COLS = [
+  'id',
+  'person_id',
+  'date',
+  'time',
+  'kind',
+  'title',
+  'body',
+  'source',
+  'body_part',
+  'side',
+  'severity',
+  'tags',
+  'value',
+  'value2',
+  'unit',
+  'analyte',
+  'ref_low',
+  'ref_high',
+  'flag',
+  'value_text',
+  'created_at',
+]
+
+/** Defaults and normalisation shared by one entry and a batch. */
+function newHealthEntry(e: HealthEntryInput): HealthEntry {
   const entry: HealthEntry = {
     id: newId(),
     createdAt: now(),
@@ -346,6 +381,11 @@ export async function addHealthEntry(
     value: null,
     value2: null,
     unit: '',
+    analyte: '',
+    refLow: null,
+    refHigh: null,
+    flag: '',
+    valueText: '',
     ...e,
   }
   entry.bodyPart = entry.bodyPart.trim().toLowerCase()
@@ -353,28 +393,51 @@ export async function addHealthEntry(
   entry.tags = parseTags(formatTags(entry.tags))
   entry.unit = entry.unit.trim()
   entry.time = normTime(entry.time)
+  return entry
+}
+
+const healthRow = (e: HealthEntry): unknown[] => [
+  e.id,
+  e.personId,
+  e.date,
+  e.time,
+  e.kind,
+  e.title,
+  e.body,
+  e.source,
+  e.bodyPart,
+  e.side,
+  e.severity,
+  formatTags(e.tags),
+  e.value,
+  e.value2,
+  e.unit,
+  e.analyte,
+  e.refLow,
+  e.refHigh,
+  e.flag,
+  e.valueText,
+  e.createdAt,
+]
+
+export async function addHealthEntry(db: Database, e: HealthEntryInput): Promise<HealthEntry> {
+  const entry = newHealthEntry(e)
   await db.exec(
-    'INSERT INTO health_log(id,person_id,date,time,kind,title,body,source,body_part,side,severity,tags,value,value2,unit,created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
-    [
-      entry.id,
-      entry.personId,
-      entry.date,
-      entry.time,
-      entry.kind,
-      entry.title,
-      entry.body,
-      entry.source,
-      entry.bodyPart,
-      entry.side,
-      entry.severity,
-      formatTags(entry.tags),
-      entry.value,
-      entry.value2,
-      entry.unit,
-      entry.createdAt,
-    ],
+    `INSERT INTO health_log(${HEALTH_INSERT_COLS.join(',')}) VALUES (${HEALTH_INSERT_COLS.map(() => '?').join(',')})`,
+    healthRow(entry),
   )
   return entry
+}
+
+/** Many entries in one transaction (a CSV import of thousands of readings). */
+export async function addHealthEntries(db: Database, es: HealthEntryInput[]): Promise<number> {
+  if (!es.length) return 0
+  await db.bulkInsert(
+    'health_log',
+    HEALTH_INSERT_COLS,
+    es.map((e) => healthRow(newHealthEntry(e))),
+  )
+  return es.length
 }
 
 export async function deleteHealthEntry(db: Database, id: string): Promise<void> {

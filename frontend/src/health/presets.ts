@@ -18,6 +18,27 @@ export interface HealthPreset {
   pair?: [string, string]
   /** Input hints; no validation beyond "is a number". */
   step?: number
+  /** Other names a spreadsheet or device export uses for this measurement (CSV import). */
+  synonyms?: string[]
+  /** Other spellings of `unit` itself ("кг" for kg). */
+  unitAliases?: string[]
+  /** Other units → conversion into `unit`, keyed by lower-case spelling (CSV import). */
+  units?: Record<string, (v: number) => number>
+}
+
+const times = (f: number) => (v: number) => v * f
+const LB = times(0.45359237)
+const INCH = times(2.54)
+const LENGTH = {
+  in: INCH,
+  inch: INCH,
+  inches: INCH,
+  '"': INCH,
+  дюйм: INCH,
+  m: times(100),
+  mm: times(0.1),
+  мм: times(0.1),
+  м: times(100),
 }
 
 const m = (
@@ -43,25 +64,94 @@ const s = (id: string, title: string, bodyPart = '', tags: string[] = []): Healt
 })
 
 export const MEASUREMENT_PRESETS: HealthPreset[] = [
-  m('temperature', 'Body temperature', '°C', 0.1),
-  m('blood-pressure', 'Blood pressure', 'mmHg', 1, { pair: ['systolic', 'diastolic'], bodyPart: 'heart' }),
-  m('heart-rate', 'Heart rate', 'bpm', 1, { bodyPart: 'heart' }),
-  m('spo2', 'Blood oxygen (SpO₂)', '%', 1, { bodyPart: 'lungs' }),
-  m('weight', 'Weight', 'kg', 0.1),
-  m('height', 'Height', 'cm', 0.5),
-  m('glucose', 'Blood glucose', 'mmol/L', 0.1),
-  m('sleep', 'Sleep', 'h', 0.25),
+  m('temperature', 'Body temperature', '°C', 0.1, {
+    synonyms: ['temperature', 'temp', 'body temp', 'температура', 't°'],
+    unitAliases: ['c', '°с', 'с', 'celsius', 'degc', 'градусы'],
+    units: {
+      '°f': (v) => ((v - 32) * 5) / 9,
+      f: (v) => ((v - 32) * 5) / 9,
+      fahrenheit: (v) => ((v - 32) * 5) / 9,
+      degf: (v) => ((v - 32) * 5) / 9,
+    },
+  }),
+  m('blood-pressure', 'Blood pressure', 'mmHg', 1, {
+    pair: ['systolic', 'diastolic'],
+    bodyPart: 'heart',
+    synonyms: ['bp', 'давление', 'артериальное давление'],
+    unitAliases: ['mm hg', 'мм рт. ст.', 'мм рт.ст.', 'мм рт ст'],
+  }),
+  m('heart-rate', 'Heart rate', 'bpm', 1, {
+    bodyPart: 'heart',
+    synonyms: ['pulse', 'hr', 'resting heart rate', 'пульс', 'чсс'],
+    unitAliases: ['beats/min', '/min', 'уд/мин', 'уд./мин', 'count/min'],
+  }),
+  m('spo2', 'Blood oxygen (SpO₂)', '%', 1, {
+    bodyPart: 'lungs',
+    synonyms: ['spo2', 'oxygen saturation', 'blood oxygen', 'сатурация'],
+  }),
+  m('weight', 'Weight', 'kg', 0.1, {
+    synonyms: ['body mass', 'body weight', 'mass', 'вес', 'масса тела', 'масса'],
+    unitAliases: ['кг', 'kilograms', 'kgs'],
+    units: {
+      lb: LB,
+      lbs: LB,
+      pound: LB,
+      pounds: LB,
+      фунт: LB,
+      st: times(6.35029318),
+      stone: times(6.35029318),
+      g: times(0.001),
+      г: times(0.001),
+    },
+  }),
+  m('height', 'Height', 'cm', 0.5, {
+    synonyms: ['body height', 'length', 'stature', 'рост', 'длина тела'],
+    unitAliases: ['см'],
+    units: { ...LENGTH, ft: times(30.48) },
+  }),
+  m('glucose', 'Blood glucose', 'mmol/L', 0.1, {
+    synonyms: ['glucose', 'blood sugar', 'sugar', 'сахар', 'глюкоза', 'сахар крови'],
+    unitAliases: ['mmol/l', 'ммоль/л'],
+    units: { 'mg/dl': times(0.0555), 'мг/дл': times(0.0555) },
+  }),
+  m('sleep', 'Sleep', 'h', 0.25, {
+    synonyms: ['sleep duration', 'time asleep', 'сон'],
+    unitAliases: ['hr', 'hours', 'ч', 'час', 'часы'],
+    units: { min: times(1 / 60), minutes: times(1 / 60), мин: times(1 / 60) },
+  }),
   m('peak-flow', 'Peak flow', 'L/min', 5, { bodyPart: 'lungs' }),
   m('respiratory-rate', 'Breathing rate', 'breaths/min', 1, { bodyPart: 'lungs' }),
-  m('waist', 'Waist circumference', 'cm', 0.5, { bodyPart: 'abdomen' }),
-  m('hip', 'Hip circumference', 'cm', 0.5, { bodyPart: 'hips' }),
-  m('body-fat', 'Body fat', '%', 0.1),
+  m('waist', 'Waist circumference', 'cm', 0.5, {
+    bodyPart: 'abdomen',
+    synonyms: ['waist', 'талия', 'обхват талии'],
+    unitAliases: ['см'],
+    units: LENGTH,
+  }),
+  m('hip', 'Hip circumference', 'cm', 0.5, {
+    bodyPart: 'hips',
+    synonyms: ['hips', 'hip', 'бедра', 'обхват бедер'],
+    unitAliases: ['см'],
+    units: LENGTH,
+  }),
+  m('body-fat', 'Body fat', '%', 0.1, { synonyms: ['body fat percentage', 'fat', 'жир', 'процент жира'] }),
   m('muscle-mass', 'Muscle mass', '%', 0.1),
-  m('head-circumference', 'Head circumference', 'cm', 0.5, { bodyPart: 'head' }),
-  m('steps', 'Steps', 'steps', 100),
-  m('water', 'Water drunk', 'L', 0.1),
-  m('mood', 'Mood', '/10', 1),
-  m('stress', 'Stress', '/10', 1),
+  m('head-circumference', 'Head circumference', 'cm', 0.5, {
+    bodyPart: 'head',
+    synonyms: ['head', 'окружность головы'],
+    unitAliases: ['см'],
+    units: LENGTH,
+  }),
+  m('steps', 'Steps', 'steps', 100, {
+    synonyms: ['step count', 'шаги'],
+    unitAliases: ['count', 'шаг', 'шагов'],
+  }),
+  m('water', 'Water drunk', 'L', 0.1, {
+    synonyms: ['water', 'dietary water', 'вода'],
+    unitAliases: ['l', 'л', 'litre', 'liter'],
+    units: { ml: times(0.001), мл: times(0.001), 'fl oz': times(0.0295735), floz: times(0.0295735) },
+  }),
+  m('mood', 'Mood', '/10', 1, { synonyms: ['настроение'] }),
+  m('stress', 'Stress', '/10', 1, { synonyms: ['стресс'] }),
   m('inr', 'INR (blood clotting)', 'ratio', 0.1),
 ]
 

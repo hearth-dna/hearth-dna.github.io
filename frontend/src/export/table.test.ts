@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { Finding } from '../kb/kb'
+import type { Finding, Kb } from '../kb/kb'
 import type { HealthEntry, Person } from '../types'
 import {
   CSV_BOM,
@@ -79,7 +79,8 @@ describe('tables', () => {
       match: { label: 'two copies', magnitude: 3 },
       riskCopies: 2,
     }
-    const t = findingsTable([{ person: person('1', 'me', 'Me'), findings: [f] }])
+    const kb = { conditions: [{ id: 'c1', names: { en: 'Condition one' } }] } as unknown as Kb
+    const t = findingsTable(kb, [{ person: person('1', 'me', 'Me'), findings: [f] }])
     expect(t.rows[0]).toEqual([
       'Me',
       'rs1',
@@ -92,7 +93,7 @@ describe('tables', () => {
       'two copies',
       'B',
       't',
-      'c1; c2',
+      'Condition one; c2',
       'd1',
       's',
       'x y',
@@ -111,6 +112,11 @@ describe('tables', () => {
       source: '',
       bodyPart: 'head',
       side: 'left',
+      analyte: '',
+      refLow: null,
+      refHigh: null,
+      flag: '' as const,
+      valueText: '',
       severity: 4,
       tags: ['migraine', 'stress'],
       value: null,
@@ -130,6 +136,11 @@ describe('tables', () => {
       4,
       null,
       null,
+      '',
+      '',
+      null,
+      null,
+      '',
       '',
       'migraine; stress',
       '',

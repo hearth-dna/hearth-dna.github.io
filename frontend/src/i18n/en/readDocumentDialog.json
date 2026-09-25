@@ -18,5 +18,13 @@
   "readDocumentDialog.hint.diagnosis": "Diagnosis",
   "readDocumentDialog.tooBig": "{mb} MB selected; the limit is {max} MB per document. Split it or downscale the photos.",
   "readDocumentDialog.failed": "Failed: {message}",
-  "readDocumentDialog.continue": "Continue…"
+  "readDocumentDialog.continue": "Continue…",
+  "readDocumentDialog.labIntro": "Text, .txt, .csv and .tsv files, and PDFs with selectable text are read on this device and never leave it. Photos and scanned PDFs are read by Google Gemini with your key.",
+  "readDocumentDialog.pasteLabel": "Or paste the report text",
+  "readDocumentDialog.pastePlaceholder": "Copy the results table from a lab portal or e-mail and paste it here",
+  "readDocumentDialog.readingLocally": "Reading on this device…",
+  "readDocumentDialog.localPartial": "Only {n} of about {m} result lines could be read on this device.",
+  "readDocumentDialog.localNothing": "No results could be read on this device.",
+  "readDocumentDialog.reviewFound": "Review the {n} found",
+  "readDocumentDialog.useGemini": "Read with Gemini instead…"
 }

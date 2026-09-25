@@ -1,10 +1,10 @@
 import { Database } from '../db/db'
 import { getMeta } from '../db/repo'
-import { fillGenomes, missingGenomes, openContainer } from '../export/container'
 import { type Progress, type RestoreResult, restoreContainer } from '../export/restore'
 import { snapshotBytes } from '../export/snapshot'
 import * as folder from './folder'
 import { baseName, conflictName, hasNewer, isForeign, spareNames } from './naming'
+import { openRepaired } from './repair'
 
 /**
  * App-wide backup state: the remembered folder, the session passphrase, a debounced autosave
@@ -300,22 +300,14 @@ class Backups {
     const bytes = await folder.readCurrent(this.saved.handle, base)
     if (!bytes) throw new Error(`no ${base} in ${this.name}`)
     const pass = this.plain ? undefined : this.passphrase() || undefined
-    onProgress('restore.openingDump')
-    const c = await openContainer(bytes, pass)
-    // A snapshot that lost genome files (an interrupted sync, a bad copy) is repaired from the
-    // older copies and conflict files next to it: same path, same hash, same bytes.
-    if (missingGenomes(c).length) {
-      onProgress('restore.repairing')
-      for (const name of spareNames(await folder.list(this.saved.handle), base)) {
-        try {
-          const spare = await folder.readNamed(this.saved.handle, name)
-          if (spare) fillGenomes(c, await openContainer(spare, pass))
-        } catch {
-          // Another passphrase or an unreadable file: it just cannot help.
-        }
-        if (!missingGenomes(c).length) break
-      }
-    }
+    const handle = this.saved.handle
+    const c = await openRepaired(
+      bytes,
+      pass,
+      spareNames(await folder.list(handle), base),
+      (name) => folder.readNamed(handle, name),
+      onProgress,
+    )
     const r = await restoreContainer(this.db, c, onProgress)
     this.missing = r.missing
     this.onLoaded()

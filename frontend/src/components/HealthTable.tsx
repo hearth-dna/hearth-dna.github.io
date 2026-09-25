@@ -213,7 +213,10 @@ export function HealthTable({
                       {e.title}
                       {e.body && <span className="muted"> ¶</span>}
                     </td>
-                    <td className="nowrap">{formatValue(e)}</td>
+                    <td className="nowrap">
+                      {formatValue(e)}
+                      {e.flag && <span className="danger"> {e.flag === 'H' ? '↑' : '↓'}</span>}
+                    </td>
                     <td>
                       {e.bodyPart}
                       {e.bodyPart && e.side && <span className="muted"> · {t(`side.${e.side}`)}</span>}

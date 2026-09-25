@@ -93,6 +93,11 @@ const HEALTH_COLS = [
   'value',
   'value2',
   'unit',
+  'analyte',
+  'ref_low',
+  'ref_high',
+  'flag',
+  'value_text',
   'created_at',
 ]
 const PERSON_COLS = ['id', 'label', 'display_name', 'sex', 'birth_year', 'notes', 'created_at']
@@ -110,6 +115,11 @@ function withDefaults(rows: Rows): Rows {
     value: null,
     value2: null,
     unit: '',
+    analyte: '',
+    ref_low: null,
+    ref_high: null,
+    flag: '',
+    value_text: '',
     ...h,
   }))
 }

@@ -1,5 +1,7 @@
 import { fetchOwnAsset } from '../egress/egress'
+import type { KbAnalyte, KbPanel, KbUnit } from '../labs/types'
 import type { Call } from '../types'
+import { conditionById, conditionNames, type KbCondition } from './conditions'
 
 export interface KbGenotype {
   label: string
@@ -16,6 +18,7 @@ export interface KbEntry {
   genotypes: Record<string, KbGenotype>
   sources: string[]
   drugs?: string[]
+  /** Condition ids (`Kb.conditions`). */
   conditions?: string[]
   topic: string
   generated_by: string
@@ -24,6 +27,10 @@ export interface Kb {
   version: string
   entries: KbEntry[]
   topics: { id: string; category: string }[]
+  conditions: KbCondition[]
+  analytes: KbAnalyte[]
+  panels: KbPanel[]
+  units: KbUnit[]
 }
 
 export async function loadKb(): Promise<Kb> {
@@ -65,13 +72,21 @@ export function computeFindings(kb: Kb, calls: Iterable<Call>): Finding[] {
   )
 }
 
-/** Text search over the kb: gene, name, drugs, conditions, summary. */
+/** Text search over the kb: gene, name, drugs, summary, and every name of the linked conditions. */
 export function searchKb(kb: Kb, q: string): KbEntry[] {
   const needle = q.trim().toLowerCase()
   if (!needle) return []
   return kb.entries.filter((e) =>
-    [e.rsid, e.gene, e.name, e.summary, ...(e.drugs ?? []), ...(e.conditions ?? [])].some((s) =>
-      s.toLowerCase().includes(needle),
-    ),
+    [
+      e.rsid,
+      e.gene,
+      e.name,
+      e.summary,
+      ...(e.drugs ?? []),
+      ...(e.conditions ?? []).flatMap((id) => {
+        const c = conditionById(kb, id)
+        return c ? conditionNames(c) : []
+      }),
+    ].some((s) => s.toLowerCase().includes(needle)),
   )
 }

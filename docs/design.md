@@ -128,6 +128,8 @@ kb_topic     (id, name, category, description_md, prs_available)
 kb_prs       (topic_id, rsid, effect_allele, beta, source_study)          -- GWAS Catalog / PGS Catalog
 kb_pgx       (gene, star_allele, defining_rsids_json, function, cpic_guideline_url, drugs_json)
 kb_group     (id, name, rsids_json, rule_json)                            -- haplotypes, star alleles
+kb_condition (id, names_json, synonyms_json, icd10_json, rsids_json, labs_json, measurements_json,
+              symptoms_json, body_parts_json, drugs_json)   -- shipped: kb/reviewed/conditions.json
 ```
 
 **Seed content, in priority order:**
@@ -226,7 +228,8 @@ kb fields at tier 0, so the user gets a decision frame even without any LLM.
 
 ### 6.4 Medical documents — processed locally, never stored remotely
 - **Shipped first (health log):** a per-person `health_log(id, person_id, date, time, kind, title, body,
-  body_part, side, severity, tags, value, value2, unit)` of dated entries — lab result, diagnosis,
+  body_part, side, severity, tags, value, value2, unit, analyte, ref_low, ref_high, flag,
+  value_text)` of dated entries — lab result, diagnosis,
   medication, doctor letter, a self-reported **symptom** ("pain in both hands", body part `hands`,
   severity 6/10, tags `arthritis`), or a home **measurement** stored as numbers (`value`, a second
   `value2` for pairs like blood pressure, and `unit`: 37.8 °C, 120/80 mmHg, 71.5 kg) — typed or
@@ -242,6 +245,29 @@ kb fields at tier 0, so the user gets a decision frame even without any LLM.
   a transcription-only JSON draft the user reviews in the health-log form. The key lives in `meta`,
   is never dumped, and is deleted by "Erase all data" or by revoking the consent. Free-tier keys
   are flagged: Google may train on the input.
+- **Shipped third (blood-test reader):** with "Lab result" chosen, the reader also takes pasted
+  text and .txt/.csv/.tsv files, and reads them and PDFs with a text layer on this device
+  (`labs/parseText.ts`, pdf.js loaded on demand); nothing leaves it. Photos and scans go to Gemini
+  with `labs/prompt.ts`, whose schema makes the model pick each test from the lab catalogue
+  (`kb/reviewed/labs/`) and forbids converting. Both paths go through `labs/normalise.ts` and a
+  review table; each ticked row becomes one `lab` entry with its catalogue id, value and unit as
+  printed, reference range and flag.
+- **Shipped fourth (charts):** a Charts page (`/charts`) draws numeric health-log readings over
+  time: pick people and tests or measurements, one panel per metric (never two y-axes), one line
+  per person in that person's fixed colour, every panel on one time range. Lab readings are
+  converted into the test's canonical unit so readings from different labs form one line; the
+  printed reference range is a band when every reading shares it. Pure grouping and conversion in
+  `charts/series.ts`; hand-drawn SVG in `components/TimeChart.tsx` with a crosshair tooltip, arrow
+  keys (a slider over the readings) and a table view.
+- **Shipped fifth (CSV timeline import):** "Import CSV…" in a person's health log takes a
+  spreadsheet or a device export, one row per date with a column per measurement or one reading
+  per row (name, value, unit). The user assigns every column (and, for the long shape, every
+  metric name) to a measurement preset, a lab test or a custom metric; suggestions come from
+  headers in English or Russian, units in brackets and device identifiers. Dates are read per
+  column (ISO, d.m.y, m/d/y, spreadsheet serials, Unix time; ambiguous columns are flagged).
+  Values are converted into the app's unit (lb → kg, in → cm, °F → °C, mg/dL → mmol/L) with the
+  printed value kept in the text; a unit that cannot be converted blocks its column. Readings the
+  log already has are skipped, so a re-import adds nothing twice. `timeline/`, local only.
 - Accept PDF, images, plain text. `pdf.js` extracts the text layer; `Tesseract.js` OCRs scans; both in
   a worker. Originals stored as blobs in OPFS, referenced from `document`.
 - Structured extraction into `observation` rows (lab values with units and reference ranges,

@@ -5,6 +5,7 @@ import { StartupLog, type StepState } from './app/startup'
 import { archivePayload, openArchiveDb } from './archive/mode'
 import { backups } from './backup/scheduler'
 import { AskPage } from './components/AskPage'
+import { ChartsPage } from './components/ChartsPage'
 import { ConsentGate } from './components/ConsentGate'
 import { EraseDialog } from './components/EraseDialog'
 import { FamilyPage } from './components/FamilyPage'
@@ -145,6 +146,7 @@ export function App() {
           {nav({ name: 'people' }, t('app.navPeople'))}
           {nav({ name: 'family' }, t('app.navFamily'))}
           {nav({ name: 'health', person: '' }, t('app.navHealth'))}
+          {nav({ name: 'charts' }, t('app.navCharts'))}
           {nav({ name: 'ask' }, t('app.navAsk'))}
           {nav({ name: 'settings' }, t('app.navSettings'))}
         </nav>
@@ -174,6 +176,7 @@ export function App() {
         {page.name === 'health' && (
           <HealthPage person={page.person} onPerson={(person) => setPage({ name: 'health', person })} />
         )}
+        {page.name === 'charts' && <ChartsPage />}
         {page.name === 'ask' && <AskPage />}
         {page.name === 'settings' && <SettingsPage />}
       </main>

@@ -1,0 +1,932 @@
+{
+  "conditions": [
+    {
+      "id": "t2d",
+      "names": {
+        "en": "Type 2 diabetes",
+        "ru": "Сахарный диабет 2 типа"
+      },
+      "synonyms": {
+        "en": [
+          "diabetes",
+          "t2d",
+          "diabetes mellitus type 2",
+          "type 2 diabetes"
+        ],
+        "ru": [
+          "диабет",
+          "сахарный диабет"
+        ]
+      },
+      "icd10": [
+        "E11"
+      ],
+      "category": "cardiometabolic",
+      "rsids": [],
+      "labs": [
+        "hba1c",
+        "glucose",
+        "glucose_2h",
+        "insulin"
+      ],
+      "measurements": [
+        "glucose",
+        "weight",
+        "waist",
+        "blood-pressure"
+      ],
+      "symptoms": [
+        "thirst",
+        "frequent urination",
+        "fatigue"
+      ],
+      "body_parts": [],
+      "drugs": [
+        "metformin"
+      ],
+      "summary": "Chronic high blood sugar from insulin resistance. Common, strongly influenced by weight and activity; TCF7L2 is the largest common genetic effect.",
+      "sources": [
+        "https://icd.who.int/browse10/2019/en#/E11"
+      ],
+      "reviewed_at": "2026-09-25"
+    },
+    {
+      "id": "cad",
+      "names": {
+        "en": "Coronary artery disease",
+        "ru": "Ишемическая болезнь сердца"
+      },
+      "synonyms": {
+        "en": [
+          "coronary heart disease",
+          "chd",
+          "cad",
+          "angina"
+        ],
+        "ru": [
+          "ибс",
+          "стенокардия"
+        ]
+      },
+      "icd10": [
+        "I25"
+      ],
+      "category": "cardiometabolic",
+      "rsids": [],
+      "labs": [
+        "ldl",
+        "hdl",
+        "tg",
+        "chol_total",
+        "lpa",
+        "apob",
+        "hs_crp"
+      ],
+      "measurements": [
+        "blood-pressure",
+        "heart-rate",
+        "weight"
+      ],
+      "symptoms": [
+        "chest pain",
+        "shortness of breath"
+      ],
+      "body_parts": [
+        "chest",
+        "heart"
+      ],
+      "drugs": [
+        "statins",
+        "aspirin",
+        "clopidogrel"
+      ],
+      "summary": "Narrowing of the heart arteries by atherosclerosis; the 9p21 locus is the strongest common genetic signal, independent of cholesterol.",
+      "sources": [
+        "https://icd.who.int/browse10/2019/en#/I25"
+      ],
+      "reviewed_at": "2026-09-25"
+    },
+    {
+      "id": "mi",
+      "names": {
+        "en": "Myocardial infarction",
+        "ru": "Инфаркт миокарда"
+      },
+      "synonyms": {
+        "en": [
+          "heart attack",
+          "mi"
+        ],
+        "ru": [
+          "инфаркт"
+        ]
+      },
+      "icd10": [
+        "I21"
+      ],
+      "category": "cardiometabolic",
+      "rsids": [],
+      "labs": [
+        "ldl",
+        "chol_total",
+        "troponin",
+        "nt_probnp"
+      ],
+      "measurements": [
+        "blood-pressure",
+        "heart-rate"
+      ],
+      "symptoms": [
+        "chest pain"
+      ],
+      "body_parts": [
+        "chest",
+        "heart"
+      ],
+      "drugs": [
+        "statins",
+        "aspirin",
+        "clopidogrel"
+      ],
+      "summary": "Death of heart muscle from a blocked coronary artery.",
+      "sources": [
+        "https://icd.who.int/browse10/2019/en#/I21"
+      ],
+      "reviewed_at": "2026-09-25"
+    },
+    {
+      "id": "hypertriglyceridaemia",
+      "names": {
+        "en": "Hypertriglyceridaemia",
+        "ru": "Гипертриглицеридемия"
+      },
+      "synonyms": {
+        "en": [
+          "hypertriglyceridemia",
+          "high triglycerides"
+        ],
+        "ru": [
+          "высокие триглицериды"
+        ]
+      },
+      "icd10": [
+        "E78.1"
+      ],
+      "category": "cardiometabolic",
+      "rsids": [],
+      "labs": [
+        "tg"
+      ],
+      "measurements": [
+        "weight",
+        "waist"
+      ],
+      "symptoms": [],
+      "body_parts": [],
+      "drugs": [],
+      "summary": "Raised blood triglycerides; APOA5 variants raise them further.",
+      "sources": [
+        "https://icd.who.int/browse10/2019/en#/E78.1"
+      ],
+      "reviewed_at": "2026-09-25"
+    },
+    {
+      "id": "hyperlipidaemia",
+      "names": {
+        "en": "Hyperlipidaemia",
+        "ru": "Гиперлипидемия"
+      },
+      "synonyms": {
+        "en": [
+          "hyperlipidemia",
+          "high cholesterol",
+          "dyslipidaemia",
+          "dyslipidemia"
+        ],
+        "ru": [
+          "высокий холестерин",
+          "дислипидемия"
+        ]
+      },
+      "icd10": [
+        "E78.5"
+      ],
+      "category": "cardiometabolic",
+      "rsids": [],
+      "labs": [
+        "ldl",
+        "hdl",
+        "tg",
+        "chol_total",
+        "non_hdl"
+      ],
+      "measurements": [
+        "weight"
+      ],
+      "symptoms": [],
+      "body_parts": [],
+      "drugs": [
+        "statins",
+        "atorvastatin",
+        "rosuvastatin",
+        "simvastatin"
+      ],
+      "summary": "Raised blood lipids, the main modifiable driver of coronary artery disease.",
+      "sources": [
+        "https://icd.who.int/browse10/2019/en#/E78.5"
+      ],
+      "reviewed_at": "2026-09-25"
+    },
+    {
+      "id": "type3_hlp",
+      "names": {
+        "en": "Type III hyperlipoproteinaemia",
+        "ru": "Гиперлипопротеинемия III типа"
+      },
+      "synonyms": {
+        "en": [
+          "dysbetalipoproteinaemia",
+          "dysbetalipoproteinemia",
+          "remnant hyperlipidaemia"
+        ],
+        "ru": [
+          "дисбеталипопротеинемия"
+        ]
+      },
+      "icd10": [
+        "E78.2"
+      ],
+      "category": "cardiometabolic",
+      "rsids": [],
+      "labs": [
+        "chol_total",
+        "tg",
+        "apob"
+      ],
+      "measurements": [],
+      "symptoms": [],
+      "body_parts": [],
+      "drugs": [
+        "statins"
+      ],
+      "summary": "Remnant-lipoprotein disorder seen mostly in APOE e2/e2 carriers with a second trigger.",
+      "sources": [
+        "https://icd.who.int/browse10/2019/en#/E78.2"
+      ],
+      "reviewed_at": "2026-09-25"
+    },
+    {
+      "id": "alzheimers",
+      "names": {
+        "en": "Alzheimer's disease",
+        "ru": "Болезнь Альцгеймера"
+      },
+      "synonyms": {
+        "en": [
+          "alzheimer",
+          "dementia"
+        ],
+        "ru": [
+          "альцгеймер",
+          "деменция"
+        ]
+      },
+      "icd10": [
+        "G30"
+      ],
+      "category": "neurological",
+      "rsids": [],
+      "labs": [],
+      "measurements": [],
+      "symptoms": [
+        "memory loss",
+        "confusion"
+      ],
+      "body_parts": [
+        "head"
+      ],
+      "drugs": [],
+      "summary": "The commonest dementia; APOE e4 is the strongest common genetic risk factor.",
+      "sources": [
+        "https://icd.who.int/browse10/2019/en#/G30"
+      ],
+      "reviewed_at": "2026-09-25"
+    },
+    {
+      "id": "hyperhomocysteinaemia",
+      "names": {
+        "en": "Hyperhomocysteinaemia",
+        "ru": "Гипергомоцистеинемия"
+      },
+      "synonyms": {
+        "en": [
+          "hyperhomocysteinemia",
+          "high homocysteine"
+        ],
+        "ru": [
+          "высокий гомоцистеин"
+        ]
+      },
+      "icd10": [
+        "E72.1"
+      ],
+      "category": "metabolic",
+      "rsids": [],
+      "labs": [
+        "homocysteine",
+        "folate",
+        "b12"
+      ],
+      "measurements": [],
+      "symptoms": [],
+      "body_parts": [],
+      "drugs": [
+        "folic acid"
+      ],
+      "summary": "Raised homocysteine, often from low folate or B12; MTHFR TT lowers the folate reserve.",
+      "sources": [
+        "https://icd.who.int/browse10/2019/en#/E72.1"
+      ],
+      "reviewed_at": "2026-09-25"
+    },
+    {
+      "id": "haemochromatosis",
+      "names": {
+        "en": "Hereditary haemochromatosis",
+        "ru": "Наследственный гемохроматоз"
+      },
+      "synonyms": {
+        "en": [
+          "hemochromatosis",
+          "iron overload"
+        ],
+        "ru": [
+          "гемохроматоз",
+          "перегрузка железом"
+        ]
+      },
+      "icd10": [
+        "E83.1"
+      ],
+      "category": "metabolic",
+      "rsids": [],
+      "labs": [
+        "ferritin",
+        "tsat",
+        "iron"
+      ],
+      "measurements": [],
+      "symptoms": [
+        "fatigue",
+        "joint pain"
+      ],
+      "body_parts": [
+        "joints"
+      ],
+      "drugs": [],
+      "summary": "Iron overload, mostly in HFE C282Y homozygotes; early diagnosis and venesection prevent organ damage.",
+      "sources": [
+        "https://icd.who.int/browse10/2019/en#/E83.1"
+      ],
+      "reviewed_at": "2026-09-25"
+    },
+    {
+      "id": "alcohol_use_disorder",
+      "names": {
+        "en": "Alcohol use disorder",
+        "ru": "Расстройство, связанное с употреблением алкоголя"
+      },
+      "synonyms": {
+        "en": [
+          "alcoholism",
+          "alcohol dependence"
+        ],
+        "ru": [
+          "алкоголизм",
+          "алкогольная зависимость"
+        ]
+      },
+      "icd10": [
+        "F10.2"
+      ],
+      "category": "behavioural",
+      "rsids": [],
+      "labs": [],
+      "measurements": [],
+      "symptoms": [],
+      "body_parts": [],
+      "drugs": [],
+      "sources": [
+        "https://icd.who.int/browse10/2019/en#/F10.2"
+      ],
+      "reviewed_at": "2026-09-25"
+    },
+    {
+      "id": "alcohol_flush",
+      "names": {
+        "en": "Alcohol flush reaction",
+        "ru": "Алкогольная гиперемия"
+      },
+      "synonyms": {
+        "en": [
+          "alcohol flush",
+          "asian flush"
+        ],
+        "ru": [
+          "покраснение от алкоголя"
+        ]
+      },
+      "icd10": [],
+      "category": "trait",
+      "rsids": [],
+      "labs": [],
+      "measurements": [],
+      "symptoms": [
+        "flushing"
+      ],
+      "body_parts": [
+        "skin"
+      ],
+      "drugs": [],
+      "summary": "Facial flushing after alcohol from slow acetaldehyde clearance (ALDH2*2).",
+      "reviewed_at": "2026-09-25"
+    },
+    {
+      "id": "oesophageal_cancer",
+      "names": {
+        "en": "Oesophageal cancer",
+        "ru": "Рак пищевода"
+      },
+      "synonyms": {
+        "en": [
+          "esophageal cancer"
+        ],
+        "ru": [
+          "рак пищевода"
+        ]
+      },
+      "icd10": [
+        "C15"
+      ],
+      "category": "cancer",
+      "rsids": [],
+      "labs": [],
+      "measurements": [],
+      "symptoms": [
+        "difficulty swallowing"
+      ],
+      "body_parts": [
+        "throat",
+        "chest"
+      ],
+      "drugs": [],
+      "sources": [
+        "https://icd.who.int/browse10/2019/en#/C15"
+      ],
+      "reviewed_at": "2026-09-25"
+    },
+    {
+      "id": "stress_sensitivity",
+      "names": {
+        "en": "Stress sensitivity",
+        "ru": "Чувствительность к стрессу"
+      },
+      "synonyms": {
+        "en": [
+          "stress"
+        ],
+        "ru": [
+          "стресс"
+        ]
+      },
+      "icd10": [],
+      "category": "trait",
+      "rsids": [],
+      "labs": [],
+      "measurements": [
+        "stress",
+        "mood"
+      ],
+      "symptoms": [
+        "anxiety"
+      ],
+      "body_parts": [],
+      "drugs": [],
+      "reviewed_at": "2026-09-25"
+    },
+    {
+      "id": "pain_sensitivity",
+      "names": {
+        "en": "Pain sensitivity",
+        "ru": "Чувствительность к боли"
+      },
+      "synonyms": {
+        "en": [
+          "pain threshold"
+        ],
+        "ru": [
+          "болевой порог"
+        ]
+      },
+      "icd10": [],
+      "category": "trait",
+      "rsids": [],
+      "labs": [],
+      "measurements": [],
+      "symptoms": [],
+      "body_parts": [],
+      "drugs": [
+        "painkillers"
+      ],
+      "reviewed_at": "2026-09-25"
+    },
+    {
+      "id": "thyroid_cancer",
+      "names": {
+        "en": "Thyroid cancer",
+        "ru": "Рак щитовидной железы"
+      },
+      "synonyms": {},
+      "icd10": [
+        "C73"
+      ],
+      "category": "cancer",
+      "rsids": [],
+      "labs": [],
+      "measurements": [],
+      "symptoms": [],
+      "body_parts": [
+        "neck"
+      ],
+      "drugs": [],
+      "sources": [
+        "https://icd.who.int/browse10/2019/en#/C73"
+      ],
+      "reviewed_at": "2026-09-25"
+    },
+    {
+      "id": "hypothyroidism",
+      "names": {
+        "en": "Hypothyroidism",
+        "ru": "Гипотиреоз"
+      },
+      "synonyms": {
+        "en": [
+          "underactive thyroid",
+          "hashimoto"
+        ],
+        "ru": [
+          "гипотиреоз",
+          "хашимото"
+        ]
+      },
+      "icd10": [
+        "E03"
+      ],
+      "category": "endocrine",
+      "rsids": [],
+      "labs": [
+        "tsh",
+        "ft4",
+        "anti_tpo"
+      ],
+      "measurements": [
+        "weight"
+      ],
+      "symptoms": [
+        "fatigue",
+        "cold intolerance"
+      ],
+      "body_parts": [
+        "neck"
+      ],
+      "drugs": [
+        "levothyroxine"
+      ],
+      "summary": "Low thyroid hormone; common, easily tested with TSH.",
+      "sources": [
+        "https://icd.who.int/browse10/2019/en#/E03"
+      ],
+      "reviewed_at": "2026-09-25"
+    },
+    {
+      "id": "prostate_cancer",
+      "names": {
+        "en": "Prostate cancer",
+        "ru": "Рак предстательной железы"
+      },
+      "synonyms": {
+        "ru": [
+          "рак простаты"
+        ]
+      },
+      "icd10": [
+        "C61"
+      ],
+      "category": "cancer",
+      "rsids": [],
+      "labs": [
+        "psa"
+      ],
+      "measurements": [],
+      "symptoms": [],
+      "body_parts": [],
+      "drugs": [],
+      "sources": [
+        "https://icd.who.int/browse10/2019/en#/C61"
+      ],
+      "reviewed_at": "2026-09-25"
+    },
+    {
+      "id": "amd",
+      "names": {
+        "en": "Age-related macular degeneration",
+        "ru": "Возрастная макулярная дегенерация"
+      },
+      "synonyms": {
+        "en": [
+          "macular degeneration",
+          "amd"
+        ],
+        "ru": [
+          "макулодистрофия",
+          "вмд"
+        ]
+      },
+      "icd10": [
+        "H35.3"
+      ],
+      "category": "eye",
+      "rsids": [],
+      "labs": [],
+      "measurements": [],
+      "symptoms": [
+        "blurred vision"
+      ],
+      "body_parts": [
+        "eyes"
+      ],
+      "drugs": [],
+      "sources": [
+        "https://icd.who.int/browse10/2019/en#/H35.3"
+      ],
+      "reviewed_at": "2026-09-25"
+    },
+    {
+      "id": "coeliac",
+      "names": {
+        "en": "Coeliac disease",
+        "ru": "Целиакия"
+      },
+      "synonyms": {
+        "en": [
+          "celiac",
+          "celiac disease",
+          "gluten intolerance"
+        ],
+        "ru": [
+          "целиакия",
+          "непереносимость глютена"
+        ]
+      },
+      "icd10": [
+        "K90.0"
+      ],
+      "category": "digestive",
+      "rsids": [],
+      "labs": [
+        "ttg_iga",
+        "iga_total"
+      ],
+      "measurements": [
+        "weight"
+      ],
+      "symptoms": [
+        "bloating",
+        "diarrhoea",
+        "diarrhea"
+      ],
+      "body_parts": [
+        "abdomen"
+      ],
+      "drugs": [],
+      "summary": "Immune reaction to gluten; almost all patients carry HLA-DQ2 or DQ8, so a negative tag nearly rules it out.",
+      "sources": [
+        "https://icd.who.int/browse10/2019/en#/K90.0"
+      ],
+      "reviewed_at": "2026-09-25"
+    },
+    {
+      "id": "lactose_intolerance",
+      "names": {
+        "en": "Lactose intolerance",
+        "ru": "Непереносимость лактозы"
+      },
+      "synonyms": {
+        "en": [
+          "lactose",
+          "lactase deficiency"
+        ],
+        "ru": [
+          "лактоза",
+          "непереносимость молока"
+        ]
+      },
+      "icd10": [
+        "E73"
+      ],
+      "category": "digestive",
+      "rsids": [],
+      "labs": [],
+      "measurements": [],
+      "symptoms": [
+        "bloating",
+        "diarrhoea"
+      ],
+      "body_parts": [
+        "abdomen"
+      ],
+      "drugs": [],
+      "summary": "Adult loss of lactase; the MCM6/LCT genotype predicts it well in Europeans.",
+      "sources": [
+        "https://icd.who.int/browse10/2019/en#/E73"
+      ],
+      "reviewed_at": "2026-09-25"
+    },
+    {
+      "id": "melanoma",
+      "names": {
+        "en": "Melanoma",
+        "ru": "Меланома"
+      },
+      "synonyms": {
+        "en": [
+          "skin cancer"
+        ],
+        "ru": [
+          "рак кожи"
+        ]
+      },
+      "icd10": [
+        "C43"
+      ],
+      "category": "cancer",
+      "rsids": [],
+      "labs": [],
+      "measurements": [],
+      "symptoms": [
+        "new or changing mole"
+      ],
+      "body_parts": [
+        "skin"
+      ],
+      "drugs": [],
+      "sources": [
+        "https://icd.who.int/browse10/2019/en#/C43"
+      ],
+      "reviewed_at": "2026-09-25"
+    },
+    {
+      "id": "red_hair",
+      "names": {
+        "en": "Red hair",
+        "ru": "Рыжие волосы"
+      },
+      "synonyms": {
+        "en": [
+          "ginger",
+          "red hair"
+        ],
+        "ru": [
+          "рыжий"
+        ]
+      },
+      "icd10": [],
+      "category": "trait",
+      "rsids": [],
+      "labs": [],
+      "measurements": [],
+      "symptoms": [],
+      "body_parts": [],
+      "drugs": [],
+      "reviewed_at": "2026-09-25"
+    },
+    {
+      "id": "hypertension",
+      "names": {
+        "en": "Hypertension",
+        "ru": "Гипертония"
+      },
+      "synonyms": {
+        "en": [
+          "high blood pressure",
+          "hypertensive"
+        ],
+        "ru": [
+          "гипертензия",
+          "высокое давление",
+          "давление"
+        ]
+      },
+      "icd10": [
+        "I10"
+      ],
+      "category": "cardiometabolic",
+      "rsids": [],
+      "labs": [],
+      "measurements": [
+        "blood-pressure",
+        "heart-rate",
+        "weight"
+      ],
+      "symptoms": [
+        "headache",
+        "dizziness"
+      ],
+      "body_parts": [
+        "heart"
+      ],
+      "drugs": [],
+      "summary": "Persistently raised blood pressure; the commonest modifiable cardiovascular risk.",
+      "sources": [
+        "https://icd.who.int/browse10/2019/en#/I10"
+      ],
+      "reviewed_at": "2026-09-25"
+    },
+    {
+      "id": "arthritis",
+      "names": {
+        "en": "Arthritis",
+        "ru": "Артрит"
+      },
+      "synonyms": {
+        "en": [
+          "osteoarthritis",
+          "rheumatoid arthritis",
+          "arthrosis"
+        ],
+        "ru": [
+          "артрит",
+          "артроз",
+          "остеоартрит"
+        ]
+      },
+      "icd10": [],
+      "category": "musculoskeletal",
+      "rsids": [],
+      "labs": [
+        "crp",
+        "esr"
+      ],
+      "measurements": [],
+      "symptoms": [
+        "joint pain",
+        "stiffness",
+        "swelling"
+      ],
+      "body_parts": [
+        "joints",
+        "hands",
+        "knees",
+        "hips"
+      ],
+      "drugs": [
+        "ibuprofen"
+      ],
+      "summary": "Joint inflammation or wear; track pain, stiffness and which joints.",
+      "reviewed_at": "2026-09-25"
+    },
+    {
+      "id": "migraine",
+      "names": {
+        "en": "Migraine",
+        "ru": "Мигрень"
+      },
+      "synonyms": {
+        "ru": [
+          "мигрень"
+        ]
+      },
+      "icd10": [
+        "G43"
+      ],
+      "category": "neurological",
+      "rsids": [],
+      "labs": [],
+      "measurements": [],
+      "symptoms": [
+        "headache",
+        "nausea"
+      ],
+      "body_parts": [
+        "head"
+      ],
+      "drugs": [],
+      "summary": "Recurrent headache attacks, often with nausea and light sensitivity.",
+      "sources": [
+        "https://icd.who.int/browse10/2019/en#/G43"
+      ],
+      "reviewed_at": "2026-09-25"
+    }
+  ]
+}

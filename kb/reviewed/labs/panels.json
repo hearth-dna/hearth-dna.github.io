@@ -1,0 +1,225 @@
+{
+ "panels": [
+  {
+   "id": "glucose",
+   "names": {
+    "en": "Glucose and diabetes",
+    "ru": "Глюкоза и диабет"
+   },
+   "synonyms": {
+    "en": [
+     "sugar test",
+     "glucose test"
+    ],
+    "ru": [
+     "сахар",
+     "углеводный обмен"
+    ]
+   }
+  },
+  {
+   "id": "lipid",
+   "names": {
+    "en": "Lipid panel",
+    "ru": "Липидный профиль"
+   },
+   "synonyms": {
+    "en": [
+     "lipid profile",
+     "lipids",
+     "cholesterol panel"
+    ],
+    "ru": [
+     "липидограмма",
+     "липидный спектр"
+    ]
+   }
+  },
+  {
+   "id": "cbc",
+   "names": {
+    "en": "Complete blood count",
+    "ru": "Общий анализ крови"
+   },
+   "synonyms": {
+    "en": [
+     "cbc",
+     "fbc",
+     "full blood count",
+     "blood count",
+     "hemogram",
+     "haemogram"
+    ],
+    "ru": [
+     "оак",
+     "клинический анализ крови",
+     "гемограмма"
+    ]
+   }
+  },
+  {
+   "id": "metabolic",
+   "names": {
+    "en": "Metabolic panel",
+    "ru": "Биохимический анализ крови"
+   },
+   "synonyms": {
+    "en": [
+     "bmp",
+     "cmp",
+     "basic metabolic panel",
+     "comprehensive metabolic panel",
+     "biochemistry",
+     "chemistry"
+    ],
+    "ru": [
+     "биохимия",
+     "биохимический анализ"
+    ]
+   }
+  },
+  {
+   "id": "kidney",
+   "names": {
+    "en": "Kidney function",
+    "ru": "Функция почек"
+   },
+   "synonyms": {
+    "en": [
+     "renal function",
+     "renal panel",
+     "u&e"
+    ],
+    "ru": [
+     "почечные пробы"
+    ]
+   }
+  },
+  {
+   "id": "liver",
+   "names": {
+    "en": "Liver function",
+    "ru": "Печёночные пробы"
+   },
+   "synonyms": {
+    "en": [
+     "lft",
+     "liver panel",
+     "hepatic panel"
+    ],
+    "ru": [
+     "печеночные пробы",
+     "функция печени"
+    ]
+   }
+  },
+  {
+   "id": "iron",
+   "names": {
+    "en": "Iron studies",
+    "ru": "Обмен железа"
+   },
+   "synonyms": {
+    "en": [
+     "iron panel",
+     "iron profile"
+    ],
+    "ru": [
+     "железо",
+     "показатели обмена железа"
+    ]
+   }
+  },
+  {
+   "id": "vitamins",
+   "names": {
+    "en": "Vitamins",
+    "ru": "Витамины"
+   },
+   "synonyms": {}
+  },
+  {
+   "id": "thyroid",
+   "names": {
+    "en": "Thyroid function",
+    "ru": "Гормоны щитовидной железы"
+   },
+   "synonyms": {
+    "en": [
+     "thyroid panel",
+     "tft"
+    ],
+    "ru": [
+     "щитовидная железа",
+     "тиреоидный профиль"
+    ]
+   }
+  },
+  {
+   "id": "inflammation",
+   "names": {
+    "en": "Inflammation markers",
+    "ru": "Маркеры воспаления"
+   },
+   "synonyms": {
+    "ru": [
+     "воспаление"
+    ]
+   }
+  },
+  {
+   "id": "coagulation",
+   "names": {
+    "en": "Coagulation",
+    "ru": "Коагулограмма"
+   },
+   "synonyms": {
+    "en": [
+     "clotting",
+     "coagulation panel",
+     "coag"
+    ],
+    "ru": [
+     "гемостаз",
+     "свертываемость"
+    ]
+   }
+  },
+  {
+   "id": "hormones",
+   "names": {
+    "en": "Hormones",
+    "ru": "Гормоны"
+   },
+   "synonyms": {}
+  },
+  {
+   "id": "cardiac",
+   "names": {
+    "en": "Cardiac markers",
+    "ru": "Кардиомаркеры"
+   },
+   "synonyms": {
+    "ru": [
+     "сердечные маркеры"
+    ]
+   }
+  },
+  {
+   "id": "coeliac",
+   "names": {
+    "en": "Coeliac serology",
+    "ru": "Серология целиакии"
+   },
+   "synonyms": {
+    "en": [
+     "celiac panel",
+     "celiac serology"
+    ],
+    "ru": [
+     "целиакия"
+    ]
+   }
+  }
+ ]
+}

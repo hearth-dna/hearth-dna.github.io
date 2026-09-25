@@ -126,6 +126,15 @@ export interface HealthEntry {
   value2: number | null
   /** Unit of `value`, e.g. '°C', 'mmHg'; '' when there is no value. */
   unit: string
+  /** Lab catalogue id (`Kb.analytes`) of a lab result; '' for anything else. */
+  analyte: string
+  /** Reference range as printed on the report, in `unit`; null when none was printed. */
+  refLow: number | null
+  refHigh: number | null
+  /** Out of range per the report (or its printed range): 'H', 'L', or ''. */
+  flag: '' | 'H' | 'L'
+  /** The result as printed when it is not a plain number ("<0.5", "negative"); '' otherwise. */
+  valueText: string
   createdAt: string
 }
 
