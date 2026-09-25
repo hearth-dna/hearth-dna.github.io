@@ -1,4 +1,6 @@
+import { conditionById, conditionNames } from '../kb/conditions'
 import type { Kb, KbEntry } from '../kb/kb'
+import { tokenMatch, tokens } from '../kb/text'
 
 /**
  * Which knowledge-base entries a free-text question is about. Matches gene symbols, marker names,
@@ -12,20 +14,16 @@ const STOP = new Set(
 )
 
 export function questionTerms(question: string): string[] {
-  return [
-    ...new Set(
-      question
-        .toLowerCase()
-        .split(/[^a-z0-9*]+/)
-        .filter((w) => w.length >= 3 && !STOP.has(w)),
-    ),
-  ]
+  return [...new Set(tokens(question).filter((w) => !STOP.has(w)))]
 }
 
-function entryTerms(e: KbEntry): string[] {
-  return [e.rsid, e.gene, e.name, ...(e.drugs ?? []), ...(e.conditions ?? [])]
-    .flatMap((s) => s.toLowerCase().split(/[^a-z0-9*]+/))
-    .filter((w) => w.length >= 3)
+/** Marker names, drugs, and the names and synonyms of the conditions the marker is linked to. */
+function entryTerms(kb: Kb, e: KbEntry): string[] {
+  const conditions = (e.conditions ?? []).flatMap((id) => {
+    const c = conditionById(kb, id)
+    return c ? conditionNames(c) : [id]
+  })
+  return [e.rsid, e.gene, e.name, ...(e.drugs ?? []), ...conditions].flatMap(tokens)
 }
 
 export function retrieveForQuestion(kb: Kb, question: string): Set<string> {
@@ -33,14 +31,8 @@ export function retrieveForQuestion(kb: Kb, question: string): Set<string> {
   const hits = new Set<string>()
   if (terms.length === 0) return hits
   for (const e of kb.entries) {
-    const et = entryTerms(e)
-    // Whole-token match, or a question term that is a prefix of a token ≥ 5 chars (statin → statins, diabet → diabetes).
-    if (
-      terms.some((t) =>
-        et.some((w) => w === t || (t.length >= 5 && w.startsWith(t)) || (w.length >= 5 && t.startsWith(w))),
-      )
-    )
-      hits.add(e.rsid)
+    const et = entryTerms(kb, e)
+    if (terms.some((t) => et.some((w) => tokenMatch(t, w)))) hits.add(e.rsid)
   }
   return hits
 }

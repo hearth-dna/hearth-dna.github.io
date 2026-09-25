@@ -1,4 +1,5 @@
-import type { Finding } from '../kb/kb'
+import { conditionLabel } from '../kb/conditions'
+import type { Finding, Kb } from '../kb/kb'
 import type { HealthEntry, Person } from '../types'
 
 /**
@@ -76,7 +77,7 @@ export const FINDING_HEADER = [
   'sources',
 ]
 
-export function findingsTable(byPerson: { person: Person; findings: Finding[] }[]): Table {
+export function findingsTable(kb: Kb, byPerson: { person: Person; findings: Finding[] }[]): Table {
   const rows: Cell[][] = []
   for (const { person, findings } of byPerson) {
     for (const f of findings) {
@@ -92,7 +93,7 @@ export function findingsTable(byPerson: { person: Person; findings: Finding[] }[
         f.match?.label ?? '',
         f.entry.evidence,
         f.entry.topic,
-        (f.entry.conditions ?? []).join('; '),
+        (f.entry.conditions ?? []).map((id) => conditionLabel(kb, id)).join('; '),
         (f.entry.drugs ?? []).join('; '),
         f.entry.summary,
         f.entry.sources.join(' '),

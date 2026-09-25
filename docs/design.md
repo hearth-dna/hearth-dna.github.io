@@ -128,6 +128,8 @@ kb_topic     (id, name, category, description_md, prs_available)
 kb_prs       (topic_id, rsid, effect_allele, beta, source_study)          -- GWAS Catalog / PGS Catalog
 kb_pgx       (gene, star_allele, defining_rsids_json, function, cpic_guideline_url, drugs_json)
 kb_group     (id, name, rsids_json, rule_json)                            -- haplotypes, star alleles
+kb_condition (id, names_json, synonyms_json, icd10_json, rsids_json, labs_json, measurements_json,
+              symptoms_json, body_parts_json, drugs_json)   -- shipped: kb/reviewed/conditions.json
 ```
 
 **Seed content, in priority order:**

@@ -17,6 +17,10 @@ describe('retrieveForQuestion', () => {
     expect(retrieveForQuestion(kb, 'is there anything about diabetes?')).toContain('rs7903146')
     expect(retrieveForQuestion(kb, 'which statins are safe for me')).toContain('rs4149056')
   })
+  it('matches condition synonyms in other languages', () => {
+    expect(retrieveForQuestion(kb, 'есть ли риск диабета у мамы?')).toContain('rs7903146')
+    expect(retrieveForQuestion(kb, 'anything about heart attack risk')).toContain('rs10757278')
+  })
   it('ignores stop words', () => {
     expect(questionTerms('should I worry about this with my family')).toEqual([])
     expect(retrieveForQuestion(kb, 'should I worry about this with my family').size).toBe(0)

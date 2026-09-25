@@ -43,7 +43,7 @@ export async function exportFindings(
   const byPerson = []
   for (const person of persons)
     byPerson.push({ person, findings: computeFindings(kb, await personCallsFor(db, person.id, rsids)) })
-  const table = findingsTable(byPerson)
+  const table = findingsTable(kb, byPerson)
   const bytes = text(render(table, format))
   const name = openFileName('findings', format)
   downloadBytes(bytes, name, format === 'csv' ? 'text/csv' : 'application/x-ndjson')
