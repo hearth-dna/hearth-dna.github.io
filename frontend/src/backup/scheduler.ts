@@ -1,9 +1,10 @@
 import { Database } from '../db/db'
 import { getMeta } from '../db/repo'
-import { type Progress, type RestoreResult, restoreBytes } from '../export/restore'
+import { fillGenomes, missingGenomes, openContainer } from '../export/container'
+import { type Progress, type RestoreResult, restoreContainer } from '../export/restore'
 import { snapshotBytes } from '../export/snapshot'
 import * as folder from './folder'
-import { baseName, conflictName, hasNewer, isForeign } from './naming'
+import { baseName, conflictName, hasNewer, isForeign, spareNames } from './naming'
 
 /**
  * App-wide backup state: the remembered folder, the session passphrase, a debounced autosave
@@ -24,6 +25,8 @@ export type Status =
       dirty: boolean
       lastAt: string | null
       newer: boolean
+      /** People whose genome file the last loaded snapshot and its spares all lacked. */
+      missing: { id: string; name: string }[]
     }
   | { state: 'writing'; name: string; step: 'loading' | 'building' | 'writing' }
   | { state: 'conflict'; name: string; file: string }
@@ -57,8 +60,11 @@ class Backups {
   private saved: folder.Saved | null = null
   private timer: ReturnType<typeof setTimeout> | null = null
   private newer = false
+  private missing: { id: string; name: string }[] = []
   private busy = false
   private readonly listeners = new Set<() => void>()
+  /** Called after a snapshot from the folder was loaded, so the app can re-read its lists. */
+  onLoaded: () => void = () => {}
   status: Status = { state: 'none' }
 
   async start(db: Database, appVersion: string): Promise<void> {
@@ -150,6 +156,10 @@ class Backups {
       return this.set({ state: 'error', name, message: e instanceof Error ? e.message : String(e) })
     }
     this.newer = hasNewer(current, device, this.saved.lastSeen)
+    // The notice goes away once a genome is imported for that person by hand.
+    for (const m of [...this.missing])
+      if ((await this.db.query('SELECT 1 FROM genotype WHERE person_id=? LIMIT 1', [m.id])).length)
+        this.missing = this.missing.filter((x) => x !== m)
     const dirty = await this.dirty(device)
     this.set({
       state: 'ready',
@@ -158,6 +168,7 @@ class Backups {
       dirty,
       lastAt: this.saved.lastAt ?? null,
       newer: this.newer,
+      missing: this.missing,
     })
     // Changes made while the folder was unreachable (or before a reload) go out without waiting
     // for the next edit. A newer copy from another computer is left for the user to pull in.
@@ -250,6 +261,18 @@ class Backups {
     try {
       const base = baseName(this.profile)
       const device = (await getMeta(this.db, 'device')) ?? ''
+      if (
+        !force &&
+        isForeign(await folder.currentHeader(this.saved.handle, base), device, this.saved.lastSeen)
+      ) {
+        // Another computer saved since we last looked. Loading is a union by id, so taking theirs
+        // in first loses nothing on either side; only a file this browser cannot open (another
+        // passphrase) still ends up as a conflict file below.
+        this.set({ state: 'writing', name, step: 'loading' })
+        await this.loadFromFolder().catch(() => {})
+        this.cancelPending()
+        this.set({ state: 'writing', name, step: 'building' })
+      }
       const bytes = await snapshotBytes(this.db, this.appVersion, this.plain ? undefined : pass)
       this.set({ state: 'writing', name, step: 'writing' })
       const current = await folder.currentHeader(this.saved.handle, base)
@@ -271,17 +294,31 @@ class Backups {
   }
 
   /** Loads the folder's current snapshot into this browser (union by id, see restore.ts). */
-  async loadFromFolder(onProgress: Progress): Promise<RestoreResult> {
+  async loadFromFolder(onProgress: Progress = () => {}): Promise<RestoreResult> {
     if (!this.saved) throw new Error('no folder chosen')
     const base = baseName(this.profile)
     const bytes = await folder.readCurrent(this.saved.handle, base)
     if (!bytes) throw new Error(`no ${base} in ${this.name}`)
-    const r = await restoreBytes(
-      this.db,
-      bytes,
-      this.plain ? undefined : this.passphrase() || undefined,
-      onProgress,
-    )
+    const pass = this.plain ? undefined : this.passphrase() || undefined
+    onProgress('restore.openingDump')
+    const c = await openContainer(bytes, pass)
+    // A snapshot that lost genome files (an interrupted sync, a bad copy) is repaired from the
+    // older copies and conflict files next to it: same path, same hash, same bytes.
+    if (missingGenomes(c).length) {
+      onProgress('restore.repairing')
+      for (const name of spareNames(await folder.list(this.saved.handle), base)) {
+        try {
+          const spare = await folder.readNamed(this.saved.handle, name)
+          if (spare) fillGenomes(c, await openContainer(spare, pass))
+        } catch {
+          // Another passphrase or an unreadable file: it just cannot help.
+        }
+        if (!missingGenomes(c).length) break
+      }
+    }
+    const r = await restoreContainer(this.db, c, onProgress)
+    this.missing = r.missing
+    this.onLoaded()
     const header = await folder.currentHeader(this.saved.handle, base)
     if (header) this.saved.lastSeen = { device: header.device, generation: header.generation }
     await folder.save(this.profile, this.saved)

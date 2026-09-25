@@ -71,10 +71,18 @@ the first cut, and the reason dump v2 is step 1.
 **Conflict detection.** Before overwriting, read the header of the current folder file (the
 first few hundred bytes are plaintext: format, generation, device, exported_at, even when the
 payload is encrypted). If its `generation` is not the one this browser last wrote or loaded, and
-its `device` differs, do not overwrite: write `hearth-backup.conflict-<device>-<date>.hearth` and show
-"Another computer saved a newer backup. Load theirs, or keep yours?" Choosing *keep yours* writes
-the current file. This is last-writer-wins with a visible seam, which is what a family sharing a
-stick or a Drive folder actually needs.
+its `device` differs, load it first. Loading is a union by id (nothing on either side is lost), so
+the automatic backup merges and then writes the union. Only when the foreign file cannot be opened
+(another passphrase, unreadable) is the old seam used: write
+`hearth-backup.conflict-<device>-<date>.hearth` and show "Another computer saved a newer backup.
+Load theirs, or keep yours?" Choosing *keep yours* writes the current file.
+
+**Missing genomes.** A snapshot is never written with a manifest entry whose bytes are not in the
+zip. A file that lacks one anyway (a bad copy, a partial sync) still opens: the missing genome is
+left out and everything else restores. Loading from the folder first looks for the missing path in
+the older copies (`.1`, `.2`, `.3`) and conflict files; paths are content hashes, so a match is the
+same file. People whose genome no copy has are listed in the backup card and in the import message,
+with the fix: import their raw file again.
 
 **Synced-folder specifics.** Google Drive for desktop, Dropbox and OneDrive all sync a rewritten
 file within seconds; a 5 MB file is trivial. Two clients writing the same path concurrently

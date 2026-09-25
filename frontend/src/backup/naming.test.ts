@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Header } from '../export/container'
-import { baseName, conflictName, hasNewer, isForeign, rotationPlan } from './naming'
+import { baseName, conflictName, hasNewer, isForeign, rotationPlan, spareNames } from './naming'
 
 const header = (device: string, generation: number): Header => ({
   format: 'hearth-dump',
@@ -32,6 +32,30 @@ describe('backup naming', () => {
     expect(conflictName('hearth-backup.hearth', 'abcdef01-2345', '2026-09-14T10:00:00.000Z')).toBe(
       'hearth-backup.conflict-abcdef01-2026-09-14-10-00-00.hearth',
     )
+  })
+
+  it('lists older copies oldest-last, then conflict files newest-first', () => {
+    const base = 'hearth-backup.hearth'
+    expect(
+      spareNames(
+        [
+          base,
+          `${base}.3`,
+          `${base}.1`,
+          'README.txt',
+          'hearth-backup.conflict-aa-2026-09-01-10-00-00.hearth',
+          'hearth-backup.conflict-bb-2026-09-20-10-00-00.hearth',
+          'hearth-backup-kids.hearth.1',
+          `${base}.1.tmp`,
+        ],
+        base,
+      ),
+    ).toEqual([
+      `${base}.1`,
+      `${base}.3`,
+      'hearth-backup.conflict-bb-2026-09-20-10-00-00.hearth',
+      'hearth-backup.conflict-aa-2026-09-01-10-00-00.hearth',
+    ])
   })
 
   it('detects another device having written since we last looked', () => {

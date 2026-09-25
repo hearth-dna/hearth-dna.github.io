@@ -17,6 +17,7 @@
   "backupCard.keepMine": "Keep mine, overwrite",
   "backupCard.failed": "Backup failed: {message}",
   "backupCard.newerNotice": "The folder holds a backup from another computer that is newer than what is here.",
+  "backupCard.missingGenomes": "No backup in {name} still has the genome files for {names}, including older copies and conflict files. Import their raw files again from their person pages; the next backup will include them.",
   "backupCard.loadFromFolder": "Load from folder",
   "backupCard.loaded": "Loaded {people} new people and {genomes} genomes from {name} ({exportedAt}).",
   "backupCard.backUpNow": "Back up now",

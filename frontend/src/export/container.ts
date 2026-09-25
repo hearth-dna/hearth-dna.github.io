@@ -73,6 +73,9 @@ const json = (v: unknown) => strToU8(JSON.stringify(v))
 
 /** Container → bytes. With a passphrase the zip is encrypted and the header travels in front. */
 export async function serialiseContainer(c: Container, passphrase?: string): Promise<Uint8Array> {
+  // A manifest naming a genome the zip does not carry would restore nowhere; never write one.
+  const absent = missingGenomes(c)
+  if (absent.length) throw new Error(`snapshot incomplete: no bytes for ${absent.join(', ')}`)
   const header: Header = { ...c.header, encrypted: !!passphrase }
   const entries: Record<string, [Uint8Array, { level: 0 | 6 }]> = {
     [HEADER_ENTRY]: [json({ ...header, encrypted: false }), { level: 0 }],
@@ -127,7 +130,31 @@ export function readHeader(bytes: Uint8Array): Header | null {
   return raw ? parseHeader(raw) : null
 }
 
-/** Bytes → container, verifying every genome entry's hash. */
+/** Manifest paths the container has no verified bytes for. */
+export function missingGenomes(c: Container): string[] {
+  return c.manifest.genomes.filter((g) => !c.genomes[g.path]).map((g) => g.path)
+}
+
+/**
+ * Copies the genomes `c` lacks from `from`, another snapshot. Paths are content hashes and every
+ * entry was verified on open, so a match is the same file byte for byte. Returns how many it found.
+ */
+export function fillGenomes(c: Container, from: Container): number {
+  let n = 0
+  for (const path of missingGenomes(c)) {
+    const bytes = from.genomes[path]
+    if (bytes) {
+      c.genomes[path] = bytes
+      n++
+    }
+  }
+  return n
+}
+
+/**
+ * Bytes → container. Genome entries that are absent or fail their hash are left out rather than
+ * failing the whole file; `missingGenomes` lists them, and the rest still restores.
+ */
 export async function openContainer(bytes: Uint8Array, passphrase?: string): Promise<Container> {
   let zip = bytes
   if (isEnvelope(bytes)) {
@@ -155,9 +182,7 @@ export async function openContainer(bytes: Uint8Array, passphrase?: string): Pro
   const genomes: Record<string, Uint8Array> = {}
   for (const g of manifest.genomes) {
     const data = entries[g.path]
-    if (!data) throw new Error(`missing ${g.path}`)
-    if ((await sha256(data)) !== g.sha256) throw new Error(`corrupt entry ${g.path}`)
-    genomes[g.path] = data
+    if (data && (await sha256(data)) === g.sha256) genomes[g.path] = data
   }
   return { header: { ...header, encrypted: isEnvelope(bytes) }, manifest, journal, genomes }
 }

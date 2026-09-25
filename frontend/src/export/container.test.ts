@@ -2,7 +2,9 @@ import { gzipSync, strToU8 } from 'fflate'
 import { describe, expect, it } from 'vitest'
 import {
   type Container,
+  fillGenomes,
   genomePath,
+  missingGenomes,
   openContainer,
   readHeader,
   serialiseContainer,
@@ -73,10 +75,29 @@ describe('dump v2 container', () => {
     expect(back.manifest.genomes).toHaveLength(1)
   })
 
-  it('rejects a tampered genome entry', async () => {
+  it('leaves out a tampered genome entry and reports it missing', async () => {
     const c = await sample()
     c.manifest.genomes[0].sha256 = '00'
-    await expect(openContainer(await serialiseContainer(c))).rejects.toThrow(/corrupt/)
+    const back = await openContainer(await serialiseContainer(c))
+    expect(back.genomes).toEqual({})
+    expect(missingGenomes(back)).toEqual([c.manifest.genomes[0].path])
+    expect(back.journal.persons).toEqual([{ id: 'p1' }])
+  })
+
+  it('refuses to write a manifest naming a genome it does not carry', async () => {
+    const c = await sample()
+    c.genomes = {}
+    await expect(serialiseContainer(c)).rejects.toThrow(/incomplete/)
+  })
+
+  it('fills missing genomes from another snapshot by content hash', async () => {
+    const full = await sample()
+    const path = full.manifest.genomes[0].path
+    const broken: Container = { ...(await sample()), genomes: {} }
+    expect(fillGenomes(broken, { ...full, genomes: {} })).toBe(0)
+    expect(fillGenomes(broken, full)).toBe(1)
+    expect(missingGenomes(broken)).toEqual([])
+    expect(broken.genomes[path]).toEqual(full.genomes[path])
   })
 
   it('returns null for v1 files and other bytes', async () => {
