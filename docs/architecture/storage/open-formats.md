@@ -15,7 +15,7 @@ All three carry every person. Names: `hearth-<what>-<date>.csv` / `.jsonl`.
 |---|---|---|
 | `genotypes` | one SNP | `rsid`, `chromosome`, `position`, then one column per person named by the person's short label (`mama`, `papa`, …; a duplicate label gets `-2`, `-3`). Cell = two alleles (`AG`), empty when that person has no call. |
 | `findings` | one knowledge-base match for one person | `person`, `rsid`, `gene`, `name`, `genotype`, `risk_allele`, `risk_copies`, `magnitude`, `label`, `evidence`, `topic`, `conditions`, `drugs`, `summary`, `sources` |
-| `health-log` | one health-log entry | `person`, `date`, `time`, `kind`, `title`, `body_part`, `severity`, `value`, `value2`, `unit`, `tags`, `source`, `body`, `created_at` |
+| `health-log` | one health-log entry | `person`, `date`, `time`, `kind`, `title`, `body_part`, `side`, `severity`, `value`, `value2`, `unit`, `analyte`, `ref_low`, `ref_high`, `flag`, `value_text`, `tags`, `source`, `body`, `created_at` |
 
 `conditions` holds the English condition names (the kb stores ids). Lists inside a cell (`conditions`, `drugs`, `tags`) are `; `-separated in CSV and JSON arrays are
 *not* used there so a spreadsheet shows them as text; in JSON Lines they are the same strings, so

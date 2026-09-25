@@ -187,13 +187,19 @@ export function recogniseAnalyte(
   return { analyte: null, issue: 'unknownAnalyte' }
 }
 
-/** One printed result → a catalogue result with its issues for the review table. */
-export function normaliseRow(kb: Kb, raw: RawLabRow): LabRow {
+/**
+ * One printed result → a catalogue result with its issues for the review table. `pinned`: the
+ * user chose the test by hand, so `raw.analyte` stands even when the name says otherwise.
+ */
+export function normaliseRow(kb: Kb, raw: RawLabRow, pinned = false): LabRow {
   const printedUnit = raw.unit?.trim() ?? ''
   const unit = normaliseUnit(kb, printedUnit)
   const issues: LabIssue[] = []
   if (printedUnit && !unit) issues.push('unknownUnit')
-  const { analyte, issue } = recogniseAnalyte(kb, raw.name, unit, raw.analyte)
+  const chosen = pinned && raw.analyte ? labCatalogue(kb).byId.get(raw.analyte) : undefined
+  const { analyte, issue } = chosen
+    ? { analyte: chosen.id, issue: unit && !accepts(chosen, unit) ? ('unitMismatch' as const) : undefined }
+    : recogniseAnalyte(kb, raw.name, unit, raw.analyte)
   if (issue) issues.push(issue)
   const parsed = parseValue(raw.value)
   const { low, high } = parseRef(raw.ref ?? '')

@@ -1,0 +1,5 @@
+Test,Result,Flag,Units,Reference Range
+Cholesterol Total,212,H,mg/dL,<200
+Triglycerides,148,,mg/dL,<150
+HDL Cholesterol,52,,mg/dL,>39
+LDL Cholesterol Calc,131,H,mg/dL,0-99

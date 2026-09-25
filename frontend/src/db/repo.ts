@@ -311,6 +311,11 @@ function rowToHealthEntry(r: Row): HealthEntry {
     value: (r.value as number | null) ?? null,
     value2: (r.value2 as number | null) ?? null,
     unit: (r.unit as string) ?? '',
+    analyte: (r.analyte as string) ?? '',
+    refLow: (r.ref_low as number | null) ?? null,
+    refHigh: (r.ref_high as number | null) ?? null,
+    flag: ((r.flag as string) ?? '') as HealthEntry['flag'],
+    valueText: (r.value_text as string) ?? '',
     createdAt: r.created_at as string,
   }
 }
@@ -332,6 +337,11 @@ export async function addHealthEntry(
     value?: number | null
     value2?: number | null
     unit?: string
+    analyte?: string
+    refLow?: number | null
+    refHigh?: number | null
+    flag?: HealthEntry['flag']
+    valueText?: string
   },
 ): Promise<HealthEntry> {
   const entry: HealthEntry = {
@@ -346,6 +356,11 @@ export async function addHealthEntry(
     value: null,
     value2: null,
     unit: '',
+    analyte: '',
+    refLow: null,
+    refHigh: null,
+    flag: '',
+    valueText: '',
     ...e,
   }
   entry.bodyPart = entry.bodyPart.trim().toLowerCase()
@@ -354,7 +369,7 @@ export async function addHealthEntry(
   entry.unit = entry.unit.trim()
   entry.time = normTime(entry.time)
   await db.exec(
-    'INSERT INTO health_log(id,person_id,date,time,kind,title,body,source,body_part,side,severity,tags,value,value2,unit,created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+    'INSERT INTO health_log(id,person_id,date,time,kind,title,body,source,body_part,side,severity,tags,value,value2,unit,analyte,ref_low,ref_high,flag,value_text,created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
     [
       entry.id,
       entry.personId,
@@ -371,6 +386,11 @@ export async function addHealthEntry(
       entry.value,
       entry.value2,
       entry.unit,
+      entry.analyte,
+      entry.refLow,
+      entry.refHigh,
+      entry.flag,
+      entry.valueText,
       entry.createdAt,
     ],
   )

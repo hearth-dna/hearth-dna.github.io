@@ -48,7 +48,7 @@ export default defineConfig({
         icons: [{ src: 'favicon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' }],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,wasm,json}'],
+        globPatterns: ['**/*.{js,mjs,css,html,svg,wasm,json}'],
         maximumFileSizeToCacheInBytes: 8 * 1024 * 1024,
         // Nothing but our own origin is ever fetched at runtime; no runtime caching rules needed.
         //

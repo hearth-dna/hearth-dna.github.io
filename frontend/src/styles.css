@@ -77,6 +77,10 @@ button.link { background: none; border: none; padding: 0; color: var(--accent, i
 table.healthtable tbody tr:not(.detail) { cursor: pointer; }
 table.healthtable tbody tr:not(.detail):hover, table.healthtable tr.open { background: var(--bg); }
 table.healthtable tr.detail td { background: var(--bg); }
+table.labreview tbody tr:not(.detail) { cursor: default; }
+table.labreview tbody tr:not(.detail):hover { background: none; }
+table.labreview tr.check td { background: color-mix(in srgb, var(--warn) 12%, transparent); }
+table.labreview td { vertical-align: top; }
 button.tag { padding: 0.1rem 0.5rem; margin: 0 0.25rem 0.2rem 0; font-size: 0.8rem; border-radius: 999px; }
 button.tag.active { border-color: var(--accent); background: var(--accent); color: var(--accent-fg); }
 .kindpicker { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 0.5rem; margin-top: 0.6rem; }

@@ -228,7 +228,8 @@ kb fields at tier 0, so the user gets a decision frame even without any LLM.
 
 ### 6.4 Medical documents — processed locally, never stored remotely
 - **Shipped first (health log):** a per-person `health_log(id, person_id, date, time, kind, title, body,
-  body_part, side, severity, tags, value, value2, unit)` of dated entries — lab result, diagnosis,
+  body_part, side, severity, tags, value, value2, unit, analyte, ref_low, ref_high, flag,
+  value_text)` of dated entries — lab result, diagnosis,
   medication, doctor letter, a self-reported **symptom** ("pain in both hands", body part `hands`,
   severity 6/10, tags `arthritis`), or a home **measurement** stored as numbers (`value`, a second
   `value2` for pairs like blood pressure, and `unit`: 37.8 °C, 120/80 mmHg, 71.5 kg) — typed or
@@ -244,6 +245,13 @@ kb fields at tier 0, so the user gets a decision frame even without any LLM.
   a transcription-only JSON draft the user reviews in the health-log form. The key lives in `meta`,
   is never dumped, and is deleted by "Erase all data" or by revoking the consent. Free-tier keys
   are flagged: Google may train on the input.
+- **Shipped third (blood-test reader):** with "Lab result" chosen, the reader also takes pasted
+  text and .txt/.csv/.tsv files, and reads them and PDFs with a text layer on this device
+  (`labs/parseText.ts`, pdf.js loaded on demand); nothing leaves it. Photos and scans go to Gemini
+  with `labs/prompt.ts`, whose schema makes the model pick each test from the lab catalogue
+  (`kb/reviewed/labs/`) and forbids converting. Both paths go through `labs/normalise.ts` and a
+  review table; each ticked row becomes one `lab` entry with its catalogue id, value and unit as
+  printed, reference range and flag.
 - Accept PDF, images, plain text. `pdf.js` extracts the text layer; `Tesseract.js` OCRs scans; both in
   a worker. Originals stored as blobs in OPFS, referenced from `document`.
 - Structured extraction into `observation` rows (lab values with units and reference ranges,

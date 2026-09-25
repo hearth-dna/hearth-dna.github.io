@@ -4,9 +4,11 @@ import { deleteHealthEntry, listHealthLog } from '../db/repo'
 import type { HealthDraft } from '../documents/draft'
 import { facets, type HealthFilter, NO_FILTER } from '../health/log'
 import { useT } from '../i18n/context'
+import type { LabReportDraft } from '../labs/types'
 import type { HealthEntry, Person } from '../types'
 import { HealthEntryForm } from './HealthEntryForm'
 import { HealthTable } from './HealthTable'
+import { LabReviewTable } from './LabReviewTable'
 import { QuickMeasurement } from './QuickMeasurement'
 import { ReadDocumentDialog } from './ReadDocumentDialog'
 
@@ -23,12 +25,14 @@ export function HealthLog({ person }: { person: Person }) {
   const [filter, setFilter] = useState<HealthFilter>(NO_FILTER)
   const [adding, setAdding] = useState<{ draft?: { draft: HealthDraft; source: string } } | null>(null)
   const [reading, setReading] = useState(false)
+  const [lab, setLab] = useState<{ draft: LabReportDraft; source: string } | null>(null)
 
   const reload = async () => setEntries(await listHealthLog(db, person.id))
   // biome-ignore lint/correctness/useExhaustiveDependencies: reload is stable per db/person
   useEffect(() => {
     reload()
     setAdding(null)
+    setLab(null)
     setFilter(NO_FILTER)
   }, [db, person.id])
 
@@ -61,6 +65,19 @@ export function HealthLog({ person }: { person: Person }) {
           }}
         />
       )}
+      {lab && (
+        <LabReviewTable
+          key={lab.source}
+          person={person}
+          draft={lab.draft}
+          source={lab.source}
+          onCancel={() => setLab(null)}
+          onSaved={async () => {
+            setLab(null)
+            await reload()
+          }}
+        />
+      )}
       <HealthTable
         entries={entries}
         persons={[person]}
@@ -79,6 +96,7 @@ export function HealthLog({ person }: { person: Person }) {
           person={person}
           onClose={() => setReading(false)}
           onDraft={(draft, source) => setAdding({ draft: { draft, source } })}
+          onLabDraft={(draft, source) => setLab({ draft, source })}
         />
       )}
     </div>
