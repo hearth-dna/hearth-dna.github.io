@@ -1,0 +1,7 @@
+type,unit,value,startDate
+HKQuantityTypeIdentifierBodyMass,kg,71.4,2026-02-01 07:31:00 +0100
+HKQuantityTypeIdentifierBodyMass,kg,71.1,2026-02-08 07:28:00 +0100
+HKQuantityTypeIdentifierHeartRate,count/min,62,2026-02-01 07:33:00 +0100
+HKQuantityTypeIdentifierHeartRate,count/min,58,2026-02-08 07:30:00 +0100
+HKQuantityTypeIdentifierBodyTemperature,degF,98.6,2026-02-03 21:00:00 +0100
+HKQuantityTypeIdentifierFlightsClimbed,count,12,2026-02-01 18:00:00 +0100

@@ -29,5 +29,6 @@
   "healthLog.tags": "Tags (conditions, diseases; comma-separated)",
   "healthLog.tagsPlaceholder": "e.g. arthritis, flare",
   "healthLog.transcribedNotice": "Transcribed by a model from your document; check every number against the paper before saving.",
-  "healthLog.saveEntry": "Save entry"
+  "healthLog.saveEntry": "Save entry",
+  "healthLog.importCsv": "Import CSV…"
 }

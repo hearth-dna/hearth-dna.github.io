@@ -1,9 +1,7 @@
-import type { addHealthEntry } from '../db/repo'
+import type { HealthEntryInput } from '../db/repo'
 import type { Kb } from '../kb/kb'
 import { labCatalogue } from './normalise'
 import type { LabReportDraft, LabRow } from './types'
-
-type EntryInput = Parameters<typeof addHealthEntry>[1]
 
 /** The test's name in the UI language (English when the catalogue has none), or as printed. */
 export function labTitle(kb: Kb, row: Pick<LabRow, 'analyte' | 'printedName'>, lang: string): string {
@@ -21,7 +19,7 @@ export function labEntries(
   draft: LabReportDraft,
   rows: LabRow[],
   o: { personId: string; source: string; lang: string; fallbackDate: string },
-): EntryInput[] {
+): HealthEntryInput[] {
   return rows.map((r) => {
     const printed = [
       `${r.printedName}: ${r.printedValue}${r.printedUnit ? ` ${r.printedUnit}` : ''}`,

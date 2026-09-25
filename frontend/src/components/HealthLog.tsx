@@ -11,6 +11,7 @@ import { HealthTable } from './HealthTable'
 import { LabReviewTable } from './LabReviewTable'
 import { QuickMeasurement } from './QuickMeasurement'
 import { ReadDocumentDialog } from './ReadDocumentDialog'
+import { TimelineImportDialog } from './TimelineImportDialog'
 
 /**
  * A person's health log: symptoms, home measurements, and dated text from lab reports, letters,
@@ -25,6 +26,8 @@ export function HealthLog({ person }: { person: Person }) {
   const [filter, setFilter] = useState<HealthFilter>(NO_FILTER)
   const [adding, setAdding] = useState<{ draft?: { draft: HealthDraft; source: string } } | null>(null)
   const [reading, setReading] = useState(false)
+  const [importing, setImporting] = useState(false)
+  const [imported, setImported] = useState<number | null>(null)
   const [lab, setLab] = useState<{ draft: LabReportDraft; source: string } | null>(null)
 
   const reload = async () => setEntries(await listHealthLog(db, person.id))
@@ -48,7 +51,11 @@ export function HealthLog({ person }: { person: Person }) {
         <button type="button" onClick={() => setReading(true)}>
           {t('healthLog.readDocument')}
         </button>
+        <button type="button" onClick={() => setImporting(true)}>
+          {t('healthLog.importCsv')}
+        </button>
       </div>
+      {imported !== null && <p className="notice">{t('timelineImport.done', { n: imported })}</p>}
       <p className="muted">{t('healthLog.intro')}</p>
       <QuickMeasurement persons={[person]} personId={person.id} entries={entries} onSaved={reload} />
       {adding && (
@@ -91,6 +98,16 @@ export function HealthLog({ person }: { person: Person }) {
           }
         }}
       />
+      {importing && (
+        <TimelineImportDialog
+          person={person}
+          onClose={() => setImporting(false)}
+          onImported={async (n) => {
+            setImported(n)
+            await reload()
+          }}
+        />
+      )}
       {reading && (
         <ReadDocumentDialog
           person={person}

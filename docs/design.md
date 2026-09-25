@@ -259,6 +259,15 @@ kb fields at tier 0, so the user gets a decision frame even without any LLM.
   printed reference range is a band when every reading shares it. Pure grouping and conversion in
   `charts/series.ts`; hand-drawn SVG in `components/TimeChart.tsx` with a crosshair tooltip, arrow
   keys (a slider over the readings) and a table view.
+- **Shipped fifth (CSV timeline import):** "Import CSV…" in a person's health log takes a
+  spreadsheet or a device export, one row per date with a column per measurement or one reading
+  per row (name, value, unit). The user assigns every column (and, for the long shape, every
+  metric name) to a measurement preset, a lab test or a custom metric; suggestions come from
+  headers in English or Russian, units in brackets and device identifiers. Dates are read per
+  column (ISO, d.m.y, m/d/y, spreadsheet serials, Unix time; ambiguous columns are flagged).
+  Values are converted into the app's unit (lb → kg, in → cm, °F → °C, mg/dL → mmol/L) with the
+  printed value kept in the text; a unit that cannot be converted blocks its column. Readings the
+  log already has are skipped, so a re-import adds nothing twice. `timeline/`, local only.
 - Accept PDF, images, plain text. `pdf.js` extracts the text layer; `Tesseract.js` OCRs scans; both in
   a worker. Originals stored as blobs in OPFS, referenced from `document`.
 - Structured extraction into `observation` rows (lab values with units and reference ranges,

@@ -1,4 +1,5 @@
 import type { Kb } from '../kb/kb'
+import { DELIMITERS, splitCells } from '../text/table'
 import { labCatalogue, normaliseRow, normaliseUnit, parseFlag, parseRef, parseValue } from './normalise'
 import type { LabReportDraft, LabRow, RawLabRow } from './types'
 
@@ -43,26 +44,10 @@ function reportDate(lines: string[]): { date: string; time: string } {
   return { date, time: t ? `${t[1]}:${t[2]}` : '' }
 }
 
-/** A delimited line into cells; a double quote protects a delimiter inside it. */
-function cells(line: string, delimiter: string): string[] {
-  const out: string[] = []
-  let cur = ''
-  let quoted = false
-  for (const ch of line) {
-    if (ch === '"') quoted = !quoted
-    else if (ch === delimiter && !quoted) {
-      out.push(cur)
-      cur = ''
-    } else cur += ch
-  }
-  out.push(cur)
-  return out.map((c) => c.trim())
-}
-
 /** A header row: the delimiter, and which column holds what. */
 function header(line: string): { delimiter: string; columns: Column[] } | null {
-  for (const delimiter of ['\t', ';', '|', ',']) {
-    const cs = cells(line, delimiter).map((c) => c.toLowerCase())
+  for (const delimiter of DELIMITERS) {
+    const cs = splitCells(line, delimiter).map((c) => c.toLowerCase())
     if (cs.length < 2) continue
     const columns = cs.map(
       (c) => (Object.keys(HEADERS) as Column[]).find((k) => HEADERS[k].test(c)) ?? ('' as Column),
@@ -108,7 +93,7 @@ function freeLine(kb: Kb, line: string): RawLabRow | null {
 
 /** A table row under a known header. */
 function tableRow(line: string, h: { delimiter: string; columns: Column[] }): RawLabRow | null {
-  const cs = cells(line, h.delimiter)
+  const cs = splitCells(line, h.delimiter)
   const get = (k: Column) => cs[h.columns.indexOf(k)] ?? ''
   const name = get('name')
   const { value, flag } = splitFlag(get('value'))
