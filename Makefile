@@ -1,6 +1,6 @@
 .PHONY: help dev dev-stop dev-status test lint \
 	frontend-install frontend-run frontend-build frontend-build-archive frontend-build-pages \
-	frontend-preview-pages frontend-test frontend-lint pages-deploy \
+	frontend-preview-pages frontend-test frontend-fixtures frontend-lint pages-deploy \
 	kb-build \
 	mobile-web android android-build android-install android-test android-lint android-logs android-clean \
 	android-keystore android-bundle android-verify android-publish _android-release-ready \
@@ -47,6 +47,9 @@ frontend-preview-pages: frontend-build-pages ## Serve the GitHub Pages build loc
 
 frontend-test: ## Run frontend unit tests (Vitest)
 	cd $(FRONTEND_DIR) && npm run test
+
+frontend-fixtures: ## Rewrite the synthetic backup fixtures (frontend/src/export/fixtures/)
+	cd $(FRONTEND_DIR) && WRITE_FIXTURES=1 npx vitest run src/export/fixtures/build.test.ts
 
 frontend-lint: ## Biome check
 	cd $(FRONTEND_DIR) && npm run lint
