@@ -6,12 +6,6 @@ import { tokenMatch, tokens } from './text'
  * markers to the health-log records that belong to it — names and synonyms in several languages,
  * ICD-10 codes, lab tests, measurement presets, symptoms and drugs. Pure.
  */
-export interface KbLab {
-  name: string
-  loinc?: string
-  synonyms?: string[]
-}
-
 export interface KbCondition {
   id: string
   /** `en` is always present; other languages fall back to it. */
@@ -20,7 +14,8 @@ export interface KbCondition {
   icd10: string[]
   category: string
   rsids: string[]
-  labs: KbLab[]
+  /** Analyte ids from the lab catalogue (`Kb.analytes`). */
+  labs: string[]
   /** Preset ids from health/presets.ts. */
   measurements: string[]
   symptoms: string[]
@@ -53,8 +48,15 @@ export function conditionNames(c: KbCondition): string[] {
  * its drugs. Symptoms and body parts are left out on purpose: "fatigue" or "joints" alone say too
  * little to suggest a diagnosis.
  */
-function pointers(c: KbCondition): string[] {
-  return [...conditionNames(c), ...c.labs.flatMap((l) => [l.name, ...(l.synonyms ?? [])]), ...c.drugs]
+function pointers(kb: Kb, c: KbCondition): string[] {
+  const labs = kb.analytes
+    .filter((a) => c.labs.includes(a.id))
+    .flatMap((a) => [
+      ...Object.values(a.names),
+      ...Object.values(a.synonyms ?? {}).flat(),
+      ...(a.abbreviations ?? []),
+    ])
+  return [...conditionNames(c), ...labs, ...c.drugs]
 }
 
 /** A phrase occurs in the text when each of its words matches a word of the text. */
@@ -67,5 +69,5 @@ function phraseIn(phrase: string, words: string[]): boolean {
 export function matchConditions(kb: Kb, text: string): string[] {
   const words = tokens(text)
   if (!words.length) return []
-  return kb.conditions.filter((c) => pointers(c).some((p) => phraseIn(p, words))).map((c) => c.id)
+  return kb.conditions.filter((c) => pointers(kb, c).some((p) => phraseIn(p, words))).map((c) => c.id)
 }

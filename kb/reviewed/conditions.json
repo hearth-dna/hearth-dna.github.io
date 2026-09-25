@@ -24,25 +24,10 @@
       "category": "cardiometabolic",
       "rsids": [],
       "labs": [
-        {
-          "name": "HbA1c",
-          "loinc": "4548-4",
-          "synonyms": [
-            "glycated haemoglobin",
-            "hemoglobin a1c",
-            "гликированный гемоглобин"
-          ]
-        },
-        {
-          "name": "Fasting glucose",
-          "loinc": "1558-6",
-          "synonyms": [
-            "glucose",
-            "blood sugar",
-            "глюкоза",
-            "сахар крови"
-          ]
-        }
+        "hba1c",
+        "glucose",
+        "glucose_2h",
+        "insulin"
       ],
       "measurements": [
         "glucose",
@@ -89,38 +74,13 @@
       "category": "cardiometabolic",
       "rsids": [],
       "labs": [
-        {
-          "name": "LDL cholesterol",
-          "loinc": "13457-7",
-          "synonyms": [
-            "ldl",
-            "лпнп"
-          ]
-        },
-        {
-          "name": "HDL cholesterol",
-          "loinc": "2085-9",
-          "synonyms": [
-            "hdl",
-            "лпвп"
-          ]
-        },
-        {
-          "name": "Triglycerides",
-          "loinc": "2571-8",
-          "synonyms": [
-            "triglyceride",
-            "триглицериды"
-          ]
-        },
-        {
-          "name": "Total cholesterol",
-          "loinc": "2093-3",
-          "synonyms": [
-            "cholesterol",
-            "холестерин"
-          ]
-        }
+        "ldl",
+        "hdl",
+        "tg",
+        "chol_total",
+        "lpa",
+        "apob",
+        "hs_crp"
       ],
       "measurements": [
         "blood-pressure",
@@ -167,22 +127,10 @@
       "category": "cardiometabolic",
       "rsids": [],
       "labs": [
-        {
-          "name": "LDL cholesterol",
-          "loinc": "13457-7",
-          "synonyms": [
-            "ldl",
-            "лпнп"
-          ]
-        },
-        {
-          "name": "Total cholesterol",
-          "loinc": "2093-3",
-          "synonyms": [
-            "cholesterol",
-            "холестерин"
-          ]
-        }
+        "ldl",
+        "chol_total",
+        "troponin",
+        "nt_probnp"
       ],
       "measurements": [
         "blood-pressure",
@@ -227,14 +175,7 @@
       "category": "cardiometabolic",
       "rsids": [],
       "labs": [
-        {
-          "name": "Triglycerides",
-          "loinc": "2571-8",
-          "synonyms": [
-            "triglyceride",
-            "триглицериды"
-          ]
-        }
+        "tg"
       ],
       "measurements": [
         "weight",
@@ -273,38 +214,11 @@
       "category": "cardiometabolic",
       "rsids": [],
       "labs": [
-        {
-          "name": "LDL cholesterol",
-          "loinc": "13457-7",
-          "synonyms": [
-            "ldl",
-            "лпнп"
-          ]
-        },
-        {
-          "name": "HDL cholesterol",
-          "loinc": "2085-9",
-          "synonyms": [
-            "hdl",
-            "лпвп"
-          ]
-        },
-        {
-          "name": "Triglycerides",
-          "loinc": "2571-8",
-          "synonyms": [
-            "triglyceride",
-            "триглицериды"
-          ]
-        },
-        {
-          "name": "Total cholesterol",
-          "loinc": "2093-3",
-          "synonyms": [
-            "cholesterol",
-            "холестерин"
-          ]
-        }
+        "ldl",
+        "hdl",
+        "tg",
+        "chol_total",
+        "non_hdl"
       ],
       "measurements": [
         "weight"
@@ -345,22 +259,9 @@
       "category": "cardiometabolic",
       "rsids": [],
       "labs": [
-        {
-          "name": "Total cholesterol",
-          "loinc": "2093-3",
-          "synonyms": [
-            "cholesterol",
-            "холестерин"
-          ]
-        },
-        {
-          "name": "Triglycerides",
-          "loinc": "2571-8",
-          "synonyms": [
-            "triglyceride",
-            "триглицериды"
-          ]
-        }
+        "chol_total",
+        "tg",
+        "apob"
       ],
       "measurements": [],
       "symptoms": [],
@@ -432,31 +333,9 @@
       "category": "metabolic",
       "rsids": [],
       "labs": [
-        {
-          "name": "Homocysteine",
-          "loinc": "13965-9",
-          "synonyms": [
-            "гомоцистеин"
-          ]
-        },
-        {
-          "name": "Folate",
-          "loinc": "2284-8",
-          "synonyms": [
-            "folic acid",
-            "фолат",
-            "фолиевая кислота"
-          ]
-        },
-        {
-          "name": "Vitamin B12",
-          "loinc": "2132-9",
-          "synonyms": [
-            "b12",
-            "cobalamin",
-            "витамин b12"
-          ]
-        }
+        "homocysteine",
+        "folate",
+        "b12"
       ],
       "measurements": [],
       "symptoms": [],
@@ -492,21 +371,9 @@
       "category": "metabolic",
       "rsids": [],
       "labs": [
-        {
-          "name": "Ferritin",
-          "loinc": "2276-4",
-          "synonyms": [
-            "ферритин"
-          ]
-        },
-        {
-          "name": "Transferrin saturation",
-          "loinc": "2502-3",
-          "synonyms": [
-            "tsat",
-            "насыщение трансферрина"
-          ]
-        }
+        "ferritin",
+        "tsat",
+        "iron"
       ],
       "measurements": [],
       "symptoms": [
@@ -685,16 +552,7 @@
       ],
       "category": "cancer",
       "rsids": [],
-      "labs": [
-        {
-          "name": "TSH",
-          "loinc": "3016-3",
-          "synonyms": [
-            "thyrotropin",
-            "ттг"
-          ]
-        }
-      ],
+      "labs": [],
       "measurements": [],
       "symptoms": [],
       "body_parts": [
@@ -728,23 +586,9 @@
       "category": "endocrine",
       "rsids": [],
       "labs": [
-        {
-          "name": "TSH",
-          "loinc": "3016-3",
-          "synonyms": [
-            "thyrotropin",
-            "ттг"
-          ]
-        },
-        {
-          "name": "Free T4",
-          "loinc": "3024-7",
-          "synonyms": [
-            "ft4",
-            "free thyroxine",
-            "свободный т4"
-          ]
-        }
+        "tsh",
+        "ft4",
+        "anti_tpo"
       ],
       "measurements": [
         "weight"
@@ -782,14 +626,7 @@
       "category": "cancer",
       "rsids": [],
       "labs": [
-        {
-          "name": "PSA",
-          "loinc": "2857-1",
-          "synonyms": [
-            "prostate specific antigen",
-            "пса"
-          ]
-        }
+        "psa"
       ],
       "measurements": [],
       "symptoms": [],
@@ -858,14 +695,8 @@
       "category": "digestive",
       "rsids": [],
       "labs": [
-        {
-          "name": "tTG-IgA",
-          "loinc": "31017-7",
-          "synonyms": [
-            "tissue transglutaminase",
-            "transglutaminase"
-          ]
-        }
+        "ttg_iga",
+        "iga_total"
       ],
       "measurements": [
         "weight"
@@ -1044,14 +875,8 @@
       "category": "musculoskeletal",
       "rsids": [],
       "labs": [
-        {
-          "name": "C-reactive protein",
-          "loinc": "1988-5",
-          "synonyms": [
-            "crp",
-            "срб"
-          ]
-        }
+        "crp",
+        "esr"
       ],
       "measurements": [],
       "symptoms": [

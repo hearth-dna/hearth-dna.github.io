@@ -5,6 +5,11 @@
 ICD-10 codes and the lab tests, measurements, symptoms and drugs that belong to it. Marker entries
 name conditions by id; the build checks every id and links markers and conditions both ways.
 
+`reviewed/labs/` is the lab catalogue the document reader maps printed results onto: analytes
+(one id per test, with LOINC codes, names and printed abbreviations, a canonical unit and the
+factors from every other accepted unit), panels (named groups such as a complete blood count) and
+units (printed spellings of each canonical unit). Conditions name their lab tests by analyte id.
+
 The reviewed files are hand-curated (evidence grades follow family_dna's CLINICAL_PRIORITY.MD:
 A = guideline/replicated, B = replicated association, C = preliminary). Genotype keys are on the
 forward strand and are normalised to sorted allele order so lookups are orientation-free.
@@ -19,6 +24,9 @@ from datetime import date
 ROOT = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(ROOT, '..', 'frontend', 'public', 'kb.json')
 CONDITIONS = os.path.join(ROOT, 'reviewed', 'conditions.json')
+LABS = os.path.join(ROOT, 'reviewed', 'labs')
+ANALYTE_KEYS = ('id', 'names', 'panels', 'specimen', 'unit', 'units', 'plausible', 'decimals')
+CONVERSIONS = {'hba1c'}  # non-linear conversions implemented in frontend/src/labs/normalise.ts
 CONDITION_KEYS = ('id', 'names', 'category', 'rsids', 'labs', 'measurements', 'symptoms', 'body_parts', 'drugs')
 
 
@@ -46,6 +54,48 @@ def load_conditions() -> list:
     return conditions
 
 
+def load_labs() -> tuple:
+    def read(name: str) -> list:
+        with open(os.path.join(LABS, f'{name}.json'), encoding='utf-8') as f:
+            return json.load(f)[name]
+
+    units, panels, analytes = read('units'), read('panels'), read('analytes')
+    unit_ids = {u['id'] for u in units}
+    seen_alias = {}
+    for u in units:
+        for alias in u['aliases']:
+            if seen_alias.setdefault(alias, u['id']) != u['id']:
+                raise ValueError(f'unit alias {alias} belongs to {seen_alias[alias]} and {u["id"]}')
+    panel_ids = {p['id'] for p in panels}
+    ids = set()
+    for a in analytes:
+        for k in ANALYTE_KEYS:
+            if k not in a:
+                raise ValueError(f'analyte {a.get("id")}: missing {k}')
+        if a['id'] in ids:
+            raise ValueError(f'duplicate analyte {a["id"]}')
+        ids.add(a['id'])
+        if not a['names'].get('en'):
+            raise ValueError(f'analyte {a["id"]}: names.en is required')
+        for unit in [a['unit'], *a['units']]:
+            if unit not in unit_ids:
+                raise ValueError(f'analyte {a["id"]}: unknown unit {unit}')
+        # A factor multiplies a value in that unit into the canonical one; null accepts the unit
+        # as printed with no exact conversion (Lp(a) mg/dL ↔ nmol/L depends on the isoform).
+        for unit, factor in a['units'].items():
+            if factor is not None and not factor > 0:
+                raise ValueError(f'analyte {a["id"]}: factor for {unit} must be positive')
+        if a.get('convert') and a['convert'] not in CONVERSIONS:
+            raise ValueError(f'analyte {a["id"]}: unknown conversion {a["convert"]}')
+        lo, hi = a['plausible']
+        if not lo < hi:
+            raise ValueError(f'analyte {a["id"]}: plausible range must be low < high')
+        for p in a['panels']:
+            if p not in panel_ids:
+                raise ValueError(f'analyte {a["id"]}: unknown panel {p}')
+    return units, panels, analytes
+
+
 def main() -> int:
     entries = []
     topics = {}
@@ -53,6 +103,15 @@ def main() -> int:
         conditions = load_conditions()
     except ValueError as e:
         return fail(f'{CONDITIONS}: {e}')
+    try:
+        units, panels, analytes = load_labs()
+    except ValueError as e:
+        return fail(f'{LABS}: {e}')
+    analyte_ids = {a['id'] for a in analytes}
+    for c in conditions:
+        for lab in c['labs']:
+            if lab not in analyte_ids:
+                return fail(f'condition {c["id"]}: unknown lab {lab}')
     for path in sorted(glob.glob(os.path.join(ROOT, 'reviewed', '*.json'))):
         if path == CONDITIONS:
             continue
@@ -96,10 +155,14 @@ def main() -> int:
         'entries': sorted(entries, key=lambda e: e['rsid']),
         'topics': list(topics.values()),
         'conditions': sorted(conditions, key=lambda c: c['id']),
+        'analytes': analytes,
+        'panels': panels,
+        'units': units,
         'licences': [
             'dbSNP, ClinVar, GWAS Catalog: public domain / open',
             'CPIC guidelines: CC BY-SA 4.0',
             'Reviewed entries: curated in the family_dna repository',
+            'LOINC codes: copyright Regenstrief Institute, Inc., available at no cost at loinc.org',
         ],
     }
     body = json.dumps(payload, ensure_ascii=False, indent=1)
@@ -107,7 +170,7 @@ def main() -> int:
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, 'w', encoding='utf-8') as f:
         json.dump(payload, f, ensure_ascii=False, indent=1)
-    print(f'wrote {OUT}: {len(entries)} entries, {len(topics)} topics, {len(conditions)} conditions')
+    print(f'wrote {OUT}: {len(entries)} entries, {len(topics)} topics, {len(conditions)} conditions, {len(analytes)} lab tests')
     return 0
 
 

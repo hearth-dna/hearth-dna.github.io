@@ -28,3 +28,27 @@ FOXE1 = A, MSMB = T, APOA5 = G, NAT2*5 = C.
 
 Later sources (design §5): CPIC star-allele tables, ClinVar pathogenic on consumer chips, PGS
 Catalog weights, SNPedia (non-commercial only, switchable).
+
+## Lab catalogue
+
+`reviewed/labs/` is what the document reader maps printed blood-test results onto, from a glucose
+slip to a full biochemistry panel (`frontend/src/labs/`):
+
+- `analytes.json`: one id per test. `names` and `synonyms` per language, `abbreviations` as
+  printed (HGB, NEUT%, АЛТ), `loinc[]`, `panels[]`, `specimen[]`, the canonical `unit`, and
+  `units`: every other accepted unit with the factor that multiplies it into the canonical one
+  (null when there is no exact conversion, as for Lp(a) mg/dL). HbA1c % ↔ mmol/mol is not linear
+  and names a conversion (`convert: "hba1c"`) implemented in `labs/normalise.ts`. `plausible` is
+  the range outside which a value is a transcription slip, not a result; it is not a reference
+  range, which always comes from the printed report.
+- `panels.json`: named groups (complete blood count, lipid panel, metabolic panel…) with the names
+  labs print for them.
+- `units.json`: each canonical unit and its printed spellings (`ммоль/л`, `×10⁹/л`, `тыс/мкл`,
+  `Ед/л`…), compared after lower-casing and removing spaces.
+
+A percentage and an absolute count of the same cells are separate ids (`neut_pct`, `neut_abs`);
+the reader tells them apart by the printed unit. Conditions name their lab tests by these ids.
+The build rejects unknown units, panels and conversions, non-positive factors and a unit
+spelling claimed by two units. LOINC codes were entered by hand and should be checked against
+loinc.org when an entry is next reviewed.
+

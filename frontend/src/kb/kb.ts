@@ -1,4 +1,5 @@
 import { fetchOwnAsset } from '../egress/egress'
+import type { KbAnalyte, KbPanel, KbUnit } from '../labs/types'
 import type { Call } from '../types'
 import { conditionById, conditionNames, type KbCondition } from './conditions'
 
@@ -27,6 +28,9 @@ export interface Kb {
   entries: KbEntry[]
   topics: { id: string; category: string }[]
   conditions: KbCondition[]
+  analytes: KbAnalyte[]
+  panels: KbPanel[]
+  units: KbUnit[]
 }
 
 export async function loadKb(): Promise<Kb> {

@@ -1,0 +1,15 @@
+{
+ "date": "2026-09-18",
+ "time": "08:40",
+ "panel": "cbc",
+ "results": [
+  { "printed_name": "Гемоглобин (HGB)", "analyte": "hb", "value": "128", "unit": "г/л", "ref": "120 - 140", "flag": "", "section": "Общий анализ крови" },
+  { "printed_name": "Эритроциты (RBC)", "analyte": "rbc", "value": "4,31", "unit": "×10¹²/л", "ref": "3,8 - 5,1", "flag": "", "section": "Общий анализ крови" },
+  { "printed_name": "Лейкоциты (WBC)", "analyte": "wbc", "value": "11,2", "unit": "×10⁹/л", "ref": "4,0 - 9,0", "flag": "↑", "section": "Общий анализ крови" },
+  { "printed_name": "Нейтрофилы, %", "analyte": "neut_pct", "value": "72", "unit": "%", "ref": "47 - 72", "flag": "", "section": "Лейкоцитарная формула" },
+  { "printed_name": "Нейтрофилы, абс.", "analyte": "neut_pct", "value": "8,06", "unit": "×10⁹/л", "ref": "1,8 - 6,5", "flag": "↑", "section": "Лейкоцитарная формула" },
+  { "printed_name": "СОЭ", "analyte": "esr", "value": "18", "unit": "мм/ч", "ref": "2 - 15", "flag": "", "section": "" },
+  { "printed_name": "Тромбоциты (PLT)", "analyte": "plt", "value": "2 450", "unit": "×10⁹/л", "ref": "150 - 400", "flag": "", "section": "Общий анализ крови" },
+  { "printed_name": "Ретикулоциты по Тарасову", "analyte": "other", "value": "0,9", "unit": "%", "ref": "0,2 - 1,2", "flag": "", "section": "" }
+ ]
+}
