@@ -2,6 +2,7 @@ import { createContext, useContext } from 'react'
 import type { Database } from '../db/db'
 import type { Kb } from '../kb/kb'
 import type { Person } from '../types'
+import type { Page } from './routes'
 
 export interface AppState {
   db: Database
@@ -10,6 +11,8 @@ export interface AppState {
   counts: Record<string, number>
   relationships: { parentId: string; childId: string }[]
   refresh: () => Promise<void>
+  /** Open another page (the Import shortcuts on People and in the health log). */
+  go: (p: Page) => void
 }
 
 export const AppContext = createContext<AppState | null>(null)

@@ -10,6 +10,7 @@ import { ConsentGate } from './components/ConsentGate'
 import { EraseDialog } from './components/EraseDialog'
 import { FamilyPage } from './components/FamilyPage'
 import { HealthPage } from './components/HealthPage'
+import { ImportPage } from './components/ImportPage'
 import { PeoplePage } from './components/PeoplePage'
 import { PersonPage } from './components/PersonPage'
 import { SettingsPage } from './components/SettingsPage'
@@ -25,12 +26,13 @@ import { type Kb, loadKb } from './kb/kb'
 
 export function App() {
   const t = useT()
-  const [state, setState] = useState<AppState | null>(null)
+  const [loaded, setState] = useState<Omit<AppState, 'go'> | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [takenOver, setTakenOver] = useState(false)
   const [memoryOk, setMemoryOk] = useState(false)
   const [consented, setConsented] = useState(false)
   const [page, setPage] = useRoute()
+  const state: AppState | null = loaded && { ...loaded, go: setPage }
   const [erasing, setErasing] = useState(false)
   const [steps, setSteps] = useState<StepState[]>([])
   const [startup] = useState(() => new StartupLog(setSteps))
@@ -146,6 +148,7 @@ export function App() {
           {nav({ name: 'people' }, t('app.navPeople'))}
           {nav({ name: 'family' }, t('app.navFamily'))}
           {nav({ name: 'health', person: '' }, t('app.navHealth'))}
+          {nav({ name: 'import', source: '', person: '' }, t('app.navImport'))}
           {nav({ name: 'charts' }, t('app.navCharts'))}
           {nav({ name: 'ask' }, t('app.navAsk'))}
           {nav({ name: 'settings' }, t('app.navSettings'))}
@@ -176,6 +179,7 @@ export function App() {
         {page.name === 'health' && (
           <HealthPage person={page.person} onPerson={(person) => setPage({ name: 'health', person })} />
         )}
+        {page.name === 'import' && <ImportPage source={page.source} person={page.person} />}
         {page.name === 'charts' && <ChartsPage />}
         {page.name === 'ask' && <AskPage />}
         {page.name === 'settings' && <SettingsPage />}

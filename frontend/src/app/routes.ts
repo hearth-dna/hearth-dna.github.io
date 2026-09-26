@@ -5,6 +5,10 @@
  */
 import { useCallback, useEffect, useState } from 'react'
 
+/** What the Import page opens straight away; '' for none. */
+export const IMPORT_SOURCES = ['', 'dna', 'dna-batch', 'document', 'csv'] as const
+export type ImportSource = (typeof IMPORT_SOURCES)[number]
+
 export type Page =
   | { name: 'people' }
   | { name: 'person'; id: string }
@@ -12,6 +16,8 @@ export type Page =
   /** `person` is '' for the whole family. */
   | { name: 'health'; person: string }
   | { name: 'charts' }
+  /** `/import`, `/import/<source>`, `/import/<source>/<person>`; `person` '' for none chosen. */
+  | { name: 'import'; source: ImportSource; person: string }
   | { name: 'ask' }
   | { name: 'settings' }
 
@@ -25,6 +31,11 @@ export function parseRoute(path: string): Page | null {
     .filter(Boolean)
     .map((s) => decodeURIComponent(s))
   const [head = '', id, ...rest] = parts
+  if (head === 'import') {
+    const source = (id === '-' ? '' : (id ?? '')) as ImportSource
+    if (!IMPORT_SOURCES.includes(source) || rest.length > 1) return null
+    return { name: 'import', source, person: rest[0] ?? '' }
+  }
   if (rest.length) return null
   switch (head) {
     case '':
@@ -49,6 +60,13 @@ export function formatRoute(p: Page): string {
       return `/people/${encodeURIComponent(p.id)}`
     case 'health':
       return p.person ? `/health-log/${encodeURIComponent(p.person)}` : '/health-log'
+    case 'import':
+      // A person needs a source in front of it; '-' holds the place when none is chosen.
+      return p.person
+        ? `/import/${p.source || '-'}/${encodeURIComponent(p.person)}`
+        : p.source
+          ? `/import/${p.source}`
+          : '/import'
     default:
       return `/${p.name}`
   }
