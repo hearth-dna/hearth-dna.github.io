@@ -80,13 +80,12 @@ export function SettingsPage() {
 
       <div className="card">
         <h2>{t('settingsPage.appearance')}</h2>
-        <div className="segmented" role="radiogroup" aria-label={t('settingsPage.appearance')}>
+        <div className="segmented">
           {THEMES.map((m) => (
             <button
               key={m}
               type="button"
-              role="radio"
-              aria-checked={theme === m}
+              aria-pressed={theme === m}
               className={theme === m ? 'active' : ''}
               onClick={() => setTheme(m)}
             >
