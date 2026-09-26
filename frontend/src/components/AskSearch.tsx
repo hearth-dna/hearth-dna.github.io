@@ -102,7 +102,7 @@ export function AskSearch({
         </button>
       </div>
       {people.length > 1 && (
-        <div className="row filters" style={{ marginTop: '0.6rem' }}>
+        <div className="row filters mt-3">
           <select
             aria-label={t('healthPage.filterPerson')}
             value={who}
@@ -119,7 +119,7 @@ export function AskSearch({
       )}
       {tab === 'health' ? (
         <>
-          <div className="row filters" style={{ marginTop: '0.6rem' }}>
+          <div className="row filters mt-3">
             <input
               type="search"
               placeholder={t('askPage.searchHealth')}
@@ -174,7 +174,7 @@ export function AskSearch({
         </>
       ) : (
         <>
-          <div className="row filters" style={{ marginTop: '0.6rem' }}>
+          <div className="row filters mt-3">
             <input
               type="search"
               placeholder={t('askPage.searchDna')}

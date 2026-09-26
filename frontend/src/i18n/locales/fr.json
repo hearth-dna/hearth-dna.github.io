@@ -734,5 +734,12 @@
   "healthLog.addCondition": "+ ajouter une affection…",
   "healthLog.unlinkCondition": "Délier cette affection",
   "healthLog.filterCondition": "Affection",
-  "healthLog.allConditions": "toute affection"
+  "healthLog.allConditions": "toute affection",
+  "app.navMore": "Plus",
+  "theme.system": "Système",
+  "theme.light": "Clair",
+  "theme.dark": "Sombre",
+  "app.theme": "Thème : {mode}",
+  "settingsPage.appearance": "Apparence",
+  "settingsPage.appearanceNote": "Système suit le réglage clair ou sombre de votre appareil ; Clair et Sombre conservent cet aspect sur cet appareil."
 }

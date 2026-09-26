@@ -93,7 +93,7 @@ export function AskSuggestions({
       ) : (
         <>
           <div className="row">
-            <h3 style={{ margin: 0 }}>{t('askPage.suggestedRecords', { n: suggestions.length })}</h3>
+            <h3 className="m-0">{t('askPage.suggestedRecords', { n: suggestions.length })}</h3>
             {pending.length > 0 && (
               <button
                 type="button"

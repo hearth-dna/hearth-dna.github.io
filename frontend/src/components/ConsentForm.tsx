@@ -31,7 +31,7 @@ export function ConsentForm({
           <span>{t(s)}</span>
         </label>
       ))}
-      <div className="row" style={{ marginTop: '0.8rem' }}>
+      <div className="row mt-3">
         <button type="button" className="primary" disabled={!all} onClick={onConfirm}>
           {confirmLabel ?? t('consentForm.confirm')}
         </button>

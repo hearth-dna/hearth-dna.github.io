@@ -734,5 +734,12 @@
   "healthLog.addCondition": "+ dodaj schorzenie…",
   "healthLog.unlinkCondition": "Odłącz to schorzenie",
   "healthLog.filterCondition": "Schorzenie",
-  "healthLog.allConditions": "dowolne schorzenie"
+  "healthLog.allConditions": "dowolne schorzenie",
+  "app.navMore": "Więcej",
+  "theme.system": "Systemowy",
+  "theme.light": "Jasny",
+  "theme.dark": "Ciemny",
+  "app.theme": "Motyw: {mode}",
+  "settingsPage.appearance": "Wygląd",
+  "settingsPage.appearanceNote": "Systemowy podąża za jasnym lub ciemnym ustawieniem urządzenia; Jasny i Ciemny utrzymują ten wygląd na tym urządzeniu."
 }

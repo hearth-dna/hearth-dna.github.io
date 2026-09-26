@@ -204,7 +204,7 @@ export function HealthEntryForm({
             </button>
           ))}
         </div>
-        <div className="row" style={{ marginTop: '0.6rem' }}>
+        <div className="row mt-3">
           <button type="button" onClick={onCancel}>
             {t('common.cancel')}
           </button>
@@ -216,7 +216,7 @@ export function HealthEntryForm({
   return (
     <div className="card inset">
       <div className="row">
-        <h3 style={{ margin: 0 }}>{t('healthForm.newEntry', { kind: t(`kind.${kind}`) })}</h3>
+        <h3 className="m-0">{t('healthForm.newEntry', { kind: t(`kind.${kind}`) })}</h3>
         {!draft && (
           <button
             type="button"
@@ -241,7 +241,7 @@ export function HealthEntryForm({
           ))}
         </div>
       )}
-      <div className="row" style={{ marginTop: '0.6rem' }}>
+      <div className="row mt-3">
         {personPicker}
         <label className="field">
           {t('healthLog.date')}
@@ -265,7 +265,7 @@ export function HealthEntryForm({
             </button>
           </span>
         </label>
-        <label className="field" style={{ flex: 1 }}>
+        <label className="field grow">
           {t(`healthForm.title.${kind}`)}
           <input
             value={form.title}
@@ -275,7 +275,7 @@ export function HealthEntryForm({
         </label>
       </div>
       {fields.value && (
-        <div className="row" style={{ marginTop: '0.6rem' }}>
+        <div className="row mt-3">
           <label className="field">
             {pair ? t('healthLog.valueOf', { label: t(`preset.pair.${pair[0]}`) }) : t('healthLog.value')}
             <input
@@ -308,7 +308,7 @@ export function HealthEntryForm({
           </label>
         </div>
       )}
-      <div className="row" style={{ marginTop: '0.6rem' }}>
+      <div className="row mt-3">
         {fields.bodyPart && (
           <label className="field">
             {t('healthLog.bodyPart')}
@@ -355,7 +355,7 @@ export function HealthEntryForm({
             </select>
           </label>
         )}
-        <label className="field" style={{ flex: 1 }}>
+        <label className="field grow">
           {t('healthLog.tags')}
           <input
             list="health-tags"
@@ -370,14 +370,14 @@ export function HealthEntryForm({
           </datalist>
         </label>
       </div>
-      <div style={{ marginTop: '0.6rem' }}>
+      <div className="mt-3">
         <ConditionPicker
           value={form.conditions}
           suggestions={suggested}
           onChange={(conditions) => setForm({ ...form, conditions })}
         />
       </div>
-      <label className="field" style={{ marginTop: '0.6rem' }}>
+      <label className="field mt-3">
         {t(`healthForm.details.${kind}`)}
         <textarea
           value={form.body}
@@ -386,7 +386,7 @@ export function HealthEntryForm({
         />
       </label>
       {form.source && <p className="muted">{t('healthLog.transcribedNotice')}</p>}
-      <div className="row" style={{ marginTop: '0.6rem' }}>
+      <div className="row mt-3">
         <button type="button" className="primary" disabled={!valid || consented !== true} onClick={save}>
           {t('healthLog.saveEntry')}
         </button>

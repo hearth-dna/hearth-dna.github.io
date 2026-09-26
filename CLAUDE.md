@@ -39,5 +39,6 @@ under `.dev/`; `make dev-stop` stops it; `make test` runs the suite.
 
 ## Conventions
 
-TypeScript: Biome (single quotes, no semicolons, 2-space). Tests: Vitest, pure-logic suites in
+TypeScript: Biome (single quotes, no semicolons, 2-space). UI: tokens and components in
+`frontend/src/styles.css` (`docs/architecture/ui/design-system.md`); no inline spacing styles. Tests: Vitest, pure-logic suites in
 `node` env, DOM suites opt in per file. Commits: imperative, lower-case.

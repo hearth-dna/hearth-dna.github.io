@@ -734,5 +734,12 @@
   "healthLog.addCondition": "+ tambah kondisi…",
   "healthLog.unlinkCondition": "Lepaskan kondisi ini",
   "healthLog.filterCondition": "Kondisi",
-  "healthLog.allConditions": "kondisi apa pun"
+  "healthLog.allConditions": "kondisi apa pun",
+  "app.navMore": "Lainnya",
+  "theme.system": "Sistem",
+  "theme.light": "Terang",
+  "theme.dark": "Gelap",
+  "app.theme": "Tema: {mode}",
+  "settingsPage.appearance": "Tampilan",
+  "settingsPage.appearanceNote": "Sistem mengikuti pengaturan terang atau gelap perangkat Anda; Terang dan Gelap mempertahankan tampilan itu di perangkat ini."
 }

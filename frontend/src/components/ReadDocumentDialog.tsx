@@ -194,7 +194,7 @@ export function ReadDocumentDialog({
 
   return (
     <dialog ref={ref} onClose={onClose}>
-      <h2 style={{ marginTop: 0 }}>{t('readDocumentDialog.title', { name: person.displayName })}</h2>
+      <h2 className="mt-0">{t('readDocumentDialog.title', { name: person.displayName })}</h2>
       {stage.s === 'key' ? (
         <div>
           <p className="notice">{t('readDocumentDialog.keyNotice')}</p>
@@ -317,7 +317,7 @@ export function ReadDocumentDialog({
             />
           </label>
           {lab && (
-            <label className="field" style={{ marginTop: '0.6rem' }}>
+            <label className="field mt-3">
               {t('readDocumentDialog.pasteLabel')}
               <textarea
                 rows={6}
@@ -338,7 +338,7 @@ export function ReadDocumentDialog({
           {stage.s === 'error' && (
             <p className="danger">{t('readDocumentDialog.failed', { message: stage.message })}</p>
           )}
-          <div className="row" style={{ marginTop: '0.8rem' }}>
+          <div className="row mt-3">
             <button
               type="button"
               className="primary"

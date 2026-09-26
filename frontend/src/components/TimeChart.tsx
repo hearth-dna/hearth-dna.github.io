@@ -135,7 +135,7 @@ export function TimeChart({
   return (
     <div className="card chart" ref={box}>
       <div className="row" style={{ alignItems: 'baseline' }}>
-        <h3 style={{ margin: 0, marginRight: 'auto' }}>
+        <h3 className="m-0 me-auto">
           {title} {panel.unit && <span className="muted">· {panel.unit}</span>}
         </h3>
         <button type="button" className="small" onClick={() => setTable(!table)}>

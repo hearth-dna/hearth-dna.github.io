@@ -135,10 +135,10 @@ export function AskPage() {
             placeholder={t('askPage.questionPlaceholder')}
           />
         </label>
-        <div className="row" style={{ marginTop: '0.6rem' }}>
+        <div className="row mt-3">
           <span>{t('askPage.people')}</span>
           {persons.map((p) => (
-            <label className="check" key={p.id} style={{ margin: 0 }}>
+            <label className="check m-0" key={p.id}>
               <input
                 type="checkbox"
                 checked={selected.includes(p.id)}
@@ -171,8 +171,8 @@ export function AskPage() {
       )}
 
       <div className="card">
-        <div className="row">
-          <h2 style={{ marginRight: 'auto' }}>
+        <div className="card-head">
+          <h2>
             {t('askPage.includedHeading')}{' '}
             <span className="muted">
               {t('askPage.includedStats', {
@@ -213,7 +213,7 @@ export function AskPage() {
             </div>
           ))
         )}
-        <div className="row" style={{ marginTop: '0.6rem' }}>
+        <div className="row mt-3">
           <label className="field">
             {t('askPage.promptTemplate')}
             <select
@@ -230,15 +230,15 @@ export function AskPage() {
               ))}
             </select>
           </label>
-          <label className="check" style={{ margin: 0 }}>
+          <label className="check m-0">
             <input type="checkbox" checked={compact} onChange={(e) => setCompact(e.target.checked)} />
             <span>{t('askPage.compact')}</span>
           </label>
-          <label className="check" style={{ margin: 0 }}>
+          <label className="check m-0">
             <input type="checkbox" checked={evidence} onChange={(e) => setEvidence(e.target.checked)} />
             <span>{t('askPage.evidenceNotes')}</span>
           </label>
-          <label className="check" style={{ margin: 0 }}>
+          <label className="check m-0">
             <input type="checkbox" checked={realNames} onChange={(e) => setRealNames(e.target.checked)} />
             <span>{t('askPage.realNames')}</span>
           </label>
@@ -292,7 +292,7 @@ export function AskPage() {
 
       {confirmOpen && (
         <dialog open>
-          <h2 style={{ marginTop: 0 }}>{t('askPage.confirmTitle')}</h2>
+          <h2 className="mt-0">{t('askPage.confirmTitle')}</h2>
           <p>{rich(t('askPage.confirmBody'))}</p>
           <ul>
             <li>

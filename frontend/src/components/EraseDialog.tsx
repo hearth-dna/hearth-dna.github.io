@@ -43,7 +43,7 @@ export function EraseDialog({ onClose }: { onClose: () => void }) {
 
   return (
     <dialog ref={ref} onClose={onClose}>
-      <h2 style={{ marginTop: 0 }}>{t('eraseDialog.title')}</h2>
+      <h2 className="mt-0">{t('eraseDialog.title')}</h2>
       <p>{t('eraseDialog.intro')}</p>
       <div className="notice">{rich(t('eraseDialog.exportFirst'))}</div>
       <div className="row">
@@ -61,7 +61,7 @@ export function EraseDialog({ onClose }: { onClose: () => void }) {
         </button>
       </div>
       {msg && <p className="muted">{msg}</p>}
-      <div className="row" style={{ marginTop: '1rem' }}>
+      <div className="row mt-4">
         <button type="button" className="danger" onClick={erase} disabled={busy}>
           {t('eraseDialog.eraseEverything')}
         </button>

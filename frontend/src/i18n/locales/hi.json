@@ -734,5 +734,12 @@
   "healthLog.addCondition": "+ स्थिति जोड़ें…",
   "healthLog.unlinkCondition": "इस स्थिति से जोड़ हटाएँ",
   "healthLog.filterCondition": "स्थिति",
-  "healthLog.allConditions": "कोई भी स्थिति"
+  "healthLog.allConditions": "कोई भी स्थिति",
+  "app.navMore": "और",
+  "theme.system": "सिस्टम",
+  "theme.light": "हल्का",
+  "theme.dark": "गहरा",
+  "app.theme": "थीम: {mode}",
+  "settingsPage.appearance": "दिखावट",
+  "settingsPage.appearanceNote": "सिस्टम आपके डिवाइस की हल्की या गहरी सेटिंग का पालन करता है; हल्का और गहरा इस डिवाइस पर वही रूप रखते हैं।"
 }

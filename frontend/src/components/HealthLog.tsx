@@ -34,8 +34,8 @@ export function HealthLog({ person }: { person: Person }) {
 
   return (
     <div className="card">
-      <div className="row">
-        <h2 style={{ marginRight: 'auto' }}>{t('healthLog.title')}</h2>
+      <div className="card-head">
+        <h2>{t('healthLog.title')}</h2>
         <button type="button" className="primary" disabled={adding} onClick={() => setAdding(true)}>
           {t('healthLog.addEntry')}
         </button>

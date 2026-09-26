@@ -734,5 +734,12 @@
   "healthLog.addCondition": "+ أضف حالة…",
   "healthLog.unlinkCondition": "إلغاء ربط هذه الحالة",
   "healthLog.filterCondition": "الحالة",
-  "healthLog.allConditions": "أي حالة"
+  "healthLog.allConditions": "أي حالة",
+  "app.navMore": "المزيد",
+  "theme.system": "النظام",
+  "theme.light": "فاتح",
+  "theme.dark": "داكن",
+  "app.theme": "المظهر: {mode}",
+  "settingsPage.appearance": "المظهر",
+  "settingsPage.appearanceNote": "«النظام» يتبع إعداد جهازك الفاتح أو الداكن؛ «فاتح» و«داكن» يثبّتان المظهر على هذا الجهاز."
 }

@@ -734,5 +734,12 @@
   "healthLog.addCondition": "+ додати захворювання…",
   "healthLog.unlinkCondition": "Відв'язати це захворювання",
   "healthLog.filterCondition": "Захворювання",
-  "healthLog.allConditions": "будь-яке захворювання"
+  "healthLog.allConditions": "будь-яке захворювання",
+  "app.navMore": "Ще",
+  "theme.system": "Системна",
+  "theme.light": "Світла",
+  "theme.dark": "Темна",
+  "app.theme": "Тема: {mode}",
+  "settingsPage.appearance": "Оформлення",
+  "settingsPage.appearanceNote": "«Системна» стежить за світлим або темним налаштуванням пристрою; «Світла» і «Темна» закріплюють її на цьому пристрої."
 }

@@ -37,5 +37,7 @@
   "settingsPage.eraseAllData": "Erase all data",
   "settingsPage.footer": "Hearth {version} · storage: {storage} · id {id}",
   "settingsPage.storageOpfs": "OPFS (persistent)",
-  "settingsPage.storageMemory": "memory (not persistent in this browser context)"
+  "settingsPage.storageMemory": "memory (not persistent in this browser context)",
+  "settingsPage.appearance": "Appearance",
+  "settingsPage.appearanceNote": "System follows your device's light or dark setting; Light and Dark keep that look on this device."
 }

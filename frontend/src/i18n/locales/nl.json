@@ -734,5 +734,12 @@
   "healthLog.addCondition": "+ aandoening toevoegen…",
   "healthLog.unlinkCondition": "Koppeling met deze aandoening verwijderen",
   "healthLog.filterCondition": "Aandoening",
-  "healthLog.allConditions": "elke aandoening"
+  "healthLog.allConditions": "elke aandoening",
+  "app.navMore": "Meer",
+  "theme.system": "Systeem",
+  "theme.light": "Licht",
+  "theme.dark": "Donker",
+  "app.theme": "Thema: {mode}",
+  "settingsPage.appearance": "Weergave",
+  "settingsPage.appearanceNote": "Systeem volgt de lichte of donkere instelling van je apparaat; Licht en Donker houden die weergave op dit apparaat."
 }

@@ -184,7 +184,7 @@ export function TimelineImportDialog({
 
   return (
     <dialog ref={ref} onClose={onClose} className="wide">
-      <h2 style={{ marginTop: 0 }}>{t('timelineImport.title', { name: person.displayName })}</h2>
+      <h2 className="mt-0">{t('timelineImport.title', { name: person.displayName })}</h2>
       {consented === false ? (
         <ConsentForm
           kind="import_document"
@@ -208,12 +208,12 @@ export function TimelineImportDialog({
               }}
             />
           </label>
-          <label className="field" style={{ marginTop: '0.6rem' }}>
+          <label className="field mt-3">
             {t('timelineImport.paste')}
             <textarea rows={6} value={text} onChange={(e) => setText(e.target.value)} />
           </label>
           {error && <p className="danger">{error}</p>}
-          <div className="row" style={{ marginTop: '0.8rem' }}>
+          <div className="row mt-3">
             <button type="button" className="primary" disabled={!text.trim()} onClick={read}>
               {t('readDocumentDialog.continue')}
             </button>
@@ -248,7 +248,7 @@ export function TimelineImportDialog({
               <option value="long">{t('timelineImport.shape.long')}</option>
             </select>
           </label>
-          <div className="tablewrap" style={{ marginTop: '0.6rem' }}>
+          <div className="tablewrap mt-3">
             <table className="healthtable labreview">
               <thead>
                 <tr>
@@ -332,8 +332,8 @@ export function TimelineImportDialog({
             </>
           )}
           {result && (
-            <div className="notice" style={{ marginTop: '0.8rem' }}>
-              <p style={{ margin: 0 }}>
+            <div className="notice mt-3">
+              <p className="m-0">
                 {hasDate
                   ? t('timelineImport.willAdd', { n: result.entries.length })
                   : t('timelineImport.needDate')}
@@ -363,7 +363,7 @@ export function TimelineImportDialog({
             </ul>
           )}
           {error && <p className="danger">{error}</p>}
-          <div className="row" style={{ marginTop: '0.8rem' }}>
+          <div className="row mt-3">
             <button
               type="button"
               className="primary"
