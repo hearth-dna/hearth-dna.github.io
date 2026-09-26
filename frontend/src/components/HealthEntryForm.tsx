@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useApp } from '../app/context'
 import { grantConsent, hasConsent } from '../consent/consent'
 import { addHealthEntry } from '../db/repo'
@@ -6,6 +6,7 @@ import type { HealthDraft } from '../documents/draft'
 import { parseTags } from '../health/log'
 import { findPreset, presetsFor } from '../health/presets'
 import { useT } from '../i18n/context'
+import { suggestConditions } from '../kb/conditions'
 import {
   BODY_PARTS,
   BODY_SIDES,
@@ -14,6 +15,7 @@ import {
   type HealthKind,
   type Person,
 } from '../types'
+import { ConditionPicker } from './ConditionPicker'
 import { ConsentForm } from './ConsentForm'
 
 /** Local date and time; toISOString() is UTC and gives yesterday's date late in the evening. */
@@ -57,6 +59,7 @@ const blank = (kind: HealthKind | null) => ({
   value2: '',
   unit: '',
   preset: '',
+  conditions: [] as string[],
 })
 
 /**
@@ -81,7 +84,7 @@ export function HealthEntryForm({
   onSaved: () => void
   onCancel: () => void
 }) {
-  const { db } = useApp()
+  const { db, kb } = useApp()
   const t = useT()
   const [personId, setPersonId] = useState(initialPerson)
   const [consented, setConsented] = useState<boolean | null>(null)
@@ -95,6 +98,16 @@ export function HealthEntryForm({
   }, [db, personId])
 
   const kind = form.kind
+  const suggested = useMemo(
+    () =>
+      suggestConditions(kb, {
+        title: form.title,
+        body: form.body,
+        tags: parseTags(form.tags),
+        preset: form.preset,
+      }),
+    [kb, form.title, form.body, form.tags, form.preset],
+  )
   const fields = kind ? FIELDS[kind] : {}
   const preset = findPreset(form.preset)
   const pair = kind === 'measurement' ? preset?.pair : undefined
@@ -138,6 +151,7 @@ export function HealthEntryForm({
       value: fields.value ? Number(form.value) : null,
       value2: pair ? Number(form.value2) : null,
       unit: fields.value ? form.unit.trim() : '',
+      conditions: form.conditions,
     })
     onSaved()
   }
@@ -355,6 +369,13 @@ export function HealthEntryForm({
             ))}
           </datalist>
         </label>
+      </div>
+      <div style={{ marginTop: '0.6rem' }}>
+        <ConditionPicker
+          value={form.conditions}
+          suggestions={suggested}
+          onChange={(conditions) => setForm({ ...form, conditions })}
+        />
       </div>
       <label className="field" style={{ marginTop: '0.6rem' }}>
         {t(`healthForm.details.${kind}`)}

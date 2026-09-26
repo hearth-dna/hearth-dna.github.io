@@ -4,7 +4,7 @@ import { openRepaired } from '../../backup/repair'
 import type { Database } from '../../db/db'
 import { missingGenomes, openContainer, serialiseContainer } from '../container'
 import { restoreBytes, restoreContainer } from '../restore'
-import { CHILD, PARENT, PASSPHRASE, ROWS } from './family'
+import { CHILD, family, PARENT, PASSPHRASE, ROWS } from './family'
 
 const fixture = (name: string) => new Uint8Array(readFileSync(`${__dirname}/${name}`))
 const COMPLETE = fixture('family.hearth')
@@ -14,9 +14,13 @@ const MISSING_ENC = fixture('family-missing-genome.hearth.enc')
 /** An empty database that records what a restore writes. */
 function fakeDb() {
   const sql: string[] = []
+  const params: unknown[][] = []
   const genotypes: Record<string, number> = {}
   const db = {
-    exec: async (s: string) => void sql.push(s),
+    exec: async (s: string, p: unknown[] = []) => {
+      sql.push(s)
+      params.push(p)
+    },
     query: async () => [],
     bulkInsert: async (_table: string, _cols: string[], rows: unknown[][]) => {
       for (const r of rows) genotypes[r[0] as string] = (genotypes[r[0] as string] ?? 0) + 1
@@ -24,7 +28,13 @@ function fakeDb() {
     filePut: async () => {},
   } as unknown as Database
   const inserted = (table: string) => sql.filter((s) => s.includes(`INTO ${table}`)).length
-  return { db, genotypes, inserted }
+  /** The named column of every row inserted into the table. */
+  const column = (table: string, col: string) =>
+    sql.flatMap((s, i) => {
+      const m = s.match(new RegExp(`INTO ${table}\\(([^)]*)\\)`))
+      return m ? [params[i][m[1].split(',').indexOf(col)]] : []
+    })
+  return { db, genotypes, inserted, column }
 }
 
 describe('backup fixtures', () => {
@@ -56,6 +66,18 @@ describe('backup fixtures', () => {
     await expect(restoreBytes(fakeDb().db, MISSING_ENC, undefined)).rejects.toThrow(/passphrase/)
     const r = await restoreBytes(fakeDb().db, MISSING_ENC, PASSPHRASE)
     expect(r).toMatchObject({ genomes: 1, missing: [CHILD] })
+  })
+
+  it('keeps the conditions a health-log entry is linked to, and defaults them in older dumps', async () => {
+    const now = fakeDb()
+    await restoreBytes(now.db, COMPLETE, undefined)
+    expect(now.column('health_log', 'conditions')).toEqual(['arthritis'])
+
+    const old = await family()
+    for (const h of old.journal.health_log as Record<string, unknown>[]) delete h.conditions
+    const before = fakeDb()
+    await restoreContainer(before.db, old)
+    expect(before.column('health_log', 'conditions')).toEqual([''])
   })
 
   it('never writes the broken shape back out', async () => {

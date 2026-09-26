@@ -728,5 +728,11 @@
   "importPage.historyVia.text": "texte d'analyse lu ici",
   "importPage.historyVia.gemini": "lu par {model}",
   "importPage.historyEntries": "{n} entrées, {from} – {to}, importées le {date}",
-  "app.navImport": "Importer"
+  "app.navImport": "Importer",
+  "healthLog.conditions": "Affections",
+  "healthLog.conditionsSuggested": "suggérées :",
+  "healthLog.addCondition": "+ ajouter une affection…",
+  "healthLog.unlinkCondition": "Délier cette affection",
+  "healthLog.filterCondition": "Affection",
+  "healthLog.allConditions": "toute affection"
 }

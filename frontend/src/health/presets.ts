@@ -215,6 +215,10 @@ export function findPreset(id: string): HealthPreset | undefined {
   return undefined
 }
 
+/** The measurement preset a saved entry was made from, by its title. */
+export const measurementPreset = (title: string): HealthPreset | undefined =>
+  MEASUREMENT_PRESETS.find((x) => x.title.toLowerCase() === title.trim().toLowerCase())
+
 /**
  * Measurement presets ordered for the quick bar: the ones this person has recorded before come
  * first, most recently used first, then the rest in list order. `entries` must be newest first.
@@ -223,7 +227,7 @@ export function measurementOrder(entries: { kind: string; title: string }[]): He
   const used: HealthPreset[] = []
   for (const e of entries) {
     if (e.kind !== 'measurement') continue
-    const p = MEASUREMENT_PRESETS.find((x) => x.title.toLowerCase() === e.title.trim().toLowerCase())
+    const p = measurementPreset(e.title)
     if (p && !used.includes(p)) used.push(p)
   }
   return [...used, ...MEASUREMENT_PRESETS.filter((p) => !used.includes(p))]

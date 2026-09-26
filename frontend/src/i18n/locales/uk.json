@@ -728,5 +728,11 @@
   "importPage.historyVia.text": "текст аналізу, прочитано тут",
   "importPage.historyVia.gemini": "прочитано {model}",
   "importPage.historyEntries": "записів: {n}, {from} – {to}, імпорт {date}",
-  "app.navImport": "Імпорт"
+  "app.navImport": "Імпорт",
+  "healthLog.conditions": "Захворювання",
+  "healthLog.conditionsSuggested": "запропоновано:",
+  "healthLog.addCondition": "+ додати захворювання…",
+  "healthLog.unlinkCondition": "Відв'язати це захворювання",
+  "healthLog.filterCondition": "Захворювання",
+  "healthLog.allConditions": "будь-яке захворювання"
 }

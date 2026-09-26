@@ -728,5 +728,11 @@
   "importPage.historyVia.text": "यहीं पढ़ा गया लैब टेक्स्ट",
   "importPage.historyVia.gemini": "{model} ने पढ़ा",
   "importPage.historyEntries": "{n} प्रविष्टियाँ, {from} – {to}, आयात {date}",
-  "app.navImport": "आयात"
+  "app.navImport": "आयात",
+  "healthLog.conditions": "स्थितियाँ",
+  "healthLog.conditionsSuggested": "सुझाई गई:",
+  "healthLog.addCondition": "+ स्थिति जोड़ें…",
+  "healthLog.unlinkCondition": "इस स्थिति से जोड़ हटाएँ",
+  "healthLog.filterCondition": "स्थिति",
+  "healthLog.allConditions": "कोई भी स्थिति"
 }

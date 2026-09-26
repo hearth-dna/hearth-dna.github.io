@@ -88,6 +88,7 @@ export function HealthPage({ person: who, onPerson }: { person: string; onPerson
             showPerson
             filter={filter}
             onFilter={setFilter}
+            onChange={reload}
             onDelete={async (e) => {
               if (confirm(t('healthLog.confirmDelete', { title: e.title, date: e.date }))) {
                 await deleteHealthEntry(db, e.id)

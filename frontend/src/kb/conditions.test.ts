@@ -2,7 +2,13 @@ import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { MEASUREMENT_PRESETS } from '../health/presets'
 import { BODY_PARTS } from '../types'
-import { conditionById, conditionLabel, conditionName, matchConditions } from './conditions'
+import {
+  conditionById,
+  conditionLabel,
+  conditionName,
+  matchConditions,
+  suggestConditions,
+} from './conditions'
 import { type Kb, searchKb } from './kb'
 
 const kb = JSON.parse(readFileSync(`${__dirname}/../../public/kb.json`, 'utf8')) as Kb
@@ -56,5 +62,21 @@ describe('kb search with condition ids', () => {
     expect(searchKb(kb, 'diabetes').map((e) => e.rsid)).toContain('rs7903146')
     expect(searchKb(kb, 'heart attack').map((e) => e.rsid)).toContain('rs10757278')
     expect(searchKb(kb, 'целиакия').map((e) => e.gene)).toContain('HLA-DQA1 (DQ2.5 tag)')
+  })
+})
+
+describe('suggestConditions', () => {
+  const e = { title: '', body: '', tags: [] as string[] }
+  it('suggests from the words, the lab test and the measurement preset', () => {
+    expect(suggestConditions(kb, { ...e, title: 'Started metformin' })).toEqual(['t2d'])
+    expect(suggestConditions(kb, { ...e, title: 'Glucose', analyte: 'glucose' })).toContain('t2d')
+    expect(suggestConditions(kb, { ...e, title: 'CRP', analyte: 'crp' })).toContain('arthritis')
+    expect(suggestConditions(kb, { ...e, title: 'Blood pressure', preset: 'blood-pressure' })).toEqual(
+      expect.arrayContaining(['hypertension', 't2d', 'cad']),
+    )
+    expect(suggestConditions(kb, { ...e, tags: ['migraine'] })).toEqual(['migraine'])
+  })
+  it('suggests nothing for unrelated text', () => {
+    expect(suggestConditions(kb, { ...e, title: 'Walked the dog', body: 'fine day' })).toEqual([])
   })
 })

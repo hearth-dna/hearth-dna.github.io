@@ -728,5 +728,11 @@
   "importPage.historyVia.text": "ここで読み取った検査テキスト",
   "importPage.historyVia.gemini": "{model} が読み取り",
   "importPage.historyEntries": "{n} 件、{from} – {to}、{date} に取り込み",
-  "app.navImport": "取り込み"
+  "app.navImport": "取り込み",
+  "healthLog.conditions": "疾患",
+  "healthLog.conditionsSuggested": "候補:",
+  "healthLog.addCondition": "+ 疾患を追加…",
+  "healthLog.unlinkCondition": "この疾患とのリンクを解除",
+  "healthLog.filterCondition": "疾患",
+  "healthLog.allConditions": "すべての疾患"
 }

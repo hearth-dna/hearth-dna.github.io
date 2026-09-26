@@ -316,6 +316,7 @@ function rowToHealthEntry(r: Row): HealthEntry {
     refHigh: (r.ref_high as number | null) ?? null,
     flag: ((r.flag as string) ?? '') as HealthEntry['flag'],
     valueText: (r.value_text as string) ?? '',
+    conditions: parseTags((r.conditions as string) ?? ''),
     createdAt: r.created_at as string,
   }
 }
@@ -341,6 +342,7 @@ export interface HealthEntryInput {
   refHigh?: number | null
   flag?: HealthEntry['flag']
   valueText?: string
+  conditions?: string[]
 }
 
 const HEALTH_INSERT_COLS = [
@@ -364,6 +366,7 @@ const HEALTH_INSERT_COLS = [
   'ref_high',
   'flag',
   'value_text',
+  'conditions',
   'created_at',
 ]
 
@@ -386,11 +389,13 @@ function newHealthEntry(e: HealthEntryInput): HealthEntry {
     refHigh: null,
     flag: '',
     valueText: '',
+    conditions: [],
     ...e,
   }
   entry.bodyPart = entry.bodyPart.trim().toLowerCase()
   if (!entry.bodyPart) entry.side = ''
   entry.tags = parseTags(formatTags(entry.tags))
+  entry.conditions = parseTags(formatTags(entry.conditions))
   entry.unit = entry.unit.trim()
   entry.time = normTime(entry.time)
   return entry
@@ -417,6 +422,7 @@ const healthRow = (e: HealthEntry): unknown[] => [
   e.refHigh,
   e.flag,
   e.valueText,
+  formatTags(e.conditions),
   e.createdAt,
 ]
 
@@ -438,6 +444,11 @@ export async function addHealthEntries(db: Database, es: HealthEntryInput[]): Pr
     es.map((e) => healthRow(newHealthEntry(e))),
   )
   return es.length
+}
+
+/** Replace the conditions an entry is linked to; the only field of an entry that is edited in place. */
+export async function setHealthConditions(db: Database, id: string, ids: string[]): Promise<void> {
+  await db.exec('UPDATE health_log SET conditions=? WHERE id=?', [formatTags(parseTags(formatTags(ids))), id])
 }
 
 export async function deleteHealthEntry(db: Database, id: string): Promise<void> {

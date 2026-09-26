@@ -728,5 +728,11 @@
   "importPage.historyVia.text": "یہیں پڑھا گیا لیب ٹیکسٹ",
   "importPage.historyVia.gemini": "{model} نے پڑھا",
   "importPage.historyEntries": "{n} اندراجات، {from} – {to}، درآمد {date}",
-  "app.navImport": "درآمد"
+  "app.navImport": "درآمد",
+  "healthLog.conditions": "کیفیات",
+  "healthLog.conditionsSuggested": "تجویز کردہ:",
+  "healthLog.addCondition": "+ کیفیت شامل کریں…",
+  "healthLog.unlinkCondition": "اس کیفیت کا ربط ختم کریں",
+  "healthLog.filterCondition": "کیفیت",
+  "healthLog.allConditions": "کوئی بھی کیفیت"
 }

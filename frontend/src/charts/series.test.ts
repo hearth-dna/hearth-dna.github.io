@@ -28,6 +28,7 @@ const e = (o: Partial<HealthEntry>): HealthEntry => ({
   refHigh: null,
   flag: '',
   valueText: '',
+  conditions: [],
   createdAt: 't',
   ...o,
 })

@@ -30,5 +30,11 @@
   "healthLog.tagsPlaceholder": "e.g. arthritis, flare",
   "healthLog.transcribedNotice": "Transcribed by a model from your document; check every number against the paper before saving.",
   "healthLog.saveEntry": "Save entry",
-  "healthLog.importCsv": "Import CSV…"
+  "healthLog.importCsv": "Import CSV…",
+  "healthLog.conditions": "Conditions",
+  "healthLog.conditionsSuggested": "suggested:",
+  "healthLog.addCondition": "+ add a condition…",
+  "healthLog.unlinkCondition": "Unlink this condition",
+  "healthLog.filterCondition": "Condition",
+  "healthLog.allConditions": "any condition"
 }

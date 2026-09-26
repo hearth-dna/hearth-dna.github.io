@@ -1,4 +1,6 @@
 import { Fragment, useMemo, useState } from 'react'
+import { useApp } from '../app/context'
+import { setHealthConditions } from '../db/repo'
 import {
   facets,
   filterHealthLog,
@@ -11,14 +13,19 @@ import {
   type SortDir,
   sortHealthLog,
 } from '../health/log'
-import { useT } from '../i18n/context'
+import { measurementPreset } from '../health/presets'
+import { useI18n, useT } from '../i18n/context'
+import { conditionById, conditionName, suggestConditions } from '../kb/conditions'
 import { HEALTH_KIND_LABELS, type HealthEntry, type HealthKind, type Person } from '../types'
+import { ConditionPicker } from './ConditionPicker'
 
 const KINDS = Object.keys(HEALTH_KIND_LABELS) as HealthKind[]
 
 /**
- * The health log as a table: kind chips with counts, filters for person, body part, tag, date
- * range, minimum severity and free text, and sortable columns. A row opens to show the full text.
+ * The health log as a table: kind chips with counts, filters for person, body part, tag,
+ * condition, date range, minimum severity and free text, and sortable columns. A row opens to show
+ * the full text and the conditions it is linked to, which can be changed there (`onChange` then
+ * reloads the log).
  * The filter lives in the parent so other widgets (the measurement summary) can set it.
  */
 export function HealthTable({
@@ -28,6 +35,7 @@ export function HealthTable({
   filter,
   onFilter,
   onDelete,
+  onChange,
 }: {
   entries: HealthEntry[]
   persons: Person[]
@@ -35,12 +43,23 @@ export function HealthTable({
   filter: HealthFilter
   onFilter: (f: HealthFilter) => void
   onDelete?: (e: HealthEntry) => void
+  onChange?: () => void
 }) {
+  const { db, kb } = useApp()
+  const { lang } = useI18n()
   const t = useT()
   const [sort, setSort] = useState<{ key: HealthSortKey; dir: SortDir }>({ key: 'date', dir: 'desc' })
   const [open, setOpen] = useState<string | null>(null)
   const name = (id: string) => persons.find((p) => p.id === id)?.displayName ?? id
-  const { bodyParts, tags } = useMemo(() => facets(entries), [entries])
+  const { bodyParts, tags, conditions } = useMemo(() => facets(entries), [entries])
+  const conditionLabel = (id: string) => {
+    const c = conditionById(kb, id)
+    return c ? conditionName(c, lang) : id
+  }
+  const link = async (e: HealthEntry, ids: string[]) => {
+    await setHealthConditions(db, e.id, ids)
+    onChange?.()
+  }
   const counts = useMemo(() => {
     const byPerson = filterHealthLog(entries, { ...NO_FILTER, person: filter.person })
     const c = {} as Record<HealthKind, number>
@@ -135,6 +154,19 @@ export function HealthTable({
           ))}
         </select>
         <select
+          aria-label={t('healthLog.filterCondition')}
+          value={filter.condition}
+          disabled={conditions.length === 0}
+          onChange={(e) => set({ condition: e.target.value })}
+        >
+          <option value="">{t('healthLog.allConditions')}</option>
+          {conditions.map((id) => (
+            <option key={id} value={id}>
+              {conditionLabel(id)}
+            </option>
+          ))}
+        </select>
+        <select
           aria-label={t('healthTable.minSeverity')}
           value={filter.minSeverity ?? ''}
           onChange={(e) => set({ minSeverity: e.target.value === '' ? null : Number(e.target.value) })}
@@ -223,6 +255,19 @@ export function HealthTable({
                     </td>
                     <td>{e.severity === null ? '' : `${e.severity}/10`}</td>
                     <td>
+                      {e.conditions.map((id) => (
+                        <button
+                          key={id}
+                          type="button"
+                          className={`tag condition${filter.condition === id ? ' active' : ''}`}
+                          onClick={(ev) => {
+                            ev.stopPropagation()
+                            set({ condition: filter.condition === id ? '' : id })
+                          }}
+                        >
+                          {conditionLabel(id)}
+                        </button>
+                      ))}
                       {e.tags.map((tag) => (
                         <button
                           key={tag}
@@ -245,6 +290,16 @@ export function HealthTable({
                           <pre className="pack">{e.body}</pre>
                         ) : (
                           <p className="muted">{t('healthTable.noText')}</p>
+                        )}
+                        {onChange && (
+                          <ConditionPicker
+                            value={e.conditions}
+                            suggestions={suggestConditions(kb, {
+                              ...e,
+                              preset: e.kind === 'measurement' ? measurementPreset(e.title)?.id : undefined,
+                            })}
+                            onChange={(ids) => link(e, ids)}
+                          />
                         )}
                         <div className="row">
                           {e.source && (

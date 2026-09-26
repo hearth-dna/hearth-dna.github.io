@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Hearth</string>
     <!--
-      The web app carries 14 languages of its own; these four strings are the only text the shell
+      The web app carries 20 languages of its own; these four strings are the only text the shell
       draws, and they are only ever seen when the web app cannot run or a save failed.
     -->
     <string name="webview_too_old">Hearth needs a newer Android System WebView (this device has %1$d, Hearth needs %2$d or later). Update it from the Play Store, then reopen Hearth.</string>

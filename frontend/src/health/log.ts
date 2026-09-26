@@ -61,6 +61,8 @@ export interface HealthFilter {
   kind: HealthKind | ''
   bodyPart: string
   tag: string
+  /** A condition id the entry is linked to. */
+  condition: string
   /** Inclusive YYYY-MM-DD bounds; '' for open-ended. */
   from: string
   to: string
@@ -75,6 +77,7 @@ export const NO_FILTER: HealthFilter = {
   kind: '',
   bodyPart: '',
   tag: '',
+  condition: '',
   from: '',
   to: '',
   minSeverity: null,
@@ -93,6 +96,7 @@ export function filterHealthLog(entries: HealthEntry[], f: HealthFilter): Health
       (!f.kind || e.kind === f.kind) &&
       (!f.bodyPart || e.bodyPart === f.bodyPart) &&
       (!f.tag || e.tags.includes(f.tag)) &&
+      (!f.condition || e.conditions.includes(f.condition)) &&
       (!f.from || e.date >= f.from) &&
       (!f.to || e.date <= f.to) &&
       (f.minSeverity === null || (e.severity !== null && e.severity >= f.minSeverity)) &&
@@ -148,12 +152,18 @@ export function sortHealthLog(
 }
 
 /** Distinct values present in the log, sorted, for the filter dropdowns. */
-export function facets(entries: HealthEntry[]): { bodyParts: string[]; tags: string[] } {
+export function facets(entries: HealthEntry[]): {
+  bodyParts: string[]
+  tags: string[]
+  conditions: string[]
+} {
   const bodyParts = new Set<string>()
   const tags = new Set<string>()
+  const conditions = new Set<string>()
   for (const e of entries) {
     if (e.bodyPart) bodyParts.add(e.bodyPart)
     for (const t of e.tags) tags.add(t)
+    for (const c of e.conditions) conditions.add(c)
   }
-  return { bodyParts: [...bodyParts].sort(), tags: [...tags].sort() }
+  return { bodyParts: [...bodyParts].sort(), tags: [...tags].sort(), conditions: [...conditions].sort() }
 }

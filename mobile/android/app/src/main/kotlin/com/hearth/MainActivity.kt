@@ -28,20 +28,28 @@ import androidx.webkit.WebViewCompat
 class MainActivity : AppCompatActivity() {
     private lateinit var web: WebView
     private var pendingFileChooser: ValueCallback<Array<Uri>>? = null
+    private var pendingCapture: Camera.Capture? = null
 
     /**
-     * The system file picker, for the `<input type="file">` behind every import dialog. The result
-     * goes straight back to the WebView; nothing is copied, read or remembered here.
+     * The system file picker, for the `<input type="file">` behind every import dialog, with the
+     * camera offered next to it when the input takes pictures ([Camera]). The result goes straight
+     * back to the WebView; nothing is read or remembered here, and the only copy is a photo the
+     * user just took.
      */
     private val filePicker =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             val callback = pendingFileChooser ?: return@registerForActivityResult
+            val capture = pendingCapture
             pendingFileChooser = null
-            callback.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(result.resultCode, result.data))
+            pendingCapture = null
+            val picked = WebChromeClient.FileChooserParams.parseResult(result.resultCode, result.data)
+            val photo = if (result.resultCode == RESULT_OK && picked.isNullOrEmpty()) capture?.result() else null
+            callback.onReceiveValue(picked?.takeIf { it.isNotEmpty() } ?: photo)
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Camera.clear(this)
 
         // The engine, not the OS, is what has to be new enough: the database uses OPFS synchronous
         // access handles, which arrived in Chromium 108. An older WebView would fall back to the
@@ -77,11 +85,20 @@ class MainActivity : AppCompatActivity() {
             ): Boolean {
                 pendingFileChooser?.onReceiveValue(null)
                 pendingFileChooser = callback
+                val capture = if (Camera.wantsImages(params.acceptTypes)) Camera.capture(this@MainActivity) else null
+                pendingCapture = capture
+                val intent = if (capture == null) {
+                    params.createIntent()
+                } else {
+                    Intent.createChooser(params.createIntent(), null)
+                        .putExtra(Intent.EXTRA_INITIAL_INTENTS, arrayOf(capture.intent))
+                }
                 return try {
-                    filePicker.launch(params.createIntent())
+                    filePicker.launch(intent)
                     true
                 } catch (_: ActivityNotFoundException) {
                     pendingFileChooser = null
+                    pendingCapture = null
                     false
                 }
             }
@@ -113,6 +130,8 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         pendingFileChooser?.onReceiveValue(null)
         pendingFileChooser = null
+        pendingCapture = null
+        if (isFinishing) Camera.clear(this)
         if (::web.isInitialized) web.destroy()
         super.onDestroy()
     }

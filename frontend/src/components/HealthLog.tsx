@@ -66,6 +66,7 @@ export function HealthLog({ person }: { person: Person }) {
         showPerson={false}
         filter={filter}
         onFilter={setFilter}
+        onChange={reload}
         onDelete={async (e) => {
           if (confirm(t('healthLog.confirmDelete', { title: e.title, date: e.date }))) {
             await deleteHealthEntry(db, e.id)

@@ -65,6 +65,10 @@ jobs:
       - name: Install frontend dependencies
         run: cd frontend && npm ci
 
+      # The shell's JVM tests gate the release: this is the one place the Kotlin is built at all.
+      - name: Run the shell's unit tests
+        run: make android-test ANDROID_JAVA_HOME="$JAVA_HOME" ANDROID_SDK_HOME="$ANDROID_HOME"
+
       # Outside the workspace and removed in a cleanup step: a keystore in the checkout could be
       # picked up by a later step or an artifact upload.
       - name: Restore the upload keystore

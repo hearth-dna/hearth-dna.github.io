@@ -98,6 +98,7 @@ const HEALTH_COLS = [
   'ref_high',
   'flag',
   'value_text',
+  'conditions',
   'created_at',
 ]
 const PERSON_COLS = ['id', 'label', 'display_name', 'sex', 'birth_year', 'notes', 'created_at']
@@ -120,6 +121,7 @@ function withDefaults(rows: Rows): Rows {
     ref_high: null,
     flag: '',
     value_text: '',
+    conditions: '',
     ...h,
   }))
 }
