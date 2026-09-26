@@ -38,6 +38,5 @@
   "timelineImport.skip.pairIncomplete": "{n} blood-pressure rows with only one of the two numbers",
   "timelineImport.skip.duplicate": "{n} readings already in the log",
   "timelineImport.blocked": "{metric} in {unit} cannot be converted; pick the right unit or leave the column out.",
-  "timelineImport.import": "Import {n} entries",
-  "timelineImport.done": "Imported {n} entries."
+  "timelineImport.import": "Import {n} entries"
 }

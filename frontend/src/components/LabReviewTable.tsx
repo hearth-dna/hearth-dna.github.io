@@ -38,7 +38,8 @@ export function LabReviewTable({
   person: Person
   draft: LabReportDraft
   source: string
-  onSaved: () => void
+  /** With the number of entries written. */
+  onSaved: (n: number) => void
   onCancel: () => void
 }) {
   const { db, kb } = useApp()
@@ -86,7 +87,7 @@ export function LabReviewTable({
       fallbackDate: today(),
     })
     for (const e of entries) await addHealthEntry(db, e)
-    onSaved()
+    onSaved(entries.length)
   }
 
   if (consented === false)

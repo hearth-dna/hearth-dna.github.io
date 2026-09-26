@@ -3,9 +3,7 @@ import { useApp } from '../app/context'
 import { addPerson, deletePerson, setParent, unsetParent, updatePerson } from '../db/repo'
 import { useT } from '../i18n/context'
 import { type Person, PROVIDER_LABELS, type Sex } from '../types'
-import { BatchImportDialog } from './BatchImportDialog'
 import { FamilyTree } from './FamilyTree'
-import { ImportDialog } from './ImportDialog'
 
 type View = 'cards' | 'table' | 'tree'
 const VIEWS: View[] = ['cards', 'table', 'tree']
@@ -22,10 +20,8 @@ const loadView = (): View => {
 
 export function PeoplePage({ onOpen }: { onOpen: (id: string) => void }) {
   const t = useT()
-  const { db, persons, counts, relationships, refresh } = useApp()
+  const { db, persons, counts, relationships, refresh, go } = useApp()
   const [form, setForm] = useState({ label: '', displayName: '', sex: 'unknown' as Sex, birthYear: '' })
-  const [importFor, setImportFor] = useState<string | null>(null)
-  const [batch, setBatch] = useState(false)
   const [view, setView] = useState<View>(loadView)
   const pickView = (v: View) => {
     setView(v)
@@ -111,7 +107,7 @@ export function PeoplePage({ onOpen }: { onOpen: (id: string) => void }) {
           <button type="button" className="primary" onClick={submit}>
             {t('peoplePage.add')}
           </button>
-          <button type="button" onClick={() => setBatch(true)}>
+          <button type="button" onClick={() => go({ name: 'import', source: 'dna-batch', person: '' })}>
             {t('peoplePage.importSeveral')}
           </button>
         </div>
@@ -150,7 +146,7 @@ export function PeoplePage({ onOpen }: { onOpen: (id: string) => void }) {
               sexLabel={sexLabel}
               sexOptions={sexOptions}
               onOpen={onOpen}
-              onImport={() => setImportFor(p.id)}
+              onImport={() => go({ name: 'import', source: 'dna', person: p.id })}
               onDelete={() => remove(p)}
             />
           ))}
@@ -181,7 +177,11 @@ export function PeoplePage({ onOpen }: { onOpen: (id: string) => void }) {
                   <td>{counts[p.id] ? counts[p.id].toLocaleString() : '–'}</td>
                   <td>
                     <div className="row" style={{ justifyContent: 'flex-end', flexWrap: 'nowrap' }}>
-                      <button type="button" className="small" onClick={() => setImportFor(p.id)}>
+                      <button
+                        type="button"
+                        className="small"
+                        onClick={() => go({ name: 'import', source: 'dna', person: p.id })}
+                      >
                         {t('peoplePage.importDna')}
                       </button>
                       <button
@@ -208,8 +208,6 @@ export function PeoplePage({ onOpen }: { onOpen: (id: string) => void }) {
           <FamilyTree onOpen={onOpen} />
         </div>
       )}
-      {importFor && <ImportDialog personId={importFor} onClose={() => setImportFor(null)} />}
-      {batch && <BatchImportDialog onClose={() => setBatch(false)} />}
     </div>
   )
 }

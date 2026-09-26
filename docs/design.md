@@ -268,6 +268,13 @@ kb fields at tier 0, so the user gets a decision frame even without any LLM.
   Values are converted into the app's unit (lb → kg, in → cm, °F → °C, mg/dL → mmol/L) with the
   printed value kept in the text; a unit that cannot be converted blocks its column. Readings the
   log already has are skipped, so a re-import adds nothing twice. `timeline/`, local only.
+- **Import section:** everything that comes in from outside has one page in the header
+  (`/import`, `components/ImportPage.tsx`): raw DNA files (one person or several at once),
+  documents and blood tests, and CSV timelines. The person is picked first; the lab review table
+  and document draft appear on the same page, and an import history per person lists DNA source
+  files and health-log import batches (grouped by their `source`, `import/history.ts`). The old
+  buttons on People and in the health log are shortcuts to `/import/<source>/<person>`. Backups
+  stay in Settings next to export.
 - Accept PDF, images, plain text. `pdf.js` extracts the text layer; `Tesseract.js` OCRs scans; both in
   a worker. Originals stored as blobs in OPFS, referenced from `document`.
 - Structured extraction into `observation` rows (lab values with units and reference ranges,
