@@ -728,5 +728,11 @@
   "importPage.historyVia.text": "testo di esame letto qui",
   "importPage.historyVia.gemini": "letto da {model}",
   "importPage.historyEntries": "{n} voci, {from} – {to}, importate il {date}",
-  "app.navImport": "Importa"
+  "app.navImport": "Importa",
+  "healthLog.conditions": "Condizioni",
+  "healthLog.conditionsSuggested": "suggerite:",
+  "healthLog.addCondition": "+ aggiungi una condizione…",
+  "healthLog.unlinkCondition": "Scollega questa condizione",
+  "healthLog.filterCondition": "Condizione",
+  "healthLog.allConditions": "qualsiasi condizione"
 }

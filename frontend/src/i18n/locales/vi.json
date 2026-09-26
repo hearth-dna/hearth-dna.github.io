@@ -728,5 +728,11 @@
   "importPage.historyVia.text": "văn bản xét nghiệm đọc tại đây",
   "importPage.historyVia.gemini": "do {model} đọc",
   "importPage.historyEntries": "{n} mục, {from} – {to}, nhập ngày {date}",
-  "app.navImport": "Nhập"
+  "app.navImport": "Nhập",
+  "healthLog.conditions": "Bệnh lý",
+  "healthLog.conditionsSuggested": "gợi ý:",
+  "healthLog.addCondition": "+ thêm bệnh lý…",
+  "healthLog.unlinkCondition": "Bỏ liên kết bệnh lý này",
+  "healthLog.filterCondition": "Bệnh lý",
+  "healthLog.allConditions": "mọi bệnh lý"
 }

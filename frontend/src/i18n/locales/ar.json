@@ -728,5 +728,11 @@
   "importPage.historyVia.text": "نص تحليل قُرئ هنا",
   "importPage.historyVia.gemini": "قرأه {model}",
   "importPage.historyEntries": "{n} إدخالات، {from} – {to}، استُوردت {date}",
-  "app.navImport": "استيراد"
+  "app.navImport": "استيراد",
+  "healthLog.conditions": "الحالات",
+  "healthLog.conditionsSuggested": "مقترحة:",
+  "healthLog.addCondition": "+ أضف حالة…",
+  "healthLog.unlinkCondition": "إلغاء ربط هذه الحالة",
+  "healthLog.filterCondition": "الحالة",
+  "healthLog.allConditions": "أي حالة"
 }

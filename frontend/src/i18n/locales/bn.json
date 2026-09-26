@@ -728,5 +728,11 @@
   "importPage.historyVia.text": "এখানে পড়া ল্যাব টেক্সট",
   "importPage.historyVia.gemini": "{model} পড়েছে",
   "importPage.historyEntries": "{n}টি এন্ট্রি, {from} – {to}, ইমপোর্ট {date}",
-  "app.navImport": "ইমপোর্ট"
+  "app.navImport": "ইমপোর্ট",
+  "healthLog.conditions": "অবস্থা",
+  "healthLog.conditionsSuggested": "প্রস্তাবিত:",
+  "healthLog.addCondition": "+ একটি অবস্থা যোগ করুন…",
+  "healthLog.unlinkCondition": "এই অবস্থার সংযোগ সরান",
+  "healthLog.filterCondition": "অবস্থা",
+  "healthLog.allConditions": "যেকোনো অবস্থা"
 }

@@ -32,6 +32,7 @@ const entry = (o: Partial<HealthEntry>): HealthEntry => ({
   refHigh: null,
   flag: '' as const,
   valueText: '',
+  conditions: [],
   severity: null,
   tags: [],
   value: null,
@@ -131,7 +132,14 @@ describe('filterHealthLog', () => {
   const log = [
     entry({ id: '1', title: 'Pain in hands', bodyPart: 'hands', severity: 6, tags: ['arthritis'] }),
     entry({ id: '2', title: 'Headache', bodyPart: 'head', severity: 3, tags: ['migraine'] }),
-    entry({ id: '3', kind: 'lab', title: 'CRP', body: 'CRP 12 mg/L', tags: ['arthritis'] }),
+    entry({
+      id: '3',
+      kind: 'lab',
+      title: 'CRP',
+      body: 'CRP 12 mg/L',
+      tags: ['arthritis'],
+      conditions: ['arthritis'],
+    }),
     entry({ id: '4', kind: 'measurement', title: 'Temperature', value: 38.2, unit: '°C' }),
   ]
   const ids = (f: Partial<typeof NO_FILTER>) => filterHealthLog(log, { ...NO_FILTER, ...f }).map((e) => e.id)
@@ -142,6 +150,7 @@ describe('filterHealthLog', () => {
     expect(ids({ bodyPart: 'head' })).toEqual(['2'])
     expect(ids({ tag: 'arthritis' })).toEqual(['1', '3'])
     expect(ids({ tag: 'arthritis', kind: 'lab' })).toEqual(['3'])
+    expect(ids({ condition: 'arthritis' })).toEqual(['3'])
   })
   it('searches title, body, body part and tags case-insensitively', () => {
     expect(ids({ text: 'HAND' })).toEqual(['1'])
@@ -165,7 +174,11 @@ describe('filterHealthLog', () => {
     expect(isFiltering({ ...NO_FILTER, minSeverity: 1 })).toBe(true)
   })
   it('lists distinct facets sorted', () => {
-    expect(facets(log)).toEqual({ bodyParts: ['hands', 'head'], tags: ['arthritis', 'migraine'] })
+    expect(facets(log)).toEqual({
+      bodyParts: ['hands', 'head'],
+      tags: ['arthritis', 'migraine'],
+      conditions: ['arthritis'],
+    })
   })
 })
 

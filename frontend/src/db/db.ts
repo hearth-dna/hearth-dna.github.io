@@ -167,6 +167,7 @@ export class Database {
       'ref_high REAL',
       "flag TEXT NOT NULL DEFAULT ''",
       "value_text TEXT NOT NULL DEFAULT ''",
+      "conditions TEXT NOT NULL DEFAULT ''",
     ]) {
       await ready.exec(`ALTER TABLE health_log ADD COLUMN ${col}`).catch(() => {})
     }

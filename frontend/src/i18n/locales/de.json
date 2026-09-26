@@ -728,5 +728,11 @@
   "importPage.historyVia.text": "Labortext, hier gelesen",
   "importPage.historyVia.gemini": "gelesen von {model}",
   "importPage.historyEntries": "{n} Einträge, {from} – {to}, importiert {date}",
-  "app.navImport": "Import"
+  "app.navImport": "Import",
+  "healthLog.conditions": "Erkrankungen",
+  "healthLog.conditionsSuggested": "vorgeschlagen:",
+  "healthLog.addCondition": "+ Erkrankung hinzufügen…",
+  "healthLog.unlinkCondition": "Verknüpfung mit dieser Erkrankung lösen",
+  "healthLog.filterCondition": "Erkrankung",
+  "healthLog.allConditions": "jede Erkrankung"
 }

@@ -728,5 +728,11 @@
   "importPage.historyVia.text": "burada okunan tahlil metni",
   "importPage.historyVia.gemini": "{model} tarafından okundu",
   "importPage.historyEntries": "{n} kayıt, {from} – {to}, {date} tarihinde içe aktarıldı",
-  "app.navImport": "İçe aktar"
+  "app.navImport": "İçe aktar",
+  "healthLog.conditions": "Hastalıklar",
+  "healthLog.conditionsSuggested": "önerilen:",
+  "healthLog.addCondition": "+ hastalık ekle…",
+  "healthLog.unlinkCondition": "Bu hastalığın bağlantısını kaldır",
+  "healthLog.filterCondition": "Hastalık",
+  "healthLog.allConditions": "herhangi bir hastalık"
 }

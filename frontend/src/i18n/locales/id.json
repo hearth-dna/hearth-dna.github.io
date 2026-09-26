@@ -728,5 +728,11 @@
   "importPage.historyVia.text": "teks lab dibaca di sini",
   "importPage.historyVia.gemini": "dibaca oleh {model}",
   "importPage.historyEntries": "{n} entri, {from} – {to}, diimpor {date}",
-  "app.navImport": "Impor"
+  "app.navImport": "Impor",
+  "healthLog.conditions": "Kondisi",
+  "healthLog.conditionsSuggested": "disarankan:",
+  "healthLog.addCondition": "+ tambah kondisi…",
+  "healthLog.unlinkCondition": "Lepaskan kondisi ini",
+  "healthLog.filterCondition": "Kondisi",
+  "healthLog.allConditions": "kondisi apa pun"
 }

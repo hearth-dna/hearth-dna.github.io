@@ -90,6 +90,7 @@ export async function family(): Promise<Container> {
           side: 'left',
           severity: 4,
           tags: 'arthritis',
+          conditions: 'arthritis',
           value: null,
           value2: null,
           unit: '',

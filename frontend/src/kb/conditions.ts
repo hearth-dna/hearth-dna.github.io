@@ -71,3 +71,23 @@ export function matchConditions(kb: Kb, text: string): string[] {
   if (!words.length) return []
   return kb.conditions.filter((c) => pointers(kb, c).some((p) => phraseIn(p, words))).map((c) => c.id)
 }
+
+/**
+ * Conditions to offer for one health-log entry: those its words point to, those that list its
+ * lab test (glucose → t2d) and those that list its measurement preset (blood pressure →
+ * hypertension). Only suggestions: an entry is linked when the user clicks one.
+ */
+export function suggestConditions(
+  kb: Kb,
+  e: { title: string; body: string; tags: string[]; analyte?: string; preset?: string },
+): string[] {
+  const byText = new Set(matchConditions(kb, [e.title, e.tags.join(' '), e.body].join('\n')))
+  return kb.conditions
+    .filter(
+      (c) =>
+        byText.has(c.id) ||
+        (!!e.analyte && c.labs.includes(e.analyte)) ||
+        (!!e.preset && c.measurements.includes(e.preset)),
+    )
+    .map((c) => c.id)
+}

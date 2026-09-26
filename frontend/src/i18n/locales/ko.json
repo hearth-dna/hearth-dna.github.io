@@ -728,5 +728,11 @@
   "importPage.historyVia.text": "여기서 읽은 검사 텍스트",
   "importPage.historyVia.gemini": "{model}이(가) 읽음",
   "importPage.historyEntries": "항목 {n}개, {from} – {to}, {date}에 가져옴",
-  "app.navImport": "가져오기"
+  "app.navImport": "가져오기",
+  "healthLog.conditions": "질환",
+  "healthLog.conditionsSuggested": "추천:",
+  "healthLog.addCondition": "+ 질환 추가…",
+  "healthLog.unlinkCondition": "이 질환 연결 해제",
+  "healthLog.filterCondition": "질환",
+  "healthLog.allConditions": "모든 질환"
 }

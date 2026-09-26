@@ -135,6 +135,8 @@ export interface HealthEntry {
   flag: '' | 'H' | 'L'
   /** The result as printed when it is not a plain number ("<0.5", "negative"); '' otherwise. */
   valueText: string
+  /** Condition ids from the kb (`Kb.conditions`) the user linked this entry to. */
+  conditions: string[]
   createdAt: string
 }
 

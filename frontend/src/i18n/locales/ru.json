@@ -728,5 +728,11 @@
   "importPage.historyVia.text": "текст анализа, прочитан здесь",
   "importPage.historyVia.gemini": "прочитано {model}",
   "importPage.historyEntries": "записей: {n}, {from} – {to}, импорт {date}",
-  "app.navImport": "Импорт"
+  "app.navImport": "Импорт",
+  "healthLog.conditions": "Заболевания",
+  "healthLog.conditionsSuggested": "предложено:",
+  "healthLog.addCondition": "+ добавить заболевание…",
+  "healthLog.unlinkCondition": "Отвязать это заболевание",
+  "healthLog.filterCondition": "Заболевание",
+  "healthLog.allConditions": "любое заболевание"
 }

@@ -728,5 +728,11 @@
   "importPage.historyVia.text": "在此读取的化验文字",
   "importPage.historyVia.gemini": "由 {model} 读取",
   "importPage.historyEntries": "{n} 条记录，{from} – {to}，导入于 {date}",
-  "app.navImport": "导入"
+  "app.navImport": "导入",
+  "healthLog.conditions": "病症",
+  "healthLog.conditionsSuggested": "建议：",
+  "healthLog.addCondition": "+ 添加病症…",
+  "healthLog.unlinkCondition": "取消关联此病症",
+  "healthLog.filterCondition": "病症",
+  "healthLog.allConditions": "任意病症"
 }

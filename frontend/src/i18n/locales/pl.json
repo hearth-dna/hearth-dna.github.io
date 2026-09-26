@@ -728,5 +728,11 @@
   "importPage.historyVia.text": "tekst badania odczytany tutaj",
   "importPage.historyVia.gemini": "odczytane przez {model}",
   "importPage.historyEntries": "wpisów: {n}, {from} – {to}, import {date}",
-  "app.navImport": "Import"
+  "app.navImport": "Import",
+  "healthLog.conditions": "Schorzenia",
+  "healthLog.conditionsSuggested": "sugerowane:",
+  "healthLog.addCondition": "+ dodaj schorzenie…",
+  "healthLog.unlinkCondition": "Odłącz to schorzenie",
+  "healthLog.filterCondition": "Schorzenie",
+  "healthLog.allConditions": "dowolne schorzenie"
 }

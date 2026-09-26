@@ -728,5 +728,11 @@
   "importPage.historyVia.text": "labtekst hier gelezen",
   "importPage.historyVia.gemini": "gelezen door {model}",
   "importPage.historyEntries": "{n} items, {from} – {to}, geïmporteerd {date}",
-  "app.navImport": "Importeren"
+  "app.navImport": "Importeren",
+  "healthLog.conditions": "Aandoeningen",
+  "healthLog.conditionsSuggested": "voorgesteld:",
+  "healthLog.addCondition": "+ aandoening toevoegen…",
+  "healthLog.unlinkCondition": "Koppeling met deze aandoening verwijderen",
+  "healthLog.filterCondition": "Aandoening",
+  "healthLog.allConditions": "elke aandoening"
 }
