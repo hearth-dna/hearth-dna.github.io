@@ -47,8 +47,13 @@ const MIN_CHARS_PER_PAGE = 40
 
 export async function pdfText(bytes: Uint8Array): Promise<string | null> {
   if (__HEARTH_ARCHIVE__) return null
-  const pdfjs = await import('pdfjs-dist')
-  pdfjs.GlobalWorkerOptions.workerSrc = (await import('pdfjs-dist/build/pdf.worker.min.mjs?url')).default
+  // The legacy build: the modern one calls Map.prototype.getOrInsertComputed, Promise.withResolvers
+  // and Math.sumPrecise unpolyfilled, which the phone apps' engines (Android WebView 108+, iOS 17
+  // WebKit) and current Safari lack. The legacy build carries the polyfills.
+  const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs')
+  pdfjs.GlobalWorkerOptions.workerSrc = (
+    await import('pdfjs-dist/legacy/build/pdf.worker.min.mjs?url')
+  ).default
   // A copy: pdf.js transfers the buffer to its worker, and the caller may still need the bytes.
   // No font or character-map URLs are given, so the worker has nothing to fetch.
   const task = pdfjs.getDocument({ data: bytes.slice(), disableFontFace: true, useWorkerFetch: false })

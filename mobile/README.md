@@ -17,6 +17,8 @@ What is left for a shell is small, and each piece has a reason it cannot be done
 | --- | --- | --- |
 | Serving the app | `WebViewAssetLoader`, `https://appassets.androidplatform.net/` | `LocalWebServer.swift`, `http://127.0.0.1:17800/` |
 | Picking a file to import | `WebChromeClient.onShowFileChooser` | nothing — WKWebView does it |
+| Photographing a document | `Camera.kt`: the system camera app, next to the picker | WKWebView's "Take Photo", with `NSCameraUsageDescription` |
+| Exact asset types (`.mjs`, `.wasm`) | `HearthWebView.mimeOverride` | `LocalWebServer.mimeType` |
 | Saving an export | `Downloads.kt` → MediaStore | `WKDownload` → the share sheet |
 | Screen fit | window insets on the container view | SwiftUI's safe area |
 | Links off-origin | `shouldOverrideUrlLoading` → browser | `decidePolicyFor` → Safari |
@@ -64,4 +66,7 @@ with no installs, reviews or upgrade path.
 No push notifications, no background work, no native sync, no analytics, no crash reporter, no
 third-party SDK of any kind. Android asks for exactly one permission (`INTERNET`, for the web app's
 BYOK Ask call) and turns off `allowBackup` so that Android's own cloud backup cannot copy the
-database off the device.
+database off the device. Photographing a document needs no `CAMERA` permission: the shell starts
+the system camera app, which writes into the app's `cache/camera/` through a non-exported
+`FileProvider`, and that directory is emptied before each capture and at start and exit. iOS
+carries the camera purpose string only because WebKit's own "Take Photo" requires it.

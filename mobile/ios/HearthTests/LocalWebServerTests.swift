@@ -85,4 +85,9 @@ final class SavedFileTests: XCTestCase {
     func testNamesStayShortEnoughForAnyFilesystem() {
         XCTAssertEqual(SavedFile.safeName(String(repeating: "a", count: 400)).count, 120)
     }
+
+    /// The PDF reader's worker is a module script: WebKit refuses it under any other type.
+    func testServesModuleScriptsAsJavaScript() {
+        XCTAssertEqual(LocalWebServer.mimeType(for: "mjs"), "text/javascript; charset=utf-8")
+    }
 }

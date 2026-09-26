@@ -34,5 +34,20 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!--
+          Lets the system camera app write a photo the user takes on the Import page into
+          cache/camera/ (Camera.kt). Not exported: only an app handed a URI for one file, with a
+          one-off grant, can reach it. Starting the camera app this way needs no CAMERA permission.
+        -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.camera"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/camera_paths" />
+        </provider>
     </application>
 </manifest>

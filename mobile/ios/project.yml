@@ -25,8 +25,8 @@ settings:
     SWIFT_VERSION: "5.9"
     # The version of record. Info.plist reads these rather than repeating them: a literal there is
     # what would ship when the two disagree, and nothing warns.
-    MARKETING_VERSION: "0.1.0"
-    CURRENT_PROJECT_VERSION: "1"
+    MARKETING_VERSION: "0.2.0"
+    CURRENT_PROJECT_VERSION: "2"
 
 configs:
   Debug: debug
@@ -77,6 +77,12 @@ targets:
         # only way to give the web app a trustworthy origin (see LocalWebServer.swift). This is the
         # narrow key — it permits cleartext to local hosts only and leaves the public internet
         # still requiring HTTPS, which is what the BYOK Ask call uses.
+        # WKWebView offers "Take Photo" for the Import page's document picker, and iOS ends the
+        # app on that tap unless this purpose string is present. The photo goes to the web app like
+        # any picked file; the shell keeps nothing.
+        NSCameraUsageDescription: >-
+          Take a photo of a medical document to read it into your health log. The photo stays on
+          this device unless you send it to your own AI provider.
         NSAppTransportSecurity:
           NSAllowsLocalNetworking: true
     settings:

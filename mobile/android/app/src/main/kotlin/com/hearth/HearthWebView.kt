@@ -88,10 +88,23 @@ object HearthWebView {
         WebViewAssetLoader.PathHandler {
         override fun handle(path: String): WebResourceResponse? {
             val direct = assets.handle(WEB_DIR + path)
+            mimeOverride(path)?.let { direct?.mimeType = it }
             // A missing asset comes back as a response with no body, not as null, so the body is
             // what "found it" has to be read from.
             if (direct?.data != null || path.substringAfterLast('/').contains('.')) return direct
             return assets.handle(WEB_DIR + "index.html")
         }
     }
+
+    /**
+     * The types that must be exact, whatever the asset loader guesses from the name: a module
+     * script or worker (the PDF reader's `pdf.worker.*.mjs`) served as anything but JavaScript is
+     * refused, and WebAssembly only stream-compiles as `application/wasm`. Both failures are silent.
+     */
+    fun mimeOverride(path: String): String? =
+        when (path.substringAfterLast('/').substringAfterLast('.', "").lowercase()) {
+            "js", "mjs" -> "text/javascript"
+            "wasm" -> "application/wasm"
+            else -> null
+        }
 }
