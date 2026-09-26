@@ -734,5 +734,6 @@
   "healthLog.addCondition": "+ tambah kondisi…",
   "healthLog.unlinkCondition": "Lepaskan kondisi ini",
   "healthLog.filterCondition": "Kondisi",
-  "healthLog.allConditions": "kondisi apa pun"
+  "healthLog.allConditions": "kondisi apa pun",
+  "app.navMore": "Lainnya"
 }

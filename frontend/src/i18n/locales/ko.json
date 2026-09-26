@@ -734,5 +734,6 @@
   "healthLog.addCondition": "+ 질환 추가…",
   "healthLog.unlinkCondition": "이 질환 연결 해제",
   "healthLog.filterCondition": "질환",
-  "healthLog.allConditions": "모든 질환"
+  "healthLog.allConditions": "모든 질환",
+  "app.navMore": "더보기"
 }

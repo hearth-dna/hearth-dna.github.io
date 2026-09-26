@@ -47,7 +47,7 @@ export function ImportDialog({ personId, onClose }: { personId: string; onClose:
 
   return (
     <dialog ref={ref} onClose={onClose}>
-      <h2 style={{ marginTop: 0 }}>{t('importDialog.title', { name: person.displayName })}</h2>
+      <h2 className="mt-0">{t('importDialog.title', { name: person.displayName })}</h2>
       {stage.s === 'consent' && (
         <div>
           {isMinor && (

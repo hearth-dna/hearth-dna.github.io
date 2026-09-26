@@ -734,5 +734,6 @@
   "healthLog.addCondition": "+ Erkrankung hinzufügen…",
   "healthLog.unlinkCondition": "Verknüpfung mit dieser Erkrankung lösen",
   "healthLog.filterCondition": "Erkrankung",
-  "healthLog.allConditions": "jede Erkrankung"
+  "healthLog.allConditions": "jede Erkrankung",
+  "app.navMore": "Mehr"
 }

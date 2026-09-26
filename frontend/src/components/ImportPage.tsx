@@ -61,14 +61,14 @@ export function ImportPage({ source, person: personId }: { source: ImportSource;
   const batches = importBatches(entries)
   const card = (s: ImportSource, title: string, what: string, where: string, extra?: React.ReactNode) => (
     <div className="card">
-      <h2 style={{ marginTop: 0 }}>{title}</h2>
+      <h2 className="mt-0">{title}</h2>
       <p className="muted">{what}</p>
       <p className="muted">{where}</p>
-      <div className="row">
+      <div className="actions stacked">
+        {extra}
         <button type="button" className="primary" disabled={needsPerson} onClick={() => open(s)}>
           {person ? t('importPage.forPerson', { name: person.displayName }) : t('importPage.pickFirst')}
         </button>
-        {extra}
       </div>
     </div>
   )
@@ -105,7 +105,7 @@ export function ImportPage({ source, person: personId }: { source: ImportSource;
           </label>
         )}
         {done && person && (
-          <p className="notice">
+          <p className="notice ok">
             {done.kind === 'dna' ? t('importPage.doneDna') : t('importPage.doneHealth', { n: done.n ?? 0 })}{' '}
             {done.kind === 'dna' ? (
               <button type="button" onClick={() => go({ name: 'person', id: person.id })}>
@@ -174,7 +174,7 @@ export function ImportPage({ source, person: personId }: { source: ImportSource;
 
       {person && (files.length > 0 || batches.length > 0) && (
         <div className="card">
-          <h2 style={{ marginTop: 0 }}>{t('importPage.history', { name: person.displayName })}</h2>
+          <h2 className="mt-0">{t('importPage.history', { name: person.displayName })}</h2>
           <ul>
             {files.map((f) => (
               <li key={f.id}>

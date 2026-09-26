@@ -734,5 +734,6 @@
   "healthLog.addCondition": "+ aandoening toevoegen…",
   "healthLog.unlinkCondition": "Koppeling met deze aandoening verwijderen",
   "healthLog.filterCondition": "Aandoening",
-  "healthLog.allConditions": "elke aandoening"
+  "healthLog.allConditions": "elke aandoening",
+  "app.navMore": "Meer"
 }

@@ -734,5 +734,6 @@
   "healthLog.addCondition": "+ ajouter une affection…",
   "healthLog.unlinkCondition": "Délier cette affection",
   "healthLog.filterCondition": "Affection",
-  "healthLog.allConditions": "toute affection"
+  "healthLog.allConditions": "toute affection",
+  "app.navMore": "Plus"
 }

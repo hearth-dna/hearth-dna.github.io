@@ -734,5 +734,6 @@
   "healthLog.addCondition": "+ একটি অবস্থা যোগ করুন…",
   "healthLog.unlinkCondition": "এই অবস্থার সংযোগ সরান",
   "healthLog.filterCondition": "অবস্থা",
-  "healthLog.allConditions": "যেকোনো অবস্থা"
+  "healthLog.allConditions": "যেকোনো অবস্থা",
+  "app.navMore": "আরও"
 }

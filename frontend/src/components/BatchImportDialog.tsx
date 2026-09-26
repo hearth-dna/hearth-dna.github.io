@@ -64,7 +64,7 @@ export function BatchImportDialog({ onClose }: { onClose: () => void }) {
 
   return (
     <dialog ref={ref} onClose={onClose}>
-      <h2 style={{ marginTop: 0 }}>{t('batchImportDialog.title')}</h2>
+      <h2 className="mt-0">{t('batchImportDialog.title')}</h2>
       {stage === 'pick' && (
         <div>
           <p className="muted">{t('batchImportDialog.intro')}</p>

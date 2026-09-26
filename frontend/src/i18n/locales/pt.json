@@ -734,5 +734,6 @@
   "healthLog.addCondition": "+ adicionar uma condição…",
   "healthLog.unlinkCondition": "Desvincular esta condição",
   "healthLog.filterCondition": "Condição",
-  "healthLog.allConditions": "qualquer condição"
+  "healthLog.allConditions": "qualquer condição",
+  "app.navMore": "Mais"
 }

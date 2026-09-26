@@ -106,7 +106,7 @@ export function LabReviewTable({
 
   return (
     <div className="card inset">
-      <h3 style={{ marginTop: 0 }}>{t('labReview.title', { n: read.length })}</h3>
+      <h3 className="mt-0">{t('labReview.title', { n: read.length })}</h3>
       <p className="muted">{t('labReview.intro')}</p>
       <div className="row">
         <label className="field">
@@ -196,7 +196,7 @@ export function LabReviewTable({
           </tbody>
         </table>
       </div>
-      <div className="row" style={{ marginTop: '0.8rem' }}>
+      <div className="row mt-3">
         <button type="button" className="primary" disabled={chosen.length === 0} onClick={save}>
           {t('labReview.save', { n: chosen.length })}
         </button>

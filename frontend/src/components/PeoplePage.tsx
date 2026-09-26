@@ -71,7 +71,16 @@ export function PeoplePage({ onOpen }: { onOpen: (id: string) => void }) {
     <div>
       <h1>{t('peoplePage.title')}</h1>
       <div className="card">
-        <h2>{t('peoplePage.addPerson')}</h2>
+        <div className="card-head">
+          <h2>{t('peoplePage.addPerson')}</h2>
+          <button
+            type="button"
+            className="small"
+            onClick={() => go({ name: 'import', source: 'dna-batch', person: '' })}
+          >
+            {t('peoplePage.importSeveral')}
+          </button>
+        </div>
         <div className="row">
           <label className="field">
             {t('peoplePage.shortLabel')}
@@ -106,9 +115,6 @@ export function PeoplePage({ onOpen }: { onOpen: (id: string) => void }) {
           </label>
           <button type="button" className="primary" onClick={submit}>
             {t('peoplePage.add')}
-          </button>
-          <button type="button" onClick={() => go({ name: 'import', source: 'dna-batch', person: '' })}>
-            {t('peoplePage.importSeveral')}
           </button>
         </div>
       </div>
@@ -176,7 +182,10 @@ export function PeoplePage({ onOpen }: { onOpen: (id: string) => void }) {
                   <td>{parentsOf(p.id).length ? parentsOf(p.id).map(nameOf).join(', ') : '–'}</td>
                   <td>{counts[p.id] ? counts[p.id].toLocaleString() : '–'}</td>
                   <td>
-                    <div className="row" style={{ justifyContent: 'flex-end', flexWrap: 'nowrap' }}>
+                    <div
+                      className="actions nowrap"
+                      style={{ justifyContent: 'flex-end', flexWrap: 'nowrap' }}
+                    >
                       <button
                         type="button"
                         className="small"
@@ -247,9 +256,29 @@ function PersonCard({
 
   return (
     <div className="card">
-      <h3>
-        {p.displayName} <span className="muted">({p.label})</span>
-      </h3>
+      <div className="card-head">
+        <h3>
+          {p.displayName} <span className="muted">({p.label})</span>
+        </h3>
+        {!edit && (
+          <button
+            type="button"
+            className="small ghost"
+            onClick={() =>
+              setEdit({
+                displayName: p.displayName,
+                sex: p.sex,
+                birthYear: p.birthYear ? String(p.birthYear) : '',
+              })
+            }
+          >
+            {t('peoplePage.edit')}
+          </button>
+        )}
+        <button type="button" className="small danger ghost" onClick={onDelete}>
+          {t('peoplePage.delete')}
+        </button>
+      </div>
       {edit ? (
         <div className="row">
           <label className="field">
@@ -282,20 +311,7 @@ function PersonCard({
           {p.birthYear ? ` · ${t('peoplePage.born', { year: p.birthYear })}` : ''} ·{' '}
           {counts[p.id]
             ? t('peoplePage.snps', { n: counts[p.id].toLocaleString() })
-            : t('peoplePage.noGenotypes')}{' '}
-          <button
-            type="button"
-            className="small"
-            onClick={() =>
-              setEdit({
-                displayName: p.displayName,
-                sex: p.sex,
-                birthYear: p.birthYear ? String(p.birthYear) : '',
-              })
-            }
-          >
-            {t('peoplePage.edit')}
-          </button>
+            : t('peoplePage.noGenotypes')}
         </p>
       )}
       <p className="muted">
@@ -305,6 +321,7 @@ function PersonCard({
       </p>
       <div className="row">
         <select
+          className="small"
           value=""
           onChange={async (e) => {
             if (!e.target.value) return
@@ -324,6 +341,7 @@ function PersonCard({
         {parents.map((pid) => (
           <button
             type="button"
+            className="small"
             key={pid}
             onClick={async () => {
               await unsetParent(db, pid, p.id)
@@ -334,15 +352,12 @@ function PersonCard({
           </button>
         ))}
       </div>
-      <div className="row" style={{ marginTop: '0.6rem' }}>
+      <div className="actions">
         <button type="button" className="primary" onClick={onImport}>
           {t('peoplePage.importDna')}
         </button>
         <button type="button" onClick={() => onOpen(p.id)} disabled={!counts[p.id]}>
           {t('peoplePage.report')}
-        </button>
-        <button type="button" className="danger" onClick={onDelete}>
-          {t('peoplePage.delete')}
         </button>
       </div>
     </div>

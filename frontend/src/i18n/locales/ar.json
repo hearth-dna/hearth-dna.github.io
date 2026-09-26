@@ -734,5 +734,6 @@
   "healthLog.addCondition": "+ أضف حالة…",
   "healthLog.unlinkCondition": "إلغاء ربط هذه الحالة",
   "healthLog.filterCondition": "الحالة",
-  "healthLog.allConditions": "أي حالة"
+  "healthLog.allConditions": "أي حالة",
+  "app.navMore": "المزيد"
 }

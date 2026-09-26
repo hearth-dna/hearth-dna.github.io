@@ -734,5 +734,6 @@
   "healthLog.addCondition": "+ hastalık ekle…",
   "healthLog.unlinkCondition": "Bu hastalığın bağlantısını kaldır",
   "healthLog.filterCondition": "Hastalık",
-  "healthLog.allConditions": "herhangi bir hastalık"
+  "healthLog.allConditions": "herhangi bir hastalık",
+  "app.navMore": "Daha fazla"
 }

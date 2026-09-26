@@ -10,7 +10,9 @@ import { ConsentGate } from './components/ConsentGate'
 import { EraseDialog } from './components/EraseDialog'
 import { FamilyPage } from './components/FamilyPage'
 import { HealthPage } from './components/HealthPage'
+import { Icon, type IconName } from './components/Icon'
 import { ImportPage } from './components/ImportPage'
+import { MoreSheet } from './components/MoreSheet'
 import { PeoplePage } from './components/PeoplePage'
 import { PersonPage } from './components/PersonPage'
 import { SettingsPage } from './components/SettingsPage'
@@ -34,6 +36,7 @@ export function App() {
   const [page, setPage] = useRoute()
   const state: AppState | null = loaded && { ...loaded, go: setPage }
   const [erasing, setErasing] = useState(false)
+  const [more, setMore] = useState(false)
   const [steps, setSteps] = useState<StepState[]>([])
   const [startup] = useState(() => new StartupLog(setSteps))
   // StrictMode runs effects twice in dev; the start-up sequence must run once.
@@ -135,40 +138,101 @@ export function App() {
       </AppContext.Provider>
     )
 
-  const nav = (p: Page, label: string) => (
-    <button type="button" className={page.name === p.name ? 'active' : ''} onClick={() => setPage(p)}>
-      {label}
+  const NAV: { page: Page; label: string; icon: IconName; tab: boolean }[] = [
+    { page: { name: 'people' }, label: t('app.navPeople'), icon: 'people', tab: true },
+    { page: { name: 'family' }, label: t('app.navFamily'), icon: 'family', tab: false },
+    { page: { name: 'health', person: '' }, label: t('app.navHealth'), icon: 'health', tab: true },
+    {
+      page: { name: 'import', source: '', person: '' },
+      label: t('app.navImport'),
+      icon: 'import',
+      tab: true,
+    },
+    { page: { name: 'charts' }, label: t('app.navCharts'), icon: 'charts', tab: true },
+    { page: { name: 'ask' }, label: t('app.navAsk'), icon: 'ask', tab: true },
+    { page: { name: 'settings' }, label: t('app.navSettings'), icon: 'settings', tab: false },
+  ]
+  // The person page belongs to People for the purpose of "where am I".
+  const current = (p: Page) => page.name === p.name || (page.name === 'person' && p.name === 'people')
+  const go = (p: Page) => {
+    setMore(false)
+    setPage(p)
+  }
+  const status = t('app.status', {
+    people: state.persons.length,
+    kb: state.kb.version,
+    storage: archive
+      ? t('app.storageArchive')
+      : state.db.persistent
+        ? t('app.storageDevice')
+        : t('app.storageMemory'),
+  })
+  const erase = (
+    <button type="button" className="danger small erase" onClick={() => setErasing(true)}>
+      {t('app.eraseData')}
     </button>
   )
   return (
     <AppContext.Provider value={state}>
       <header className="top">
-        <span className="brand">Hearth</span>
-        <nav>
-          {nav({ name: 'people' }, t('app.navPeople'))}
-          {nav({ name: 'family' }, t('app.navFamily'))}
-          {nav({ name: 'health', person: '' }, t('app.navHealth'))}
-          {nav({ name: 'import', source: '', person: '' }, t('app.navImport'))}
-          {nav({ name: 'charts' }, t('app.navCharts'))}
-          {nav({ name: 'ask' }, t('app.navAsk'))}
-          {nav({ name: 'settings' }, t('app.navSettings'))}
-        </nav>
-        {!archive && <SyncButton onOpenSettings={() => setPage({ name: 'settings' })} />}
-        <span className="status">
-          {t('app.status', {
-            people: state.persons.length,
-            kb: state.kb.version,
-            storage: archive
-              ? t('app.storageArchive')
-              : state.db.persistent
-                ? t('app.storageDevice')
-                : t('app.storageMemory'),
-          })}
+        <span className="brand">
+          <Icon name="brand" size={22} />
+          Hearth
         </span>
-        <button type="button" className="danger small" onClick={() => setErasing(true)}>
-          {t('app.eraseData')}
-        </button>
+        <nav className="topnav">
+          {NAV.map((n) => (
+            <button
+              key={n.page.name}
+              type="button"
+              className={current(n.page) ? 'active' : ''}
+              aria-current={current(n.page) ? 'page' : undefined}
+              onClick={() => go(n.page)}
+            >
+              {n.label}
+            </button>
+          ))}
+        </nav>
+        <div className="tools">
+          {!archive && <SyncButton onOpenSettings={() => go({ name: 'settings' })} />}
+          <span className="status" title={status}>
+            {status}
+          </span>
+          {erase}
+        </div>
       </header>
+      <nav className="tabbar">
+        {NAV.filter((n) => n.tab).map((n) => (
+          <button
+            key={n.page.name}
+            type="button"
+            aria-current={current(n.page) ? 'page' : undefined}
+            onClick={() => go(n.page)}
+          >
+            <Icon name={n.icon} />
+            {n.label}
+          </button>
+        ))}
+        <button
+          type="button"
+          aria-current={NAV.some((n) => !n.tab && current(n.page)) ? 'page' : undefined}
+          onClick={() => setMore(true)}
+        >
+          <Icon name="more" />
+          {t('app.navMore')}
+        </button>
+      </nav>
+      {more && (
+        <MoreSheet onClose={() => setMore(false)}>
+          {NAV.filter((n) => !n.tab).map((n) => (
+            <button key={n.page.name} type="button" onClick={() => go(n.page)}>
+              <Icon name={n.icon} />
+              {n.label}
+            </button>
+          ))}
+          <p className="muted">{status}</p>
+          {erase}
+        </MoreSheet>
+      )}
       {erasing && <EraseDialog onClose={() => setErasing(false)} />}
       {archive && <div className="banner">{t('app.archiveBanner')}</div>}
       {!state.db.persistent && !archive && <div className="banner danger">{t('app.memoryBanner')}</div>}

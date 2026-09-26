@@ -734,5 +734,6 @@
   "healthLog.addCondition": "+ додати захворювання…",
   "healthLog.unlinkCondition": "Відв'язати це захворювання",
   "healthLog.filterCondition": "Захворювання",
-  "healthLog.allConditions": "будь-яке захворювання"
+  "healthLog.allConditions": "будь-яке захворювання",
+  "app.navMore": "Ще"
 }

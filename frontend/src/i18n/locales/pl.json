@@ -734,5 +734,6 @@
   "healthLog.addCondition": "+ dodaj schorzenie…",
   "healthLog.unlinkCondition": "Odłącz to schorzenie",
   "healthLog.filterCondition": "Schorzenie",
-  "healthLog.allConditions": "dowolne schorzenie"
+  "healthLog.allConditions": "dowolne schorzenie",
+  "app.navMore": "Więcej"
 }

@@ -31,7 +31,7 @@ export function StartupScreen({
   return (
     <main>
       <div className="card startup">
-        <h2 style={{ marginTop: 0 }}>{t('startup.title')}</h2>
+        <h2 className="mt-0">{t('startup.title')}</h2>
         <ul className="steps">
           {steps.map((s) => {
             const done = s.endedAt !== null

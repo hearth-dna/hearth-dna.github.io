@@ -38,7 +38,7 @@ export function HealthPage({ person: who, onPerson }: { person: string; onPerson
       {persons.length === 0 ? (
         <p className="muted">{t('healthPage.noPeople')}</p>
       ) : (
-        <div className="row tabs" style={{ marginBottom: '1rem' }}>
+        <div className="row tabs mb-3">
           <button type="button" className={!person ? 'active' : ''} onClick={() => onPerson('')}>
             {t('healthPage.everyone')}
           </button>
@@ -58,8 +58,8 @@ export function HealthPage({ person: who, onPerson }: { person: string; onPerson
         <HealthLog person={person} />
       ) : persons.length > 0 ? (
         <div className="card">
-          <div className="row">
-            <h2 style={{ marginRight: 'auto' }}>{t('healthPage.timeline')}</h2>
+          <div className="card-head">
+            <h2>{t('healthPage.timeline')}</h2>
             <button type="button" className="primary" disabled={adding} onClick={() => setAdding(true)}>
               {t('healthLog.addEntry')}
             </button>

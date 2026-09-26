@@ -734,5 +734,6 @@
   "healthLog.addCondition": "+ thêm bệnh lý…",
   "healthLog.unlinkCondition": "Bỏ liên kết bệnh lý này",
   "healthLog.filterCondition": "Bệnh lý",
-  "healthLog.allConditions": "mọi bệnh lý"
+  "healthLog.allConditions": "mọi bệnh lý",
+  "app.navMore": "Thêm"
 }

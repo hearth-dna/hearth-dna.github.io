@@ -734,5 +734,6 @@
   "healthLog.addCondition": "+ 添加病症…",
   "healthLog.unlinkCondition": "取消关联此病症",
   "healthLog.filterCondition": "病症",
-  "healthLog.allConditions": "任意病症"
+  "healthLog.allConditions": "任意病症",
+  "app.navMore": "更多"
 }

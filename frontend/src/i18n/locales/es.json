@@ -734,5 +734,6 @@
   "healthLog.addCondition": "+ añadir una afección…",
   "healthLog.unlinkCondition": "Desvincular esta afección",
   "healthLog.filterCondition": "Afección",
-  "healthLog.allConditions": "cualquier afección"
+  "healthLog.allConditions": "cualquier afección",
+  "app.navMore": "Más"
 }

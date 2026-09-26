@@ -734,5 +734,6 @@
   "healthLog.addCondition": "+ स्थिति जोड़ें…",
   "healthLog.unlinkCondition": "इस स्थिति से जोड़ हटाएँ",
   "healthLog.filterCondition": "स्थिति",
-  "healthLog.allConditions": "कोई भी स्थिति"
+  "healthLog.allConditions": "कोई भी स्थिति",
+  "app.navMore": "और"
 }
