@@ -735,5 +735,11 @@
   "healthLog.unlinkCondition": "取消关联此病症",
   "healthLog.filterCondition": "病症",
   "healthLog.allConditions": "任意病症",
-  "app.navMore": "更多"
+  "app.navMore": "更多",
+  "theme.system": "跟随系统",
+  "theme.light": "浅色",
+  "theme.dark": "深色",
+  "app.theme": "主题：{mode}",
+  "settingsPage.appearance": "外观",
+  "settingsPage.appearanceNote": "“跟随系统”随设备的浅色或深色设置变化；“浅色”和“深色”在本设备上固定该外观。"
 }

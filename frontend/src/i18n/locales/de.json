@@ -735,5 +735,11 @@
   "healthLog.unlinkCondition": "Verknüpfung mit dieser Erkrankung lösen",
   "healthLog.filterCondition": "Erkrankung",
   "healthLog.allConditions": "jede Erkrankung",
-  "app.navMore": "Mehr"
+  "app.navMore": "Mehr",
+  "theme.system": "System",
+  "theme.light": "Hell",
+  "theme.dark": "Dunkel",
+  "app.theme": "Design: {mode}",
+  "settingsPage.appearance": "Darstellung",
+  "settingsPage.appearanceNote": "„System“ folgt der Hell-/Dunkel-Einstellung deines Geräts; „Hell“ und „Dunkel“ behalten diese Darstellung auf diesem Gerät."
 }

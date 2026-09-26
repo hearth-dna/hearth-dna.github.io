@@ -735,5 +735,11 @@
   "healthLog.unlinkCondition": "اس کیفیت کا ربط ختم کریں",
   "healthLog.filterCondition": "کیفیت",
   "healthLog.allConditions": "کوئی بھی کیفیت",
-  "app.navMore": "مزید"
+  "app.navMore": "مزید",
+  "theme.system": "سسٹم",
+  "theme.light": "ہلکا",
+  "theme.dark": "گہرا",
+  "app.theme": "تھیم: {mode}",
+  "settingsPage.appearance": "ظاہری شکل",
+  "settingsPage.appearanceNote": "سسٹم آپ کے آلے کی ہلکی یا گہری ترتیب کی پیروی کرتا ہے؛ ہلکا اور گہرا اس آلے پر وہی شکل رکھتے ہیں۔"
 }

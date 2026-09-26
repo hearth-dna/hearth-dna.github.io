@@ -30,8 +30,15 @@
   /* Older names, kept as aliases so page rules read the same. */
   --card: var(--surface); --radius: var(--radius-md);
 }
+/*
+ * Theme: System follows the OS; Light or Dark is forced with <html data-theme> (app/theme.ts).
+ * The dark tokens appear twice, once for "system on a dark OS" and once for "forced dark", because
+ * light-dark() is newer than the app's engine floors. styles.test.ts keeps the two identical.
+ */
+:root { color-scheme: light dark; }
+:root[data-theme='light'] { color-scheme: light; }
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme='light']) {
     --bg: #121416; --surface: #1b1e22; --surface-2: #23272c; --fg: #ebe8e1; --muted: #a3a097;
     --line: #2d3238; --line-strong: #454b53;
     --accent: #7fc8a3; --accent-hover: #97d6b5; --accent-fg: #0f1f18;
@@ -40,6 +47,16 @@
     --series-1: #3987e5; --series-2: #d95926; --series-3: #199e70; --series-4: #c98500;
     --series-5: #d55181; --series-6: #008300; --series-7: #9085e9; --series-8: #e66767;
   }
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #121416; --surface: #1b1e22; --surface-2: #23272c; --fg: #ebe8e1; --muted: #a3a097;
+  --line: #2d3238; --line-strong: #454b53;
+  --accent: #7fc8a3; --accent-hover: #97d6b5; --accent-fg: #0f1f18;
+  --warn: #e0a15a; --danger: #f07b75; --ok: #6fcf97; --info: #7fb2ec;
+  --shadow-1: 0 1px 2px rgb(0 0 0 / 0.4); --shadow-2: 0 12px 32px rgb(0 0 0 / 0.55);
+  --series-1: #3987e5; --series-2: #d95926; --series-3: #199e70; --series-4: #c98500;
+  --series-5: #d55181; --series-6: #008300; --series-7: #9085e9; --series-8: #e66767;
 }
 
 /* ---- Base ------------------------------------------------------------------------------- */

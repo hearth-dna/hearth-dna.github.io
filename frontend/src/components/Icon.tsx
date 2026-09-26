@@ -17,6 +17,10 @@ const PATHS = {
   ask: 'M4 5.5A1.5 1.5 0 0 1 5.5 4h13A1.5 1.5 0 0 1 20 5.5v9a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 4v-4h0A1.5 1.5 0 0 1 4 14.5ZM8.5 9h7M8.5 12h4.5',
   settings: 'M4 7h9M17 7h3M4 17h3M11 17h9M15 5v4M9 15v4',
   more: 'M5 12h.01M12 12h.01M19 12h.01',
+  light:
+    'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8ZM12 2.5V4.5M12 19.5v2M4.6 4.6 6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4',
+  dark: 'M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z',
+  system: 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18ZM12 3v18M12 7.5h4.5M12 12h6M12 16.5h4.5',
 } as const
 
 export type IconName = keyof typeof PATHS

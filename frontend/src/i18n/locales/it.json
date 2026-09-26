@@ -735,5 +735,11 @@
   "healthLog.unlinkCondition": "Scollega questa condizione",
   "healthLog.filterCondition": "Condizione",
   "healthLog.allConditions": "qualsiasi condizione",
-  "app.navMore": "Altro"
+  "app.navMore": "Altro",
+  "theme.system": "Sistema",
+  "theme.light": "Chiaro",
+  "theme.dark": "Scuro",
+  "app.theme": "Tema: {mode}",
+  "settingsPage.appearance": "Aspetto",
+  "settingsPage.appearanceNote": "Sistema segue l'impostazione chiara o scura del dispositivo; Chiaro e Scuro mantengono quell'aspetto su questo dispositivo."
 }

@@ -735,5 +735,11 @@
   "healthLog.unlinkCondition": "Desvincular esta afección",
   "healthLog.filterCondition": "Afección",
   "healthLog.allConditions": "cualquier afección",
-  "app.navMore": "Más"
+  "app.navMore": "Más",
+  "theme.system": "Sistema",
+  "theme.light": "Claro",
+  "theme.dark": "Oscuro",
+  "app.theme": "Tema: {mode}",
+  "settingsPage.appearance": "Apariencia",
+  "settingsPage.appearanceNote": "Sistema sigue el ajuste claro u oscuro de tu dispositivo; Claro y Oscuro mantienen ese aspecto en este dispositivo."
 }

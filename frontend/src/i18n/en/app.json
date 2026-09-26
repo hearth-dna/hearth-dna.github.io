@@ -26,5 +26,6 @@
   "app.navHealth": "Health",
   "app.navCharts": "Charts",
   "app.navImport": "Import",
-  "app.navMore": "More"
+  "app.navMore": "More",
+  "app.theme": "Theme: {mode}"
 }

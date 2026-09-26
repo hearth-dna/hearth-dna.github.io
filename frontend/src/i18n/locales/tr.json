@@ -735,5 +735,11 @@
   "healthLog.unlinkCondition": "Bu hastalığın bağlantısını kaldır",
   "healthLog.filterCondition": "Hastalık",
   "healthLog.allConditions": "herhangi bir hastalık",
-  "app.navMore": "Daha fazla"
+  "app.navMore": "Daha fazla",
+  "theme.system": "Sistem",
+  "theme.light": "Açık",
+  "theme.dark": "Koyu",
+  "app.theme": "Tema: {mode}",
+  "settingsPage.appearance": "Görünüm",
+  "settingsPage.appearanceNote": "Sistem, cihazınızın açık veya koyu ayarını izler; Açık ve Koyu bu görünümü bu cihazda sabit tutar."
 }

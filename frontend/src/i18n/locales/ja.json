@@ -735,5 +735,11 @@
   "healthLog.unlinkCondition": "この疾患とのリンクを解除",
   "healthLog.filterCondition": "疾患",
   "healthLog.allConditions": "すべての疾患",
-  "app.navMore": "その他"
+  "app.navMore": "その他",
+  "theme.system": "システム",
+  "theme.light": "ライト",
+  "theme.dark": "ダーク",
+  "app.theme": "テーマ: {mode}",
+  "settingsPage.appearance": "外観",
+  "settingsPage.appearanceNote": "「システム」は端末のライト/ダーク設定に従います。「ライト」と「ダーク」はこの端末でその表示を固定します。"
 }

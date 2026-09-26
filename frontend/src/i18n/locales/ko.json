@@ -735,5 +735,11 @@
   "healthLog.unlinkCondition": "이 질환 연결 해제",
   "healthLog.filterCondition": "질환",
   "healthLog.allConditions": "모든 질환",
-  "app.navMore": "더보기"
+  "app.navMore": "더보기",
+  "theme.system": "시스템",
+  "theme.light": "라이트",
+  "theme.dark": "다크",
+  "app.theme": "테마: {mode}",
+  "settingsPage.appearance": "화면 모드",
+  "settingsPage.appearanceNote": "시스템은 기기의 라이트/다크 설정을 따릅니다. 라이트와 다크는 이 기기에서 해당 모드를 유지합니다."
 }

@@ -67,3 +67,18 @@ data: a person's series colour, or a chart's measured size.
 
 New rules use logical properties (`margin-inline-*`, `padding-inline-*`, `text-align: start`),
 so Arabic and Urdu mirror without per-rule `[dir=rtl]` overrides.
+
+## Theme
+
+There are three modes: **System** (the default, following the device), **Light** and **Dark**.
+You can switch them with the header button, which cycles System → Light → Dark, or with the
+Appearance card in Settings. `app/theme.ts` stores the choice under `hearth.theme` in
+`localStorage`. It's a per-device preference like the language, and it isn't part of a dump.
+`main.tsx` applies the stored theme before the first render.
+
+Forcing a mode sets `<html data-theme="light|dark">`. The dark tokens are declared twice: under
+`@media (prefers-color-scheme: dark) :root:not([data-theme='light'])` and under
+`:root[data-theme='dark']`. The CSS function `light-dark()` would avoid this, but it's newer than
+the engine floors (Android WebView 108, iOS 17.0). `styles.test.ts` fails if the two blocks
+drift apart. `color-scheme` follows the choice, so date pickers, scrollbars and select popups
+match the theme.

@@ -735,5 +735,11 @@
   "healthLog.unlinkCondition": "Bỏ liên kết bệnh lý này",
   "healthLog.filterCondition": "Bệnh lý",
   "healthLog.allConditions": "mọi bệnh lý",
-  "app.navMore": "Thêm"
+  "app.navMore": "Thêm",
+  "theme.system": "Hệ thống",
+  "theme.light": "Sáng",
+  "theme.dark": "Tối",
+  "app.theme": "Giao diện: {mode}",
+  "settingsPage.appearance": "Giao diện",
+  "settingsPage.appearanceNote": "Hệ thống làm theo cài đặt sáng hoặc tối của thiết bị; Sáng và Tối giữ nguyên giao diện đó trên thiết bị này."
 }

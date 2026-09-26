@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { APP_VERSION, AppContext, type AppState } from './app/context'
 import { type Page, useRoute } from './app/routes'
 import { StartupLog, type StepState } from './app/startup'
+import { nextTheme, setTheme, useTheme } from './app/theme'
 import { archivePayload, openArchiveDb } from './archive/mode'
 import { backups } from './backup/scheduler'
 import { AskPage } from './components/AskPage'
@@ -37,6 +38,7 @@ export function App() {
   const state: AppState | null = loaded && { ...loaded, go: setPage }
   const [erasing, setErasing] = useState(false)
   const [more, setMore] = useState(false)
+  const theme = useTheme()
   const [steps, setSteps] = useState<StepState[]>([])
   const [startup] = useState(() => new StartupLog(setSteps))
   // StrictMode runs effects twice in dev; the start-up sequence must run once.
@@ -193,6 +195,15 @@ export function App() {
           ))}
         </nav>
         <div className="tools">
+          <button
+            type="button"
+            className="small ghost"
+            aria-label={t('app.theme', { mode: t(`theme.${theme}`) })}
+            title={t('app.theme', { mode: t(`theme.${theme}`) })}
+            onClick={() => setTheme(nextTheme(theme))}
+          >
+            <Icon name={theme} size={18} />
+          </button>
           {!archive && <SyncButton onOpenSettings={() => go({ name: 'settings' })} />}
           <span className="status" title={status}>
             {status}

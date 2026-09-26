@@ -2,6 +2,7 @@ import { registerSW } from 'virtual:pwa-register'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { App } from './App'
+import { applyTheme, readTheme } from './app/theme'
 import { I18nProvider } from './i18n/context'
 import './styles.css'
 
@@ -13,6 +14,8 @@ if (window.top !== window.self) {
   throw new Error('refusing to run in a frame')
 }
 
+// Before the first render, so a forced light or dark theme never flashes the other one.
+applyTheme(readTheme())
 registerSW({ immediate: true })
 
 createRoot(document.getElementById('root')!).render(

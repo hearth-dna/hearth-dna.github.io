@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { APP_VERSION, useApp } from '../app/context'
+import { setTheme, THEMES, useTheme } from '../app/theme'
 import { listConsents, revokeConsent, revokeDeletesData } from '../consent/consent'
 import { CONSENTS } from '../consent/kinds'
 import { getMeta, listSharing, META_GEMINI_KEY, META_GEMINI_MODEL, newId, setMeta } from '../db/repo'
@@ -17,6 +18,7 @@ import { OpenFormatsCard } from './OpenFormatsCard'
 export function SettingsPage() {
   const { db, persons, refresh } = useApp()
   const { t, lang, setLang } = useI18n()
+  const theme = useTheme()
   const [pass, setPass] = useState('')
   const [msg, setMsg] = useState<string | null>(null)
   const [consents, setConsents] = useState<Awaited<ReturnType<typeof listConsents>>>([])
@@ -74,6 +76,25 @@ export function SettingsPage() {
           ))}
         </select>
         <p className="muted">{t('settingsPage.languageNote')}</p>
+      </div>
+
+      <div className="card">
+        <h2>{t('settingsPage.appearance')}</h2>
+        <div className="segmented" role="radiogroup" aria-label={t('settingsPage.appearance')}>
+          {THEMES.map((m) => (
+            <button
+              key={m}
+              type="button"
+              role="radio"
+              aria-checked={theme === m}
+              className={theme === m ? 'active' : ''}
+              onClick={() => setTheme(m)}
+            >
+              {t(`theme.${m}`)}
+            </button>
+          ))}
+        </div>
+        <p className="muted">{t('settingsPage.appearanceNote')}</p>
       </div>
 
       <div className="card">

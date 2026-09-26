@@ -735,5 +735,11 @@
   "healthLog.unlinkCondition": "এই অবস্থার সংযোগ সরান",
   "healthLog.filterCondition": "অবস্থা",
   "healthLog.allConditions": "যেকোনো অবস্থা",
-  "app.navMore": "আরও"
+  "app.navMore": "আরও",
+  "theme.system": "সিস্টেম",
+  "theme.light": "হালকা",
+  "theme.dark": "গাঢ়",
+  "app.theme": "থিম: {mode}",
+  "settingsPage.appearance": "চেহারা",
+  "settingsPage.appearanceNote": "সিস্টেম আপনার ডিভাইসের হালকা বা গাঢ় সেটিং অনুসরণ করে; হালকা ও গাঢ় এই ডিভাইসে সেই চেহারা রাখে।"
 }
