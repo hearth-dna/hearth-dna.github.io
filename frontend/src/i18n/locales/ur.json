@@ -674,7 +674,6 @@
   "timelineImport.column": "کالم",
   "timelineImport.sample": "پہلی قدریں",
   "timelineImport.isWhat": "یہ ہے",
-  "timelineImport.role.ignore": "چھوڑیں",
   "timelineImport.role.date": "تاریخ",
   "timelineImport.role.time": "وقت",
   "timelineImport.role.note": "نوٹ",
@@ -691,7 +690,6 @@
   "timelineImport.ambiguousDate": "اس فائل کی ہر تاریخ دن/ماہ اور ماہ/دن دونوں طرح پڑھی جا سکتی ہے۔ اوپر تاریخ کا فارمیٹ دیکھیں۔",
   "timelineImport.names": "فائل میں پیمائشوں کے نام",
   "timelineImport.metric": "پیمائش",
-  "timelineImport.leaveOut": "چھوڑیں",
   "timelineImport.custom": "کچھ اور…",
   "timelineImport.customName": "نام",
   "timelineImport.unitInFile": "فائل میں اکائی",
@@ -701,7 +699,7 @@
   "timelineImport.skip.notNumber": "{n} خانے جو عدد نہیں ہیں",
   "timelineImport.skip.pairIncomplete": "دو میں سے صرف ایک قدر والی {n} بلڈ پریشر قطاریں",
   "timelineImport.skip.duplicate": "{n} ریڈنگز پہلے سے لاگ میں ہیں",
-  "timelineImport.blocked": "{unit} میں {metric} تبدیل نہیں ہو سکتا؛ درست اکائی منتخب کریں یا کالم چھوڑ دیں۔",
+  "timelineImport.blocked": "{unit} میں {metric} تبدیل نہیں ہو سکتا؛ درست اکائی چنیں یا کالم کا نشان ہٹا دیں۔",
   "timelineImport.import": "{n} اندراجات درآمد کریں",
   "healthLog.importCsv": "CSV درآمد کریں…",
   "importPage.title": "درآمد",
@@ -741,5 +739,12 @@
   "theme.dark": "گہرا",
   "app.theme": "تھیم: {mode}",
   "settingsPage.appearance": "ظاہری شکل",
-  "settingsPage.appearanceNote": "سسٹم آپ کے آلے کی ہلکی یا گہری ترتیب کی پیروی کرتا ہے؛ ہلکا اور گہرا اس آلے پر وہی شکل رکھتے ہیں۔"
+  "settingsPage.appearanceNote": "سسٹم آپ کے آلے کی ہلکی یا گہری ترتیب کی پیروی کرتا ہے؛ ہلکا اور گہرا اس آلے پر وہی شکل رکھتے ہیں۔",
+  "timelineImport.include": "درآمد",
+  "timelineImport.includeAll": "سب",
+  "timelineImport.includeNone": "کوئی نہیں",
+  "timelineImport.columnsIncluded": "{m} میں سے {n} کالم درآمد ہوں گے",
+  "timelineImport.includeColumn": "کالم {column} درآمد کریں",
+  "timelineImport.adds": "ریڈنگز",
+  "timelineImport.leftOut": "چھوڑے گئے: {list}"
 }

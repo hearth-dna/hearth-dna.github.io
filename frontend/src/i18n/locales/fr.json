@@ -674,7 +674,6 @@
   "timelineImport.column": "Colonne",
   "timelineImport.sample": "Premières valeurs",
   "timelineImport.isWhat": "Est",
-  "timelineImport.role.ignore": "ignorer",
   "timelineImport.role.date": "date",
   "timelineImport.role.time": "heure",
   "timelineImport.role.note": "note",
@@ -691,7 +690,6 @@
   "timelineImport.ambiguousDate": "Toutes les dates du fichier se lisent en jour/mois et en mois/jour. Vérifiez le format de date ci-dessus.",
   "timelineImport.names": "Noms de mesures dans le fichier",
   "timelineImport.metric": "Mesure",
-  "timelineImport.leaveOut": "ignorer",
   "timelineImport.custom": "autre chose…",
   "timelineImport.customName": "Nom",
   "timelineImport.unitInFile": "unité dans le fichier",
@@ -701,7 +699,7 @@
   "timelineImport.skip.notNumber": "{n} cellules qui ne sont pas des nombres",
   "timelineImport.skip.pairIncomplete": "{n} lignes de tension avec une seule des deux valeurs",
   "timelineImport.skip.duplicate": "{n} mesures déjà dans le journal",
-  "timelineImport.blocked": "{metric} en {unit} ne peut pas être converti ; choisissez la bonne unité ou ignorez la colonne.",
+  "timelineImport.blocked": "{metric} en {unit} ne peut pas être converti ; choisissez la bonne unité ou décochez la colonne.",
   "timelineImport.import": "Importer {n} entrées",
   "healthLog.importCsv": "Importer un CSV…",
   "importPage.title": "Importer",
@@ -741,5 +739,12 @@
   "theme.dark": "Sombre",
   "app.theme": "Thème : {mode}",
   "settingsPage.appearance": "Apparence",
-  "settingsPage.appearanceNote": "Système suit le réglage clair ou sombre de votre appareil ; Clair et Sombre conservent cet aspect sur cet appareil."
+  "settingsPage.appearanceNote": "Système suit le réglage clair ou sombre de votre appareil ; Clair et Sombre conservent cet aspect sur cet appareil.",
+  "timelineImport.include": "Importer",
+  "timelineImport.includeAll": "Toutes",
+  "timelineImport.includeNone": "Aucune",
+  "timelineImport.columnsIncluded": "{n} colonnes sur {m} importées",
+  "timelineImport.includeColumn": "Importer la colonne {column}",
+  "timelineImport.adds": "Mesures",
+  "timelineImport.leftOut": "Laissées de côté : {list}"
 }

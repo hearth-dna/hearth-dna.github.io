@@ -674,7 +674,6 @@
   "timelineImport.column": "Столбец",
   "timelineImport.sample": "Первые значения",
   "timelineImport.isWhat": "Это",
-  "timelineImport.role.ignore": "пропустить",
   "timelineImport.role.date": "дата",
   "timelineImport.role.time": "время",
   "timelineImport.role.note": "заметка",
@@ -691,7 +690,6 @@
   "timelineImport.ambiguousDate": "Все даты в файле читаются и как день/месяц, и как месяц/день. Проверьте формат даты выше.",
   "timelineImport.names": "Названия показателей в файле",
   "timelineImport.metric": "Показатель",
-  "timelineImport.leaveOut": "пропустить",
   "timelineImport.custom": "другое…",
   "timelineImport.customName": "Название",
   "timelineImport.unitInFile": "единица в файле",
@@ -701,7 +699,7 @@
   "timelineImport.skip.notNumber": "Ячеек не с числом: {n}",
   "timelineImport.skip.pairIncomplete": "Строк давления только с одним из двух чисел: {n}",
   "timelineImport.skip.duplicate": "Измерений уже в журнале: {n}",
-  "timelineImport.blocked": "{metric} в {unit} нельзя пересчитать; выберите правильную единицу или пропустите столбец.",
+  "timelineImport.blocked": "{metric} в {unit} не пересчитать; выберите правильную единицу или снимите отметку со столбца.",
   "timelineImport.import": "Импортировать записи: {n}",
   "healthLog.importCsv": "Импорт CSV…",
   "importPage.title": "Импорт",
@@ -741,5 +739,12 @@
   "theme.dark": "Тёмная",
   "app.theme": "Тема: {mode}",
   "settingsPage.appearance": "Оформление",
-  "settingsPage.appearanceNote": "«Системная» следует светлой или тёмной настройке устройства; «Светлая» и «Тёмная» закрепляют её на этом устройстве."
+  "settingsPage.appearanceNote": "«Системная» следует светлой или тёмной настройке устройства; «Светлая» и «Тёмная» закрепляют её на этом устройстве.",
+  "timelineImport.include": "Импорт",
+  "timelineImport.includeAll": "Все",
+  "timelineImport.includeNone": "Ни одной",
+  "timelineImport.columnsIncluded": "Импортируется {n} из {m} столбцов",
+  "timelineImport.includeColumn": "Импортировать столбец {column}",
+  "timelineImport.adds": "Значений",
+  "timelineImport.leftOut": "Пропущено: {list}"
 }

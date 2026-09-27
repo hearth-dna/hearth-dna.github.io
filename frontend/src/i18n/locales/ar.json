@@ -674,7 +674,6 @@
   "timelineImport.column": "العمود",
   "timelineImport.sample": "القيم الأولى",
   "timelineImport.isWhat": "هو",
-  "timelineImport.role.ignore": "تجاهل",
   "timelineImport.role.date": "التاريخ",
   "timelineImport.role.time": "الوقت",
   "timelineImport.role.note": "ملاحظة",
@@ -691,7 +690,6 @@
   "timelineImport.ambiguousDate": "كل تاريخ في هذا الملف يُقرأ يوم/شهر وشهر/يوم معًا. تحقق من صيغة التاريخ أعلاه.",
   "timelineImport.names": "أسماء القياسات في الملف",
   "timelineImport.metric": "القياس",
-  "timelineImport.leaveOut": "تجاهل",
   "timelineImport.custom": "شيء آخر…",
   "timelineImport.customName": "الاسم",
   "timelineImport.unitInFile": "الوحدة في الملف",
@@ -701,7 +699,7 @@
   "timelineImport.skip.notNumber": "{n} خلايا ليست أرقامًا",
   "timelineImport.skip.pairIncomplete": "{n} صفوف ضغط فيها قيمة واحدة فقط من القيمتين",
   "timelineImport.skip.duplicate": "{n} قراءات موجودة في السجل بالفعل",
-  "timelineImport.blocked": "لا يمكن تحويل {metric} بوحدة {unit}؛ اختر الوحدة الصحيحة أو تجاهل العمود.",
+  "timelineImport.blocked": "لا يمكن تحويل {metric} بوحدة {unit}؛ اختر الوحدة الصحيحة أو ألغِ تحديد العمود.",
   "timelineImport.import": "استيراد {n} إدخالات",
   "healthLog.importCsv": "استيراد CSV…",
   "importPage.title": "استيراد",
@@ -741,5 +739,12 @@
   "theme.dark": "داكن",
   "app.theme": "المظهر: {mode}",
   "settingsPage.appearance": "المظهر",
-  "settingsPage.appearanceNote": "«النظام» يتبع إعداد جهازك الفاتح أو الداكن؛ «فاتح» و«داكن» يثبّتان المظهر على هذا الجهاز."
+  "settingsPage.appearanceNote": "«النظام» يتبع إعداد جهازك الفاتح أو الداكن؛ «فاتح» و«داكن» يثبّتان المظهر على هذا الجهاز.",
+  "timelineImport.include": "استيراد",
+  "timelineImport.includeAll": "الكل",
+  "timelineImport.includeNone": "لا شيء",
+  "timelineImport.columnsIncluded": "يُستورد {n} من {m} أعمدة",
+  "timelineImport.includeColumn": "استيراد العمود {column}",
+  "timelineImport.adds": "القراءات",
+  "timelineImport.leftOut": "مستبعد: {list}"
 }

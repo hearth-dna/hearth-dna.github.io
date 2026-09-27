@@ -674,7 +674,6 @@
   "timelineImport.column": "Sütun",
   "timelineImport.sample": "İlk değerler",
   "timelineImport.isWhat": "Bu",
-  "timelineImport.role.ignore": "atla",
   "timelineImport.role.date": "tarih",
   "timelineImport.role.time": "saat",
   "timelineImport.role.note": "not",
@@ -691,7 +690,6 @@
   "timelineImport.ambiguousDate": "Bu dosyadaki her tarih hem gün/ay hem ay/gün olarak okunabiliyor. Yukarıdaki tarih biçimini kontrol edin.",
   "timelineImport.names": "Dosyadaki ölçüm adları",
   "timelineImport.metric": "Ölçüm",
-  "timelineImport.leaveOut": "atla",
   "timelineImport.custom": "başka bir şey…",
   "timelineImport.customName": "Ad",
   "timelineImport.unitInFile": "dosyadaki birim",
@@ -701,7 +699,7 @@
   "timelineImport.skip.notNumber": "Sayı olmayan {n} hücre",
   "timelineImport.skip.pairIncomplete": "İki değerden yalnızca biri olan {n} tansiyon satırı",
   "timelineImport.skip.duplicate": "Günlükte zaten olan {n} ölçüm",
-  "timelineImport.blocked": "{metric} {unit} biriminden dönüştürülemiyor; doğru birimi seçin ya da sütunu atlayın.",
+  "timelineImport.blocked": "{unit} birimindeki {metric} dönüştürülemiyor; doğru birimi seçin veya sütunun işaretini kaldırın.",
   "timelineImport.import": "{n} kaydı içe aktar",
   "healthLog.importCsv": "CSV içe aktar…",
   "importPage.title": "İçe aktar",
@@ -741,5 +739,12 @@
   "theme.dark": "Koyu",
   "app.theme": "Tema: {mode}",
   "settingsPage.appearance": "Görünüm",
-  "settingsPage.appearanceNote": "Sistem, cihazınızın açık veya koyu ayarını izler; Açık ve Koyu bu görünümü bu cihazda sabit tutar."
+  "settingsPage.appearanceNote": "Sistem, cihazınızın açık veya koyu ayarını izler; Açık ve Koyu bu görünümü bu cihazda sabit tutar.",
+  "timelineImport.include": "İçe aktar",
+  "timelineImport.includeAll": "Tümü",
+  "timelineImport.includeNone": "Hiçbiri",
+  "timelineImport.columnsIncluded": "{m} sütundan {n} tanesi içe aktarılıyor",
+  "timelineImport.includeColumn": "{column} sütununu içe aktar",
+  "timelineImport.adds": "Ölçüm",
+  "timelineImport.leftOut": "Dışarıda bırakılan: {list}"
 }

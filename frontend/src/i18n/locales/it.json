@@ -674,7 +674,6 @@
   "timelineImport.column": "Colonna",
   "timelineImport.sample": "Primi valori",
   "timelineImport.isWhat": "È",
-  "timelineImport.role.ignore": "escludi",
   "timelineImport.role.date": "data",
   "timelineImport.role.time": "ora",
   "timelineImport.role.note": "nota",
@@ -691,7 +690,6 @@
   "timelineImport.ambiguousDate": "Ogni data del file si legge sia come giorno/mese sia come mese/giorno. Controlla il formato data sopra.",
   "timelineImport.names": "Nomi delle misure nel file",
   "timelineImport.metric": "Misura",
-  "timelineImport.leaveOut": "escludi",
   "timelineImport.custom": "altro…",
   "timelineImport.customName": "Nome",
   "timelineImport.unitInFile": "unità nel file",
@@ -701,7 +699,7 @@
   "timelineImport.skip.notNumber": "{n} celle che non sono numeri",
   "timelineImport.skip.pairIncomplete": "{n} righe di pressione con uno solo dei due valori",
   "timelineImport.skip.duplicate": "{n} misurazioni già nel diario",
-  "timelineImport.blocked": "{metric} in {unit} non si può convertire; scegli l'unità giusta o escludi la colonna.",
+  "timelineImport.blocked": "{metric} in {unit} non può essere convertito; scegli l’unità giusta o togli la spunta alla colonna.",
   "timelineImport.import": "Importa {n} voci",
   "healthLog.importCsv": "Importa CSV…",
   "importPage.title": "Importa",
@@ -741,5 +739,12 @@
   "theme.dark": "Scuro",
   "app.theme": "Tema: {mode}",
   "settingsPage.appearance": "Aspetto",
-  "settingsPage.appearanceNote": "Sistema segue l'impostazione chiara o scura del dispositivo; Chiaro e Scuro mantengono quell'aspetto su questo dispositivo."
+  "settingsPage.appearanceNote": "Sistema segue l'impostazione chiara o scura del dispositivo; Chiaro e Scuro mantengono quell'aspetto su questo dispositivo.",
+  "timelineImport.include": "Importa",
+  "timelineImport.includeAll": "Tutte",
+  "timelineImport.includeNone": "Nessuna",
+  "timelineImport.columnsIncluded": "{n} di {m} colonne importate",
+  "timelineImport.includeColumn": "Importa la colonna {column}",
+  "timelineImport.adds": "Letture",
+  "timelineImport.leftOut": "Escluse: {list}"
 }

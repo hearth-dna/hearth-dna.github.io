@@ -674,7 +674,6 @@
   "timelineImport.column": "Cột",
   "timelineImport.sample": "Giá trị đầu",
   "timelineImport.isWhat": "Là",
-  "timelineImport.role.ignore": "bỏ qua",
   "timelineImport.role.date": "ngày",
   "timelineImport.role.time": "giờ",
   "timelineImport.role.note": "ghi chú",
@@ -691,7 +690,6 @@
   "timelineImport.ambiguousDate": "Mọi ngày trong tệp đều đọc được theo ngày/tháng lẫn tháng/ngày. Hãy kiểm tra định dạng ngày ở trên.",
   "timelineImport.names": "Tên số đo trong tệp",
   "timelineImport.metric": "Số đo",
-  "timelineImport.leaveOut": "bỏ qua",
   "timelineImport.custom": "khác…",
   "timelineImport.customName": "Tên",
   "timelineImport.unitInFile": "đơn vị trong tệp",
@@ -701,7 +699,7 @@
   "timelineImport.skip.notNumber": "{n} ô không phải số",
   "timelineImport.skip.pairIncomplete": "{n} dòng huyết áp chỉ có một trong hai số",
   "timelineImport.skip.duplicate": "{n} lần đo đã có trong nhật ký",
-  "timelineImport.blocked": "Không thể quy đổi {metric} theo {unit}; hãy chọn đúng đơn vị hoặc bỏ qua cột.",
+  "timelineImport.blocked": "Không thể quy đổi {metric} theo {unit}; hãy chọn đúng đơn vị hoặc bỏ chọn cột.",
   "timelineImport.import": "Nhập {n} mục",
   "healthLog.importCsv": "Nhập CSV…",
   "importPage.title": "Nhập",
@@ -741,5 +739,12 @@
   "theme.dark": "Tối",
   "app.theme": "Giao diện: {mode}",
   "settingsPage.appearance": "Giao diện",
-  "settingsPage.appearanceNote": "Hệ thống làm theo cài đặt sáng hoặc tối của thiết bị; Sáng và Tối giữ nguyên giao diện đó trên thiết bị này."
+  "settingsPage.appearanceNote": "Hệ thống làm theo cài đặt sáng hoặc tối của thiết bị; Sáng và Tối giữ nguyên giao diện đó trên thiết bị này.",
+  "timelineImport.include": "Nhập",
+  "timelineImport.includeAll": "Tất cả",
+  "timelineImport.includeNone": "Không",
+  "timelineImport.columnsIncluded": "Nhập {n} trên {m} cột",
+  "timelineImport.includeColumn": "Nhập cột {column}",
+  "timelineImport.adds": "Giá trị",
+  "timelineImport.leftOut": "Bỏ qua: {list}"
 }

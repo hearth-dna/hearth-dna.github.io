@@ -284,3 +284,9 @@ ul.picklist li > button, ul.picklist li > .small { flex: none; min-width: 5.5rem
 select.small { min-height: var(--control-h-sm); font-size: var(--text-sm); }
 button.danger.ghost { border-color: transparent; }
 .row.filters input[type='search'] { flex: 1 1 12rem; }
+/* CSV import: a left-out column or metric name keeps its mapping but reads as off. */
+.row.tight { gap: var(--space-1) var(--space-2); }
+tr.skipped td:not(:first-child), .namemap.skipped > :not(label) { opacity: 0.5; }
+tr.skipped td:nth-child(2), .namemap.skipped label span { text-decoration: line-through; color: var(--muted); }
+.namemap { padding: var(--space-1) 0; border-bottom: 1px solid var(--line); }
+.namemap > label { min-width: 14rem; }

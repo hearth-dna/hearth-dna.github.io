@@ -674,7 +674,6 @@
   "timelineImport.column": "列",
   "timelineImport.sample": "最初の値",
   "timelineImport.isWhat": "内容",
-  "timelineImport.role.ignore": "除外",
   "timelineImport.role.date": "日付",
   "timelineImport.role.time": "時刻",
   "timelineImport.role.note": "メモ",
@@ -691,7 +690,6 @@
   "timelineImport.ambiguousDate": "このファイルの日付はどれも日/月とも月/日とも読めます。上の日付形式を確認してください。",
   "timelineImport.names": "ファイル内の測定名",
   "timelineImport.metric": "測定",
-  "timelineImport.leaveOut": "除外",
   "timelineImport.custom": "その他…",
   "timelineImport.customName": "名前",
   "timelineImport.unitInFile": "ファイル内の単位",
@@ -701,7 +699,7 @@
   "timelineImport.skip.notNumber": "数値でないセル：{n}",
   "timelineImport.skip.pairIncomplete": "2つの値の片方しかない血圧の行：{n}",
   "timelineImport.skip.duplicate": "すでに記録にある測定値：{n}",
-  "timelineImport.blocked": "{unit} の {metric} は換算できません。正しい単位を選ぶか列を除外してください。",
+  "timelineImport.blocked": "{unit} の {metric} は変換できません。正しい単位を選ぶか、列のチェックを外してください。",
   "timelineImport.import": "{n} 件を取り込む",
   "healthLog.importCsv": "CSV を取り込む…",
   "importPage.title": "取り込み",
@@ -741,5 +739,12 @@
   "theme.dark": "ダーク",
   "app.theme": "テーマ: {mode}",
   "settingsPage.appearance": "外観",
-  "settingsPage.appearanceNote": "「システム」は端末のライト/ダーク設定に従います。「ライト」と「ダーク」はこの端末でその表示を固定します。"
+  "settingsPage.appearanceNote": "「システム」は端末のライト/ダーク設定に従います。「ライト」と「ダーク」はこの端末でその表示を固定します。",
+  "timelineImport.include": "取り込む",
+  "timelineImport.includeAll": "すべて",
+  "timelineImport.includeNone": "なし",
+  "timelineImport.columnsIncluded": "{m} 列中 {n} 列を取り込み",
+  "timelineImport.includeColumn": "列「{column}」を取り込む",
+  "timelineImport.adds": "件数",
+  "timelineImport.leftOut": "除外: {list}"
 }

@@ -674,7 +674,6 @@
   "timelineImport.column": "Columna",
   "timelineImport.sample": "Primeros valores",
   "timelineImport.isWhat": "Es",
-  "timelineImport.role.ignore": "omitir",
   "timelineImport.role.date": "fecha",
   "timelineImport.role.time": "hora",
   "timelineImport.role.note": "nota",
@@ -691,7 +690,6 @@
   "timelineImport.ambiguousDate": "Todas las fechas del archivo se leen como día/mes y como mes/día. Revisa el formato de fecha arriba.",
   "timelineImport.names": "Nombres de mediciones en el archivo",
   "timelineImport.metric": "Medición",
-  "timelineImport.leaveOut": "omitir",
   "timelineImport.custom": "otra cosa…",
   "timelineImport.customName": "Nombre",
   "timelineImport.unitInFile": "unidad en el archivo",
@@ -701,7 +699,7 @@
   "timelineImport.skip.notNumber": "{n} celdas que no son números",
   "timelineImport.skip.pairIncomplete": "{n} filas de tensión con solo uno de los dos valores",
   "timelineImport.skip.duplicate": "{n} lecturas ya están en el registro",
-  "timelineImport.blocked": "{metric} en {unit} no se puede convertir; elige la unidad correcta u omite la columna.",
+  "timelineImport.blocked": "{metric} en {unit} no se puede convertir; elige la unidad correcta o desmarca la columna.",
   "timelineImport.import": "Importar {n} entradas",
   "healthLog.importCsv": "Importar CSV…",
   "importPage.title": "Importar",
@@ -741,5 +739,12 @@
   "theme.dark": "Oscuro",
   "app.theme": "Tema: {mode}",
   "settingsPage.appearance": "Apariencia",
-  "settingsPage.appearanceNote": "Sistema sigue el ajuste claro u oscuro de tu dispositivo; Claro y Oscuro mantienen ese aspecto en este dispositivo."
+  "settingsPage.appearanceNote": "Sistema sigue el ajuste claro u oscuro de tu dispositivo; Claro y Oscuro mantienen ese aspecto en este dispositivo.",
+  "timelineImport.include": "Importar",
+  "timelineImport.includeAll": "Todas",
+  "timelineImport.includeNone": "Ninguna",
+  "timelineImport.columnsIncluded": "Se importan {n} de {m} columnas",
+  "timelineImport.includeColumn": "Importar la columna {column}",
+  "timelineImport.adds": "Lecturas",
+  "timelineImport.leftOut": "Omitidas: {list}"
 }

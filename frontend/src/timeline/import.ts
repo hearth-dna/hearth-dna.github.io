@@ -24,7 +24,6 @@ export interface MetricMap {
 }
 
 export type Role =
-  | { role: 'ignore' }
   | { role: 'date'; format: DateFormat }
   | { role: 'time' }
   | { role: 'note' }
@@ -35,11 +34,19 @@ export type Role =
   | { role: 'value' }
   | { role: 'unit' }
 
+/**
+ * A column's role and whether it is imported at all. A skipped column keeps its role, so ticking
+ * it again brings its mapping back.
+ */
+export type Column = Role & { skip: boolean }
+/** A long file's metric name: what it is, and whether its readings are imported. */
+export type NameMap = MetricMap & { skip: boolean }
+
 export interface Mapping {
   shape: 'wide' | 'long'
-  columns: Role[]
-  /** Long files: each distinct metric name → what it is, or null to leave it out. */
-  names: Record<string, MetricMap | null>
+  columns: Column[]
+  /** Long files: each distinct metric name → what it is. */
+  names: Record<string, NameMap>
   /** Set when the date column reads as both day-first and month-first. */
   ambiguousDate: boolean
 }
@@ -112,7 +119,7 @@ export function suggestMapping(kb: Kb, table: Table, presetNames: (id: string) =
   const long = h.some((x) => NAME_HEADER.test(x)) && h.some((x) => VALUE_HEADER.test(x))
   let ambiguousDate = false
   let haveDate = false
-  const columns = h.map((header, i): Role => {
+  const columns = h.map((header, i): Column => {
     const cells = col(i)
     const dateGuess = guessDateFormat(cells)
     if (
@@ -122,20 +129,26 @@ export function suggestMapping(kb: Kb, table: Table, presetNames: (id: string) =
     ) {
       haveDate = true
       ambiguousDate = dateGuess.ambiguous
-      return { role: 'date', format: dateGuess.format }
+      return { role: 'date', format: dateGuess.format, skip: false }
     }
-    if (TIME_HEADER.test(header)) return { role: 'time' }
-    if (NOTE_HEADER.test(header)) return { role: 'note' }
-    if (long && NAME_HEADER.test(header)) return { role: 'name' }
-    if (long && VALUE_HEADER.test(header)) return { role: 'value' }
-    if (long && UNIT_HEADER.test(header)) return { role: 'unit' }
-    if (!long && numeric(cells)) return { role: 'metric', metric: suggestMetric(kb, header, presetNames) }
-    return { role: 'ignore' }
+    if (TIME_HEADER.test(header)) return { role: 'time', skip: false }
+    if (NOTE_HEADER.test(header)) return { role: 'note', skip: false }
+    if (long && NAME_HEADER.test(header)) return { role: 'name', skip: false }
+    if (long && VALUE_HEADER.test(header)) return { role: 'value', skip: false }
+    if (long && UNIT_HEADER.test(header)) return { role: 'unit', skip: false }
+    if (!long && numeric(cells))
+      return { role: 'metric', metric: suggestMetric(kb, header, presetNames), skip: false }
+    // Nothing to read here: left out, and a note if the user ticks it after all.
+    return { role: 'note', skip: true }
   })
   const mapping: Mapping = { shape: long ? 'long' : 'wide', columns, names: {}, ambiguousDate }
   if (long) mapping.names = suggestNames(kb, table, mapping, presetNames)
   return mapping
 }
+
+/** The first ticked column with this role, or -1. */
+export const columnOf = (columns: Column[], role: Role['role']) =>
+  columns.findIndex((c) => c.role === role && !c.skip)
 
 /** Long files: every distinct metric name, with its most common unit from the unit column. */
 export function suggestNames(
@@ -143,9 +156,9 @@ export function suggestNames(
   table: Table,
   mapping: Pick<Mapping, 'columns'>,
   presetNames: (id: string) => string[],
-): Record<string, MetricMap | null> {
-  const nameCol = mapping.columns.findIndex((c) => c.role === 'name')
-  const unitCol = mapping.columns.findIndex((c) => c.role === 'unit')
+): Record<string, NameMap> {
+  const nameCol = columnOf(mapping.columns, 'name')
+  const unitCol = columnOf(mapping.columns, 'unit')
   if (nameCol < 0) return {}
   const units = new Map<string, Map<string, number>>()
   for (const r of table.rows) {
@@ -156,10 +169,10 @@ export function suggestNames(
     m.set(u, (m.get(u) ?? 0) + 1)
     units.set(n, m)
   }
-  const out: Record<string, MetricMap | null> = {}
+  const out: Record<string, NameMap> = {}
   for (const [n, us] of units) {
     const unit = [...us.entries()].sort((a, b) => b[1] - a[1])[0][0]
-    out[n] = { ...suggestMetric(kb, n, presetNames), unit: unit || splitHeader(n).unit }
+    out[n] = { ...suggestMetric(kb, n, presetNames), unit: unit || splitHeader(n).unit, skip: false }
   }
   return out
 }
@@ -228,6 +241,10 @@ export interface ImportResult {
   skipped: { row: number; reason: SkipReason }[]
   /** Metrics whose file unit cannot be converted: a label and the unit, nothing of them is imported. */
   blocked: { label: string; unit: string }[]
+  /** Wide files: entries each column adds (both halves of blood pressure count the pair). */
+  perColumn: number[]
+  /** Long files: entries each metric name adds. */
+  perName: Record<string, number>
 }
 
 export const MAX_READINGS = 20_000
@@ -245,13 +262,13 @@ export function buildEntries(
   mapping: Mapping,
   o: { personId: string; source: string; existing: HealthEntry[]; labTitle: (analyte: string) => string },
 ): ImportResult {
-  const dateCol = mapping.columns.findIndex((c) => c.role === 'date')
+  const dateCol = columnOf(mapping.columns, 'date')
   const dateRole = mapping.columns[dateCol] as Extract<Role, { role: 'date' }> | undefined
-  const timeCol = mapping.columns.findIndex((c) => c.role === 'time')
-  const noteCols = mapping.columns.flatMap((c, i) => (c.role === 'note' ? [i] : []))
-  const nameCol = mapping.columns.findIndex((c) => c.role === 'name')
-  const valueCol = mapping.columns.findIndex((c) => c.role === 'value')
-  const unitCol = mapping.columns.findIndex((c) => c.role === 'unit')
+  const timeCol = columnOf(mapping.columns, 'time')
+  const noteCols = mapping.columns.flatMap((c, i) => (c.role === 'note' && !c.skip ? [i] : []))
+  const nameCol = columnOf(mapping.columns, 'name')
+  const valueCol = columnOf(mapping.columns, 'value')
+  const unitCol = columnOf(mapping.columns, 'unit')
 
   const sinks = new Map<string, Sink>()
   const sinkFor = (m: MetricMap) => {
@@ -264,6 +281,8 @@ export function buildEntries(
   const entries: HealthEntryInput[] = []
   /** The 1-based file row each entry came from, for the skip report. */
   const rowOf: number[] = []
+  /** The columns (wide) or the metric name (long) each entry came from, for the per-column counts. */
+  const fromOf: (number[] | string)[] = []
   const skipped: ImportResult['skipped'] = []
 
   table.rows.forEach((row, i) => {
@@ -277,23 +296,25 @@ export function buildEntries(
       .map((c) => row[c]?.trim())
       .filter(Boolean)
       .join('; ')
-    // The readings of this row: [metric, cell, the unit the file wrote].
-    const cells: [MetricMap, string, string][] =
+    // The readings of this row: [metric, cell, the unit the file wrote, where it came from].
+    type Cell = [MetricMap, string, string, number | string]
+    const cells: Cell[] =
       mapping.shape === 'wide'
         ? mapping.columns.flatMap((c, j) =>
-            c.role === 'metric' && row[j]?.trim()
-              ? [[c.metric, row[j], c.metric.unit] as [MetricMap, string, string]]
+            c.role === 'metric' && !c.skip && row[j]?.trim()
+              ? [[c.metric, row[j], c.metric.unit, j] as Cell]
               : [],
           )
         : (() => {
-            const m = mapping.names[row[nameCol]?.trim() ?? '']
+            const name = row[nameCol]?.trim() ?? ''
+            const m = mapping.names[name]
             const cell = row[valueCol] ?? ''
-            if (!m || !cell.trim()) return []
+            if (!m || m.skip || !cell.trim()) return []
             const unit = unitCol >= 0 && row[unitCol]?.trim() ? row[unitCol].trim() : m.unit
-            return [[{ ...m, unit }, cell, unit] as [MetricMap, string, string]]
+            return [[{ target: m.target, unit }, cell, unit, name] as Cell]
           })()
-    const pairs = new Map<string, { sys?: number; dia?: number; text: string[] }>()
-    for (const [m, cell, unit] of cells) {
+    const pairs = new Map<string, { sys?: number; dia?: number; text: string[]; from: number[] }>()
+    for (const [m, cell, unit, from] of cells) {
       const s = sinkFor(m)
       const v = parseValue(cell)
       if (v.value === null) {
@@ -307,14 +328,16 @@ export function buildEntries(
       const value = round(s.convert(v.value), s.decimals)
       const converted = unit && value !== v.value
       if (s.preset?.pair) {
-        const p = pairs.get(s.title) ?? { text: [] }
+        const p = pairs.get(s.title) ?? { text: [], from: [] }
         if (s.part === 1) p.dia = value
         else p.sys = value
         if (converted) p.text.push(printed(cell, unit))
+        if (typeof from === 'number') p.from.push(from)
         pairs.set(s.title, p)
         continue
       }
       rowOf.push(i + 1)
+      fromOf.push(typeof from === 'number' ? [from] : from)
       entries.push({
         personId: o.personId,
         date: when.date,
@@ -335,6 +358,7 @@ export function buildEntries(
         continue
       }
       rowOf.push(i + 1)
+      fromOf.push(p.from)
       entries.push({
         personId: o.personId,
         date: when.date,
@@ -351,14 +375,27 @@ export function buildEntries(
   })
 
   // Readings the log (or an earlier row of this file) already has are not added twice.
-  const fresh = entries.filter((e, n) => {
+  const kept = entries.flatMap((e, n) => {
     const k = dupKey(e)
     if (seen.has(k)) {
       skipped.push({ row: rowOf[n], reason: 'duplicate' })
-      return false
+      return []
     }
     seen.add(k)
-    return true
+    return [{ e, from: fromOf[n] }]
   })
-  return { entries: fresh.slice(0, MAX_READINGS), skipped, blocked: [...blocked.values()] }
+  const fresh = kept.slice(0, MAX_READINGS)
+  const perColumn = mapping.columns.map(() => 0)
+  const perName: Record<string, number> = {}
+  for (const { from } of fresh) {
+    if (typeof from === 'string') perName[from] = (perName[from] ?? 0) + 1
+    else for (const j of new Set(from)) perColumn[j]++
+  }
+  return {
+    entries: fresh.map((x) => x.e),
+    skipped,
+    blocked: [...blocked.values()],
+    perColumn,
+    perName,
+  }
 }

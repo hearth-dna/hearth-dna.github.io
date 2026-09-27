@@ -674,7 +674,6 @@
   "timelineImport.column": "Kolom",
   "timelineImport.sample": "Eerste waarden",
   "timelineImport.isWhat": "Is",
-  "timelineImport.role.ignore": "weglaten",
   "timelineImport.role.date": "datum",
   "timelineImport.role.time": "tijd",
   "timelineImport.role.note": "notitie",
@@ -691,7 +690,6 @@
   "timelineImport.ambiguousDate": "Elke datum in dit bestand is te lezen als dag/maand en als maand/dag. Controleer de datumnotatie hierboven.",
   "timelineImport.names": "Namen van metingen in het bestand",
   "timelineImport.metric": "Meting",
-  "timelineImport.leaveOut": "weglaten",
   "timelineImport.custom": "iets anders…",
   "timelineImport.customName": "Naam",
   "timelineImport.unitInFile": "eenheid in het bestand",
@@ -701,7 +699,7 @@
   "timelineImport.skip.notNumber": "{n} cellen die geen getal zijn",
   "timelineImport.skip.pairIncomplete": "{n} bloeddrukrijen met maar één van de twee waarden",
   "timelineImport.skip.duplicate": "{n} metingen staan al in het logboek",
-  "timelineImport.blocked": "{metric} in {unit} is niet om te rekenen; kies de juiste eenheid of laat de kolom weg.",
+  "timelineImport.blocked": "{metric} in {unit} kan niet worden omgerekend; kies de juiste eenheid of vink de kolom uit.",
   "timelineImport.import": "{n} items importeren",
   "healthLog.importCsv": "CSV importeren…",
   "importPage.title": "Importeren",
@@ -741,5 +739,12 @@
   "theme.dark": "Donker",
   "app.theme": "Thema: {mode}",
   "settingsPage.appearance": "Weergave",
-  "settingsPage.appearanceNote": "Systeem volgt de lichte of donkere instelling van je apparaat; Licht en Donker houden die weergave op dit apparaat."
+  "settingsPage.appearanceNote": "Systeem volgt de lichte of donkere instelling van je apparaat; Licht en Donker houden die weergave op dit apparaat.",
+  "timelineImport.include": "Importeren",
+  "timelineImport.includeAll": "Alle",
+  "timelineImport.includeNone": "Geen",
+  "timelineImport.columnsIncluded": "{n} van {m} kolommen geïmporteerd",
+  "timelineImport.includeColumn": "Kolom {column} importeren",
+  "timelineImport.adds": "Metingen",
+  "timelineImport.leftOut": "Weggelaten: {list}"
 }
