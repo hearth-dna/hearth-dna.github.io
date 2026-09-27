@@ -26,5 +26,18 @@
   "readDocumentDialog.localPartial": "Only {n} of about {m} result lines could be read on this device.",
   "readDocumentDialog.localNothing": "No results could be read on this device.",
   "readDocumentDialog.reviewFound": "Review the {n} found",
-  "readDocumentDialog.useGemini": "Read with Gemini instead…"
+  "readDocumentDialog.useGemini": "Read with Gemini instead…",
+  "readDocumentDialog.error.busy": "Gemini is overloaded or briefly unavailable (error {status}), even after two retries. Nothing was saved. Try again in a minute, or pick a different model in Settings.",
+  "readDocumentDialog.error.quota": "Your Gemini key has hit its rate or daily limit (error 429). Wait a little and try again, or use a key from a paid project.",
+  "readDocumentDialog.error.network": "Could not reach Google Gemini. Check the internet connection and try again.",
+  "readDocumentDialog.error.key": "Google did not accept the API key (error {status}). Check the key in Settings → Document reading.",
+  "readDocumentDialog.error.model": "The model \"{model}\" was not found (error 404). Pick another model in Settings → Document reading.",
+  "readDocumentDialog.error.rejected": "Gemini could not read these files (error {status}). Try clearer photos, fewer pages, or a smaller file.",
+  "readDocumentDialog.error.empty": "Gemini answered, but without any text. Try again, or with clearer pages.",
+  "readDocumentDialog.error.other": "Gemini returned an error ({status}). Try again later.",
+  "readDocumentDialog.providerSaid": "Gemini said: {detail}",
+  "readDocumentDialog.retrying": "Gemini is busy, trying again ({n} of {m})…",
+  "readDocumentDialog.tryAgain": "Try again",
+  "readDocumentDialog.selected": "Selected: {files}",
+  "readDocumentDialog.pdfLocal": "A PDF or text file that is a lab report is read on this device first; it only goes to Gemini if it cannot be read here."
 }

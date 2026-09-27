@@ -746,5 +746,18 @@
   "timelineImport.columnsIncluded": "{n} von {m} Spalten werden importiert",
   "timelineImport.includeColumn": "Spalte {column} importieren",
   "timelineImport.adds": "Messwerte",
-  "timelineImport.leftOut": "Ausgelassen: {list}"
+  "timelineImport.leftOut": "Ausgelassen: {list}",
+  "readDocumentDialog.error.busy": "Gemini ist überlastet oder kurz nicht erreichbar (Fehler {status}), auch nach zwei Wiederholungen. Nichts wurde gespeichert. Versuchen Sie es in einer Minute erneut oder wählen Sie in den Einstellungen ein anderes Modell.",
+  "readDocumentDialog.error.quota": "Ihr Gemini-Schlüssel hat sein Anfrage- oder Tageslimit erreicht (Fehler 429). Warten Sie etwas und versuchen Sie es erneut, oder nutzen Sie einen Schlüssel aus einem kostenpflichtigen Projekt.",
+  "readDocumentDialog.error.network": "Google Gemini ist nicht erreichbar. Prüfen Sie die Internetverbindung und versuchen Sie es erneut.",
+  "readDocumentDialog.error.key": "Google hat den API-Schlüssel nicht akzeptiert (Fehler {status}). Prüfen Sie den Schlüssel unter Einstellungen → Dokumente lesen.",
+  "readDocumentDialog.error.model": "Das Modell „{model}“ wurde nicht gefunden (Fehler 404). Wählen Sie unter Einstellungen → Dokumente lesen ein anderes Modell.",
+  "readDocumentDialog.error.rejected": "Gemini konnte diese Dateien nicht lesen (Fehler {status}). Versuchen Sie schärfere Fotos, weniger Seiten oder eine kleinere Datei.",
+  "readDocumentDialog.error.empty": "Gemini hat geantwortet, aber ohne Text. Versuchen Sie es erneut oder mit schärferen Seiten.",
+  "readDocumentDialog.error.other": "Gemini meldet einen Fehler ({status}). Versuchen Sie es später erneut.",
+  "readDocumentDialog.providerSaid": "Gemini meldet: {detail}",
+  "readDocumentDialog.retrying": "Gemini ist ausgelastet, neuer Versuch ({n} von {m})…",
+  "readDocumentDialog.tryAgain": "Erneut versuchen",
+  "readDocumentDialog.selected": "Ausgewählt: {files}",
+  "readDocumentDialog.pdfLocal": "Ein PDF oder eine Textdatei mit Laborwerten wird zuerst auf diesem Gerät gelesen; an Gemini geht sie nur, wenn das hier nicht gelingt."
 }

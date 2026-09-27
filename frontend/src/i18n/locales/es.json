@@ -746,5 +746,18 @@
   "timelineImport.columnsIncluded": "Se importan {n} de {m} columnas",
   "timelineImport.includeColumn": "Importar la columna {column}",
   "timelineImport.adds": "Lecturas",
-  "timelineImport.leftOut": "Omitidas: {list}"
+  "timelineImport.leftOut": "Omitidas: {list}",
+  "readDocumentDialog.error.busy": "Gemini está sobrecargado o no disponible por un momento (error {status}), incluso tras dos reintentos. No se guardó nada. Inténtalo en un minuto o elige otro modelo en Ajustes.",
+  "readDocumentDialog.error.quota": "Tu clave de Gemini alcanzó su límite de peticiones o diario (error 429). Espera un poco y vuelve a intentarlo, o usa una clave de un proyecto de pago.",
+  "readDocumentDialog.error.network": "No se pudo conectar con Google Gemini. Revisa la conexión a internet y vuelve a intentarlo.",
+  "readDocumentDialog.error.key": "Google no aceptó la clave de API (error {status}). Revísala en Ajustes → Lectura de documentos.",
+  "readDocumentDialog.error.model": "No se encontró el modelo «{model}» (error 404). Elige otro en Ajustes → Lectura de documentos.",
+  "readDocumentDialog.error.rejected": "Gemini no pudo leer estos archivos (error {status}). Prueba con fotos más nítidas, menos páginas o un archivo más pequeño.",
+  "readDocumentDialog.error.empty": "Gemini respondió, pero sin texto. Vuelve a intentarlo o usa páginas más nítidas.",
+  "readDocumentDialog.error.other": "Gemini devolvió un error ({status}). Inténtalo más tarde.",
+  "readDocumentDialog.providerSaid": "Gemini dijo: {detail}",
+  "readDocumentDialog.retrying": "Gemini está ocupado, reintentando ({n} de {m})…",
+  "readDocumentDialog.tryAgain": "Reintentar",
+  "readDocumentDialog.selected": "Seleccionado: {files}",
+  "readDocumentDialog.pdfLocal": "Un PDF o archivo de texto con análisis se lee primero en este dispositivo; solo va a Gemini si aquí no se puede leer."
 }
