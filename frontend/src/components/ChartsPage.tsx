@@ -39,6 +39,10 @@ export function metricLabel(kb: Kb, s: MetricSource, t: Translate, lang: string)
     const name = t(`preset.${s.preset}`)
     return pair && s.part !== undefined ? `${name} (${t(`preset.pair.${pair[s.part]}`)})` : name
   }
+  if (s.kind === 'symptom') {
+    const name = s.preset ? t(`preset.${s.preset}`) : s.title
+    return `${name}: ${s.field === 'severity' ? t('healthLog.severity') : t(`detail.${s.field}`)}`
+  }
   return s.title
 }
 
@@ -105,7 +109,7 @@ export function ChartsPage() {
     } catch {}
   }
   const q = query.trim().toLowerCase()
-  const groups = (['lab', 'measurement', 'other'] as const)
+  const groups = (['lab', 'measurement', 'symptom', 'other'] as const)
     .map((g) => ({
       g,
       ms: available.filter((m) => m.group === g && (!q || label(m).toLowerCase().includes(q))),

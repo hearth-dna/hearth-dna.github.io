@@ -3,20 +3,12 @@ import { useApp } from '../app/context'
 import { grantConsent, hasConsent } from '../consent/consent'
 import { addHealthEntry } from '../db/repo'
 import { formatValue } from '../health/log'
-import { findPreset, type HealthPreset, measurementOrder } from '../health/presets'
+import { nowTime, today } from '../health/now'
+import { findPreset, type HealthPreset, presetOrder } from '../health/presets'
 import { useT } from '../i18n/context'
 import type { HealthEntry, Person } from '../types'
 import { ConsentForm } from './ConsentForm'
 
-const pad = (n: number) => String(n).padStart(2, '0')
-const today = () => {
-  const d = new Date()
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
-}
-const nowTime = () => {
-  const d = new Date()
-  return `${pad(d.getHours())}:${pad(d.getMinutes())}`
-}
 const CUSTOM = ''
 
 /**
@@ -40,7 +32,7 @@ export function QuickMeasurement({
   const { db } = useApp()
   const t = useT()
   const [personId, setPersonId] = useState(initialPerson)
-  const [presetId, setPresetId] = useState(measurementOrder(entries)[0]?.id ?? '')
+  const [presetId, setPresetId] = useState(presetOrder('measurement', entries)[0]?.id ?? '')
   const [title, setTitle] = useState('')
   const [unit, setUnit] = useState('')
   const [value, setValue] = useState('')
@@ -128,7 +120,7 @@ export function QuickMeasurement({
           setValue2('')
         }}
       >
-        {measurementOrder(entries).map((p) => (
+        {presetOrder('measurement', entries).map((p) => (
           <option key={p.id} value={p.id}>
             {t(`preset.${p.id}`)}
           </option>

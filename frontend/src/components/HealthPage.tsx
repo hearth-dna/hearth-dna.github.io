@@ -8,6 +8,7 @@ import { HealthEntryForm } from './HealthEntryForm'
 import { HealthLog } from './HealthLog'
 import { HealthTable } from './HealthTable'
 import { QuickMeasurement } from './QuickMeasurement'
+import { QuickSymptom } from './QuickSymptom'
 
 /**
  * The Health section (`/health-log`): one sortable, filterable table of the whole family's
@@ -65,6 +66,12 @@ export function HealthPage({ person: who, onPerson }: { person: string; onPerson
             </button>
           </div>
           <QuickMeasurement
+            persons={persons}
+            personId={filter.person || (persons.length === 1 ? persons[0].id : '')}
+            entries={entries}
+            onSaved={reload}
+          />
+          <QuickSymptom
             persons={persons}
             personId={filter.person || (persons.length === 1 ? persons[0].id : '')}
             entries={entries}

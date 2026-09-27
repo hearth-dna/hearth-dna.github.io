@@ -1,4 +1,5 @@
 import { HEALTH_KIND_LABELS, type HealthEntry, type HealthKind } from '../types'
+import { type DetailValue, symptomPreset } from './presets'
 
 /** Pure helpers for the health log: tag encoding, one-line descriptions and filtering. */
 
@@ -15,6 +16,52 @@ export function parseTags(text: string): string[] {
 /** Inverse of parseTags; what the `tags` column stores. */
 export function formatTags(tags: string[]): string {
   return tags.join(', ')
+}
+
+/** The `details` column → an object; anything unreadable is treated as no details. */
+export function parseDetails(text: string): Record<string, DetailValue> {
+  if (!text) return {}
+  try {
+    const v = JSON.parse(text) as unknown
+    if (!v || typeof v !== 'object' || Array.isArray(v)) return {}
+    return Object.fromEntries(
+      Object.entries(v).filter(
+        ([, x]) =>
+          x === true || (typeof x === 'number' && Number.isFinite(x)) || (typeof x === 'string' && x !== ''),
+      ),
+    ) as Record<string, DetailValue>
+  } catch {
+    return {}
+  }
+}
+
+/** Inverse of parseDetails; '' when there are none, so the column stays empty. */
+export const formatDetailsJson = (d: Record<string, DetailValue>) =>
+  Object.keys(d).length ? JSON.stringify(d) : ''
+
+/** For exports: `bristol=6; colour=yellow; blood`. */
+export const detailsCell = (d: Record<string, DetailValue>) =>
+  Object.entries(d)
+    .map(([k, v]) => (v === true ? k : `${k}=${v}`))
+    .join('; ')
+
+/**
+ * Details in plain English, in the preset's field order: "Bristol type 6, yellow, blood". Used
+ * where the app writes text for itself and for Ask (the UI shows translated labels instead).
+ */
+export function formatDetails(e: Pick<HealthEntry, 'title' | 'details'>): string {
+  const d = e.details ?? {}
+  const fields = symptomPreset(e.title)?.details ?? []
+  const order = [...fields.map((f) => f.id), ...Object.keys(d).filter((k) => !fields.some((f) => f.id === k))]
+  return order
+    .filter((k) => d[k] !== undefined)
+    .map((k) => {
+      const v = d[k]
+      if (k === 'bristol') return `Bristol type ${v}`
+      if (k === 'times') return `${v}× a day`
+      return v === true ? k : `${k} ${v}`
+    })
+    .join(', ')
 }
 
 /** '8:05' → '08:05'; anything that is not a valid 24-hour HH:MM (or H:MM) becomes ''. */
@@ -49,9 +96,12 @@ export function where(e: Pick<HealthEntry, 'bodyPart' | 'side'>): string {
  */
 export function describeEntry(e: HealthEntry): string {
   const value = formatValue(e)
-  const extra = [where(e), e.severity === null ? '' : `severity ${e.severity}/10`, formatTags(e.tags)].filter(
-    Boolean,
-  )
+  const extra = [
+    formatDetails(e),
+    where(e),
+    e.severity === null ? '' : `severity ${e.severity}/10`,
+    formatTags(e.tags),
+  ].filter(Boolean)
   return `${when(e)} · ${HEALTH_KIND_LABELS[e.kind]} · ${e.title}${value ? ` ${value}` : ''}${extra.length ? ` (${extra.join('; ')})` : ''}`
 }
 
@@ -100,7 +150,10 @@ export function filterHealthLog(entries: HealthEntry[], f: HealthFilter): Health
       (!f.from || e.date >= f.from) &&
       (!f.to || e.date <= f.to) &&
       (f.minSeverity === null || (e.severity !== null && e.severity >= f.minSeverity)) &&
-      (!q || [e.title, e.body, e.bodyPart, e.unit, ...e.tags].some((s) => s.toLowerCase().includes(q))),
+      (!q ||
+        [e.title, e.body, e.bodyPart, e.unit, formatDetails(e), ...e.tags].some((s) =>
+          s.toLowerCase().includes(q),
+        )),
   )
 }
 

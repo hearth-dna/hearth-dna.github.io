@@ -1,4 +1,4 @@
-import { MEASUREMENT_PRESETS } from '../health/presets'
+import { MEASUREMENT_PRESETS, symptomPreset } from '../health/presets'
 import type { Kb } from '../kb/kb'
 import { labCatalogue, normaliseUnit, recogniseAnalyte, toCanonical } from '../labs/normalise'
 import type { KbAnalyte } from '../labs/types'
@@ -15,12 +15,14 @@ export type MetricSource =
   | { kind: 'lab'; analyte: string }
   | { kind: 'preset'; preset: string; part?: 0 | 1 }
   | { kind: 'custom'; title: string }
+  /** A symptom's severity or one of its numeric details (Bristol type, times a day). */
+  | { kind: 'symptom'; preset?: string; title: string; field: string }
 
 export interface Metric {
   key: string
   source: MetricSource
   unit: string
-  group: 'lab' | 'measurement' | 'other'
+  group: 'lab' | 'measurement' | 'symptom' | 'other'
   count: number
   personIds: string[]
 }
@@ -91,6 +93,7 @@ function labReading(kb: Kb, e: HealthEntry, value: number): Reading | null {
 
 /** Every chartable number in an entry: none, one, or two (a blood pressure pair). */
 export function readings(kb: Kb, e: HealthEntry): Reading[] {
+  if (e.kind === 'symptom') return symptomReadings(e)
   if (e.value === null || !Number.isFinite(e.value)) return []
   if (e.kind === 'lab') {
     const r = labReading(kb, e, e.value)
@@ -121,6 +124,26 @@ export function readings(kb: Kb, e: HealthEntry): Reading[] {
       entry: e,
     },
   ]
+}
+
+/** A symptom's chartable numbers: its severity, and its scale and count details. */
+function symptomReadings(e: HealthEntry): Reading[] {
+  const preset = symptomPreset(e.title)
+  const id = preset?.id ?? e.title.trim().toLowerCase()
+  const one = (field: string, value: number, unit: string): Reading => ({
+    key: `s:${id}:${field}`,
+    source: { kind: 'symptom', preset: preset?.id, title: e.title.trim(), field },
+    unit,
+    group: 'symptom',
+    value,
+    entry: e,
+  })
+  const out = e.severity === null ? [] : [one('severity', e.severity, '/10')]
+  for (const f of preset?.details ?? []) {
+    const v = e.details[f.id]
+    if ((f.kind === 'scale' || f.kind === 'count') && typeof v === 'number') out.push(one(f.id, v, ''))
+  }
+  return out
 }
 
 /** The metrics that have readings, most-recorded first. */

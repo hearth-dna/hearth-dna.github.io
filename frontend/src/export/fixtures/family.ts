@@ -91,6 +91,7 @@ export async function family(): Promise<Container> {
           severity: 4,
           tags: 'arthritis',
           conditions: 'arthritis',
+          details: '',
           value: null,
           value2: null,
           unit: '',
