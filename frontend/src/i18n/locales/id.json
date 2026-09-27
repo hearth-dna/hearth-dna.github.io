@@ -746,5 +746,18 @@
   "timelineImport.columnsIncluded": "{n} dari {m} kolom diimpor",
   "timelineImport.includeColumn": "Impor kolom {column}",
   "timelineImport.adds": "Pembacaan",
-  "timelineImport.leftOut": "Dikecualikan: {list}"
+  "timelineImport.leftOut": "Dikecualikan: {list}",
+  "readDocumentDialog.error.busy": "Gemini sedang kelebihan beban atau tidak tersedia sementara (error {status}), bahkan setelah dua kali percobaan ulang. Tidak ada yang disimpan. Coba lagi dalam satu menit, atau pilih model lain di Pengaturan.",
+  "readDocumentDialog.error.quota": "Kunci Gemini Anda mencapai batas permintaan atau batas harian (error 429). Tunggu sebentar lalu coba lagi, atau gunakan kunci dari proyek berbayar.",
+  "readDocumentDialog.error.network": "Tidak dapat menjangkau Google Gemini. Periksa koneksi internet dan coba lagi.",
+  "readDocumentDialog.error.key": "Google tidak menerima kunci API (error {status}). Periksa kunci di Pengaturan → Membaca dokumen.",
+  "readDocumentDialog.error.model": "Model \"{model}\" tidak ditemukan (error 404). Pilih model lain di Pengaturan → Membaca dokumen.",
+  "readDocumentDialog.error.rejected": "Gemini tidak dapat membaca file ini (error {status}). Coba foto yang lebih jelas, lebih sedikit halaman, atau file yang lebih kecil.",
+  "readDocumentDialog.error.empty": "Gemini menjawab, tetapi tanpa teks. Coba lagi, atau dengan halaman yang lebih jelas.",
+  "readDocumentDialog.error.other": "Gemini mengembalikan error ({status}). Coba lagi nanti.",
+  "readDocumentDialog.providerSaid": "Pesan Gemini: {detail}",
+  "readDocumentDialog.retrying": "Gemini sibuk, mencoba lagi ({n} dari {m})…",
+  "readDocumentDialog.tryAgain": "Coba lagi",
+  "readDocumentDialog.selected": "Dipilih: {files}",
+  "readDocumentDialog.pdfLocal": "PDF atau file teks hasil lab dibaca dulu di perangkat ini; hanya dikirim ke Gemini jika tidak dapat dibaca di sini."
 }

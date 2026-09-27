@@ -746,5 +746,18 @@
   "timelineImport.columnsIncluded": "Импортируется {n} из {m} столбцов",
   "timelineImport.includeColumn": "Импортировать столбец {column}",
   "timelineImport.adds": "Значений",
-  "timelineImport.leftOut": "Пропущено: {list}"
+  "timelineImport.leftOut": "Пропущено: {list}",
+  "readDocumentDialog.error.busy": "Gemini перегружен или временно недоступен (ошибка {status}), даже после двух повторов. Ничего не сохранено. Попробуйте через минуту или выберите другую модель в настройках.",
+  "readDocumentDialog.error.quota": "Ключ Gemini упёрся в лимит запросов или дневной лимит (ошибка 429). Подождите немного и повторите или используйте ключ платного проекта.",
+  "readDocumentDialog.error.network": "Не удалось связаться с Google Gemini. Проверьте подключение к интернету и повторите.",
+  "readDocumentDialog.error.key": "Google не принял API-ключ (ошибка {status}). Проверьте ключ в Настройки → Чтение документов.",
+  "readDocumentDialog.error.model": "Модель «{model}» не найдена (ошибка 404). Выберите другую модель в Настройки → Чтение документов.",
+  "readDocumentDialog.error.rejected": "Gemini не смог прочитать эти файлы (ошибка {status}). Попробуйте более чёткие фото, меньше страниц или файл поменьше.",
+  "readDocumentDialog.error.empty": "Gemini ответил, но без текста. Повторите или отправьте более чёткие страницы.",
+  "readDocumentDialog.error.other": "Gemini вернул ошибку ({status}). Повторите позже.",
+  "readDocumentDialog.providerSaid": "Ответ Gemini: {detail}",
+  "readDocumentDialog.retrying": "Gemini занят, повторяем ({n} из {m})…",
+  "readDocumentDialog.tryAgain": "Повторить",
+  "readDocumentDialog.selected": "Выбрано: {files}",
+  "readDocumentDialog.pdfLocal": "PDF или текстовый файл с анализами сначала читается на этом устройстве; в Gemini он уходит, только если прочитать его здесь не удалось."
 }

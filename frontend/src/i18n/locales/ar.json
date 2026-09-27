@@ -746,5 +746,18 @@
   "timelineImport.columnsIncluded": "يُستورد {n} من {m} أعمدة",
   "timelineImport.includeColumn": "استيراد العمود {column}",
   "timelineImport.adds": "القراءات",
-  "timelineImport.leftOut": "مستبعد: {list}"
+  "timelineImport.leftOut": "مستبعد: {list}",
+  "readDocumentDialog.error.busy": "Gemini مثقل أو غير متاح مؤقتًا (خطأ {status})، حتى بعد محاولتين إضافيتين. لم يُحفظ شيء. أعد المحاولة بعد دقيقة أو اختر نموذجًا آخر من الإعدادات.",
+  "readDocumentDialog.error.quota": "بلغ مفتاح Gemini حد الطلبات أو الحد اليومي (خطأ 429). انتظر قليلًا ثم أعد المحاولة، أو استخدم مفتاحًا من مشروع مدفوع.",
+  "readDocumentDialog.error.network": "تعذّر الوصول إلى Google Gemini. تحقق من الاتصال بالإنترنت وأعد المحاولة.",
+  "readDocumentDialog.error.key": "لم تقبل Google مفتاح API (خطأ {status}). تحقق من المفتاح في الإعدادات ← قراءة المستندات.",
+  "readDocumentDialog.error.model": "لم يُعثر على النموذج «{model}» (خطأ 404). اختر نموذجًا آخر في الإعدادات ← قراءة المستندات.",
+  "readDocumentDialog.error.rejected": "تعذّر على Gemini قراءة هذه الملفات (خطأ {status}). جرّب صورًا أوضح أو صفحات أقل أو ملفًا أصغر.",
+  "readDocumentDialog.error.empty": "أجاب Gemini لكن دون نص. أعد المحاولة أو استخدم صفحات أوضح.",
+  "readDocumentDialog.error.other": "أعاد Gemini خطأ ({status}). أعد المحاولة لاحقًا.",
+  "readDocumentDialog.providerSaid": "قال Gemini: {detail}",
+  "readDocumentDialog.retrying": "Gemini مشغول، تُعاد المحاولة ({n} من {m})…",
+  "readDocumentDialog.tryAgain": "أعد المحاولة",
+  "readDocumentDialog.selected": "المحدد: {files}",
+  "readDocumentDialog.pdfLocal": "يُقرأ ملف PDF أو ملف نصي لنتائج التحاليل على هذا الجهاز أولًا؛ ولا يُرسل إلى Gemini إلا إذا تعذّرت قراءته هنا."
 }

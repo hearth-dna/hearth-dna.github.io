@@ -746,5 +746,18 @@
   "timelineImport.columnsIncluded": "{m} में से {n} कॉलम आयात होंगे",
   "timelineImport.includeColumn": "कॉलम {column} आयात करें",
   "timelineImport.adds": "रीडिंग",
-  "timelineImport.leftOut": "छोड़े गए: {list}"
+  "timelineImport.leftOut": "छोड़े गए: {list}",
+  "readDocumentDialog.error.busy": "Gemini पर अधिक भार है या वह कुछ देर के लिए उपलब्ध नहीं (त्रुटि {status}), दो बार दोबारा कोशिश के बाद भी। कुछ सहेजा नहीं गया। एक मिनट बाद फिर कोशिश करें या सेटिंग्स में कोई और मॉडल चुनें।",
+  "readDocumentDialog.error.quota": "आपकी Gemini कुंजी अनुरोध या दैनिक सीमा तक पहुँच गई है (त्रुटि 429)। थोड़ा रुककर फिर कोशिश करें, या किसी सशुल्क प्रोजेक्ट की कुंजी इस्तेमाल करें।",
+  "readDocumentDialog.error.network": "Google Gemini तक नहीं पहुँच सके। इंटरनेट कनेक्शन जाँचें और फिर कोशिश करें।",
+  "readDocumentDialog.error.key": "Google ने API कुंजी स्वीकार नहीं की (त्रुटि {status})। सेटिंग्स → दस्तावेज़ पढ़ना में कुंजी जाँचें।",
+  "readDocumentDialog.error.model": "मॉडल \"{model}\" नहीं मिला (त्रुटि 404)। सेटिंग्स → दस्तावेज़ पढ़ना में कोई और मॉडल चुनें।",
+  "readDocumentDialog.error.rejected": "Gemini ये फ़ाइलें नहीं पढ़ सका (त्रुटि {status})। साफ़ फ़ोटो, कम पेज या छोटी फ़ाइल आज़माएँ।",
+  "readDocumentDialog.error.empty": "Gemini ने जवाब दिया, पर बिना पाठ के। फिर कोशिश करें या साफ़ पेज भेजें।",
+  "readDocumentDialog.error.other": "Gemini ने त्रुटि लौटाई ({status})। बाद में फिर कोशिश करें।",
+  "readDocumentDialog.providerSaid": "Gemini का संदेश: {detail}",
+  "readDocumentDialog.retrying": "Gemini व्यस्त है, फिर कोशिश हो रही है ({n}/{m})…",
+  "readDocumentDialog.tryAgain": "फिर कोशिश करें",
+  "readDocumentDialog.selected": "चुनी गई: {files}",
+  "readDocumentDialog.pdfLocal": "लैब रिपोर्ट वाली PDF या टेक्स्ट फ़ाइल पहले इसी डिवाइस पर पढ़ी जाती है; Gemini को तभी भेजी जाती है जब यहाँ न पढ़ी जा सके।"
 }

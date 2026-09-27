@@ -746,5 +746,18 @@
   "timelineImport.columnsIncluded": "{m} sütundan {n} tanesi içe aktarılıyor",
   "timelineImport.includeColumn": "{column} sütununu içe aktar",
   "timelineImport.adds": "Ölçüm",
-  "timelineImport.leftOut": "Dışarıda bırakılan: {list}"
+  "timelineImport.leftOut": "Dışarıda bırakılan: {list}",
+  "readDocumentDialog.error.busy": "Gemini aşırı yüklü veya kısa süreliğine kullanılamıyor (hata {status}), iki yeniden denemeden sonra bile. Hiçbir şey kaydedilmedi. Bir dakika sonra tekrar deneyin veya Ayarlar'dan başka bir model seçin.",
+  "readDocumentDialog.error.quota": "Gemini anahtarınız istek veya günlük sınırına ulaştı (hata 429). Biraz bekleyip tekrar deneyin ya da ücretli bir projenin anahtarını kullanın.",
+  "readDocumentDialog.error.network": "Google Gemini'ye ulaşılamadı. İnternet bağlantısını kontrol edip tekrar deneyin.",
+  "readDocumentDialog.error.key": "Google API anahtarını kabul etmedi (hata {status}). Anahtarı Ayarlar → Belge okuma bölümünden kontrol edin.",
+  "readDocumentDialog.error.model": "\"{model}\" modeli bulunamadı (hata 404). Ayarlar → Belge okuma bölümünden başka bir model seçin.",
+  "readDocumentDialog.error.rejected": "Gemini bu dosyaları okuyamadı (hata {status}). Daha net fotoğraflar, daha az sayfa veya daha küçük bir dosya deneyin.",
+  "readDocumentDialog.error.empty": "Gemini yanıt verdi ama metin yok. Tekrar deneyin veya daha net sayfalar kullanın.",
+  "readDocumentDialog.error.other": "Gemini bir hata döndürdü ({status}). Daha sonra tekrar deneyin.",
+  "readDocumentDialog.providerSaid": "Gemini'nin mesajı: {detail}",
+  "readDocumentDialog.retrying": "Gemini meşgul, yeniden deneniyor ({n}/{m})…",
+  "readDocumentDialog.tryAgain": "Tekrar dene",
+  "readDocumentDialog.selected": "Seçilen: {files}",
+  "readDocumentDialog.pdfLocal": "Tahlil sonucu olan bir PDF veya metin dosyası önce bu cihazda okunur; yalnızca burada okunamazsa Gemini'ye gider."
 }

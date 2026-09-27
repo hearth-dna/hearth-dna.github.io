@@ -746,5 +746,18 @@
   "timelineImport.columnsIncluded": "导入 {m} 列中的 {n} 列",
   "timelineImport.includeColumn": "导入列“{column}”",
   "timelineImport.adds": "读数",
-  "timelineImport.leftOut": "未导入：{list}"
+  "timelineImport.leftOut": "未导入：{list}",
+  "readDocumentDialog.error.busy": "Gemini 负载过高或暂时不可用（错误 {status}），重试两次后仍失败。没有保存任何内容。请一分钟后重试，或在设置中选择其他模型。",
+  "readDocumentDialog.error.quota": "您的 Gemini 密钥已达到请求上限或每日上限（错误 429）。请稍等后重试，或使用付费项目的密钥。",
+  "readDocumentDialog.error.network": "无法连接 Google Gemini。请检查网络连接后重试。",
+  "readDocumentDialog.error.key": "Google 未接受该 API 密钥（错误 {status}）。请在 设置 → 文档读取 中检查密钥。",
+  "readDocumentDialog.error.model": "找不到模型“{model}”（错误 404）。请在 设置 → 文档读取 中选择其他模型。",
+  "readDocumentDialog.error.rejected": "Gemini 无法读取这些文件（错误 {status}）。请尝试更清晰的照片、更少的页数或更小的文件。",
+  "readDocumentDialog.error.empty": "Gemini 已回复，但没有任何文字。请重试，或使用更清晰的页面。",
+  "readDocumentDialog.error.other": "Gemini 返回了错误（{status}）。请稍后重试。",
+  "readDocumentDialog.providerSaid": "Gemini 的说明：{detail}",
+  "readDocumentDialog.retrying": "Gemini 繁忙，正在重试（第 {n}/{m} 次）…",
+  "readDocumentDialog.tryAgain": "重试",
+  "readDocumentDialog.selected": "已选择：{files}",
+  "readDocumentDialog.pdfLocal": "化验结果的 PDF 或文本文件会先在本设备上读取；只有在这里读不了时才会发送给 Gemini。"
 }

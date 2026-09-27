@@ -746,5 +746,18 @@
   "timelineImport.columnsIncluded": "{m} میں سے {n} کالم درآمد ہوں گے",
   "timelineImport.includeColumn": "کالم {column} درآمد کریں",
   "timelineImport.adds": "ریڈنگز",
-  "timelineImport.leftOut": "چھوڑے گئے: {list}"
+  "timelineImport.leftOut": "چھوڑے گئے: {list}",
+  "readDocumentDialog.error.busy": "Gemini پر بوجھ زیادہ ہے یا وہ عارضی طور پر دستیاب نہیں (خرابی {status})، دو بار دوبارہ کوشش کے بعد بھی۔ کچھ محفوظ نہیں ہوا۔ ایک منٹ بعد دوبارہ کوشش کریں یا ترتیبات میں کوئی اور ماڈل چنیں۔",
+  "readDocumentDialog.error.quota": "آپ کی Gemini کلید درخواستوں یا روزانہ کی حد تک پہنچ گئی ہے (خرابی 429)۔ تھوڑا انتظار کر کے دوبارہ کوشش کریں، یا کسی ادائیگی والے پراجیکٹ کی کلید استعمال کریں۔",
+  "readDocumentDialog.error.network": "Google Gemini تک رسائی نہیں ہو سکی۔ انٹرنیٹ کنکشن جانچ کر دوبارہ کوشش کریں۔",
+  "readDocumentDialog.error.key": "Google نے API کلید قبول نہیں کی (خرابی {status})۔ ترتیبات ← دستاویز پڑھنا میں کلید جانچیں۔",
+  "readDocumentDialog.error.model": "ماڈل \"{model}\" نہیں ملا (خرابی 404)۔ ترتیبات ← دستاویز پڑھنا میں کوئی اور ماڈل چنیں۔",
+  "readDocumentDialog.error.rejected": "Gemini یہ فائلیں نہیں پڑھ سکا (خرابی {status})۔ صاف تصاویر، کم صفحات یا چھوٹی فائل آزمائیں۔",
+  "readDocumentDialog.error.empty": "Gemini نے جواب دیا لیکن متن کے بغیر۔ دوبارہ کوشش کریں یا صاف صفحات بھیجیں۔",
+  "readDocumentDialog.error.other": "Gemini نے خرابی لوٹائی ({status})۔ بعد میں دوبارہ کوشش کریں۔",
+  "readDocumentDialog.providerSaid": "Gemini کا پیغام: {detail}",
+  "readDocumentDialog.retrying": "Gemini مصروف ہے، دوبارہ کوشش ({n} از {m})…",
+  "readDocumentDialog.tryAgain": "دوبارہ کوشش کریں",
+  "readDocumentDialog.selected": "منتخب: {files}",
+  "readDocumentDialog.pdfLocal": "لیب رپورٹ والی PDF یا ٹیکسٹ فائل پہلے اسی آلے پر پڑھی جاتی ہے؛ Gemini کو صرف تب جاتی ہے جب یہاں نہ پڑھی جا سکے۔"
 }

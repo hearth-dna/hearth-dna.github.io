@@ -746,5 +746,18 @@
   "timelineImport.columnsIncluded": "{m} 列中 {n} 列を取り込み",
   "timelineImport.includeColumn": "列「{column}」を取り込む",
   "timelineImport.adds": "件数",
-  "timelineImport.leftOut": "除外: {list}"
+  "timelineImport.leftOut": "除外: {list}",
+  "readDocumentDialog.error.busy": "Gemini が混雑しているか一時的に利用できません（エラー {status}）。2 回再試行しても失敗しました。何も保存されていません。1 分ほどしてから再試行するか、設定で別のモデルを選んでください。",
+  "readDocumentDialog.error.quota": "Gemini キーがリクエスト上限または 1 日の上限に達しました（エラー 429）。少し待ってから再試行するか、有料プロジェクトのキーを使ってください。",
+  "readDocumentDialog.error.network": "Google Gemini に接続できませんでした。インターネット接続を確認して再試行してください。",
+  "readDocumentDialog.error.key": "Google が API キーを受け付けませんでした（エラー {status}）。設定 → 書類の読み取りでキーを確認してください。",
+  "readDocumentDialog.error.model": "モデル「{model}」が見つかりません（エラー 404）。設定 → 書類の読み取りで別のモデルを選んでください。",
+  "readDocumentDialog.error.rejected": "Gemini はこれらのファイルを読めませんでした（エラー {status}）。より鮮明な写真、少ないページ数、または小さいファイルでお試しください。",
+  "readDocumentDialog.error.empty": "Gemini は応答しましたが、テキストがありませんでした。再試行するか、より鮮明なページでお試しください。",
+  "readDocumentDialog.error.other": "Gemini がエラーを返しました（{status}）。後でもう一度お試しください。",
+  "readDocumentDialog.providerSaid": "Gemini のメッセージ: {detail}",
+  "readDocumentDialog.retrying": "Gemini が混雑中のため再試行しています（{n}/{m}）…",
+  "readDocumentDialog.tryAgain": "再試行",
+  "readDocumentDialog.selected": "選択中: {files}",
+  "readDocumentDialog.pdfLocal": "検査結果の PDF やテキストファイルは、まずこの端末で読み取ります。ここで読めない場合のみ Gemini に送ります。"
 }

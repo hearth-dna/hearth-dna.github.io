@@ -746,5 +746,18 @@
   "timelineImport.columnsIncluded": "{n} van {m} kolommen geïmporteerd",
   "timelineImport.includeColumn": "Kolom {column} importeren",
   "timelineImport.adds": "Metingen",
-  "timelineImport.leftOut": "Weggelaten: {list}"
+  "timelineImport.leftOut": "Weggelaten: {list}",
+  "readDocumentDialog.error.busy": "Gemini is overbelast of even niet bereikbaar (fout {status}), ook na twee nieuwe pogingen. Er is niets opgeslagen. Probeer het over een minuut opnieuw of kies een ander model in Instellingen.",
+  "readDocumentDialog.error.quota": "Je Gemini-sleutel heeft zijn aanvraag- of daglimiet bereikt (fout 429). Wacht even en probeer opnieuw, of gebruik een sleutel van een betaald project.",
+  "readDocumentDialog.error.network": "Google Gemini is niet bereikbaar. Controleer de internetverbinding en probeer opnieuw.",
+  "readDocumentDialog.error.key": "Google accepteerde de API-sleutel niet (fout {status}). Controleer de sleutel in Instellingen → Documenten lezen.",
+  "readDocumentDialog.error.model": "Het model ‘{model}’ is niet gevonden (fout 404). Kies een ander model in Instellingen → Documenten lezen.",
+  "readDocumentDialog.error.rejected": "Gemini kon deze bestanden niet lezen (fout {status}). Probeer scherpere foto's, minder pagina's of een kleiner bestand.",
+  "readDocumentDialog.error.empty": "Gemini antwoordde, maar zonder tekst. Probeer opnieuw, of met scherpere pagina's.",
+  "readDocumentDialog.error.other": "Gemini gaf een fout ({status}). Probeer het later opnieuw.",
+  "readDocumentDialog.providerSaid": "Gemini zei: {detail}",
+  "readDocumentDialog.retrying": "Gemini is bezet, opnieuw proberen ({n} van {m})…",
+  "readDocumentDialog.tryAgain": "Opnieuw proberen",
+  "readDocumentDialog.selected": "Gekozen: {files}",
+  "readDocumentDialog.pdfLocal": "Een pdf of tekstbestand met labuitslagen wordt eerst op dit apparaat gelezen; het gaat alleen naar Gemini als dat hier niet lukt."
 }

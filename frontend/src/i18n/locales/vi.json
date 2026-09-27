@@ -746,5 +746,18 @@
   "timelineImport.columnsIncluded": "Nhập {n} trên {m} cột",
   "timelineImport.includeColumn": "Nhập cột {column}",
   "timelineImport.adds": "Giá trị",
-  "timelineImport.leftOut": "Bỏ qua: {list}"
+  "timelineImport.leftOut": "Bỏ qua: {list}",
+  "readDocumentDialog.error.busy": "Gemini đang quá tải hoặc tạm thời không khả dụng (lỗi {status}), kể cả sau hai lần thử lại. Chưa có gì được lưu. Hãy thử lại sau một phút hoặc chọn mô hình khác trong Cài đặt.",
+  "readDocumentDialog.error.quota": "Khóa Gemini của bạn đã chạm giới hạn yêu cầu hoặc giới hạn ngày (lỗi 429). Hãy đợi một chút rồi thử lại, hoặc dùng khóa của dự án trả phí.",
+  "readDocumentDialog.error.network": "Không kết nối được Google Gemini. Hãy kiểm tra kết nối internet và thử lại.",
+  "readDocumentDialog.error.key": "Google không chấp nhận khóa API (lỗi {status}). Hãy kiểm tra khóa trong Cài đặt → Đọc tài liệu.",
+  "readDocumentDialog.error.model": "Không tìm thấy mô hình \"{model}\" (lỗi 404). Hãy chọn mô hình khác trong Cài đặt → Đọc tài liệu.",
+  "readDocumentDialog.error.rejected": "Gemini không đọc được các tệp này (lỗi {status}). Hãy thử ảnh rõ hơn, ít trang hơn hoặc tệp nhỏ hơn.",
+  "readDocumentDialog.error.empty": "Gemini đã trả lời nhưng không có văn bản. Hãy thử lại hoặc dùng trang rõ hơn.",
+  "readDocumentDialog.error.other": "Gemini trả về lỗi ({status}). Hãy thử lại sau.",
+  "readDocumentDialog.providerSaid": "Gemini cho biết: {detail}",
+  "readDocumentDialog.retrying": "Gemini đang bận, đang thử lại ({n}/{m})…",
+  "readDocumentDialog.tryAgain": "Thử lại",
+  "readDocumentDialog.selected": "Đã chọn: {files}",
+  "readDocumentDialog.pdfLocal": "Tệp PDF hoặc văn bản kết quả xét nghiệm được đọc trên thiết bị này trước; chỉ gửi tới Gemini nếu không đọc được ở đây."
 }
