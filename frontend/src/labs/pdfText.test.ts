@@ -60,6 +60,23 @@ describe('linesFromItems', () => {
       ]),
     ).toEqual(['Glucose\t6.1', 'HbA1c\t5.9'])
   })
+
+  it('reads a raised exponent as part of its line', () => {
+    const it = (str: string, x: number, y: number, size = 10): TextItem => ({
+      str,
+      transform: [size, 0, 0, size, x, y],
+      width: str.length * size * 0.5,
+    })
+    expect(
+      linesFromItems([
+        it('WBC', 50, 700),
+        it('6.5', 250, 700),
+        it('x10', 330, 700),
+        it('9', 345, 703.5, 6),
+        it('/L', 348, 700),
+      ]),
+    ).toEqual(['WBC\t6.5\tx10^9/L'])
+  })
 })
 
 describe('a text PDF, read locally', () => {

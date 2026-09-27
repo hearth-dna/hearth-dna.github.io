@@ -27,15 +27,18 @@ const SUPERSCRIPT: Record<string, string> = {
   '⁹': '9',
 }
 
-/** A printed unit as a lookup key: lower case, no spaces, one micro sign, 10⁹ → 10^9. */
+/**
+ * A printed unit as a lookup key: lower case, no spaces, one micro sign, and every spelling of a
+ * power of ten (×10⁹, x10E9, *10*9, х10^9 with a Cyrillic х) as a bare 10^9.
+ */
 export function unitKey(printed: string): string {
   return printed
     .replace(/10([⁰¹²³⁴⁵⁶⁷⁸⁹]+)/g, (_, d: string) => `10^${[...d].map((c) => SUPERSCRIPT[c]).join('')}`)
     .normalize('NFKC')
     .toLowerCase()
     .replace(/[μ]/g, 'µ')
-    .replace(/×/g, 'x')
     .replace(/\s+/g, '')
+    .replace(/^[x×х*·]?10(?:\^|\*\*?|e)(\d+)/, '10^$1')
 }
 
 /** A printed test name as a lookup key: lower case, brackets and punctuation as spaces. */
@@ -127,12 +130,19 @@ export function parseRef(printed: string): { low: number | null; high: number | 
   return { low: null, high: null }
 }
 
-/** A printed flag: H/L, ↑/↓, high/low, выше/ниже, a star. */
+/**
+ * Arrows drawn with a symbol font whose PDF has no Unicode map, so the text layer holds the
+ * font's letter: Wingdings 3 draws ▲▼ as p q, Wingdings ⬆⬇ as é ê.
+ */
+const SYMBOL_ARROWS: Record<string, LabRow['flag']> = { p: 'H', q: 'L', é: 'H', ê: 'L' }
+
+/** A printed flag: H/L, ↑/↓, ▲/▼, high/low, выше/ниже, a star. */
 export function parseFlag(printed: string): LabRow['flag'] {
   const s = printed.trim().toLowerCase()
   if (!s) return ''
-  if (/^(h|hh|high|↑|\*|\+|выше|повыш|в)/.test(s)) return 'H'
-  if (/^(l|ll|low|↓|ниже|пониж|н)/.test(s)) return 'L'
+  if (printed.trim() in SYMBOL_ARROWS) return SYMBOL_ARROWS[printed.trim()]
+  if (/^(h|hh|high|↑|▲|\*|\+|выше|повыш|в)/.test(s)) return 'H'
+  if (/^(l|ll|low|↓|▼|ниже|пониж|н)/.test(s)) return 'L'
   return ''
 }
 

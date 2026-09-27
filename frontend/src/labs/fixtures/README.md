@@ -10,4 +10,4 @@ Invented lab results for the reader tests. No real person's results belong here 
 | `ru-biochem.txt` | A Russian biochemistry and blood count: decimal commas, `↑`, `до 41`, `< 5,2`, `×10⁹/л`, section headings. |
 | `lipid-us.csv` | A US lipid panel export in mg/dL with a header row. |
 | `lis-export.tsv` | A tab-separated lab-system export with a Russian header row. |
-
+| `cbc-ru-pdf.txt` | A Russian blood count as a PDF's text layer gives it: the unit after the reference range, `▲`/`▼` from a Wingdings 3 font read as `p`/`q`, `х10^9/л` with a Cyrillic `х`, one unit wrapped onto the next line. |
