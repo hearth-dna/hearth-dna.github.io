@@ -5795,7 +5795,6 @@
     "ед/л",
     "ме/л",
     "е/л",
-    "ед./л",
     "units/l",
     "me/l"
    ]
@@ -5853,7 +5852,6 @@
     "сек",
     "с",
     "seconds",
-    "сек.",
     "secs"
    ]
   },
@@ -5881,5 +5879,5 @@
   "Reviewed entries: curated in the family_dna repository",
   "LOINC codes: copyright Regenstrief Institute, Inc., available at no cost at loinc.org"
  ],
- "sha256": "8ae3eebcce55f389f3189feaea6f8a8563b30a2bcf3bdd08e280f45f2825a645"
+ "sha256": "cee084cfb59e36b1faa539bde9dae7b5938e9d288019cbd4a441a0a262c5af26"
 }
