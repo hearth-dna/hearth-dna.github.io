@@ -9,6 +9,7 @@ import {
   parseRef,
   parseValue,
   recogniseAnalyte,
+  siSignature,
 } from './normalise'
 
 const kb = JSON.parse(readFileSync(`${__dirname}/../../public/kb.json`, 'utf8')) as Kb
@@ -46,8 +47,28 @@ describe('units', () => {
     expect(normaliseUnit(kb, 'Ед/л')).toBe('U/L')
     expect(normaliseUnit(kb, 'мкМЕ/мл')).toBe('mIU/L')
     expect(normaliseUnit(kb, 'μmol/L')).toBe('µmol/L')
+    expect(normaliseUnit(kb, 'х10^9/л')).toBe('10^9/L')
+    expect(normaliseUnit(kb, '*10*12/л')).toBe('10^12/L')
+    expect(normaliseUnit(kb, 'x10³/µL')).toBe('10^9/L')
+    expect(normaliseUnit(kb, 'T/L')).toBe('10^12/L')
+    expect(normaliseUnit(kb, 'mm/1h')).toBe('mm/h')
+    expect(normaliseUnit(kb, 'фл.')).toBe('fL')
+    expect(normaliseUnit(kb, 'Ед./л')).toBe('U/L')
+    expect(normaliseUnit(kb, 'мл/мин/1.73м2')).toBe('mL/min/1.73m²')
     expect(normaliseUnit(kb, 'furlongs')).toBe('')
     expect(normaliseUnit(kb, '')).toBe('')
+  })
+  it('works out an unlisted spelling from its SI prefixes', () => {
+    expect(siSignature('нмоль/мл')).toBe('mol/L -6')
+    expect(normaliseUnit(kb, 'пмоль/мл')).toBe('nmol/L')
+    expect(normaliseUnit(kb, 'нмоль/мл')).toBe('µmol/L')
+    expect(normaliseUnit(kb, 'мг/мл')).toBe('g/L')
+    expect(normaliseUnit(kb, 'ng/dL')).toBe('ng/dL')
+    expect(normaliseUnit(kb, 'pg/µl')).toBe('ng/mL')
+    expect(normaliseUnit(kb, 'мкл')).toBe('')
+    // mg/L and µg/mL are one size but two catalogue units: an unlisted spelling of it is not guessed.
+    expect(normaliseUnit(kb, 'ng/µl')).toBe('')
+    expect(siSignature('ед/л')).toBeNull()
   })
 })
 
@@ -72,6 +93,9 @@ describe('values, ranges and flags', () => {
     expect(parseFlag('↑')).toBe('H')
     expect(parseFlag('L')).toBe('L')
     expect(parseFlag('ниже')).toBe('L')
+    expect(parseFlag('p')).toBe('H')
+    expect(parseFlag('q')).toBe('L')
+    expect(parseFlag('▼')).toBe('L')
     expect(parseFlag('')).toBe('')
   })
 })

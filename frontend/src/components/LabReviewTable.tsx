@@ -75,6 +75,12 @@ export function LabReviewTable({
         .sort((a, b) => a.name.localeCompare(b.name, lang)),
     [kb, lang],
   )
+  // The units a test is reported in, its canonical one first: offered in the unit field, and the
+  // placeholder shows the unit an empty field is read in.
+  const unitsOf = (id: string) => {
+    const a = kb.analytes.find((x) => x.id === id)
+    return a ? [a.unit, ...Object.keys(a.units)] : []
+  }
   const set = (i: number, patch: Partial<Editable>) =>
     setRows(rows.map((r, j) => (j === i ? { ...r, ...patch } : r)))
   const chosen = read.filter((_, i) => rows[i].include)
@@ -178,9 +184,18 @@ export function LabReviewTable({
                   <input
                     aria-label={t('healthLog.unit')}
                     size={8}
+                    list={`${rows[i].id}-units`}
+                    placeholder={r.analyte ? unitsOf(r.analyte)[0] : undefined}
                     value={rows[i].unit ?? ''}
                     onChange={(e) => set(i, { unit: e.target.value })}
                   />
+                  {r.analyte && (
+                    <datalist id={`${rows[i].id}-units`}>
+                      {unitsOf(r.analyte).map((u) => (
+                        <option key={u} value={u} />
+                      ))}
+                    </datalist>
+                  )}
                 </td>
                 <td>
                   <input

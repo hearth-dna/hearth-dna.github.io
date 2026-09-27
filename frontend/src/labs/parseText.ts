@@ -32,7 +32,8 @@ const TIME = /\b([01]\d|2[0-3]):([0-5]\d)\b/
 /** Lines whose date is someone's birthday or a print stamp, never the sample date. */
 const NOT_SAMPLE_DATE = /birth|dob|born|рожд|возраст|age|printed|печат/i
 const SAMPLE_DATE = /collect|sample|drawn|taken|specimen|date of test|взят|забор|дата|date/i
-const FLAG_TAIL = /\s*(↑|↓|\*+|\b[HL]\b|\bHH\b|\bLL\b)\s*$/
+/** A flag printed after the value; p and q are ▲ ▼ from a symbol font (`parseFlag`). */
+const FLAG_TAIL = /\s*(↑|↓|▲|▼|\*+|\b[HLpq]\b|\bHH\b|\bLL\b)\s*$/
 
 function reportDate(lines: string[]): { date: string; time: string } {
   const dated = lines.filter((l) => DATE.test(l) && !NOT_SAMPLE_DATE.test(l))
@@ -76,17 +77,18 @@ function freeLine(kb: Kb, line: string): RawLabRow | null {
       cs[0],
     )
     if (!m) return null
-    cs = [m[1], m[2], ...(m[3] ? m[3].split(/\s+(?=\S*\d)|\s+(?=[↑↓*]|[HL]\b)/) : [])]
+    cs = [m[1], m[2], ...(m[3] ? m[3].split(/\s+(?=\S*\d)|\s+(?=[↑↓▲▼*]|[HLpq]\b)/) : [])]
   }
   const at = cs.findIndex((c, i) => i > 0 && isNumber(c.replace(FLAG_TAIL, '')))
   if (at < 1 || !hasLetter(cs.slice(0, at).join(' '))) return null
   const row: RawLabRow = { name: cs.slice(0, at).join(' '), ...splitFlag(cs[at]) }
+  // Columns come in any order: many reports print the unit after the reference range.
   for (const c of cs.slice(at + 1)) {
     const r = parseRef(c)
-    if (!row.unit && !row.ref && normaliseUnit(kb, c)) row.unit = c
+    if (!row.unit && normaliseUnit(kb, c)) row.unit = c
     else if (!row.ref && (r.low !== null || r.high !== null)) row.ref = c
     else if (!row.flag && parseFlag(c)) row.flag = c
-    else if (!row.unit && !row.ref && /[/%]|^[\p{L}µμ]{1,8}$/u.test(c)) row.unit = c
+    else if (!row.unit && (row.ref ? /[/%]/ : /[/%]|^[\p{L}µμ]{2,8}$/u).test(c)) row.unit = c
   }
   return row
 }
@@ -115,6 +117,8 @@ export function parseLabText(kb: Kb, text: string): TextParse {
   const lines = text.split(/\r?\n/)
   const { date, time } = reportDate(lines)
   const rows: LabRow[] = []
+  const raws: RawLabRow[] = []
+  let afterRow = false
   let table: ReturnType<typeof header> = null
   let section = ''
   let candidates = 0
@@ -129,15 +133,27 @@ export function parseLabText(kb: Kb, text: string): TextParse {
     // A header aligned with spaces: columns cannot be trusted to line up, so the free-line reader,
     // which places cells by what they look like, takes the rows under it.
     if (header(line.trim().replace(/\s{2,}/g, '\t'))) continue
-    if (hasLetter(line) && /\d/.test(line) && !NOT_SAMPLE_DATE.test(line) && !DATE.test(line)) candidates++
     const found = table ? tableRow(line, table) : freeLine(kb, line)
+    // A unit on a line of its own, right under a result printed without one: a wrapped cell.
+    const last = raws.at(-1)
+    if (!found && last && afterRow && !last.unit && normaliseUnit(kb, line)) {
+      rows[rows.length - 1] = normaliseRow(kb, { ...last, unit: line.trim() })
+      afterRow = false
+      continue
+    }
+    afterRow = false
+    if (hasLetter(line) && /\d/.test(line) && !NOT_SAMPLE_DATE.test(line) && !DATE.test(line)) candidates++
     if (!found) {
       const title = heading(line)
       if (title) section = title
       continue
     }
     const row = normaliseRow(kb, { ...found, section })
-    if (isResult(row)) rows.push(row)
+    if (isResult(row)) {
+      rows.push(row)
+      raws.push({ ...found, section })
+      afterRow = true
+    }
   }
   return { draft: { date, time, panel: singlePanel(kb, rows), rows }, candidates }
 }
