@@ -674,7 +674,6 @@
   "timelineImport.column": "Стовпець",
   "timelineImport.sample": "Перші значення",
   "timelineImport.isWhat": "Це",
-  "timelineImport.role.ignore": "пропустити",
   "timelineImport.role.date": "дата",
   "timelineImport.role.time": "час",
   "timelineImport.role.note": "нотатка",
@@ -691,7 +690,6 @@
   "timelineImport.ambiguousDate": "Усі дати у файлі читаються і як день/місяць, і як місяць/день. Перевірте формат дати вище.",
   "timelineImport.names": "Назви показників у файлі",
   "timelineImport.metric": "Показник",
-  "timelineImport.leaveOut": "пропустити",
   "timelineImport.custom": "інше…",
   "timelineImport.customName": "Назва",
   "timelineImport.unitInFile": "одиниця у файлі",
@@ -701,7 +699,7 @@
   "timelineImport.skip.notNumber": "Клітинок не з числом: {n}",
   "timelineImport.skip.pairIncomplete": "Рядків тиску лише з одним із двох чисел: {n}",
   "timelineImport.skip.duplicate": "Вимірювань уже в журналі: {n}",
-  "timelineImport.blocked": "{metric} в {unit} не можна перерахувати; виберіть правильну одиницю або пропустіть стовпець.",
+  "timelineImport.blocked": "{metric} в {unit} не перерахувати; виберіть правильну одиницю або зніміть позначку зі стовпця.",
   "timelineImport.import": "Імпортувати записи: {n}",
   "healthLog.importCsv": "Імпорт CSV…",
   "importPage.title": "Імпорт",
@@ -741,5 +739,12 @@
   "theme.dark": "Темна",
   "app.theme": "Тема: {mode}",
   "settingsPage.appearance": "Оформлення",
-  "settingsPage.appearanceNote": "«Системна» стежить за світлим або темним налаштуванням пристрою; «Світла» і «Темна» закріплюють її на цьому пристрої."
+  "settingsPage.appearanceNote": "«Системна» стежить за світлим або темним налаштуванням пристрою; «Світла» і «Темна» закріплюють її на цьому пристрої.",
+  "timelineImport.include": "Імпорт",
+  "timelineImport.includeAll": "Усі",
+  "timelineImport.includeNone": "Жодного",
+  "timelineImport.columnsIncluded": "Імпортується {n} з {m} стовпців",
+  "timelineImport.includeColumn": "Імпортувати стовпець {column}",
+  "timelineImport.adds": "Значень",
+  "timelineImport.leftOut": "Пропущено: {list}"
 }

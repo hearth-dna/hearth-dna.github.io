@@ -674,7 +674,6 @@
   "timelineImport.column": "Kolumna",
   "timelineImport.sample": "Pierwsze wartości",
   "timelineImport.isWhat": "To",
-  "timelineImport.role.ignore": "pomiń",
   "timelineImport.role.date": "data",
   "timelineImport.role.time": "godzina",
   "timelineImport.role.note": "notatka",
@@ -691,7 +690,6 @@
   "timelineImport.ambiguousDate": "Każdą datę w pliku da się odczytać jako dzień/miesiąc i jako miesiąc/dzień. Sprawdź format daty powyżej.",
   "timelineImport.names": "Nazwy pomiarów w pliku",
   "timelineImport.metric": "Pomiar",
-  "timelineImport.leaveOut": "pomiń",
   "timelineImport.custom": "coś innego…",
   "timelineImport.customName": "Nazwa",
   "timelineImport.unitInFile": "jednostka w pliku",
@@ -701,7 +699,7 @@
   "timelineImport.skip.notNumber": "Komórek, które nie są liczbą: {n}",
   "timelineImport.skip.pairIncomplete": "Wierszy ciśnienia z tylko jedną z dwóch wartości: {n}",
   "timelineImport.skip.duplicate": "Pomiarów już w dzienniku: {n}",
-  "timelineImport.blocked": "{metric} w {unit} nie da się przeliczyć; wybierz właściwą jednostkę albo pomiń kolumnę.",
+  "timelineImport.blocked": "Nie można przeliczyć {metric} w {unit}; wybierz właściwą jednostkę lub odznacz kolumnę.",
   "timelineImport.import": "Importuj wpisy: {n}",
   "healthLog.importCsv": "Import CSV…",
   "importPage.title": "Import",
@@ -741,5 +739,12 @@
   "theme.dark": "Ciemny",
   "app.theme": "Motyw: {mode}",
   "settingsPage.appearance": "Wygląd",
-  "settingsPage.appearanceNote": "Systemowy podąża za jasnym lub ciemnym ustawieniem urządzenia; Jasny i Ciemny utrzymują ten wygląd na tym urządzeniu."
+  "settingsPage.appearanceNote": "Systemowy podąża za jasnym lub ciemnym ustawieniem urządzenia; Jasny i Ciemny utrzymują ten wygląd na tym urządzeniu.",
+  "timelineImport.include": "Importuj",
+  "timelineImport.includeAll": "Wszystkie",
+  "timelineImport.includeNone": "Żadne",
+  "timelineImport.columnsIncluded": "Importowane kolumny: {n} z {m}",
+  "timelineImport.includeColumn": "Importuj kolumnę {column}",
+  "timelineImport.adds": "Odczyty",
+  "timelineImport.leftOut": "Pominięte: {list}"
 }

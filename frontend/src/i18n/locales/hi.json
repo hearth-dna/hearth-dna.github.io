@@ -674,7 +674,6 @@
   "timelineImport.column": "कॉलम",
   "timelineImport.sample": "पहले मान",
   "timelineImport.isWhat": "यह है",
-  "timelineImport.role.ignore": "छोड़ें",
   "timelineImport.role.date": "तारीख",
   "timelineImport.role.time": "समय",
   "timelineImport.role.note": "नोट",
@@ -691,7 +690,6 @@
   "timelineImport.ambiguousDate": "इस फ़ाइल की हर तारीख दिन/माह और माह/दिन दोनों तरह पढ़ी जा सकती है। ऊपर तारीख का प्रारूप जाँचें।",
   "timelineImport.names": "फ़ाइल में मापों के नाम",
   "timelineImport.metric": "माप",
-  "timelineImport.leaveOut": "छोड़ें",
   "timelineImport.custom": "कुछ और…",
   "timelineImport.customName": "नाम",
   "timelineImport.unitInFile": "फ़ाइल में इकाई",
@@ -701,7 +699,7 @@
   "timelineImport.skip.notNumber": "{n} कोष्ठ जो संख्या नहीं हैं",
   "timelineImport.skip.pairIncomplete": "दो में से केवल एक मान वाली {n} रक्तचाप पंक्तियाँ",
   "timelineImport.skip.duplicate": "{n} रीडिंग पहले से लॉग में हैं",
-  "timelineImport.blocked": "{unit} में {metric} को बदला नहीं जा सकता; सही इकाई चुनें या कॉलम छोड़ दें।",
+  "timelineImport.blocked": "{unit} में {metric} बदला नहीं जा सकता; सही इकाई चुनें या कॉलम का निशान हटाएँ।",
   "timelineImport.import": "{n} प्रविष्टियाँ आयात करें",
   "healthLog.importCsv": "CSV आयात करें…",
   "importPage.title": "आयात",
@@ -741,5 +739,12 @@
   "theme.dark": "गहरा",
   "app.theme": "थीम: {mode}",
   "settingsPage.appearance": "दिखावट",
-  "settingsPage.appearanceNote": "सिस्टम आपके डिवाइस की हल्की या गहरी सेटिंग का पालन करता है; हल्का और गहरा इस डिवाइस पर वही रूप रखते हैं।"
+  "settingsPage.appearanceNote": "सिस्टम आपके डिवाइस की हल्की या गहरी सेटिंग का पालन करता है; हल्का और गहरा इस डिवाइस पर वही रूप रखते हैं।",
+  "timelineImport.include": "आयात",
+  "timelineImport.includeAll": "सभी",
+  "timelineImport.includeNone": "कोई नहीं",
+  "timelineImport.columnsIncluded": "{m} में से {n} कॉलम आयात होंगे",
+  "timelineImport.includeColumn": "कॉलम {column} आयात करें",
+  "timelineImport.adds": "रीडिंग",
+  "timelineImport.leftOut": "छोड़े गए: {list}"
 }

@@ -674,7 +674,6 @@
   "timelineImport.column": "Kolom",
   "timelineImport.sample": "Nilai pertama",
   "timelineImport.isWhat": "Adalah",
-  "timelineImport.role.ignore": "lewati",
   "timelineImport.role.date": "tanggal",
   "timelineImport.role.time": "waktu",
   "timelineImport.role.note": "catatan",
@@ -691,7 +690,6 @@
   "timelineImport.ambiguousDate": "Setiap tanggal di file ini bisa dibaca sebagai hari/bulan maupun bulan/hari. Periksa format tanggal di atas.",
   "timelineImport.names": "Nama pengukuran di file",
   "timelineImport.metric": "Pengukuran",
-  "timelineImport.leaveOut": "lewati",
   "timelineImport.custom": "lainnya…",
   "timelineImport.customName": "Nama",
   "timelineImport.unitInFile": "satuan di file",
@@ -701,7 +699,7 @@
   "timelineImport.skip.notNumber": "{n} sel yang bukan angka",
   "timelineImport.skip.pairIncomplete": "{n} baris tekanan darah dengan hanya satu dari dua angka",
   "timelineImport.skip.duplicate": "{n} pembacaan sudah ada di catatan",
-  "timelineImport.blocked": "{metric} dalam {unit} tidak bisa dikonversi; pilih satuan yang benar atau lewati kolomnya.",
+  "timelineImport.blocked": "{metric} dalam {unit} tidak dapat dikonversi; pilih satuan yang benar atau hapus centang kolom.",
   "timelineImport.import": "Impor {n} entri",
   "healthLog.importCsv": "Impor CSV…",
   "importPage.title": "Impor",
@@ -741,5 +739,12 @@
   "theme.dark": "Gelap",
   "app.theme": "Tema: {mode}",
   "settingsPage.appearance": "Tampilan",
-  "settingsPage.appearanceNote": "Sistem mengikuti pengaturan terang atau gelap perangkat Anda; Terang dan Gelap mempertahankan tampilan itu di perangkat ini."
+  "settingsPage.appearanceNote": "Sistem mengikuti pengaturan terang atau gelap perangkat Anda; Terang dan Gelap mempertahankan tampilan itu di perangkat ini.",
+  "timelineImport.include": "Impor",
+  "timelineImport.includeAll": "Semua",
+  "timelineImport.includeNone": "Tidak ada",
+  "timelineImport.columnsIncluded": "{n} dari {m} kolom diimpor",
+  "timelineImport.includeColumn": "Impor kolom {column}",
+  "timelineImport.adds": "Pembacaan",
+  "timelineImport.leftOut": "Dikecualikan: {list}"
 }

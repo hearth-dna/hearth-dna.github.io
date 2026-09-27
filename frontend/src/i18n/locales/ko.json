@@ -674,7 +674,6 @@
   "timelineImport.column": "열",
   "timelineImport.sample": "첫 값",
   "timelineImport.isWhat": "항목",
-  "timelineImport.role.ignore": "제외",
   "timelineImport.role.date": "날짜",
   "timelineImport.role.time": "시간",
   "timelineImport.role.note": "메모",
@@ -691,7 +690,6 @@
   "timelineImport.ambiguousDate": "이 파일의 모든 날짜가 일/월과 월/일 두 가지로 읽힙니다. 위의 날짜 형식을 확인하세요.",
   "timelineImport.names": "파일의 측정 이름",
   "timelineImport.metric": "측정",
-  "timelineImport.leaveOut": "제외",
   "timelineImport.custom": "기타…",
   "timelineImport.customName": "이름",
   "timelineImport.unitInFile": "파일의 단위",
@@ -701,7 +699,7 @@
   "timelineImport.skip.notNumber": "숫자가 아닌 칸 {n}개",
   "timelineImport.skip.pairIncomplete": "두 값 중 하나만 있는 혈압 행 {n}개",
   "timelineImport.skip.duplicate": "이미 기록에 있는 측정값 {n}개",
-  "timelineImport.blocked": "{unit} 단위의 {metric}은(는) 환산할 수 없습니다. 올바른 단위를 고르거나 열을 제외하세요.",
+  "timelineImport.blocked": "{unit} 단위의 {metric}은(는) 변환할 수 없습니다. 올바른 단위를 고르거나 열 선택을 해제하세요.",
   "timelineImport.import": "{n}개 항목 가져오기",
   "healthLog.importCsv": "CSV 가져오기…",
   "importPage.title": "가져오기",
@@ -741,5 +739,12 @@
   "theme.dark": "다크",
   "app.theme": "테마: {mode}",
   "settingsPage.appearance": "화면 모드",
-  "settingsPage.appearanceNote": "시스템은 기기의 라이트/다크 설정을 따릅니다. 라이트와 다크는 이 기기에서 해당 모드를 유지합니다."
+  "settingsPage.appearanceNote": "시스템은 기기의 라이트/다크 설정을 따릅니다. 라이트와 다크는 이 기기에서 해당 모드를 유지합니다.",
+  "timelineImport.include": "가져오기",
+  "timelineImport.includeAll": "전체",
+  "timelineImport.includeNone": "없음",
+  "timelineImport.columnsIncluded": "{m}개 열 중 {n}개 가져옴",
+  "timelineImport.includeColumn": "{column} 열 가져오기",
+  "timelineImport.adds": "측정값",
+  "timelineImport.leftOut": "제외: {list}"
 }

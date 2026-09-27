@@ -674,7 +674,6 @@
   "timelineImport.column": "列",
   "timelineImport.sample": "前几个值",
   "timelineImport.isWhat": "是",
-  "timelineImport.role.ignore": "忽略",
   "timelineImport.role.date": "日期",
   "timelineImport.role.time": "时间",
   "timelineImport.role.note": "备注",
@@ -691,7 +690,6 @@
   "timelineImport.ambiguousDate": "此文件中的每个日期既可读作日/月也可读作月/日。请检查上方的日期格式。",
   "timelineImport.names": "文件中的测量名称",
   "timelineImport.metric": "测量",
-  "timelineImport.leaveOut": "忽略",
   "timelineImport.custom": "其他…",
   "timelineImport.customName": "名称",
   "timelineImport.unitInFile": "文件中的单位",
@@ -701,7 +699,7 @@
   "timelineImport.skip.notNumber": "{n} 个单元格不是数字",
   "timelineImport.skip.pairIncomplete": "{n} 行血压只有两个数值中的一个",
   "timelineImport.skip.duplicate": "{n} 次读数已在日志中",
-  "timelineImport.blocked": "无法换算单位为 {unit} 的 {metric}；请选择正确的单位或忽略此列。",
+  "timelineImport.blocked": "{unit} 单位的 {metric} 无法换算；请选择正确的单位，或取消勾选该列。",
   "timelineImport.import": "导入 {n} 条记录",
   "healthLog.importCsv": "导入 CSV…",
   "importPage.title": "导入",
@@ -741,5 +739,12 @@
   "theme.dark": "深色",
   "app.theme": "主题：{mode}",
   "settingsPage.appearance": "外观",
-  "settingsPage.appearanceNote": "“跟随系统”随设备的浅色或深色设置变化；“浅色”和“深色”在本设备上固定该外观。"
+  "settingsPage.appearanceNote": "“跟随系统”随设备的浅色或深色设置变化；“浅色”和“深色”在本设备上固定该外观。",
+  "timelineImport.include": "导入",
+  "timelineImport.includeAll": "全部",
+  "timelineImport.includeNone": "全不选",
+  "timelineImport.columnsIncluded": "导入 {m} 列中的 {n} 列",
+  "timelineImport.includeColumn": "导入列“{column}”",
+  "timelineImport.adds": "读数",
+  "timelineImport.leftOut": "未导入：{list}"
 }

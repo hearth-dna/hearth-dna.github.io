@@ -674,7 +674,6 @@
   "timelineImport.column": "কলাম",
   "timelineImport.sample": "প্রথম মানগুলো",
   "timelineImport.isWhat": "এটি",
-  "timelineImport.role.ignore": "বাদ দিন",
   "timelineImport.role.date": "তারিখ",
   "timelineImport.role.time": "সময়",
   "timelineImport.role.note": "নোট",
@@ -691,7 +690,6 @@
   "timelineImport.ambiguousDate": "এই ফাইলের প্রতিটি তারিখ দিন/মাস ও মাস/দিন দুইভাবেই পড়া যায়। ওপরে তারিখের ফরম্যাট দেখে নিন।",
   "timelineImport.names": "ফাইলে পরিমাপের নাম",
   "timelineImport.metric": "পরিমাপ",
-  "timelineImport.leaveOut": "বাদ দিন",
   "timelineImport.custom": "অন্য কিছু…",
   "timelineImport.customName": "নাম",
   "timelineImport.unitInFile": "ফাইলে একক",
@@ -701,7 +699,7 @@
   "timelineImport.skip.notNumber": "সংখ্যা নয় এমন {n}টি ঘর",
   "timelineImport.skip.pairIncomplete": "দুটি মানের মাত্র একটি থাকা {n}টি রক্তচাপ সারি",
   "timelineImport.skip.duplicate": "লগে আগে থেকেই থাকা {n}টি রিডিং",
-  "timelineImport.blocked": "{unit}-এ {metric} রূপান্তর করা যায় না; সঠিক একক বেছে নিন বা কলামটি বাদ দিন।",
+  "timelineImport.blocked": "{unit}-এ {metric} রূপান্তর করা যায় না; সঠিক একক বাছুন বা কলামের টিক তুলে দিন।",
   "timelineImport.import": "{n}টি এন্ট্রি ইমপোর্ট করুন",
   "healthLog.importCsv": "CSV ইমপোর্ট…",
   "importPage.title": "ইমপোর্ট",
@@ -741,5 +739,12 @@
   "theme.dark": "গাঢ়",
   "app.theme": "থিম: {mode}",
   "settingsPage.appearance": "চেহারা",
-  "settingsPage.appearanceNote": "সিস্টেম আপনার ডিভাইসের হালকা বা গাঢ় সেটিং অনুসরণ করে; হালকা ও গাঢ় এই ডিভাইসে সেই চেহারা রাখে।"
+  "settingsPage.appearanceNote": "সিস্টেম আপনার ডিভাইসের হালকা বা গাঢ় সেটিং অনুসরণ করে; হালকা ও গাঢ় এই ডিভাইসে সেই চেহারা রাখে।",
+  "timelineImport.include": "আমদানি",
+  "timelineImport.includeAll": "সব",
+  "timelineImport.includeNone": "কোনোটি না",
+  "timelineImport.columnsIncluded": "{m}টির মধ্যে {n}টি কলাম আমদানি হবে",
+  "timelineImport.includeColumn": "{column} কলাম আমদানি করুন",
+  "timelineImport.adds": "রিডিং",
+  "timelineImport.leftOut": "বাদ: {list}"
 }

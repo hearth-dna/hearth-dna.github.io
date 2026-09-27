@@ -9,6 +9,7 @@ import { parseTable } from '../text/table'
 import type { DateFormat } from '../timeline/dates'
 import {
   buildEntries,
+  type Column,
   type Mapping,
   type MetricMap,
   type Role,
@@ -20,8 +21,8 @@ import type { HealthEntry, Person } from '../types'
 import { ConsentForm } from './ConsentForm'
 
 const FORMATS: DateFormat[] = ['ymd', 'dmy', 'mdy', 'serial', 'unix']
-const WIDE_ROLES = ['ignore', 'date', 'time', 'note', 'metric'] as const
-const LONG_ROLES = ['ignore', 'date', 'time', 'note', 'name', 'value', 'unit'] as const
+const WIDE_ROLES = ['date', 'time', 'note', 'metric'] as const
+const LONG_ROLES = ['date', 'time', 'note', 'name', 'value', 'unit'] as const
 
 /** A target as one select value: `preset:weight`, `preset:blood-pressure:1`, `lab:glucose`, `custom`. */
 const targetValue = (t: Target) =>
@@ -42,8 +43,10 @@ function parseTarget(v: string, title: string): Target {
 /**
  * Import a CSV timeline for one person: weight, height, blood pressure, a lab value over time,
  * from a spreadsheet or a phone or device export. The user says what each column is (and, for a
- * one-reading-per-row export, what each metric name is); the preview shows exactly what will be
- * added, in the app's units, and what is left out and why. Local only: nothing leaves the device.
+ * one-reading-per-row export, what each metric name is) and unticks the columns and names to
+ * leave out, which keep their mapping for when they are ticked again. The preview shows exactly
+ * what will be added, in the app's units, how much each column brings in, and what is left out
+ * and why. Local only: nothing leaves the device.
  */
 export function TimelineImportDialog({
   person,
@@ -90,12 +93,18 @@ export function TimelineImportDialog({
     setMapping(suggestMapping(kb, table, presetNames))
   }
 
-  const setColumn = (i: number, role: Role) => {
+  const setColumns = (columns: Column[]) => {
     if (!mapping) return
-    const columns = mapping.columns.map((c, j) => (j === i ? role : c))
     const names = mapping.shape === 'long' ? suggestNames(kb, table, { columns }, presetNames) : {}
     setMapping({ ...mapping, columns, names: mapping.shape === 'long' ? { ...names, ...mapping.names } : {} })
   }
+  const setColumn = (i: number, role: Role) =>
+    mapping && setColumns(mapping.columns.map((c, j) => (j === i ? { ...role, skip: c.skip } : c)))
+  const include = (i: number, on: boolean) =>
+    mapping && setColumns(mapping.columns.map((c, j) => (j === i ? { ...c, skip: !on } : c)))
+  /** All or none; "none" keeps the date, since nothing can be imported without it. */
+  const includeAll = (on: boolean) =>
+    mapping && setColumns(mapping.columns.map((c) => ({ ...c, skip: !on && c.role !== 'date' })))
 
   const roleFor = (role: string, i: number): Role => {
     if (role === 'date') return { role, format: 'ymd' }
@@ -119,23 +128,19 @@ export function TimelineImportDialog({
     }
   }
 
-  const targetSelect = (m: MetricMap, onChange: (m: MetricMap | null) => void, allowNone = false) => (
+  const targetSelect = <M extends MetricMap>(m: M, onChange: (m: M) => void, disabled = false) => (
     <>
       <select
         aria-label={t('timelineImport.metric')}
-        value={m ? targetValue(m.target) : ''}
+        value={targetValue(m.target)}
+        disabled={disabled}
         onChange={(e) =>
-          onChange(
-            e.target.value === ''
-              ? null
-              : {
-                  ...m,
-                  target: parseTarget(e.target.value, m.target.kind === 'custom' ? m.target.title : ''),
-                },
-          )
+          onChange({
+            ...m,
+            target: parseTarget(e.target.value, m.target.kind === 'custom' ? m.target.title : ''),
+          })
         }
       >
-        {allowNone && <option value="">{t('timelineImport.leaveOut')}</option>}
         <optgroup label={t('charts.group.measurement')}>
           {MEASUREMENT_PRESETS.flatMap((p) =>
             p.pair
@@ -164,6 +169,7 @@ export function TimelineImportDialog({
         <input
           aria-label={t('timelineImport.customName')}
           placeholder={t('timelineImport.customName')}
+          disabled={disabled}
           value={m.target.title}
           onChange={(e) => onChange({ ...m, target: { kind: 'custom', title: e.target.value } })}
         />
@@ -172,6 +178,7 @@ export function TimelineImportDialog({
         aria-label={t('healthLog.unit')}
         placeholder={t('timelineImport.unitInFile')}
         size={8}
+        disabled={disabled}
         value={m.unit}
         onChange={(e) => onChange({ ...m, unit: e.target.value })}
       />
@@ -180,7 +187,14 @@ export function TimelineImportDialog({
 
   const reasons = new Map<string, number>()
   for (const x of result?.skipped ?? []) reasons.set(x.reason, (reasons.get(x.reason) ?? 0) + 1)
-  const hasDate = mapping?.columns.some((c) => c.role === 'date')
+  const hasDate = mapping?.columns.some((c) => c.role === 'date' && !c.skip)
+  const leftOut = mapping
+    ? [
+        ...table.header.filter((_, i) => mapping.columns[i].skip),
+        ...(mapping.shape === 'long' ? Object.keys(mapping.names).filter((n) => mapping.names[n].skip) : []),
+      ]
+    : []
+  const readings = (n: number | undefined) => (n ? String(n) : '—')
 
   return (
     <dialog ref={ref} onClose={onClose} className="wide">
@@ -230,11 +244,12 @@ export function TimelineImportDialog({
               value={mapping.shape}
               onChange={(e) => {
                 const shape = e.target.value as Mapping['shape']
-                const columns = mapping.columns.map((c) =>
-                  (shape === 'wide' ? LONG_ROLES : WIDE_ROLES).includes(c.role as never) &&
-                  !(shape === 'wide' ? WIDE_ROLES : LONG_ROLES).includes(c.role as never)
-                    ? ({ role: 'ignore' } as Role)
-                    : c,
+                // A role the other layout has no use for becomes a left-out note.
+                const columns = mapping.columns.map(
+                  (c): Column =>
+                    (shape === 'wide' ? WIDE_ROLES : LONG_ROLES).includes(c.role as never)
+                      ? c
+                      : { role: 'note', skip: true },
                 )
                 setMapping({
                   ...mapping,
@@ -248,13 +263,29 @@ export function TimelineImportDialog({
               <option value="long">{t('timelineImport.shape.long')}</option>
             </select>
           </label>
-          <div className="tablewrap mt-3">
+          <div className="toolbar mt-3">
+            <button type="button" className="small" onClick={() => includeAll(true)}>
+              {t('timelineImport.includeAll')}
+            </button>
+            <button type="button" className="small" onClick={() => includeAll(false)}>
+              {t('timelineImport.includeNone')}
+            </button>
+            <span className="muted">
+              {t('timelineImport.columnsIncluded', {
+                n: mapping.columns.filter((c) => !c.skip).length,
+                m: mapping.columns.length,
+              })}
+            </span>
+          </div>
+          <div className="tablewrap">
             <table className="healthtable labreview">
               <thead>
                 <tr>
+                  <th>{t('timelineImport.include')}</th>
                   <th>{t('timelineImport.column')}</th>
                   <th>{t('timelineImport.sample')}</th>
                   <th>{t('timelineImport.isWhat')}</th>
+                  <th>{t('timelineImport.adds')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -262,7 +293,15 @@ export function TimelineImportDialog({
                   const c = mapping.columns[i]
                   return (
                     // biome-ignore lint/suspicious/noArrayIndexKey: columns are positional and headers may repeat
-                    <tr key={i}>
+                    <tr key={i} className={c.skip ? 'skipped' : ''}>
+                      <td>
+                        <input
+                          type="checkbox"
+                          aria-label={t('timelineImport.includeColumn', { column: h })}
+                          checked={!c.skip}
+                          onChange={(e) => include(i, e.target.checked)}
+                        />
+                      </td>
                       <td>{h}</td>
                       <td className="muted">
                         {table.rows
@@ -272,9 +311,10 @@ export function TimelineImportDialog({
                           .join(' · ')}
                       </td>
                       <td>
-                        <div className="row" style={{ gap: '0.4rem' }}>
+                        <div className="row tight">
                           <select
                             aria-label={t('timelineImport.isWhat')}
+                            disabled={c.skip}
                             value={c.role}
                             onChange={(e) => setColumn(i, roleFor(e.target.value, i))}
                           >
@@ -287,13 +327,16 @@ export function TimelineImportDialog({
                           {c.role === 'date' && (
                             <select
                               aria-label={t('timelineImport.dateFormat')}
+                              disabled={c.skip}
                               value={c.format}
                               onChange={(e) =>
                                 setMapping({
                                   ...mapping,
                                   ambiguousDate: false,
                                   columns: mapping.columns.map((x, j) =>
-                                    j === i ? { role: 'date', format: e.target.value as DateFormat } : x,
+                                    j === i
+                                      ? { role: 'date', format: e.target.value as DateFormat, skip: x.skip }
+                                      : x,
                                   ),
                                 })
                               }
@@ -306,8 +349,17 @@ export function TimelineImportDialog({
                             </select>
                           )}
                           {c.role === 'metric' &&
-                            targetSelect(c.metric, (m) => m && setColumn(i, { role: 'metric', metric: m }))}
+                            targetSelect(
+                              c.metric,
+                              (m) => setColumn(i, { role: 'metric', metric: m }),
+                              c.skip,
+                            )}
                         </div>
+                      </td>
+                      <td className="muted nowrap">
+                        {mapping.shape === 'wide' && !c.skip && c.role === 'metric'
+                          ? readings(result?.perColumn[i])
+                          : '—'}
                       </td>
                     </tr>
                   )
@@ -320,13 +372,26 @@ export function TimelineImportDialog({
             <>
               <h3>{t('timelineImport.names')}</h3>
               {Object.entries(mapping.names).map(([name, m]) => (
-                <div key={name} className="row" style={{ gap: '0.4rem', marginBottom: '0.3rem' }}>
-                  <span style={{ minWidth: '14rem' }}>{name}</span>
+                <div key={name} className={`row tight namemap${m.skip ? ' skipped' : ''}`}>
+                  <label className="check m-0">
+                    <input
+                      type="checkbox"
+                      checked={!m.skip}
+                      onChange={(e) =>
+                        setMapping({
+                          ...mapping,
+                          names: { ...mapping.names, [name]: { ...m, skip: !e.target.checked } },
+                        })
+                      }
+                    />
+                    <span>{name}</span>
+                  </label>
                   {targetSelect(
-                    m ?? { target: { kind: 'custom', title: name }, unit: '' },
+                    m,
                     (next) => setMapping({ ...mapping, names: { ...mapping.names, [name]: next } }),
-                    true,
+                    m.skip,
                   )}
+                  <span className="muted nowrap">{m.skip ? '—' : readings(result?.perName[name])}</span>
                 </div>
               ))}
             </>
@@ -343,6 +408,9 @@ export function TimelineImportDialog({
                   {t(`timelineImport.skip.${reason}`, { n })}
                 </div>
               ))}
+              {leftOut.length > 0 && (
+                <div className="muted">{t('timelineImport.leftOut', { list: leftOut.join(', ') })}</div>
+              )}
               {result.blocked.map((b) => (
                 <div key={`${b.label}|${b.unit}`} className="danger">
                   {t('timelineImport.blocked', { metric: b.label, unit: b.unit })}
