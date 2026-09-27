@@ -27,15 +27,61 @@ const SUPERSCRIPT: Record<string, string> = {
   '⁹': '9',
 }
 
-/** A printed unit as a lookup key: lower case, no spaces, one micro sign, 10⁹ → 10^9. */
+/**
+ * A printed unit as a lookup key: lower case, no spaces, one micro sign, no abbreviation dots
+ * (фл., ед./л; the dot in 1.73 stays), and every spelling of a power of ten (×10⁹, x10E9, *10*9,
+ * х10^9 with a Cyrillic х) as a bare 10^9.
+ */
 export function unitKey(printed: string): string {
   return printed
     .replace(/10([⁰¹²³⁴⁵⁶⁷⁸⁹]+)/g, (_, d: string) => `10^${[...d].map((c) => SUPERSCRIPT[c]).join('')}`)
     .normalize('NFKC')
     .toLowerCase()
     .replace(/[μ]/g, 'µ')
-    .replace(/×/g, 'x')
     .replace(/\s+/g, '')
+    .replace(/\.(?!\d)/g, '')
+    .replace(/^[x×х*·]?10(?:\^|\*\*?|e)(\d+)/, '10^$1')
+}
+
+/** SI prefixes as powers of ten, Latin and Cyrillic. */
+const PREFIX: Record<string, number> = {
+  '': 0,
+  d: -1,
+  д: -1,
+  c: -2,
+  m: -3,
+  м: -3,
+  µ: -6,
+  u: -6,
+  mc: -6,
+  мк: -6,
+  n: -9,
+  н: -9,
+  p: -12,
+  п: -12,
+  f: -15,
+  ф: -15,
+}
+const BASE: Record<string, string> = { g: 'g', г: 'g', l: 'L', л: 'L', mol: 'mol', моль: 'mol' }
+const PREFIXED = new RegExp(
+  `^(${Object.keys(PREFIX)
+    .filter(Boolean)
+    .sort((a, b) => b.length - a.length)
+    .join('|')})?(${Object.keys(BASE).join('|')})$`,
+)
+
+/**
+ * A unit key built from SI prefixes on grams, litres and moles ("нмоль/мл", "fl", "mcg/dl") as
+ * its dimension and power of ten: "mol/L -6". Null for anything else.
+ */
+export function siSignature(key: string): string | null {
+  const parts = key.split('/')
+  if (parts.length > 2) return null
+  const read = parts.map((p) => PREFIXED.exec(p))
+  if (read.some((m) => !m)) return null
+  const [num, den] = read as RegExpExecArray[]
+  const exp = PREFIX[num[1] ?? ''] - (den ? PREFIX[den[1] ?? ''] : 0)
+  return `${BASE[num[2]]}${den ? `/${BASE[den[2]]}` : ''} ${exp}`
 }
 
 /** A printed test name as a lookup key: lower case, brackets and punctuation as spaces. */
@@ -53,6 +99,7 @@ interface Catalogue {
   /** Every name and synonym as tokens, for the fallback match. */
   phrases: { id: string; words: string[] }[]
   unitByAlias: Map<string, string>
+  unitBySi: Map<string, string | null>
 }
 
 const cache = new WeakMap<Kb, Catalogue>()
@@ -77,18 +124,32 @@ export function labCatalogue(kb: Kb): Catalogue {
     }
   }
   const unitByAlias = new Map<string, string>()
+  // Signature → unit, or null when two catalogue units share one (mg/L and µg/mL).
+  const unitBySi = new Map<string, string | null>()
   for (const u of kb.units) {
-    unitByAlias.set(unitKey(u.id), u.id)
-    for (const alias of u.aliases) unitByAlias.set(unitKey(alias), u.id)
+    for (const key of [u.id, ...u.aliases].map(unitKey)) {
+      unitByAlias.set(key, u.id)
+      const sig = siSignature(key)
+      if (sig) unitBySi.set(sig, unitBySi.has(sig) && unitBySi.get(sig) !== u.id ? null : u.id)
+    }
   }
-  const c = { byId: new Map(kb.analytes.map((a) => [a.id, a])), byName, phrases, unitByAlias }
+  const c = { byId: new Map(kb.analytes.map((a) => [a.id, a])), byName, phrases, unitByAlias, unitBySi }
   cache.set(kb, c)
   return c
 }
 
-/** The canonical spelling of a printed unit, or '' when the catalogue does not know it. */
-export const normaliseUnit = (kb: Kb, printed: string): string =>
-  printed.trim() ? (labCatalogue(kb).unitByAlias.get(unitKey(printed)) ?? '') : ''
+/**
+ * The canonical spelling of a printed unit, or '' when the catalogue does not know it. A spelling
+ * not listed is still known when its SI prefixes make it exactly one catalogue unit: пмоль/мл is
+ * nmol/L, мкг/л is ng/mL.
+ */
+export function normaliseUnit(kb: Kb, printed: string): string {
+  if (!printed.trim()) return ''
+  const c = labCatalogue(kb)
+  const key = unitKey(printed)
+  const sig = siSignature(key)
+  return c.unitByAlias.get(key) ?? (sig && c.unitBySi.get(sig)) ?? ''
+}
 
 const COMPARATOR: Record<string, LabRow['comparator']> = {
   '<': '<',
@@ -127,12 +188,19 @@ export function parseRef(printed: string): { low: number | null; high: number | 
   return { low: null, high: null }
 }
 
-/** A printed flag: H/L, ↑/↓, high/low, выше/ниже, a star. */
+/**
+ * Arrows drawn with a symbol font whose PDF has no Unicode map, so the text layer holds the
+ * font's letter: Wingdings 3 draws ▲▼ as p q, Wingdings ⬆⬇ as é ê.
+ */
+const SYMBOL_ARROWS: Record<string, LabRow['flag']> = { p: 'H', q: 'L', é: 'H', ê: 'L' }
+
+/** A printed flag: H/L, ↑/↓, ▲/▼, high/low, выше/ниже, a star. */
 export function parseFlag(printed: string): LabRow['flag'] {
   const s = printed.trim().toLowerCase()
   if (!s) return ''
-  if (/^(h|hh|high|↑|\*|\+|выше|повыш|в)/.test(s)) return 'H'
-  if (/^(l|ll|low|↓|ниже|пониж|н)/.test(s)) return 'L'
+  if (printed.trim() in SYMBOL_ARROWS) return SYMBOL_ARROWS[printed.trim()]
+  if (/^(h|hh|high|↑|▲|\*|\+|выше|повыш|в)/.test(s)) return 'H'
+  if (/^(l|ll|low|↓|▼|ниже|пониж|н)/.test(s)) return 'L'
   return ''
 }
 

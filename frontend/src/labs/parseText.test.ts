@@ -66,6 +66,22 @@ describe('parseLabText', () => {
     expect(candidates).toBe(8)
   })
 
+  it('reads a PDF blood count: unit after the range, symbol-font arrows, a wrapped unit', () => {
+    const { draft } = parse('cbc-ru-pdf.txt')
+    expect(draft.date).toBe('2026-02-08')
+    expect(pick(draft.rows)).toEqual(['wbc', 'hb', 'mcv', 'mono_pct', 'plt', 'esr'])
+    expect(draft.rows.map((r) => [r.unit, r.flag])).toEqual([
+      ['10^9/L', ''],
+      ['g/L', ''],
+      ['fL', 'H'],
+      ['%', 'H'],
+      ['10^9/L', 'L'],
+      ['mm/h', ''],
+    ])
+    expect(draft.rows[4]).toMatchObject({ value: 133, refLow: 150, refHigh: 400 })
+    expect(draft.rows.every((r) => r.issues.length === 0)).toBe(true)
+  })
+
   it('reads a CSV export by its header, and converts US units', () => {
     const { draft } = parse('lipid-us.csv')
     expect(pick(draft.rows)).toEqual(['chol_total', 'tg', 'hdl', 'ldl'])

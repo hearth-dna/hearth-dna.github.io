@@ -11,19 +11,24 @@ export interface TextItem {
   width: number
 }
 
+const size = (it: TextItem) => Math.abs(it.transform[3]) || 10
+
 /**
- * Items → lines: same baseline (within half a glyph) is one line, left to right; a horizontal gap
- * wider than about two spaces becomes a tab so columns stay columns for the parser.
+ * Items → lines: same baseline (within half a glyph of the larger text) is one line, left to
+ * right; a horizontal gap wider than about two spaces becomes a tab so columns stay columns for
+ * the parser. Smaller raised digits after a digit are an exponent: 10 and a raised 9 read 10^9.
  */
 export function linesFromItems(items: TextItem[]): string[] {
-  const rows: { y: number; items: TextItem[] }[] = []
+  const rows: { y: number; size: number; items: TextItem[] }[] = []
   for (const it of items) {
     if (!it.str.trim()) continue
     const y = it.transform[5]
-    const size = Math.abs(it.transform[3]) || 10
-    const row = rows.find((r) => Math.abs(r.y - y) < size / 2)
-    if (row) row.items.push(it)
-    else rows.push({ y, items: [it] })
+    const row = rows.find((r) => Math.abs(r.y - y) < Math.max(r.size, size(it)) / 2)
+    if (!row) rows.push({ y, size: size(it), items: [it] })
+    else {
+      row.items.push(it)
+      if (size(it) > row.size) Object.assign(row, { y, size: size(it) })
+    }
   }
   return rows
     .sort((a, b) => b.y - a.y)
@@ -33,9 +38,13 @@ export function linesFromItems(items: TextItem[]): string[] {
       let end = Number.NEGATIVE_INFINITY
       for (const it of sorted) {
         const x = it.transform[4]
-        const size = Math.abs(it.transform[3]) || 10
-        if (line) line += x - end > size ? '\t' : x - end > size / 8 ? ' ' : ''
-        line += it.str
+        const raised = size(it) < r.size * 0.85 && it.transform[5] - r.y > r.size * 0.2
+        if (raised && /^\d+$/.test(it.str.trim()) && /\d$/.test(line) && x - end < r.size / 2)
+          line += `^${it.str.trim()}`
+        else {
+          if (line) line += x - end > r.size ? '\t' : x - end > r.size / 8 ? ' ' : ''
+          line += it.str
+        }
         end = x + it.width
       }
       return line.trim()
