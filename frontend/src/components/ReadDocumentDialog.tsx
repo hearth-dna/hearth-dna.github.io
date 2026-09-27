@@ -298,7 +298,10 @@ export function ReadDocumentDialog({
           <ul>
             {parts.map((p) => (
               <li key={p.name}>
-                {t('readDocumentDialog.fileLine', { name: p.name, kb: Math.max(1, Math.round(p.bytes.length / 1024)) })}
+                {t('readDocumentDialog.fileLine', {
+                  name: p.name,
+                  kb: Math.max(1, Math.round(p.bytes.length / 1024)),
+                })}
               </li>
             ))}
           </ul>
