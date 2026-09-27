@@ -1,3 +1,4 @@
+import { detailsCell } from '../health/log'
 import { conditionLabel } from '../kb/conditions'
 import type { Finding, Kb } from '../kb/kb'
 import type { HealthEntry, Person } from '../types'
@@ -121,6 +122,7 @@ export const HEALTH_HEADER = [
   'flag',
   'value_text',
   'conditions',
+  'details',
   'tags',
   'source',
   'body',
@@ -149,6 +151,7 @@ export function healthTable(byPerson: { person: Person; entries: HealthEntry[] }
         e.flag,
         e.valueText,
         e.conditions.join('; '),
+        detailsCell(e.details),
         e.tags.join('; '),
         e.source,
         e.body,

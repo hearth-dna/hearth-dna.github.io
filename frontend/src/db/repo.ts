@@ -1,4 +1,4 @@
-import { formatTags, normTime, parseTags } from '../health/log'
+import { formatDetailsJson, formatTags, normTime, parseDetails, parseTags } from '../health/log'
 import type { BodySide, Call, HealthEntry, HealthKind, Person, Provider, Sex, SourceFile } from '../types'
 import type { Database, Row } from './db'
 
@@ -317,6 +317,7 @@ function rowToHealthEntry(r: Row): HealthEntry {
     flag: ((r.flag as string) ?? '') as HealthEntry['flag'],
     valueText: (r.value_text as string) ?? '',
     conditions: parseTags((r.conditions as string) ?? ''),
+    details: parseDetails((r.details as string) ?? ''),
     createdAt: r.created_at as string,
   }
 }
@@ -343,6 +344,7 @@ export interface HealthEntryInput {
   flag?: HealthEntry['flag']
   valueText?: string
   conditions?: string[]
+  details?: HealthEntry['details']
 }
 
 const HEALTH_INSERT_COLS = [
@@ -367,6 +369,7 @@ const HEALTH_INSERT_COLS = [
   'flag',
   'value_text',
   'conditions',
+  'details',
   'created_at',
 ]
 
@@ -390,6 +393,7 @@ function newHealthEntry(e: HealthEntryInput): HealthEntry {
     flag: '',
     valueText: '',
     conditions: [],
+    details: {},
     ...e,
   }
   entry.bodyPart = entry.bodyPart.trim().toLowerCase()
@@ -423,6 +427,7 @@ const healthRow = (e: HealthEntry): unknown[] => [
   e.flag,
   e.valueText,
   formatTags(e.conditions),
+  formatDetailsJson(e.details),
   e.createdAt,
 ]
 

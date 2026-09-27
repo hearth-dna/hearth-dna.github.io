@@ -137,6 +137,8 @@ export interface HealthEntry {
   valueText: string
   /** Condition ids from the kb (`Kb.conditions`) the user linked this entry to. */
   conditions: string[]
+  /** Structured symptom details by field id (health/presets.ts `DetailField`); {} when none. */
+  details: Record<string, number | string | true>
   createdAt: string
 }
 

@@ -99,6 +99,7 @@ const HEALTH_COLS = [
   'flag',
   'value_text',
   'conditions',
+  'details',
   'created_at',
 ]
 const PERSON_COLS = ['id', 'label', 'display_name', 'sex', 'birth_year', 'notes', 'created_at']
@@ -122,6 +123,7 @@ function withDefaults(rows: Rows): Rows {
     flag: '',
     value_text: '',
     conditions: '',
+    details: '',
     ...h,
   }))
 }

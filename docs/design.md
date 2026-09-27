@@ -229,7 +229,7 @@ kb fields at tier 0, so the user gets a decision frame even without any LLM.
 ### 6.4 Medical documents — processed locally, never stored remotely
 - **Shipped first (health log):** a per-person `health_log(id, person_id, date, time, kind, title, body,
   body_part, side, severity, tags, value, value2, unit, analyte, ref_low, ref_high, flag,
-  value_text, conditions)` of dated entries — lab result, diagnosis,
+  value_text, conditions, details)` of dated entries — lab result, diagnosis,
   medication, doctor letter, a self-reported **symptom** ("pain in both hands", body part `hands`,
   severity 6/10, tags `arthritis`), or a home **measurement** stored as numbers (`value`, a second
   `value2` for pairs like blood pressure, and `unit`: 37.8 °C, 120/80 mmHg, 71.5 kg) — typed or
@@ -240,7 +240,11 @@ kb fields at tier 0, so the user gets a decision frame even without any LLM.
   `hypertension`) the user linked the entry to: the form and each table row suggest them from the
   entry's words, its lab test and its measurement preset (`suggestConditions`), and nothing is
   linked without a click. It is the key the condition view, Ask and the per-condition export join
-  DNA findings and health records on.
+  DNA findings and health records on. `details` (JSON) holds a symptom's structured details, defined
+  per preset in `health/presets.ts`: stool form on the Bristol scale, colour, blood; cough type
+  and sputum colour; nasal discharge; times a day for vomiting and diarrhoea. The log's Quick
+  symptom bar records one in a tap. Severity and the numeric details are chartable, and Ask packs
+  carry them in words.
   Gated by the `import_document` consent; part of the dump; offered entry-by-entry to the Ask
   context pack under "Health log". The steps below build on it.
 - **Shipped second (BYOK document reader):** "Read a document" sends the photo/scan/PDF straight

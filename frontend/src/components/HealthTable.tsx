@@ -13,11 +13,12 @@ import {
   type SortDir,
   sortHealthLog,
 } from '../health/log'
-import { measurementPreset } from '../health/presets'
+import { measurementPreset, symptomPreset } from '../health/presets'
 import { useI18n, useT } from '../i18n/context'
 import { conditionById, conditionName, suggestConditions } from '../kb/conditions'
 import { HEALTH_KIND_LABELS, type HealthEntry, type HealthKind, type Person } from '../types'
 import { ConditionPicker } from './ConditionPicker'
+import { useDetailsText } from './DetailFields'
 
 const KINDS = Object.keys(HEALTH_KIND_LABELS) as HealthKind[]
 
@@ -48,6 +49,7 @@ export function HealthTable({
   const { db, kb } = useApp()
   const { lang } = useI18n()
   const t = useT()
+  const detailsText = useDetailsText()
   const [sort, setSort] = useState<{ key: HealthSortKey; dir: SortDir }>({ key: 'date', dir: 'desc' })
   const [open, setOpen] = useState<string | null>(null)
   const name = (id: string) => persons.find((p) => p.id === id)?.displayName ?? id
@@ -247,6 +249,11 @@ export function HealthTable({
                     </td>
                     <td className="nowrap">
                       {formatValue(e)}
+                      {Object.keys(e.details).length > 0 && (
+                        <span className="muted">
+                          {detailsText(symptomPreset(e.title)?.details, e.details)}
+                        </span>
+                      )}
                       {e.flag && <span className="danger"> {e.flag === 'H' ? '↑' : '↓'}</span>}
                     </td>
                     <td>

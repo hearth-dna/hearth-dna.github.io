@@ -7,6 +7,7 @@ import type { HealthEntry, Person } from '../types'
 import { HealthEntryForm } from './HealthEntryForm'
 import { HealthTable } from './HealthTable'
 import { QuickMeasurement } from './QuickMeasurement'
+import { QuickSymptom } from './QuickSymptom'
 
 /**
  * A person's health log: symptoms, home measurements, and dated text from lab reports, letters,
@@ -48,6 +49,7 @@ export function HealthLog({ person }: { person: Person }) {
       </div>
       <p className="muted">{t('healthLog.intro')}</p>
       <QuickMeasurement persons={[person]} personId={person.id} entries={entries} onSaved={reload} />
+      <QuickSymptom persons={[person]} personId={person.id} entries={entries} onSaved={reload} />
       {adding && (
         <HealthEntryForm
           persons={[person]}

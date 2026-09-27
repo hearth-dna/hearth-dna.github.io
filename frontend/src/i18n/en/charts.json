@@ -20,5 +20,6 @@
   "charts.aria": "{title}, {n} readings. Use the arrow keys to step through them.",
   "charts.ariaHint": "Use the arrow keys to step through the readings",
   "charts.high": "high",
-  "charts.low": "low"
+  "charts.low": "low",
+  "charts.group.symptom": "Symptoms"
 }

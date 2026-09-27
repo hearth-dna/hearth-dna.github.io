@@ -24,7 +24,24 @@ export interface HealthPreset {
   unitAliases?: string[]
   /** Other units → conversion into `unit`, keyed by lower-case spelling (CSV import). */
   units?: Record<string, (v: number) => number>
+  /** Symptoms only: the structured details worth recording (stool form, cough type…). */
+  details?: DetailField[]
 }
+
+/**
+ * One structured detail of a symptom, stored in the entry's `details` under its id. Option ids are
+ * plain English words, so the stored data and an export read without the app.
+ */
+export type DetailField =
+  /** A whole number on a fixed scale, e.g. the Bristol stool form 1–7. Chartable. */
+  | { id: string; kind: 'scale'; min: number; max: number }
+  /** How many times (per day). Chartable. */
+  | { id: string; kind: 'count' }
+  | { id: string; kind: 'choice'; options: string[] }
+  /** Present or not; stored only when present. */
+  | { id: string; kind: 'flag' }
+
+export type DetailValue = number | string | true
 
 const times = (f: number) => (v: number) => v * f
 const LB = times(0.45359237)
@@ -55,13 +72,23 @@ const m = (
   step,
   ...extra,
 })
-const s = (id: string, title: string, bodyPart = '', tags: string[] = []): HealthPreset => ({
+const s = (
+  id: string,
+  title: string,
+  bodyPart = '',
+  tags: string[] = [],
+  details?: DetailField[],
+): HealthPreset => ({
   id,
   title,
   kind: 'symptom',
   bodyPart,
   tags,
+  ...(details ? { details } : {}),
 })
+const choice = (id: string, options: string[]): DetailField => ({ id, kind: 'choice', options })
+const flag = (id: string): DetailField => ({ id, kind: 'flag' })
+const TIMES: DetailField = { id: 'times', kind: 'count' }
 
 export const MEASUREMENT_PRESETS: HealthPreset[] = [
   m('temperature', 'Body temperature', '°C', 0.1, {
@@ -163,31 +190,102 @@ export const SYMPTOM_PRESETS: HealthPreset[] = [
   s('fatigue', 'Fatigue', 'whole body'),
   s('dizziness', 'Dizziness', 'head'),
   s('nosebleed', 'Nosebleed', 'nose'),
-  s('runny-nose', 'Runny or blocked nose', 'nose'),
+  s(
+    'runny-nose',
+    'Runny or blocked nose',
+    'nose',
+    [],
+    [
+      choice('nose', ['runny', 'blocked', 'both']),
+      choice('discharge', ['clear', 'white', 'yellow', 'green', 'bloody']),
+    ],
+  ),
   s('sneezing', 'Sneezing', 'nose', ['allergy']),
+  s('loss-of-smell', 'Loss of smell or taste', 'nose'),
   s('sore-throat', 'Sore throat', 'throat'),
-  s('cough', 'Cough', 'lungs'),
+  s('hoarse-voice', 'Hoarse voice', 'throat'),
+  s(
+    'cough',
+    'Cough',
+    'lungs',
+    [],
+    [
+      choice('type', ['dry', 'wet']),
+      choice('sputum', ['none', 'clear', 'white', 'yellow', 'green', 'brown', 'blood-streaked']),
+    ],
+  ),
+  s(
+    'phlegm',
+    'Phlegm or sputum',
+    'lungs',
+    [],
+    [choice('sputum', ['clear', 'white', 'yellow', 'green', 'brown', 'blood-streaked'])],
+  ),
+  s('wheezing', 'Wheezing', 'lungs'),
   s('shortness-of-breath', 'Shortness of breath', 'lungs'),
   s('chest-pain', 'Chest pain', 'chest'),
   s('palpitations', 'Palpitations', 'heart'),
   s('nausea', 'Nausea', 'stomach'),
-  s('vomiting', 'Vomiting', 'stomach'),
-  s('diarrhea', 'Diarrhea', 'abdomen'),
+  s('vomiting', 'Vomiting', 'stomach', [], [TIMES]),
+  s(
+    'stool',
+    'Stool',
+    'abdomen',
+    [],
+    [
+      { id: 'bristol', kind: 'scale', min: 1, max: 7 },
+      choice('colour', ['brown', 'yellow', 'green', 'black', 'red', 'pale']),
+      flag('blood'),
+      flag('mucus'),
+    ],
+  ),
+  s('diarrhea', 'Diarrhea', 'abdomen', [], [TIMES]),
   s('constipation', 'Constipation', 'abdomen'),
+  s('bloating', 'Bloating', 'abdomen'),
+  s('gas', 'Wind or gas', 'abdomen'),
   s('stomach-ache', 'Stomach ache', 'stomach'),
+  s('loss-of-appetite', 'Loss of appetite', 'stomach'),
   s('heartburn', 'Heartburn', 'chest'),
+  s(
+    'urination',
+    'Urination problems',
+    'abdomen',
+    [],
+    [
+      choice('issue', ['frequent', 'painful', 'urgent', 'leaking']),
+      choice('colour', ['pale', 'yellow', 'dark', 'red', 'cloudy']),
+    ],
+  ),
+  s('thirst', 'Excessive thirst', 'whole body'),
+  s('dry-mouth', 'Dry mouth', 'mouth'),
   s('back-pain', 'Back pain', 'back'),
   s('joint-pain', 'Joint pain', 'joints'),
   s('muscle-pain', 'Muscle pain', 'muscles'),
+  s('leg-cramps', 'Leg cramps', 'legs'),
   s('rash', 'Rash', 'skin'),
+  s('hives', 'Hives', 'skin', ['allergy']),
   s('itching', 'Itching', 'skin'),
-  s('eye-irritation', 'Eye irritation', 'eyes'),
+  s('bruising', 'Bruising', 'skin'),
+  s('cold-sore', 'Cold sore', 'mouth'),
+  s('hair-loss', 'Hair loss', 'head'),
+  // The id predates the wider name; kept so older entries still match their preset.
+  s(
+    'eye-irritation',
+    'Red or irritated eyes',
+    'eyes',
+    [],
+    [choice('discharge', ['none', 'watery', 'sticky']), flag('itchy')],
+  ),
+  s('watery-eyes', 'Watery eyes', 'eyes'),
   s('earache', 'Earache', 'ears'),
+  s('blocked-ears', 'Blocked ears', 'ears'),
   s('toothache', 'Toothache', 'mouth'),
   s('insomnia', 'Trouble sleeping', ''),
   s('anxiety', 'Anxiety', ''),
   s('low-mood', 'Low mood', ''),
   s('period-pain', 'Period pain', 'abdomen'),
+  s('night-sweats', 'Night sweats', 'whole body'),
+  s('hot-flushes', 'Hot flushes', 'whole body'),
   s('swelling', 'Swelling', ''),
   s('numbness', 'Numbness or tingling', ''),
 ]
@@ -215,22 +313,35 @@ export function findPreset(id: string): HealthPreset | undefined {
   return undefined
 }
 
+const byTitle = (list: HealthPreset[], title: string) =>
+  list.find((x) => x.title.toLowerCase() === title.trim().toLowerCase())
+
 /** The measurement preset a saved entry was made from, by its title. */
 export const measurementPreset = (title: string): HealthPreset | undefined =>
-  MEASUREMENT_PRESETS.find((x) => x.title.toLowerCase() === title.trim().toLowerCase())
+  byTitle(MEASUREMENT_PRESETS, title)
+
+/** The symptom preset a saved entry was made from, by its title (older titles included). */
+export const symptomPreset = (title: string): HealthPreset | undefined =>
+  byTitle(SYMPTOM_PRESETS, title) ??
+  (title.trim().toLowerCase() === 'eye irritation' ? findPreset('eye-irritation') : undefined)
 
 /**
- * Measurement presets ordered for the quick bar: the ones this person has recorded before come
+ * Presets of one kind ordered for a quick bar: the ones this person has recorded before come
  * first, most recently used first, then the rest in list order. `entries` must be newest first.
  */
-export function measurementOrder(entries: { kind: string; title: string }[]): HealthPreset[] {
+export function presetOrder(
+  kind: 'measurement' | 'symptom',
+  entries: { kind: string; title: string }[],
+): HealthPreset[] {
+  const [list, find] =
+    kind === 'measurement' ? [MEASUREMENT_PRESETS, measurementPreset] : [SYMPTOM_PRESETS, symptomPreset]
   const used: HealthPreset[] = []
   for (const e of entries) {
-    if (e.kind !== 'measurement') continue
-    const p = measurementPreset(e.title)
+    if (e.kind !== kind) continue
+    const p = find(e.title)
     if (p && !used.includes(p)) used.push(p)
   }
-  return [...used, ...MEASUREMENT_PRESETS.filter((p) => !used.includes(p))]
+  return [...used, ...list.filter((p) => !used.includes(p))]
 }
 
 /** Presets that start an entry of this kind, in list order, for the chips above the form. */
