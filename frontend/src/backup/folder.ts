@@ -68,6 +68,30 @@ export async function loadSaved(profile: string): Promise<Saved | null> {
   }
 }
 
+/**
+ * What this browser remembers about backups it handed to the share sheet (no folder to read back):
+ * the snapshot it last shared or loaded, when, and whether it was stored unencrypted.
+ */
+export interface Shared {
+  lastSeen: Seen | null
+  plain: boolean
+  lastAt?: string
+}
+
+const sharedKey = (profile: string) => `${profile}:shared`
+
+export async function loadShared(profile: string): Promise<Shared | null> {
+  try {
+    return ((await tx('readonly', (s) => s.get(sharedKey(profile)))) as Shared | undefined) ?? null
+  } catch {
+    return null
+  }
+}
+
+export async function saveShared(profile: string, shared: Shared): Promise<void> {
+  await tx('readwrite', (s) => s.put(shared, sharedKey(profile)))
+}
+
 export async function save(profile: string, saved: Saved): Promise<void> {
   await tx('readwrite', (s) => s.put(saved, profile))
 }

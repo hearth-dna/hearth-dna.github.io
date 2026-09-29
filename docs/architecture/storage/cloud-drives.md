@@ -12,6 +12,9 @@ encrypted snapshot, the provider moves the bytes. Properties:
 - Works identically for a USB stick, so one code path serves both.
 
 Limitation: it needs the desktop sync client installed, and Chromium for the directory picker.
+On phones and non-Chromium browsers the same snapshot goes through the system share sheet to the
+Drive app (or Files → Google Drive) and is loaded back through the file picker; one tap per backup,
+no autosave (`backup-folder.md`, "Phones and other browsers").
 On a locked-down or borrowed machine the user falls back to downloading the dump and uploading it
 through Drive's web UI by hand, which also works and needs nothing from us.
 

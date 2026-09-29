@@ -1,7 +1,6 @@
 {
   "backupCard.title": "Backup folder",
   "backupCard.intro": "Hearth writes a snapshot of everything to a folder you choose — on a USB stick, or a folder that Google Drive, Dropbox, OneDrive or similar keeps in sync — after every change, and can load it back on another computer. Nothing is sent by Hearth itself.",
-  "backupCard.unsupported": "Your browser cannot write to a folder on its own (Chrome, Edge and other Chromium browsers can). Use Export dump and Import dump above instead.",
   "backupCard.chooseFolder": "Choose folder…",
   "backupCard.folder": "Folder: <b>{name}</b>",
   "backupCard.lastBackup": " · last backup {time}",
@@ -30,5 +29,20 @@
   "backupCard.writingFile": "Writing to {name}…",
   "backupCard.loading": "Loading from {name}…",
   "backupCard.done": "Backed up to {name} at {time}.",
-  "backupCard.autoSync": "Sync automatically after every change"
+  "backupCard.autoSync": "Sync automatically after every change",
+  "backupCard.titleManual": "Backup",
+  "backupCard.introManual": "This browser cannot keep a folder in sync, so backups are files. <b>Back up</b> builds an encrypted snapshot and opens the share sheet, where you choose Google Drive, Files or any other app. On another device, <b>Load backup</b> opens a saved file and adds what is in it. Nothing is sent by Hearth itself.",
+  "backupCard.downloadOnly": "This browser can only download the file. Upload it to Google Drive from the Drive app, or move it somewhere safe.",
+  "backupCard.lastShared": "Last backup: {time}.",
+  "backupCard.neverShared": "No backup from this device yet.",
+  "backupCard.changedSince": " Changes since then are not in it.",
+  "backupCard.needsPassphraseManual": "Enter a passphrase (or tick unencrypted) to back up.",
+  "backupCard.fileReady": "{name} is ready. Tap Share to save it.",
+  "backupCard.shareFile": "Share",
+  "backupCard.backUpShare": "Back up…",
+  "backupCard.backUpDownload": "Download backup",
+  "backupCard.loadFile": "Load backup…",
+  "backupCard.shared": "Backup handed to the app you chose. Check that it arrived.",
+  "backupCard.downloaded": "Backup downloaded. Move it to Google Drive or another safe place.",
+  "backupCard.loadFailed": "Could not load the backup: {message}"
 }
