@@ -18,9 +18,31 @@ Settings gains a **Backup folder** card:
   access again (or not at all after the user picks "Allow on every visit", Chrome 122+); until it
   is re-granted the card shows *Reconnect folder*.
 
-Browsers without the directory picker (Firefox, Safari, all mobile) see the card with one line:
-"Your browser cannot write to a folder on its own; use Export dump and Import dump" and the
-existing buttons. Feature detection is `'showDirectoryPicker' in window`.
+Browsers without the directory picker (phones, Safari, Firefox) get the share-sheet variant
+below. Feature detection is `'showDirectoryPicker' in window`.
+
+## Phones and other browsers: the share sheet
+
+No mobile browser can mount a folder, so there a backup is a file the user hands on:
+
+- **Back up…** builds the same snapshot (same passphrase rule, same envelope) and opens the system
+  share sheet with it (`navigator.share({ files })`), where the user picks Google Drive, Files →
+  Google Drive, or any other app. Names are timestamped (`hearth-backup-2026-09-29-1402.hearth`),
+  because Drive and Files save a new copy rather than overwrite.
+- **Load backup…** is a file input without `accept` (iOS greys out unknown extensions); the
+  system picker browses Drive. Loading is the same union-by-id restore as Import dump.
+- The header button tracks whether anything changed since the last backup file ("Back up" /
+  "Backed up 14:02") and makes a new one on click. There is no autosave: sharing needs a tap.
+- Where files cannot be shared the file is downloaded instead, with a hint to upload it from the
+  Drive app. Chrome on Android shares only an allowlist of media types, so it downloads; so does
+  the Android shell (its WebView has no Web Share and downloads go through `Downloads.kt`). iOS
+  Safari, the iOS shell and desktop Safari get the share sheet.
+- `navigator.share` needs a fresh click and building a large snapshot can outlast it; the built
+  file then waits (`status.file`) and the button becomes *Share*.
+- What this browser remembers (last snapshot shared, when, plaintext choice) sits in the same
+  `hearth-handles` IndexedDB store under `<profile>:shared`, not in SQLite, where writing it would
+  bump the generation it is compared against. No consent record: like Export dump, every file is
+  one the user explicitly hands over.
 
 ## Layout in the folder
 

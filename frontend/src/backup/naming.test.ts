@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Header } from '../export/container'
-import { baseName, conflictName, hasNewer, isForeign, rotationPlan, spareNames } from './naming'
+import { baseName, conflictName, hasNewer, isForeign, rotationPlan, sharedName, spareNames } from './naming'
 
 const header = (device: string, generation: number): Header => ({
   format: 'hearth-dump',
@@ -15,6 +15,12 @@ describe('backup naming', () => {
   it('names the file per profile', () => {
     expect(baseName('default')).toBe('hearth-backup.hearth')
     expect(baseName('kids')).toBe('hearth-backup-kids.hearth')
+  })
+
+  it('stamps shared snapshots with the local time', () => {
+    const at = new Date(2026, 8, 29, 14, 2)
+    expect(sharedName('default', at)).toBe('hearth-backup-2026-09-29-1402.hearth')
+    expect(sharedName('kids', at)).toBe('hearth-backup-kids-2026-09-29-1402.hearth')
   })
 
   it('plans rotation oldest first and never beyond the keep count', () => {

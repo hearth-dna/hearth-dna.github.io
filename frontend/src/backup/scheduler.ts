@@ -1,18 +1,35 @@
 import { Database } from '../db/db'
 import { getMeta } from '../db/repo'
-import { type Progress, type RestoreResult, restoreContainer } from '../export/restore'
+import { type Progress, type RestoreResult, restoreBytes, restoreContainer } from '../export/restore'
 import { snapshotBytes } from '../export/snapshot'
 import * as folder from './folder'
-import { baseName, conflictName, hasNewer, isForeign, spareNames } from './naming'
+import { baseName, conflictName, hasNewer, isForeign, type Seen, sharedName, spareNames } from './naming'
 import { openRepaired } from './repair'
+import { shareOrDownload } from './share'
 
 /**
  * App-wide backup state: the remembered folder, the session passphrase, a debounced autosave
  * after every write, and the conflict rule. One instance per page; the Settings card renders
  * whatever `status` says and calls the actions.
+ *
+ * Browsers without a folder picker (phones, Safari, Firefox) get the `manual` state instead: a
+ * snapshot is handed to the share sheet on request and a saved one is loaded from a file, and the
+ * status only tracks whether anything changed since the last one.
  */
+type Missing = { id: string; name: string }[]
+
 export type Status =
-  | { state: 'unsupported' }
+  | {
+      state: 'manual'
+      /** When this browser last shared or downloaded a snapshot (ISO). */
+      lastAt: string | null
+      /** This browser has changes no shared snapshot has. */
+      dirty: boolean
+      /** A snapshot that is built but still waits for a tap to open the share sheet. */
+      file: string | null
+      step: 'building' | 'loading' | null
+      missing: Missing
+    }
   | { state: 'none' }
   | { state: 'reconnect'; name: string }
   | { state: 'needs-passphrase'; name: string }
@@ -26,7 +43,7 @@ export type Status =
       lastAt: string | null
       newer: boolean
       /** People whose genome file the last loaded snapshot and its spares all lacked. */
-      missing: { id: string; name: string }[]
+      missing: Missing
     }
   | { state: 'writing'; name: string; step: 'loading' | 'building' | 'writing' }
   | { state: 'conflict'; name: string; file: string }
@@ -60,7 +77,10 @@ class Backups {
   private saved: folder.Saved | null = null
   private timer: ReturnType<typeof setTimeout> | null = null
   private newer = false
-  private missing: { id: string; name: string }[] = []
+  private missing: Missing = []
+  /** Set when the browser has no folder picker; see the `manual` status. */
+  private shared: folder.Shared | null = null
+  private built: { name: string; bytes: Uint8Array; seen: Seen } | null = null
   private busy = false
   private readonly listeners = new Set<() => void>()
   /** Called after a snapshot from the folder was loaded, so the app can re-read its lists. */
@@ -71,8 +91,8 @@ class Backups {
     this.db = db
     this.appVersion = appVersion
     this.profile = Database.profile()
-    if (!folder.supported()) return this.set({ state: 'unsupported' })
-    this.saved = await folder.loadSaved(this.profile)
+    if (folder.supported()) this.saved = await folder.loadSaved(this.profile)
+    else this.shared = (await folder.loadShared(this.profile)) ?? { lastSeen: null, plain: false }
     db.onChange(() => this.request())
     // Reading the folder can be slow (a cloud mount) or hang; startup must not wait for it.
     void this.refresh()
@@ -93,7 +113,7 @@ class Backups {
   }
 
   get plain(): boolean {
-    return this.saved?.plain ?? false
+    return (this.shared ?? this.saved)?.plain ?? false
   }
 
   get auto(): boolean {
@@ -123,6 +143,7 @@ class Backups {
   }
 
   setPassphrase(p: string): void {
+    this.built = null
     try {
       if (p) sessionStorage.setItem(PASS_KEY(this.profile), p)
       else sessionStorage.removeItem(PASS_KEY(this.profile))
@@ -131,6 +152,12 @@ class Backups {
   }
 
   async setPlain(plain: boolean): Promise<void> {
+    if (this.shared) {
+      this.shared.plain = plain
+      this.built = null
+      await folder.saveShared(this.profile, this.shared)
+      return this.refresh()
+    }
     if (!this.saved) return
     this.saved.plain = plain
     await folder.save(this.profile, this.saved)
@@ -139,6 +166,7 @@ class Backups {
 
   /** Re-derives the status from the folder (permission, newer snapshot). */
   async refresh(): Promise<void> {
+    if (this.shared) return this.refreshShared()
     if (!this.saved) return this.set({ state: 'none' })
     const name = this.name
     if ((await folder.permission(this.saved.handle)) !== 'granted')
@@ -156,11 +184,8 @@ class Backups {
       return this.set({ state: 'error', name, message: e instanceof Error ? e.message : String(e) })
     }
     this.newer = hasNewer(current, device, this.saved.lastSeen)
-    // The notice goes away once a genome is imported for that person by hand.
-    for (const m of [...this.missing])
-      if ((await this.db.query('SELECT 1 FROM genotype WHERE person_id=? LIMIT 1', [m.id])).length)
-        this.missing = this.missing.filter((x) => x !== m)
-    const dirty = await this.dirty(device)
+    await this.pruneMissing()
+    const dirty = await this.dirty(device, this.saved.lastSeen)
     this.set({
       state: 'ready',
       name,
@@ -175,9 +200,33 @@ class Backups {
     if (dirty && this.auto && !this.newer && !this.timer && !this.busy) this.request()
   }
 
-  /** Whether the database changed since this browser last wrote to or loaded from the folder. */
-  private async dirty(device: string): Promise<boolean> {
-    const seen = this.saved?.lastSeen
+  private async refreshShared(): Promise<void> {
+    if (!this.shared) return
+    await this.pruneMissing()
+    const device = (await getMeta(this.db, 'device')) ?? ''
+    this.set({
+      state: 'manual',
+      lastAt: this.shared.lastAt ?? null,
+      dirty: await this.dirty(device, this.shared.lastSeen),
+      file: this.built?.name ?? null,
+      step: this.status.state === 'manual' ? this.status.step : null,
+      missing: this.missing,
+    })
+  }
+
+  private setStep(step: 'building' | 'loading' | null): void {
+    if (this.status.state === 'manual') this.set({ ...this.status, step })
+  }
+
+  /** The missing-genomes notice goes away once a genome is imported for that person by hand. */
+  private async pruneMissing(): Promise<void> {
+    for (const m of [...this.missing])
+      if ((await this.db.query('SELECT 1 FROM genotype WHERE person_id=? LIMIT 1', [m.id])).length)
+        this.missing = this.missing.filter((x) => x !== m)
+  }
+
+  /** Whether the database changed since this browser last wrote or loaded the snapshot `seen`. */
+  private async dirty(device: string, seen: Seen | null): Promise<boolean> {
     const generation = Number((await getMeta(this.db, 'generation')) ?? 0)
     return !seen || seen.device !== device || generation > seen.generation
   }
@@ -211,7 +260,13 @@ class Backups {
    * that there are unsynced changes.
    */
   request(): void {
-    if (!this.saved || this.status.state === 'unsupported' || this.status.state === 'none') return
+    if (this.shared) {
+      // A snapshot built before this change would be stale by the time it is shared.
+      this.built = null
+      if (!this.busy) void this.refresh()
+      return
+    }
+    if (!this.saved || this.status.state === 'none') return
     if (!this.auto) {
       if (this.status.state === 'ready') this.set({ ...this.status, dirty: true })
       return
@@ -317,6 +372,63 @@ class Backups {
     // The restore itself scheduled an autosave; that snapshot will carry the union.
     await this.refresh()
     return r
+  }
+
+  /**
+   * Builds a snapshot (unless one is already waiting) and hands it to the share sheet, or
+   * downloads it where files cannot be shared. Must run from a click. When building took so long
+   * that the browser no longer counts the click, the snapshot waits in `status.file` for another.
+   */
+  async shareNow(): Promise<'shared' | 'downloaded' | 'waiting' | 'cancelled' | undefined> {
+    if (!this.shared || this.busy) return
+    const pass = this.passphrase()
+    if (!this.plain && !pass) return
+    if (!this.built) {
+      this.busy = true
+      this.setStep('building')
+      try {
+        const bytes = await snapshotBytes(this.db, this.appVersion, this.plain ? undefined : pass)
+        const device = (await getMeta(this.db, 'device')) ?? ''
+        const generation = Number((await getMeta(this.db, 'generation')) ?? 0)
+        this.built = { name: sharedName(this.profile, new Date()), bytes, seen: { device, generation } }
+      } finally {
+        this.busy = false
+        this.setStep(null)
+      }
+    }
+    const built = this.built
+    try {
+      const how = await shareOrDownload(built.bytes, built.name)
+      this.built = null
+      this.shared.lastSeen = built.seen
+      this.shared.lastAt = new Date().toISOString()
+      await folder.saveShared(this.profile, this.shared)
+      return how
+    } catch (e) {
+      if (e instanceof DOMException && e.name === 'NotAllowedError') return 'waiting'
+      if (e instanceof DOMException && e.name === 'AbortError') return 'cancelled'
+      throw e
+    } finally {
+      await this.refresh()
+    }
+  }
+
+  /** Loads a snapshot file the user picked (union by id, see restore.ts). */
+  async loadFile(file: File, onProgress: Progress = () => {}): Promise<RestoreResult> {
+    if (this.busy) throw new Error('a backup is in progress')
+    this.busy = true
+    this.setStep('loading')
+    try {
+      const bytes = new Uint8Array(await file.arrayBuffer())
+      const r = await restoreBytes(this.db, bytes, this.passphrase() || undefined, onProgress)
+      this.missing = r.missing
+      this.onLoaded()
+      return r
+    } finally {
+      this.busy = false
+      this.setStep(null)
+      await this.refresh()
+    }
   }
 }
 

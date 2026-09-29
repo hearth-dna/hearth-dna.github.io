@@ -18,5 +18,11 @@
   "sync.unsyncedHint": "There are changes {name} does not have yet; click to sync now",
   "sync.synced": "Synced",
   "sync.syncedAt": "Synced {time}",
-  "sync.syncedHint": "{name} has everything; click to sync again"
+  "sync.syncedHint": "{name} has everything; click to sync again",
+  "sync.backingUp": "Backing up…",
+  "sync.shareReady": "Share backup",
+  "sync.backUp": "Back up",
+  "sync.backUpHint": "There are changes no backup has yet; click to save a backup file",
+  "sync.backedUpAt": "Backed up {time}",
+  "sync.backedUpHint": "Nothing changed since the last backup file; click to make another"
 }

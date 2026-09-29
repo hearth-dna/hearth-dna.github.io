@@ -11,6 +11,16 @@ export function baseName(profile: string): string {
   return profile === 'default' ? 'hearth-backup.hearth' : `hearth-backup-${profile}.hearth`
 }
 
+/**
+ * A snapshot handed to the share sheet: `hearth-backup-2026-09-29-1402.hearth` in local time.
+ * Timestamped, because Drive and Files save a copy rather than overwrite one.
+ */
+export function sharedName(profile: string, at: Date): string {
+  const p = (n: number) => String(n).padStart(2, '0')
+  const stamp = `${at.getFullYear()}-${p(at.getMonth() + 1)}-${p(at.getDate())}-${p(at.getHours())}${p(at.getMinutes())}`
+  return baseName(profile).replace(/\.hearth$/, `-${stamp}.hearth`)
+}
+
 export const rotatedName = (base: string, n: number) => `${base}.${n}`
 
 /** Copies to make, oldest first, so that `base` can then be overwritten with the newest snapshot. */
