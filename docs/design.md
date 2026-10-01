@@ -283,8 +283,18 @@ kb fields at tier 0, so the user gets a decision frame even without any LLM.
   files and health-log import batches (grouped by their `source`, `import/history.ts`). The old
   buttons on People and in the health log are shortcuts to `/import/<source>/<person>`. Backups
   stay in Settings next to export.
-- Accept PDF, images, plain text. `pdf.js` extracts the text layer; `Tesseract.js` OCRs scans; both in
-  a worker. Originals stored as blobs in OPFS, referenced from `document`.
+- **Shipped sixth (attachments):** the original image or PDF is kept with the entry —
+  `attachment(id, health_log_id, person_id, sha256, mime, bytes, name, created_at)` with the bytes
+  in the OPFS file cache as `att-<sha256>.bin`, never in a BLOB column (ADR 0001). Content
+  addressed, so the same scan attached twice is stored once; the user's file name lives only in
+  the row, never on disk. The dump carries the rows; the bytes travel to the backup folder as
+  encrypted sidecars (`docs/architecture/storage/backup-folder.md`), which keeps the few-second
+  autosave as cheap as it was. Restoring elsewhere without the folder leaves them marked "not on
+  this device" rather than failing. No new consent: `import_document` already covers documents,
+  and revoking it deletes the entries and their attachments. `describeEntry` deliberately says
+  nothing about attachments, so no file name can reach the Ask context pack.
+- Still to build: `Tesseract.js` for scans, in a worker, to read an attachment without sending it
+  anywhere (text PDFs are already read locally with `pdf.js`).
 - Structured extraction into `observation` rows (lab values with units and reference ranges,
   diagnoses, medications). Tier 0: regex/table heuristics for common lab layouts; tiers 1–2: LLM
   extraction with a fixed JSON schema.
@@ -325,8 +335,9 @@ kb fields at tier 0, so the user gets a decision frame even without any LLM.
 - Optional app lock: passphrase-derived key wraps a random data key; SQLite pages stay plain in OPFS
   in v1 (OPFS is origin-private), with an option to encrypt the DB file at rest in v2.
 - Strict CSP; no third-party origins except the user-configured LLM endpoint.
-- On phones the same build runs inside the shells in `mobile/`, which exist to give it a real
-  origin (so OPFS survives), a file picker and a way to save a dump — ADR 0006.
+- On phones Hearth is two native apps in `mobile/` (Compose, SwiftUI) with the same schema, the
+  same backup format and the same strings as this web app — ADR 0010 (it superseded the web-view
+  shells of ADR 0006).
 
 ## 7. Comparison with codegen.eu
 

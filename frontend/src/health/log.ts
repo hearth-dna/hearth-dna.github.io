@@ -71,6 +71,13 @@ export function normTime(s: string): string {
   return `${m[1].padStart(2, '0')}:${m[2]}`
 }
 
+/** The YYYY-MM-DD `days` calendar days before `date`. */
+export function daysBefore(date: string, days: number): string {
+  const d = new Date(`${date}T00:00:00Z`)
+  d.setUTCDate(d.getUTCDate() - days)
+  return d.toISOString().slice(0, 10)
+}
+
 /** '2026-09-14 08:05', or just the date when no time was recorded. */
 export const when = (e: Pick<HealthEntry, 'date' | 'time'>) => (e.time ? `${e.date} ${e.time}` : e.date)
 
@@ -93,6 +100,9 @@ export function where(e: Pick<HealthEntry, 'bodyPart' | 'side'>): string {
  * The entry on one line, as shown in the log and in the Ask context pack:
  * `2026-09-14 · Symptom · Pain in both hands (hands; severity 6/10; arthritis)`,
  * `2026-09-14 08:05 · Measurement · Blood pressure 120/80 mmHg`.
+ *
+ * This line is what the Ask context pack sends to a model, so it must never grow to mention an
+ * entry's attachments: a file name like `biopsy-2026.pdf` would leave the device with it.
  */
 export function describeEntry(e: HealthEntry): string {
   const value = formatValue(e)
@@ -136,6 +146,12 @@ export const NO_FILTER: HealthFilter = {
 
 export function isFiltering(f: HealthFilter): boolean {
   return Object.values(f).some((v) => v !== '' && v !== null)
+}
+
+/** Filters set in the Filters panel (not the kind chips or the search box); the count on its button. */
+export function panelFilterCount(f: HealthFilter): number {
+  return [f.person, f.bodyPart, f.tag, f.condition, f.from || f.to, f.minSeverity !== null].filter(Boolean)
+    .length
 }
 
 export function filterHealthLog(entries: HealthEntry[], f: HealthFilter): HealthEntry[] {
@@ -219,4 +235,15 @@ export function facets(entries: HealthEntry[]): {
     for (const c of e.conditions) conditions.add(c)
   }
   return { bodyParts: [...bodyParts].sort(), tags: [...tags].sort(), conditions: [...conditions].sort() }
+}
+
+/** Runs of consecutive entries sharing a date, in the order given: the card view's day headings. */
+export function groupByDate(entries: HealthEntry[]): { date: string; entries: HealthEntry[] }[] {
+  const out: { date: string; entries: HealthEntry[] }[] = []
+  for (const e of entries) {
+    const last = out[out.length - 1]
+    if (last?.date === e.date) last.entries.push(e)
+    else out.push({ date: e.date, entries: [e] })
+  }
+  return out
 }

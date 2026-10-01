@@ -11,12 +11,28 @@ encrypted snapshot, the provider moves the bytes. Properties:
 - Restore on a second PC is "install Drive, open Hearth, choose the folder".
 - Works identically for a USB stick, so one code path serves both.
 
-Limitation: it needs the desktop sync client installed, and Chromium for the directory picker.
-On phones and non-Chromium browsers the same snapshot goes through the system share sheet to the
+On the phones the provider's app plays the desktop client's part: the apps open the system
+document picker, and whatever the user picks there — an iCloud Drive folder, a Google Drive file —
+is written to through the provider (ADR 0008). Same properties: no provider code, no OAuth, and
+encryption decided by the passphrase, as for any folder.
+
+Limitation: on a computer it needs the desktop sync client installed, and Chromium for the directory
+picker.
+In a phone or non-Chromium *browser* the same snapshot goes through the system share sheet to the
 Drive app (or Files → Google Drive) and is loaded back through the file picker; one tap per backup,
 no autosave (`backup-folder.md`, "Phones and other browsers").
 On a locked-down or borrowed machine the user falls back to downloading the dump and uploading it
 through Drive's web UI by hand, which also works and needs nothing from us.
+
+## The phone apps: Drive and Dropbox APIs (ADR 0009)
+
+The trade-offs below are the browser's. In the native apps they change: sign-in is an
+installed-app OAuth flow with PKCE and no secret, the refresh token stays in the Keychain or the
+app's private storage, and there is no page for a provider script to touch. So the phone apps have
+**Google Drive** and **Dropbox** buttons (and **iCloud Drive** on iPhone): the apps' own REST
+clients (`backup/CloudDir.kt`, `Backup/` on iOS) through `Egress.kt` / `Egress.swift`, which accept
+only the providers' API hosts, with the user choosing the Drive folder (full `drive` scope);
+`mobile/android/.../Cloud.kt` and `mobile/ios/Hearth/Cloud.swift` for sign-in. Setup per deployment: `docs/runbook/cloud-backups.md`.
 
 ## Considered and deferred: Google Drive API from the browser
 

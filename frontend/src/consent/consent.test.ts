@@ -74,11 +74,15 @@ describe('revokeConsent', () => {
     expect(deletes.every(([, bind]) => bind?.[0] === 'p1')).toBe(true)
     expect(deletes[2][0]).toContain("'import_genome','import_minor'")
   })
-  it('deletes the health log with a document consent', async () => {
+  it('deletes the health log with a document consent, and collects its documents', async () => {
     const { db, log } = fakeDb()
     await revokeConsent(db, 'import_document', 'p1')
-    expect(log.map(([sql]) => sql.split(' ')[2])).toEqual(['health_log', 'consent'])
-    expect(log[0][1]).toEqual(['p1'])
+    const deletes = log.filter(([sql]) => sql.startsWith('DELETE'))
+    expect(deletes.map(([sql]) => sql.split(' ')[2])).toEqual(['health_log', 'consent'])
+    expect(deletes[0][1]).toEqual(['p1'])
+    // The attachment rows go with the entries; their blobs need the sweep, which re-reads the
+    // genotype counts on its way past.
+    expect(log.some(([sql]) => sql.includes('genotype_counts'))).toBe(true)
   })
   it('deletes only the record for other kinds', async () => {
     const { db, log } = fakeDb()

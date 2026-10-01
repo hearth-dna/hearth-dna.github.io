@@ -1,41 +1,47 @@
 # mobile/ — the Android and iOS apps
 
-Both apps are the same PWA in a native window: one `WebView` on Android, one `WKWebView` on iOS,
-each serving `frontend/dist/` from inside the app over a real, network-less origin. There is no
-native model layer on either side, and there must not be one — the genome, the pedigree, the health
-log and every analysis live in the web app's SQLite database, inside the web engine's own storage.
-The reasoning is [ADR 0006](../docs/decisions/0006-native-shells-around-the-pwa.md); read it before
+Two native apps: Kotlin with Jetpack Compose and Material 3 on Android, Swift with SwiftUI on iOS.
+Each has its own data layer, with the web's SQLite schema verbatim in an app-private database. The
+reasoning is [ADR 0010](../docs/decisions/0010-native-apps.md); the screens and the formats they
+must match are specified in [native-apps.md](../docs/architecture/native-apps.md). Read both before
 changing anything structural here.
 
-## The one structural rule
+## The rules that keep three apps one
 
-> **If it touches the family's data, it belongs in `frontend/`, not here.**
+- **The web app is the reference for behaviour.** Each Kotlin and Swift module ports one
+  `frontend/src` module, names it at the top, and has a test that mirrors the web's test.
+- **Backups are the contract.** A backup written by any of the three opens in the other two.
+  `fixtures/` holds golden files written by each writer, and every restore test opens them.
+- **One string catalogue.** Text is written and translated only in `frontend/src/i18n/`;
+  `make mobile-assets` copies it (and the knowledge base) into both apps.
+- **One door to the network.** Every connection goes through `Egress.kt` / `Egress.swift`, to the
+  model provider the user brings a key for and the cloud drive they sign in to, nothing else; a test
+  in each app fails if any other file opens a connection.
 
-What is left for a shell is small, and each piece has a reason it cannot be done in the page:
-
-| | `android/` | `ios/` |
+| | `android/app/src/main/kotlin/com/hearth/` | `ios/Hearth/Native/` |
 | --- | --- | --- |
-| Serving the app | `WebViewAssetLoader`, `https://appassets.androidplatform.net/` | `LocalWebServer.swift`, `http://127.0.0.1:17800/` |
-| Picking a file to import | `WebChromeClient.onShowFileChooser` | nothing — WKWebView does it |
-| Photographing a document | `Camera.kt`: the system camera app, next to the picker | WKWebView's "Take Photo", with `NSCameraUsageDescription` |
-| Exact asset types (`.mjs`, `.wasm`) | `HearthWebView.mimeOverride` | `LocalWebServer.mimeType` |
-| Saving an export | `Downloads.kt` → MediaStore | `WKDownload` → the share sheet |
-| Screen fit | window insets on the container view | SwiftUI's safe area |
-| Links off-origin | `shouldOverrideUrlLoading` → browser | `decidePolicyFor` → Safari |
+| Database, repository | `data/` | `Data/` |
+| Genome import | `genome/` | `Genome/` |
+| Knowledge base, family, ask | `kb/`, `family/`, `ask/` | `Kb/`, `Family/`, `Ask/` |
+| Documents, attachments | `documents/`, `attachments/` | `Documents/`, `Attachments/` |
+| Dump v2 (and v1), backups | `backup/` | `Backup/` |
+| Open formats | `export/` | `Export/` |
+| Screens | `ui/` | `UI/` |
+| Network | `Egress.kt`, cloud sign-in in `Cloud.kt` | `Egress.swift`, `Cloud.swift` |
 
 ## Build and run
 
 ```bash
-make mobile-web       # build the PWA and copy it into both app bundles — nothing builds without it
+make mobile-assets    # copy the strings and kb.json into both apps (the build targets do it too)
 make android          # build + install the debug APK on a connected device or emulator
-make android-test     # the shell's unit tests (JVM, no device)
+make android-test     # unit tests (JVM, no device), including the fixtures and the egress check
 make android-logs     # follow the app's logs
 make ios              # build and run on a simulator (macOS + Xcode + xcodegen)
-make ios-test         # the shell's unit tests (simulator)
+make ios-test         # unit tests on a simulator
 ```
 
-Neither `app/src/main/assets/web/` (Android) nor `Hearth/Web/` (iOS) is in git: both are copies of
-`frontend/dist/`, made by `make mobile-web`. Nor is `Hearth.xcodeproj` — it is generated from
+The copied assets (`app/src/main/assets/i18n/`, `app/src/main/assets/kb.json`, `Hearth/I18n/`,
+`Hearth/Resources/kb.json`) are not in git, nor is `Hearth.xcodeproj`, generated from
 `ios/project.yml` by `make ios-generate`.
 
 ## Publishing
@@ -61,12 +67,11 @@ Set the real id **before the first upload to either store**: Play and App Store 
 identifier permanently at that point, and a published app can only be replaced by a new listing
 with no installs, reviews or upgrade path.
 
-## What the shells deliberately do not have
+## What the apps deliberately do not have
 
-No push notifications, no background work, no native sync, no analytics, no crash reporter, no
-third-party SDK of any kind. Android asks for exactly one permission (`INTERNET`, for the web app's
-BYOK Ask call) and turns off `allowBackup` so that Android's own cloud backup cannot copy the
-database off the device. Photographing a document needs no `CAMERA` permission: the shell starts
-the system camera app, which writes into the app's `cache/camera/` through a non-exported
-`FileProvider`, and that directory is emptied before each capture and at start and exit. iOS
-carries the camera purpose string only because WebKit's own "Take Photo" requires it.
+No account, no server of ours, no push notifications, no background work beyond a debounced backup
+while the app is open, no analytics, no crash reporter, and no third-party SDK beyond Play services'
+sign-in client (ADR 0009). Android asks for exactly one permission (`INTERNET`, for reading a
+document with the user's own key and for cloud backups) and turns off `allowBackup`; iOS keeps the
+database out of iCloud and device backups. The only copy that leaves the phone is the backup the
+user sets up, encrypted with their passphrase unless they choose otherwise.

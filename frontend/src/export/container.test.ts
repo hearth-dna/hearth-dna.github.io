@@ -7,6 +7,7 @@ import {
   missingGenomes,
   openContainer,
   readHeader,
+  readHeaderPrefix,
   serialiseContainer,
   sha256,
 } from './container'
@@ -54,6 +55,18 @@ async function sample(): Promise<Container> {
 }
 
 describe('dump v2 container', () => {
+  it('reads the header from the first bytes alone, plaintext or encrypted', async () => {
+    const c = await sample()
+    for (const pass of [undefined, 'correct horse']) {
+      const bytes = await serialiseContainer(c, pass)
+      const head = bytes.subarray(0, 1024)
+      expect(readHeaderPrefix(head)).toMatchObject({ generation: 7, device: 'dev-1', encrypted: !!pass })
+      // Too few bytes to settle it: the caller reads the whole file instead of guessing.
+      expect(readHeaderPrefix(bytes.subarray(0, 20))).toBeUndefined()
+    }
+    expect(readHeaderPrefix(strToU8('not a hearth file'))).toBeNull()
+  })
+
   it('round-trips plaintext and exposes the header without opening', async () => {
     const c = await sample()
     const bytes = await serialiseContainer(c)
@@ -98,6 +111,23 @@ describe('dump v2 container', () => {
     expect(fillGenomes(broken, full)).toBe(1)
     expect(missingGenomes(broken)).toEqual([])
     expect(broken.genomes[path]).toEqual(full.genomes[path])
+  })
+
+  it('carries attachment metadata, and no attachment bytes', async () => {
+    const c = await sample()
+    const a = { id: 'a1', health_log_id: 'h1', sha256: 'ab', mime: 'application/pdf', bytes: 4096 }
+    c.journal.attachments = [a]
+    const bytes = await serialiseContainer(c)
+    const back = await openContainer(bytes)
+    expect(back.journal.attachments).toEqual([a])
+    // The whole point of the sidecar design: a document must not grow the snapshot.
+    expect(bytes.length).toBeLessThan(2048)
+  })
+
+  it('opens a container written before attachments existed', async () => {
+    const c = await sample()
+    const back = await openContainer(await serialiseContainer(c))
+    expect(back.journal.attachments).toBeUndefined()
   })
 
   it('returns null for v1 files and other bytes', async () => {

@@ -12,9 +12,8 @@ options:
   # identifiers are first-come and permanent once submitted.
   bundleIdPrefix: example.hearth
   deploymentTarget:
-    # iOS 17: the first WebKit with OPFS synchronous access handles, which the app's SQLite VFS
-    # needs (docs/decisions/0002-sqlite-wasm-on-opfs.md). On anything older the database would fall
-    # back to memory and every import would vanish when the app closed.
+    # iOS 17: the SwiftUI the screens use (ContentUnavailableView, navigationDestination(item:),
+    # the two-parameter onChange).
     iOS: "17.0"
   generateEmptyDirectories: false
   createIntermediateGroups: true
@@ -46,16 +45,28 @@ targets:
           - "**/.DS_Store"
           # Bundled, not compiled — listed below so the build phase is explicit.
           - "PrivacyInfo.xcprivacy"
-          - "Web/**"
+          - "I18n/**"
+          - "Resources/**"
       - path: Hearth/PrivacyInfo.xcprivacy
         buildPhase: resources
-      # The PWA build, copied in by `make mobile-web`. A folder reference, not a group: the file
-      # names inside are Vite's hashed output and change every build, and the directory structure
-      # has to survive into the bundle for LocalWebServer to serve it.
-      - path: Hearth/Web
+      # The web app's string catalogue for the native screens (ADR 0010), copied in by
+      # `make mobile-i18n` as one <code>.json per language. A folder reference, not a group:
+      # Strings.swift looks for the files under I18n/ in the bundle, and lists that folder to learn
+      # which languages ship.
+      - path: Hearth/I18n
         type: folder
         buildPhase: resources
         optional: true
+      # The knowledge base for the native screens (Native/Kb/Kb.swift), copied from
+      # frontend/public/kb.json by `make mobile-kb` and gitignored like the other copies. Bundled at
+      # the top level, where Bundle.main finds "kb.json"; a build without it has an empty kb.
+      - path: Hearth/Resources/kb.json
+        buildPhase: resources
+        optional: true
+    dependencies:
+      # The system zlib, for gzip in the native genome import and restore (Native/Genome/Gzip.swift):
+      # `import zlib` finds the header module, and this links the library whatever autolinking does.
+      - sdk: libz.tbd
     info:
       path: Hearth/Info.plist
       properties:
@@ -63,9 +74,8 @@ targets:
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         LSApplicationCategoryType: public.app-category.medical
-        # Hearth ships no cryptography of its own: the dump's AES-GCM is WebCrypto, inside WebKit,
-        # which is Apple's own exempt category. Declaring it spares every upload the
-        # export-compliance questionnaire.
+        # Hearth ships no cryptography of its own: the backups' AES-GCM, PBKDF2 and SHA-256 are
+        # CryptoKit and CommonCrypto — all of it Apple's, the exempt category. Declaring it spares every upload the export-compliance questionnaire.
         ITSAppUsesNonExemptEncryption: false
         UILaunchScreen:
           UIColorName: LaunchBackground
@@ -73,20 +83,41 @@ targets:
           - UIInterfaceOrientationPortrait
           - UIInterfaceOrientationLandscapeLeft
           - UIInterfaceOrientationLandscapeRight
-        # The app talks to one server: its own, on 127.0.0.1, over plain HTTP, because that is the
-        # only way to give the web app a trustworthy origin (see LocalWebServer.swift). This is the
-        # narrow key — it permits cleartext to local hosts only and leaves the public internet
-        # still requiring HTTPS, which is what the BYOK Ask call uses.
-        # WKWebView offers "Take Photo" for the Import page's document picker, and iOS ends the
-        # app on that tap unless this purpose string is present. The photo goes to the web app like
-        # any picked file; the shell keeps nothing.
-        NSCameraUsageDescription: >-
-          Take a photo of a medical document to read it into your health log. The photo stays on
-          this device unless you send it to your own AI provider.
-        NSAppTransportSecurity:
-          NSAllowsLocalNetworking: true
+        # iPad gets all four: the App Store requires it for Split View and Stage Manager unless the
+        # app opts out of multitasking, and a record-keeping app has no reason to.
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        # The cloud backup buttons (Cloud.swift, docs/runbook/cloud-backups.md). Filled from the
+        # gitignored .env through build settings; empty means the button is not offered. Both are
+        # public identifiers (an iOS OAuth client id, a Dropbox app key), but still account
+        # identifiers, so they never appear in this file.
+        HearthGoogleClientID: $(HEARTH_GOOGLE_IOS_CLIENT_ID)
+        HearthDropboxAppKey: $(HEARTH_DROPBOX_APP_KEY)
+        # Shows the app's iCloud container in iCloud Drive as a "Hearth" folder, so the user can
+        # see the backup there and it survives the app being deleted.
+        NSUbiquitousContainers:
+          iCloud.$(PRODUCT_BUNDLE_IDENTIFIER):
+            NSUbiquitousContainerIsDocumentScopePublic: true
+            NSUbiquitousContainerName: Hearth
+            NSUbiquitousContainerSupportedFolderLevels: Any
+    # iCloud Drive for the iCloud backup button. The container is named after the bundle id, so it
+    # follows HEARTH_APPLICATION_ID; the publisher enables iCloud (CloudDocuments) on that App ID.
+    entitlements:
+      path: Hearth/Hearth.entitlements
+      properties:
+        com.apple.developer.icloud-container-identifiers:
+          - iCloud.$(PRODUCT_BUNDLE_IDENTIFIER)
+        com.apple.developer.icloud-services:
+          - CloudDocuments
+        com.apple.developer.ubiquity-container-identifiers:
+          - iCloud.$(PRODUCT_BUNDLE_IDENTIFIER)
     settings:
       base:
+        HEARTH_GOOGLE_IOS_CLIENT_ID: ""
+        HEARTH_DROPBOX_APP_KEY: ""
         PRODUCT_BUNDLE_IDENTIFIER: example.hearth.app$(BUNDLE_ID_SUFFIX)
         PRODUCT_NAME: Hearth
         TARGETED_DEVICE_FAMILY: "1,2"

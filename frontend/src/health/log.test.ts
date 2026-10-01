@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { BODY_PARTS, type HealthEntry } from '../types'
 import {
+  daysBefore,
   describeEntry,
   detailsCell,
   facets,
@@ -9,15 +10,18 @@ import {
   formatDetailsJson,
   formatTags,
   formatValue,
+  groupByDate,
   isFiltering,
   NO_FILTER,
   normTime,
+  panelFilterCount,
   parseDetails,
   parseTags,
   sortHealthLog,
   when,
   where,
 } from './log'
+import { today } from './now'
 import {
   findPreset,
   MEASUREMENT_PRESETS,
@@ -297,5 +301,41 @@ describe('symptom details', () => {
     }
     expect(symptomPreset('Eye irritation')?.id).toBe('eye-irritation')
     expect(presetOrder('symptom', [{ kind: 'symptom', title: 'Cough' }])[0].id).toBe('cough')
+  })
+})
+
+describe('dates', () => {
+  it('formats the local calendar date', () => {
+    expect(today(new Date(2026, 0, 5, 23, 59))).toBe('2026-01-05')
+  })
+  it('steps back across months, years and leap days', () => {
+    expect(daysBefore('2026-09-14', 0)).toBe('2026-09-14')
+    expect(daysBefore('2026-03-01', 1)).toBe('2026-02-28')
+    expect(daysBefore('2024-03-01', 1)).toBe('2024-02-29')
+    expect(daysBefore('2026-01-03', 6)).toBe('2025-12-28')
+  })
+})
+
+describe('card view helpers', () => {
+  it('counts panel filters, a date range once, and ignores kind and search text', () => {
+    expect(panelFilterCount(NO_FILTER)).toBe(0)
+    expect(panelFilterCount({ ...NO_FILTER, kind: 'lab', text: 'x' })).toBe(0)
+    expect(panelFilterCount({ ...NO_FILTER, condition: 'asthma' })).toBe(1)
+    expect(panelFilterCount({ ...NO_FILTER, from: '2026-01-01', to: '2026-02-01', tag: 'a' })).toBe(2)
+    expect(
+      panelFilterCount({ ...NO_FILTER, person: 'p', bodyPart: 'hands', minSeverity: 1, to: '2026-01-01' }),
+    ).toBe(4)
+  })
+  it('groups consecutive entries by date, keeping order', () => {
+    const g = groupByDate([
+      entry({ id: 'a', date: '2026-09-14' }),
+      entry({ id: 'b', date: '2026-09-14' }),
+      entry({ id: 'c', date: '2026-09-12' }),
+    ])
+    expect(g.map((x) => [x.date, x.entries.map((e) => e.id)])).toEqual([
+      ['2026-09-14', ['a', 'b']],
+      ['2026-09-12', ['c']],
+    ])
+    expect(groupByDate([])).toEqual([])
   })
 })

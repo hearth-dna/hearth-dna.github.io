@@ -1,7 +1,7 @@
 import type { Header } from '../export/container'
 
 /**
- * Pure naming and conflict rules for the backup folder (docs/architecture/storage/backup-folder.md).
+ * Pure naming and newer-copy rules for the backup folder (docs/architecture/storage/backup-folder.md).
  * Everything that touches a real directory handle lives in folder.ts.
  */
 export const ROTATIONS = 3
@@ -22,6 +22,16 @@ export function sharedName(profile: string, at: Date): string {
 }
 
 export const rotatedName = (base: string, n: number) => `${base}.${n}`
+
+/**
+ * Where the copies of attached documents go. Per profile, so two families sharing one stick never
+ * delete each other's documents when one of them forgets the folder.
+ */
+export const attachmentsDirName = (profile: string) =>
+  profile === 'default' ? 'attachments' : `attachments-${profile}`
+
+/** Where a folder snapshot's genome files go (`external_genomes`), per profile like attachments. */
+export const genomesDirName = (profile: string) => (profile === 'default' ? 'genomes' : `genomes-${profile}`)
 
 /** Copies to make, oldest first, so that `base` can then be overwritten with the newest snapshot. */
 export function rotationPlan(
@@ -55,23 +65,10 @@ export function spareNames(existing: string[], base: string): string[] {
   return [...rotated, ...conflicts]
 }
 
-export function conflictName(base: string, device: string, at: string): string {
-  return `${base.replace(/\.hearth$/, '')}.conflict-${device.slice(0, 8)}-${at.slice(0, 19).replace(/[:T]/g, '-')}.hearth`
-}
-
 /** The header of the snapshot this browser last wrote to or loaded from the folder. */
 export interface Seen {
   device: string
   generation: number
-}
-
-/**
- * True when the folder holds a snapshot from another browser that this one has not loaded: a
- * second PC saved since we last looked, and overwriting would silently discard its work.
- */
-export function isForeign(current: Header | null, ourDevice: string, lastSeen: Seen | null): boolean {
-  if (!current || current.device === ourDevice) return false
-  return !(lastSeen && lastSeen.device === current.device && lastSeen.generation === current.generation)
 }
 
 /** The folder file is newer than what this browser has loaded from it. */
@@ -88,6 +85,11 @@ export const README = (url: string) =>
     'log, notes). The newest is hearth-backup.hearth; .1, .2, ... are older copies. A file starting',
     'with "HRTH2" is encrypted with the passphrase set in Hearth; a file starting with "PK" is a',
     'plain zip and readable by anyone who has it.',
+    '',
+    'The attachments folder holds one file per image or PDF attached to a health log entry, named',
+    'after the content of the file. Files starting with "HRTH1" are encrypted with the same',
+    'passphrase. They are written once and kept even after an entry is deleted, because the older',
+    'snapshots above may still refer to them; removing one only loses that document.',
     '',
     `To restore: open ${url}, go to Settings, choose this folder, and press "Load from folder".`,
     '',

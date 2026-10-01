@@ -39,5 +39,8 @@
   "settingsPage.storageOpfs": "OPFS (persistent)",
   "settingsPage.storageMemory": "memory (not persistent in this browser context)",
   "settingsPage.appearance": "Appearance",
-  "settingsPage.appearanceNote": "System follows your device's light or dark setting; Light and Dark keep that look on this device."
+  "settingsPage.appearanceNote": "System follows your device's light or dark setting; Light and Dark keep that look on this device.",
+  "settingsPage.attachmentStorage": "{n} attached documents, {mb} MB.",
+  "settingsPage.storagePersisted": "This browser has promised to keep them.",
+  "settingsPage.storageBestEffort": "The browser may clear them if it runs short of space; keep a backup folder."
 }

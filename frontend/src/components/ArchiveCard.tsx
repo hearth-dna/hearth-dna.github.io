@@ -35,6 +35,7 @@ export function ArchiveCard() {
         </button>
       </div>
       {!pass && <p className="muted">{t('archiveCard.plaintextWarning')}</p>}
+      <p className="muted">{t('archiveCard.attachmentsNotice')}</p>
       {msg && <p>{msg}</p>}
     </div>
   )

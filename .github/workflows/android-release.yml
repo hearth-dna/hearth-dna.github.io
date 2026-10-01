@@ -49,11 +49,11 @@ jobs:
             exit 1
           fi
 
+      # Node runs frontend/scripts/mobile-i18n.mjs (built-ins only, no npm install): the apps take
+      # their strings from the web's catalogue.
       - uses: actions/setup-node@v6
         with:
           node-version: '22'
-          cache: npm
-          cache-dependency-path: frontend/package-lock.json
 
       - uses: actions/setup-java@v5
         with:
@@ -62,11 +62,8 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v5
 
-      - name: Install frontend dependencies
-        run: cd frontend && npm ci
-
-      # The shell's JVM tests gate the release: this is the one place the Kotlin is built at all.
-      - name: Run the shell's unit tests
+      # The JVM tests (schema, golden backups, logic ports) gate the release.
+      - name: Run the unit tests
         run: make android-test ANDROID_JAVA_HOME="$JAVA_HOME" ANDROID_SDK_HOME="$ANDROID_HOME"
 
       # Outside the workspace and removed in a cleanup step: a keystore in the checkout could be

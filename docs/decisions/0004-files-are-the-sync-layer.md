@@ -1,6 +1,6 @@
 # ADR 0004: Files are the sync layer — backup folder and portable archive, no cloud API
 
-**Date:** 2026-09-14 · **Status:** Accepted, implemented (design in `docs/architecture/storage/`)
+**Date:** 2026-09-14 · **Status:** Accepted, implemented (design in `docs/architecture/storage/`) · **Amended by:** [0008](0008-cloud-backups-on-the-phones.md) (the phones pick a folder or file through the system picker) and [0009](0009-cloud-drive-buttons.md) (the phone apps sign in to Google Drive and Dropbox themselves)
 
 ## Context
 
