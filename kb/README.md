@@ -13,7 +13,7 @@ ids from the catalogue below, never free text.
 `reviewed/conditions.json` is the condition catalogue: the one id that ties a family's DNA markers
 to the health-log records about the same condition. Shape: `id, names {en, ru, …}, synonyms {lang:
 […]}?, icd10[], category, rsids[], labs [{name, loinc?, synonyms?}], measurements[] (preset ids from
-frontend/src/health/presets.ts), symptoms[], body_parts[] (BODY_PARTS in types.ts), drugs[],
+frontend/src/health/presets.ts), symptoms[] (symptom preset ids, same file), body_parts[] (BODY_PARTS in types.ts), drugs[],
 summary?, sources[]?, reviewed_at`. `names.en` is required; the app falls back to it for other
 languages. Names, synonyms, lab names and drugs are what the app matches free text against, in
 any language listed, so add the words people actually write ("high blood pressure", "давление").

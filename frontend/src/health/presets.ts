@@ -1,4 +1,12 @@
 import type { HealthKind } from '../types'
+import synonyms from './synonyms.json'
+
+/**
+ * Other names for each symptom preset, by id: what a person types or a document says for the
+ * same symptom in English, Russian, Ukrainian, German, Spanish and French. The UI name in every
+ * language comes from the locale files (`preset.<id>`). Lower case; matching ignores case anyway.
+ */
+const SYNONYMS: Record<string, string[]> = synonyms
 
 /**
  * Common situations offered as one-click starting points for a health-log entry. A preset only
@@ -55,12 +63,14 @@ const m = (
   step,
   ...extra,
 })
-const s = (id: string, title: string, bodyPart = '', tags: string[] = []): HealthPreset => ({
+const s = (id: string, title: string, bodyPart = '', extra: Partial<HealthPreset> = {}): HealthPreset => ({
   id,
   title,
   kind: 'symptom',
   bodyPart,
-  tags,
+  tags: [],
+  synonyms: SYNONYMS[id],
+  ...extra,
 })
 
 export const MEASUREMENT_PRESETS: HealthPreset[] = [
@@ -157,14 +167,14 @@ export const MEASUREMENT_PRESETS: HealthPreset[] = [
 
 export const SYMPTOM_PRESETS: HealthPreset[] = [
   s('headache', 'Headache', 'head'),
-  s('migraine', 'Migraine', 'head', ['migraine']),
+  s('migraine', 'Migraine', 'head', { tags: ['migraine'] }),
   s('fever', 'Fever', 'whole body'),
   s('chills', 'Chills', 'whole body'),
   s('fatigue', 'Fatigue', 'whole body'),
   s('dizziness', 'Dizziness', 'head'),
   s('nosebleed', 'Nosebleed', 'nose'),
   s('runny-nose', 'Runny or blocked nose', 'nose'),
-  s('sneezing', 'Sneezing', 'nose', ['allergy']),
+  s('sneezing', 'Sneezing', 'nose', { tags: ['allergy'] }),
   s('sore-throat', 'Sore throat', 'throat'),
   s('cough', 'Cough', 'lungs'),
   s('shortness-of-breath', 'Shortness of breath', 'lungs'),
@@ -184,21 +194,44 @@ export const SYMPTOM_PRESETS: HealthPreset[] = [
   s('eye-irritation', 'Eye irritation', 'eyes'),
   s('earache', 'Earache', 'ears'),
   s('toothache', 'Toothache', 'mouth'),
-  s('insomnia', 'Trouble sleeping', ''),
-  s('anxiety', 'Anxiety', ''),
-  s('low-mood', 'Low mood', ''),
+  s('insomnia', 'Trouble sleeping'),
+  s('anxiety', 'Anxiety'),
+  s('low-mood', 'Low mood'),
   s('period-pain', 'Period pain', 'abdomen'),
-  s('swelling', 'Swelling', ''),
-  s('numbness', 'Numbness or tingling', ''),
+  s('swelling', 'Swelling'),
+  s('numbness', 'Numbness or tingling'),
+  s('thirst', 'Excessive thirst', 'mouth'),
+  s('frequent-urination', 'Frequent urination', 'abdomen'),
+  s('bloating', 'Bloating', 'abdomen'),
+  s('blurred-vision', 'Blurred vision', 'eyes'),
+  s('cold-intolerance', 'Always feeling cold', 'whole body'),
+  s('confusion', 'Confusion', 'head'),
+  s('difficulty-swallowing', 'Difficulty swallowing', 'throat'),
+  s('flushing', 'Flushing', 'skin'),
+  s('memory-loss', 'Forgetfulness', 'head'),
+  s('mole-change', 'New or changing mole', 'skin'),
+  s('stiffness', 'Stiffness', 'joints'),
+  s('night-sweats', 'Night sweats', 'whole body'),
+  s('cramps', 'Muscle cramps', 'muscles'),
+  s('hair-loss', 'Hair loss', 'head'),
+  s('appetite-loss', 'Loss of appetite', 'stomach'),
+  s('tinnitus', 'Ringing in the ears', 'ears'),
+  s('hoarseness', 'Hoarse voice', 'throat'),
 ]
 
 export const EVENT_PRESETS: HealthPreset[] = [
   { id: 'took-medication', title: 'Took medication', kind: 'medication' },
   { id: 'vaccination', title: 'Vaccination', kind: 'medication', tags: ['vaccine'] },
   { id: 'doctor-visit', title: 'Doctor visit', kind: 'letter' },
-  { id: 'injury', title: 'Injury', kind: 'symptom', tags: ['injury'] },
-  { id: 'allergic-reaction', title: 'Allergic reaction', kind: 'symptom', tags: ['allergy'] },
-  { id: 'fainting', title: 'Fainting', kind: 'symptom', bodyPart: 'head' },
+  { id: 'injury', title: 'Injury', kind: 'symptom', tags: ['injury'], synonyms: SYNONYMS.injury },
+  {
+    id: 'allergic-reaction',
+    title: 'Allergic reaction',
+    kind: 'symptom',
+    tags: ['allergy'],
+    synonyms: SYNONYMS['allergic-reaction'],
+  },
+  { id: 'fainting', title: 'Fainting', kind: 'symptom', bodyPart: 'head', synonyms: SYNONYMS.fainting },
 ]
 
 export const PRESET_GROUPS: { label: string; labelKey: string; presets: HealthPreset[] }[] = [
@@ -213,6 +246,27 @@ export function findPreset(id: string): HealthPreset | undefined {
     if (p) return p
   }
   return undefined
+}
+
+const loose = (x: string) =>
+  x.normalize('NFKC').toLowerCase().replace(/[’ʼ]/g, "'").replace(/ё/g, 'е').replace(/\s+/g, ' ').trim()
+
+/**
+ * The preset a saved entry names: one of the same kind whose title or a synonym equals the
+ * entry's title. Entries keep the English title they were saved with ("Headache"), or whatever
+ * name the person typed ("головная боль"); this is how both show up in the UI language.
+ */
+export function presetOf(e: { kind: string; title: string }): HealthPreset | undefined {
+  const n = loose(e.title)
+  return PRESET_GROUPS.flatMap((g) => g.presets).find(
+    (p) => p.kind === e.kind && [p.title, ...(p.synonyms ?? [])].some((x) => loose(x) === n),
+  )
+}
+
+/** An entry's title as the UI shows it: the preset's name in the UI language, else as saved. */
+export function entryTitle(e: { kind: string; title: string }, t: (key: string) => string): string {
+  const p = presetOf(e)
+  return p ? t(`preset.${p.id}`) : e.title
 }
 
 /** The measurement preset a saved entry was made from, by its title. */

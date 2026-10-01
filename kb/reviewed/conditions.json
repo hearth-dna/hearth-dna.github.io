@@ -37,7 +37,7 @@
       ],
       "symptoms": [
         "thirst",
-        "frequent urination",
+        "frequent-urination",
         "fatigue"
       ],
       "body_parts": [],
@@ -88,8 +88,8 @@
         "weight"
       ],
       "symptoms": [
-        "chest pain",
-        "shortness of breath"
+        "chest-pain",
+        "shortness-of-breath"
       ],
       "body_parts": [
         "chest",
@@ -137,7 +137,7 @@
         "heart-rate"
       ],
       "symptoms": [
-        "chest pain"
+        "chest-pain"
       ],
       "body_parts": [
         "chest",
@@ -299,7 +299,7 @@
       "labs": [],
       "measurements": [],
       "symptoms": [
-        "memory loss",
+        "memory-loss",
         "confusion"
       ],
       "body_parts": [
@@ -378,7 +378,7 @@
       "measurements": [],
       "symptoms": [
         "fatigue",
-        "joint pain"
+        "joint-pain"
       ],
       "body_parts": [
         "joints"
@@ -473,7 +473,7 @@
       "labs": [],
       "measurements": [],
       "symptoms": [
-        "difficulty swallowing"
+        "difficulty-swallowing"
       ],
       "body_parts": [
         "throat",
@@ -595,7 +595,7 @@
       ],
       "symptoms": [
         "fatigue",
-        "cold intolerance"
+        "cold-intolerance"
       ],
       "body_parts": [
         "neck"
@@ -661,7 +661,7 @@
       "labs": [],
       "measurements": [],
       "symptoms": [
-        "blurred vision"
+        "blurred-vision"
       ],
       "body_parts": [
         "eyes"
@@ -703,7 +703,6 @@
       ],
       "symptoms": [
         "bloating",
-        "diarrhoea",
         "diarrhea"
       ],
       "body_parts": [
@@ -741,7 +740,7 @@
       "measurements": [],
       "symptoms": [
         "bloating",
-        "diarrhoea"
+        "diarrhea"
       ],
       "body_parts": [
         "abdomen"
@@ -775,7 +774,7 @@
       "labs": [],
       "measurements": [],
       "symptoms": [
-        "new or changing mole"
+        "mole-change"
       ],
       "body_parts": [
         "skin"
@@ -880,7 +879,7 @@
       ],
       "measurements": [],
       "symptoms": [
-        "joint pain",
+        "joint-pain",
         "stiffness",
         "swelling"
       ],

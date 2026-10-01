@@ -13,7 +13,7 @@ import {
   type SortDir,
   sortHealthLog,
 } from '../health/log'
-import { measurementPreset } from '../health/presets'
+import { entryTitle, presetOf } from '../health/presets'
 import { useI18n, useT } from '../i18n/context'
 import { conditionById, conditionName, suggestConditions } from '../kb/conditions'
 import { HEALTH_KIND_LABELS, type HealthEntry, type HealthKind, type Person } from '../types'
@@ -51,6 +51,7 @@ export function HealthTable({
   const [sort, setSort] = useState<{ key: HealthSortKey; dir: SortDir }>({ key: 'date', dir: 'desc' })
   const [open, setOpen] = useState<string | null>(null)
   const name = (id: string) => persons.find((p) => p.id === id)?.displayName ?? id
+  const title = (e: HealthEntry) => entryTitle(e, t)
   const { bodyParts, tags, conditions } = useMemo(() => facets(entries), [entries])
   const conditionLabel = (id: string) => {
     const c = conditionById(kb, id)
@@ -66,10 +67,10 @@ export function HealthTable({
     for (const e of byPerson) c[e.kind] = (c[e.kind] ?? 0) + 1
     return { all: byPerson.length, c }
   }, [entries, filter.person])
-  // biome-ignore lint/correctness/useExhaustiveDependencies: name derives from persons
+  // biome-ignore lint/correctness/useExhaustiveDependencies: name derives from persons, title from t
   const shown = useMemo(
-    () => sortHealthLog(filterHealthLog(entries, filter), sort.key, sort.dir, name),
-    [entries, filter, sort, persons],
+    () => sortHealthLog(filterHealthLog(entries, filter, title), sort.key, sort.dir, name, title),
+    [entries, filter, sort, persons, t],
   )
   const set = (patch: Partial<HealthFilter>) => onFilter({ ...filter, ...patch })
 
@@ -242,7 +243,7 @@ export function HealthTable({
                       <span className={`badge kind-${e.kind}`}>{t(`kind.${e.kind}`)}</span>
                     </td>
                     <td>
-                      {e.title}
+                      {title(e)}
                       {e.body && <span className="muted"> ¶</span>}
                     </td>
                     <td className="nowrap">
@@ -296,7 +297,7 @@ export function HealthTable({
                             value={e.conditions}
                             suggestions={suggestConditions(kb, {
                               ...e,
-                              preset: e.kind === 'measurement' ? measurementPreset(e.title)?.id : undefined,
+                              preset: presetOf(e)?.id,
                             })}
                             onChange={(ids) => link(e, ids)}
                           />

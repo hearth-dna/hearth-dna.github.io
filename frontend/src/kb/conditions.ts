@@ -18,6 +18,7 @@ export interface KbCondition {
   labs: string[]
   /** Preset ids from health/presets.ts. */
   measurements: string[]
+  /** Symptom preset ids from health/presets.ts, named in the UI language as `preset.<id>`. */
   symptoms: string[]
   /** Values from BODY_PARTS. */
   body_parts: string[]

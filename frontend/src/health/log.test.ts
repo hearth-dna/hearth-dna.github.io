@@ -14,7 +14,15 @@ import {
   when,
   where,
 } from './log'
-import { findPreset, MEASUREMENT_PRESETS, measurementOrder, PRESET_GROUPS } from './presets'
+import {
+  entryTitle,
+  findPreset,
+  MEASUREMENT_PRESETS,
+  measurementOrder,
+  PRESET_GROUPS,
+  presetOf,
+  SYMPTOM_PRESETS,
+} from './presets'
 
 const entry = (o: Partial<HealthEntry>): HealthEntry => ({
   id: 'x',
@@ -126,6 +134,25 @@ describe('presets', () => {
     expect(findPreset('nosebleed')).toMatchObject({ kind: 'symptom', bodyPart: 'nose' })
     expect(findPreset('nope')).toBeUndefined()
   })
+  it('give every symptom synonyms, and no name points to two presets of one kind', () => {
+    for (const p of SYMPTOM_PRESETS) expect(p.synonyms?.length, p.id).toBeGreaterThan(0)
+    const all = PRESET_GROUPS.flatMap((g) => g.presets)
+    for (const p of all)
+      for (const name of [p.title, ...(p.synonyms ?? [])])
+        expect(presetOf({ kind: p.kind, title: name })?.id, `${p.id}: ${name}`).toBe(p.id)
+  })
+  it('find the preset an entry names, in any listed language, and show it in the UI language', () => {
+    expect(presetOf({ kind: 'symptom', title: 'Headache' })?.id).toBe('headache')
+    expect(presetOf({ kind: 'symptom', title: ' Головная  боль ' })?.id).toBe('headache')
+    expect(presetOf({ kind: 'symptom', title: 'Kopfschmerzen' })?.id).toBe('headache')
+    expect(presetOf({ kind: 'symptom', title: 'Ночная потливость' })?.id).toBe('night-sweats')
+    expect(presetOf({ kind: 'measurement', title: 'вес' })?.id).toBe('weight')
+    expect(presetOf({ kind: 'measurement', title: 'Headache' })).toBeUndefined()
+    expect(presetOf({ kind: 'symptom', title: 'Pain in hands' })).toBeUndefined()
+    const t = (key: string) => (key === 'preset.headache' ? 'Головная боль' : key)
+    expect(entryTitle({ kind: 'symptom', title: 'Headache' }, t)).toBe('Головная боль')
+    expect(entryTitle({ kind: 'symptom', title: 'Pain in hands' }, t)).toBe('Pain in hands')
+  })
 })
 
 describe('filterHealthLog', () => {
@@ -151,6 +178,11 @@ describe('filterHealthLog', () => {
     expect(ids({ tag: 'arthritis' })).toEqual(['1', '3'])
     expect(ids({ tag: 'arthritis', kind: 'lab' })).toEqual(['3'])
     expect(ids({ condition: 'arthritis' })).toEqual(['3'])
+  })
+  it('searches the title the table shows too', () => {
+    const shown = (e: { title: string }) => (e.title === 'Headache' ? 'Головная боль' : e.title)
+    expect(filterHealthLog(log, { ...NO_FILTER, text: 'голов' }, shown).map((e) => e.id)).toEqual(['2'])
+    expect(filterHealthLog(log, { ...NO_FILTER, text: 'head' }, shown).map((e) => e.id)).toEqual(['2'])
   })
   it('searches title, body, body part and tags case-insensitively', () => {
     expect(ids({ text: 'HAND' })).toEqual(['1'])

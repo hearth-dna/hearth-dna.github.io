@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
-import { MEASUREMENT_PRESETS } from '../health/presets'
+import { MEASUREMENT_PRESETS, SYMPTOM_PRESETS } from '../health/presets'
 import { BODY_PARTS } from '../types'
 import {
   conditionById,
@@ -16,10 +16,12 @@ const kb = JSON.parse(readFileSync(`${__dirname}/../../public/kb.json`, 'utf8'))
 describe('condition catalogue', () => {
   it('links markers and conditions both ways and references only known presets and body parts', () => {
     const presets = new Set(MEASUREMENT_PRESETS.map((p) => p.id))
+    const symptoms = new Set(SYMPTOM_PRESETS.map((p) => p.id))
     const rsids = new Set(kb.entries.map((e) => e.rsid))
     for (const c of kb.conditions) {
       expect(c.names.en, c.id).toBeTruthy()
       for (const m of c.measurements) expect(presets, `${c.id} measurement ${m}`).toContain(m)
+      for (const s of c.symptoms) expect(symptoms, `${c.id} symptom ${s}`).toContain(s)
       for (const b of c.body_parts) expect(BODY_PARTS, `${c.id} body part ${b}`).toContain(b)
       for (const r of c.rsids)
         if (rsids.has(r)) expect(kb.entries.find((e) => e.rsid === r)?.conditions).toContain(c.id)

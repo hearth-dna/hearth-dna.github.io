@@ -1,5 +1,5 @@
 {
- "version": "2026.09.27",
+ "version": "2026.10.01",
  "entries": [
   {
    "rsid": "rs1057910",
@@ -1081,7 +1081,7 @@
    "labs": [],
    "measurements": [],
    "symptoms": [
-    "memory loss",
+    "memory-loss",
     "confusion"
    ],
    "body_parts": [
@@ -1120,7 +1120,7 @@
    "labs": [],
    "measurements": [],
    "symptoms": [
-    "blurred vision"
+    "blurred-vision"
    ],
    "body_parts": [
     "eyes"
@@ -1158,7 +1158,7 @@
    ],
    "measurements": [],
    "symptoms": [
-    "joint pain",
+    "joint-pain",
     "stiffness",
     "swelling"
    ],
@@ -1216,8 +1216,8 @@
     "weight"
    ],
    "symptoms": [
-    "chest pain",
-    "shortness of breath"
+    "chest-pain",
+    "shortness-of-breath"
    ],
    "body_parts": [
     "chest",
@@ -1267,7 +1267,6 @@
    ],
    "symptoms": [
     "bloating",
-    "diarrhoea",
     "diarrhea"
    ],
    "body_parts": [
@@ -1312,7 +1311,7 @@
    "measurements": [],
    "symptoms": [
     "fatigue",
-    "joint pain"
+    "joint-pain"
    ],
    "body_parts": [
     "joints"
@@ -1525,7 +1524,7 @@
    ],
    "symptoms": [
     "fatigue",
-    "cold intolerance"
+    "cold-intolerance"
    ],
    "body_parts": [
     "neck"
@@ -1566,7 +1565,7 @@
    "measurements": [],
    "symptoms": [
     "bloating",
-    "diarrhoea"
+    "diarrhea"
    ],
    "body_parts": [
     "abdomen"
@@ -1602,7 +1601,7 @@
    "labs": [],
    "measurements": [],
    "symptoms": [
-    "new or changing mole"
+    "mole-change"
    ],
    "body_parts": [
     "skin"
@@ -1646,7 +1645,7 @@
     "heart-rate"
    ],
    "symptoms": [
-    "chest pain"
+    "chest-pain"
    ],
    "body_parts": [
     "chest",
@@ -1719,7 +1718,7 @@
    "labs": [],
    "measurements": [],
    "symptoms": [
-    "difficulty swallowing"
+    "difficulty-swallowing"
    ],
    "body_parts": [
     "throat",
@@ -1887,7 +1886,7 @@
    ],
    "symptoms": [
     "thirst",
-    "frequent urination",
+    "frequent-urination",
     "fatigue"
    ],
    "body_parts": [],
@@ -5879,5 +5878,5 @@
   "Reviewed entries: curated in the family_dna repository",
   "LOINC codes: copyright Regenstrief Institute, Inc., available at no cost at loinc.org"
  ],
- "sha256": "cee084cfb59e36b1faa539bde9dae7b5938e9d288019cbd4a441a0a262c5af26"
+ "sha256": "01a2a9752d62a967cef593ecaa13c68513d3d74b58174b4ee3dc40752b051c13"
 }

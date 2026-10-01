@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useApp } from '../app/context'
 import { deleteHealthEntry, listFamilyHealthLog } from '../db/repo'
 import { facets, type HealthFilter, NO_FILTER } from '../health/log'
+import { entryTitle } from '../health/presets'
 import { useT } from '../i18n/context'
 import type { HealthEntry } from '../types'
 import { HealthEntryForm } from './HealthEntryForm'
@@ -90,7 +91,7 @@ export function HealthPage({ person: who, onPerson }: { person: string; onPerson
             onFilter={setFilter}
             onChange={reload}
             onDelete={async (e) => {
-              if (confirm(t('healthLog.confirmDelete', { title: e.title, date: e.date }))) {
+              if (confirm(t('healthLog.confirmDelete', { title: entryTitle(e, t), date: e.date }))) {
                 await deleteHealthEntry(db, e.id)
                 await reload()
               }
