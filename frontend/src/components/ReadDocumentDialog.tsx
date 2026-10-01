@@ -97,7 +97,7 @@ export function ReadDocumentDialog({
   onClose,
 }: {
   person: Person
-  onDraft: (d: HealthDraft, source: string) => void
+  onDraft: (d: HealthDraft, source: string, files?: File[]) => void
   onLabDraft: (d: LabReportDraft, source: string) => void
   onClose: () => void
 }) {
@@ -111,6 +111,7 @@ export function ReadDocumentDialog({
   const [newKey, setNewKey] = useState('')
   const [model, setModel] = useState(GEMINI_DEFAULT_MODEL)
   const [consented, setConsented] = useState(false)
+  const [keepOriginals, setKeepOriginals] = useState(true)
   const [stage, setStage] = useState<Stage>({ s: 'pick' })
   /** What goes to the model: the chosen files, and text this device could not fully read. */
   const [parts, setParts] = useState<{ name: string; mime: string; bytes: Uint8Array }[]>([])
@@ -230,7 +231,11 @@ export function ReadDocumentDialog({
       await logSharing(db, 'document', `gemini:${usedModel}`, JSON.stringify(meta, null, 2))
       const source = `gemini:${usedModel}:${hashes.join('+')}`
       if (lab) return done(labDraftFromJson(kb, text), source)
-      onDraft(draftFromJson(text, new Date().toISOString().slice(0, 10)), source)
+      onDraft(
+        draftFromJson(text, new Date().toISOString().slice(0, 10)),
+        source,
+        keepOriginals ? files : undefined,
+      )
       ref.current?.close()
     } catch (e) {
       // Stay on the send step: the files are still here, and a busy provider is worth a retry.
@@ -327,6 +332,19 @@ export function ReadDocumentDialog({
             <p className="muted" role="status">
               {t('readDocumentDialog.retrying', { n: stage.attempt, m: 3 })}
             </p>
+          )}
+          {!lab && (
+            <>
+              <label className="check">
+                <input
+                  type="checkbox"
+                  checked={keepOriginals}
+                  onChange={(e) => setKeepOriginals(e.target.checked)}
+                />
+                <span>{t('readDocumentDialog.keepOriginals')}</span>
+              </label>
+              <p className="muted">{t('readDocumentDialog.keepOriginalsHint')}</p>
+            </>
           )}
           <div className="row">
             <button

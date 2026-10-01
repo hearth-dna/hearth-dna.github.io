@@ -1,8 +1,7 @@
 /** Local date and time as the forms want them; toISOString() is UTC and gives yesterday late at night. */
 const pad = (n: number) => String(n).padStart(2, '0')
 
-export function today(): string {
-  const d = new Date()
+export function today(d = new Date()): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
 }
 

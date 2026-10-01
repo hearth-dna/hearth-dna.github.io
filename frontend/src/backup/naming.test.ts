@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Header } from '../export/container'
-import { baseName, conflictName, hasNewer, isForeign, rotationPlan, sharedName, spareNames } from './naming'
+import { attachmentsDirName, baseName, hasNewer, rotationPlan, sharedName, spareNames } from './naming'
 
 const header = (device: string, generation: number): Header => ({
   format: 'hearth-dump',
@@ -34,12 +34,6 @@ describe('backup naming', () => {
     ])
   })
 
-  it('builds a conflict name without colons', () => {
-    expect(conflictName('hearth-backup.hearth', 'abcdef01-2345', '2026-09-14T10:00:00.000Z')).toBe(
-      'hearth-backup.conflict-abcdef01-2026-09-14-10-00-00.hearth',
-    )
-  })
-
   it('lists older copies oldest-last, then conflict files newest-first', () => {
     const base = 'hearth-backup.hearth'
     expect(
@@ -64,18 +58,17 @@ describe('backup naming', () => {
     ])
   })
 
-  it('detects another device having written since we last looked', () => {
-    expect(isForeign(null, 'A', null)).toBe(false)
-    expect(isForeign(header('A', 9), 'A', null)).toBe(false)
-    expect(isForeign(header('B', 5), 'A', null)).toBe(true)
-    expect(isForeign(header('B', 5), 'A', { device: 'B', generation: 5 })).toBe(false)
-    expect(isForeign(header('B', 6), 'A', { device: 'B', generation: 5 })).toBe(true)
-  })
-
   it('offers a load when the folder is ahead of what we loaded', () => {
     expect(hasNewer(header('B', 5), 'A', null)).toBe(true)
     expect(hasNewer(header('B', 5), 'A', { device: 'B', generation: 5 })).toBe(false)
     expect(hasNewer(header('B', 7), 'A', { device: 'B', generation: 5 })).toBe(true)
     expect(hasNewer(header('A', 7), 'A', null)).toBe(false)
+  })
+})
+
+describe('attachmentsDirName', () => {
+  it('is shared by default and separate per profile', () => {
+    expect(attachmentsDirName('default')).toBe('attachments')
+    expect(attachmentsDirName('mum')).toBe('attachments-mum')
   })
 })

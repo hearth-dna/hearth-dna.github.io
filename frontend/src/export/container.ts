@@ -36,6 +36,11 @@ export interface Manifest {
   app_version: string
   profile: string
   genomes: GenomeEntry[]
+  /**
+   * The genome files are not in the zip but beside it, in the backup folder's `genomes/`, each named
+   * by its entry's path and checked against its sha256 on load. Absent means they are inside.
+   */
+  external_genomes?: boolean
 }
 
 export interface Journal {
@@ -44,6 +49,8 @@ export interface Journal {
   source_files: unknown[]
   consents: unknown[]
   health_log: unknown[]
+  /** Metadata only. The bytes travel beside the snapshot, see backup/mirror (added after v2). */
+  attachments?: unknown[]
   notes: unknown[]
   chats: unknown[]
   sharing_log: unknown[]
@@ -134,8 +141,12 @@ export function readHeader(bytes: Uint8Array): Header | null {
   return raw ? parseHeader(raw) : null
 }
 
-/** Manifest paths the container has no verified bytes for. */
+/**
+ * Manifest paths the container has no verified bytes for. None for a folder snapshot that keeps its
+ * genomes beside it (`external_genomes`): those are fetched one by one on restore.
+ */
 export function missingGenomes(c: Container): string[] {
+  if (c.manifest.external_genomes) return []
   return c.manifest.genomes.filter((g) => !c.genomes[g.path]).map((g) => g.path)
 }
 
@@ -153,6 +164,31 @@ export function fillGenomes(c: Container, from: Container): number {
     }
   }
   return n
+}
+
+/**
+ * The header from the first bytes of a file alone, so checking a folder for news never downloads a
+ * whole snapshot (tens of megabytes on a cloud drive). Works because `header.json` travels in front:
+ * plaintext ahead of an envelope, or as the first, stored zip entry. Undefined when the prefix does
+ * not settle it (an older layout, too few bytes): read the whole file then.
+ */
+export function readHeaderPrefix(bytes: Uint8Array): Header | null | undefined {
+  if (isEnvelope(bytes)) {
+    const at = MAGIC.length + 2
+    if (bytes.length < at) return undefined
+    const len = (bytes[MAGIC.length] << 8) | bytes[MAGIC.length + 1]
+    return bytes.length < at + len ? undefined : parseHeader(bytes.subarray(at, at + len))
+  }
+  if (!isZip(bytes)) return null
+  const v = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength)
+  if (bytes.length < 30 || v.getUint32(0, true) !== 0x04034b50) return undefined
+  const method = v.getUint16(8, true)
+  const size = v.getUint32(18, true)
+  const nameLength = v.getUint16(26, true)
+  const start = 30 + nameLength + v.getUint16(28, true)
+  if (method !== 0 || bytes.length < start + size) return undefined
+  if (strFromU8(bytes.subarray(30, 30 + nameLength)) !== HEADER_ENTRY) return undefined
+  return parseHeader(bytes.subarray(start, start + size))
 }
 
 /**

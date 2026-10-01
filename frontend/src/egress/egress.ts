@@ -2,8 +2,8 @@
  * The only module allowed to call `fetch` (docs/design.md §13.2; egress.test.ts enforces it).
  * Two destinations exist: our own origin for static assets (kb.json, service worker) and the
  * provider the user brings a key for. There is no server of ours in between (ADR 0007). Every
- * personal-data egress must go through `sendContext`, which requires an explicit per-request
- * confirmation token from the UI.
+ * personal-data egress to a model must go through `sendContext`, which requires an explicit
+ * per-request confirmation token from the UI.
  */
 
 export interface AskTarget {

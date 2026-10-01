@@ -11,9 +11,9 @@ Settings gains a **Backup folder** card:
   *Back up now* button.
 - **Autosave** is on by default once a folder is chosen: every change (import, health-log entry,
   note, consent) schedules a backup after a short quiet period.
-- **Restore**: if a chosen folder already contains a backup newer than what this browser has, the
-  card offers *Load from folder*. The same button is how a second PC gets the data: install the
-  PWA, choose the same folder, load.
+- **Restore** is automatic: a backup in the folder newer than what this browser has seen is loaded
+  at start, when the app comes back to the foreground, and before every backup (see *Newer data
+  wins* below). A second PC gets the data by choosing the same folder; *Load from folder* forces it.
 - The folder is remembered across launches. On the next launch Chrome asks once whether to allow
   access again (or not at all after the user picks "Allow on every visit", Chrome 122+); until it
   is re-granted the card shows *Reconnect folder*.
@@ -34,9 +34,9 @@ No mobile browser can mount a folder, so there a backup is a file the user hands
 - The header button tracks whether anything changed since the last backup file ("Back up" /
   "Backed up 14:02") and makes a new one on click. There is no autosave: sharing needs a tap.
 - Where files cannot be shared the file is downloaded instead, with a hint to upload it from the
-  Drive app. Chrome on Android shares only an allowlist of media types, so it downloads; so does
-  the Android shell (its WebView has no Web Share and downloads go through `Downloads.kt`). iOS
-  Safari, the iOS shell and desktop Safari get the share sheet.
+  Drive app. Chrome on Android shares only an allowlist of media types, so it downloads. iOS
+  Safari and desktop Safari get the share sheet. (The phone apps are native and keep their own
+  backup places, ADR 0010.)
 - `navigator.share` needs a fresh click and building a large snapshot can outlast it; the built
   file then waits (`status.file`) and the button becomes *Share*.
 - What this browser remembers (last snapshot shared, when, plaintext choice) sits in the same
@@ -44,24 +44,66 @@ No mobile browser can mount a folder, so there a backup is a file the user hands
   bump the generation it is compared against. No consent record: like Export dump, every file is
   one the user explicitly hands over.
 
+**The phone apps** (ADR 0008, 0010) use the system document picker.
+Above it, when the build is set up for them, sit **Google Drive**, **Dropbox** and **iCloud Drive**
+buttons (ADR 0009): the same folder layout, reached through the providers' APIs or the iCloud
+container; encrypted when a passphrase is set, and following the backup already there when not.
+The card offers *Choose folder…*, *Create backup file…* and *Open backup file…* — file first on
+Android, where the picker lists Google Drive, Dropbox and OneDrive (behind its ☰ menu) only for
+files, and folder first on iOS, where iCloud Drive lends folders. A folder behaves
+exactly as below; a single file — what Google Drive and Dropbox on Android lend — holds only the
+snapshot, with no rotations and no attachments. The native apps write the same files as
+`folder.ts`, behind the same `Dir` shape (`backup/Dir.kt` with `Saf.kt` and `CloudDir.kt` on
+Android; `Backup/` on iOS).
+
 ## Layout in the folder
 
 ```
 <folder>/
-  hearth-backup.hearth        ← current snapshot (see dump-v2.md)
+  hearth-backup.hearth        ← current snapshot (see dump-v2.md): header, manifest, journal
   hearth-backup.hearth.1      ← previous snapshot
   hearth-backup.hearth.2      ← the one before (ROTATIONS = 3)
+  genomes/<sha256>.txt.gz     ← one per genome file the manifest names, written once
+  attachments/<sha256>.att    ← one per document attached to a health log entry
   README.txt                  ← "This folder is written by Hearth (<url>). Files are encrypted
                                  with your passphrase / plaintext. Open <url> and choose this
                                  folder to restore."
 ```
+
+On Google Drive and Dropbox there are no `.1`/`.2` copies: the provider keeps every earlier
+version of `hearth-backup.hearth` itself, and each copy would cost a download and an upload of the
+whole snapshot.
 
 Rotation is by copy (handles on removable media cannot be renamed portably), oldest first, and
 only then is the current file overwritten, so a crash mid-write leaves `.1` intact and the
 truncated current file fails to open rather than silently restoring something partial.
 
 Multiple families on one stick: the profile name is part of the file name only when the profile
-is not `default` (`hearth-backup-<profile>.hearth`), so the common case stays tidy.
+is not `default` (`hearth-backup-<profile>.hearth`), so the common case stays tidy. The
+attachments folder follows the same rule (`attachments-<profile>/`), so *Forget folder → delete
+files* never takes the other family's documents with it.
+
+**Attachments are sidecars, not snapshot content.** The snapshot is rewritten in full every few
+seconds and kept in three rotations; documents inside it would be copied four times over on every
+edit, which is why the journal carries only the `attachment` rows and the bytes sit beside it.
+Each file is named after the sha256 of its content and written once:
+
+- Content addressing means two computers writing the same name write the same bytes, so a sidecar
+  cannot conflict the way the snapshot can.
+- The set to write is recomputed each run as `wanted − present` (`attachments/sidecar.ts`), so a
+  reformatted stick, a cloud client that dropped a file, or documents attached while the folder
+  was unreachable all heal on the next backup. A run copies at most 25 files or 100 MB and
+  continues on the next one, so an autosave never sits on the folder for minutes.
+- Sidecars are never rotated and never deleted, even when the entry goes: the rotated snapshots
+  beside them may still refer to the document. They go when the user forgets the folder and asks
+  for its files to be deleted. `README.txt` says so.
+- Encryption matches the snapshot: each file is the same `HRTH1` envelope used by the dump, with
+  one PBKDF2 derivation per run rather than per file (600 k iterations × a hundred documents
+  would block the tab for a minute). With *store unencrypted* the raw original is written, which
+  also makes the folder readable as an ordinary archive of documents.
+- Pulling back (`loadFromFolder`, or *Fetch documents*) hashes every file again before storing it:
+  the name is a claim about the content, and a folder is something other programs can write to.
+  A row whose bytes are nowhere shows in the log as "not on this device" rather than failing.
 
 ## Behaviour details
 
@@ -78,33 +120,40 @@ from `meta.generation` against the generation last written or loaded; when it is
 sync is on, the next start or reconnect syncs without waiting for another edit.
 
 **Header Sync button.** `components/SyncButton.tsx` shows the state in a word and a colour:
-synced (with the time), syncing soon, not synced, syncing, newer copy on another computer,
-passphrase needed, reconnect, conflict, failed. A click syncs: a newer copy is loaded first (a
-union by id, so nothing here is lost), then this browser's state is written. States that need a
+synced (with the time), syncing soon, not synced, syncing, passphrase needed, reconnect, failed.
+A click syncs: a newer copy is loaded first (a union by id, so nothing here is lost), then this
+browser's state is written. States that need a
 decision open Settings. Folder reads time out after 10 s, so a stuck cloud mount shows "Sync
 failed" instead of blocking the app.
 
-**Cost.** A full backup of seven genomes is ~5 MB compressed. Building it today means pulling
-every genotype to the main thread; `dump-v2.md` moves genotype serialisation into the worker and
-caches per-source-file blobs, so an autosave after a health-log edit costs milliseconds, not
-seconds. Until that lands autosave is fine but noticeably slow after an import; acceptable for
-the first cut, and the reason dump v2 is step 1.
+**Cost: genomes beside the snapshot.** Genomes are nearly all of a backup (a family of eight is
+~40 MB) and change only on import, so a folder snapshot does not carry them: its manifest lists
+each one (`external_genomes: true`) and the bytes sit in `genomes/<sha256>.txt.gz`, written once
+before the first snapshot that names them, encrypted like the attachment sidecars. Each file's
+hash is computed once and remembered in `meta`, so building a snapshot after an edit reads no
+genome at all, and the upload is the journal alone — kilobytes instead of the whole family on
+every change. A restore fetches a genome only for a person the device has no genotypes for,
+checks it against the manifest, and skips (to retry on the next load) one the folder does not
+have yet. The manual dump, the portable archive and a single-file backup still embed everything;
+a reader without this change refuses a folder snapshot with "missing genomes/…" rather than
+restoring it without its genomes.
 
-**Conflict detection.** Before overwriting, read the header of the current folder file (the
+**Newer data wins** (the simple rule, until real conflict resolution exists). Before any write,
+and at start and on returning to the foreground, the app reads the folder snapshot's header (the
 first few hundred bytes are plaintext: format, generation, device, exported_at, even when the
-payload is encrypted). If its `generation` is not the one this browser last wrote or loaded, and
-its `device` differs, load it first. Loading is a union by id (nothing on either side is lost), so
-the automatic backup merges and then writes the union. Only when the foreign file cannot be opened
-(another passphrase, unreadable) is the old seam used: write
-`hearth-backup.conflict-<device>-<date>.hearth` and show "Another computer saved a newer backup.
-Load theirs, or keep yours?" Choosing *keep yours* writes the current file.
+payload is encrypted). If another device wrote a generation this browser has not seen, that
+snapshot is loaded first — a union by id (`INSERT OR IGNORE`), so records only here survive, a
+record both sides have keeps this device's version, and a deletion does not travel — and only then
+is the union written back. No conflict copies, no
+prompt. Loading a plaintext snapshot needs no passphrase; an encrypted one waits for it.
 
-**Missing genomes.** A snapshot is never written with a manifest entry whose bytes are not in the
-zip. A file that lacks one anyway (a bad copy, a partial sync) still opens: the missing genome is
-left out and everything else restores. Loading from the folder first looks for the missing path in
-the older copies (`.1`, `.2`, `.3`) and conflict files; paths are content hashes, so a match is the
-same file. People whose genome no copy has are listed in the backup card and in the import message,
-with the fix: import their raw file again.
+**Missing genomes.** A snapshot is never written with a manifest entry whose bytes are neither in
+the zip nor, for `external_genomes`, beside it. A file that lacks one anyway (a bad copy, a
+partial sync) still opens: the missing genome is left out and everything else restores. Loading
+from the folder first looks for the missing path in the older copies (`.1`, `.2`, `.3`) and any
+conflict files an older version left; paths are content hashes, so a match is the same file.
+People whose genome no copy has are listed in the backup card and in the import message, with the
+fix: import their raw file again.
 
 **Synced-folder specifics.** Google Drive for desktop, Dropbox and OneDrive all sync a rewritten
 file within seconds; a 5 MB file is trivial. Two clients writing the same path concurrently
@@ -124,15 +173,26 @@ backup files in the folder (best effort, then tells the user to check the stick)
 - Files are the dump v2 envelope: AES-GCM, PBKDF2 600k (already in `dump.ts`). Header fields
   outside the ciphertext are format, version, generation, device id (random UUID, not a machine
   identifier), export time and whether the payload is encrypted. No names, no counts.
-- The passphrase lives in `sessionStorage` (this tab, until it closes); autosave requires it to
-  have been entered once since launch. If it has not, the card shows *Enter passphrase to resume
-  backups* instead of silently doing nothing.
+- Sidecar names are content hashes and carry no file names: the document's own name, its type and
+  its size live only in the `attachment` row, inside the encrypted snapshot. Someone who finds the
+  stick learns how many documents exist and their hashes — enough to confirm possession of a file
+  they already hold, not to learn anything new.
+- In the browser the passphrase lives in `sessionStorage` (this tab, until it closes); autosave
+  requires it to have been entered once since launch. If it has not, the card shows *Enter
+  passphrase to resume backups* instead of silently doing nothing. In the phone apps, where the OS
+  ends the app in the background at will, it is kept across restarts: sealed with an Android
+  Keystore key (`Secrets.kt`) or in the iOS Keychain, on this device only; *Forget* clears it. It protects the copy that leaves the device; the data on the device is the app's own.
 
 ## As built
 
-- `backup/naming.ts` (pure, tested): file names, rotation plan, conflict name, `isForeign`,
-  `hasNewer`. `backup/folder.ts`: picker, IndexedDB handle store, permissions, read/write/rotate.
+- `backup/naming.ts` (pure, tested): file names, rotation plan, `hasNewer`. `backup/folder.ts`: picker, IndexedDB place store, permissions, read/write/rotate,
+  over a `Dir` backed by a browser directory handle. The phones' equivalents are their own code
+  (ADR 0010), tested against an in-memory `Dir` (`DirTest.kt`).
   `backup/scheduler.ts`: the app-wide `backups` singleton the card renders.
-- Consent kind `backup_folder`; *Forget folder* revokes it and offers to delete the snapshots.
+- `attachments/{sidecar,crypto,mirror}.ts`: sidecar naming and the diff (pure, tested), the
+  per-run seal/open, and the push/pull the scheduler calls after a snapshot and after a restore.
+- Consent kind `backup_folder` (still version 1: mirroring encrypted documents beside the snapshot
+  is the promise it already makes); *Forget folder* revokes it and offers to delete the snapshots
+  and the attachments folder.
 - Not exercised end to end in this session: the directory picker needs a real click in a real
   Chromium window, so choose a temporary folder and try *Back up now* / *Load from folder* by hand.

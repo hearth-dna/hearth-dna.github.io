@@ -5,7 +5,7 @@ import { genomeBlobName, importCalls, insertSourceFile, setParent, storeCalls } 
 import { parseRawText } from '../import/parseFile'
 import { sha256Hex } from '../import/unpack'
 import type { Person, SourceFile } from '../types'
-import { type Container, openContainer, readHeader } from './container'
+import { type Container, type GenomeEntry, openContainer, readHeader, sha256 } from './container'
 import { type DumpV1, deserialiseDump, expandDump } from './dump'
 
 /**
@@ -26,17 +26,24 @@ export interface RestoreResult {
   exportedAt: string
 }
 
+/**
+ * Fetches a genome a folder snapshot keeps beside itself (`external_genomes`); null when the folder
+ * does not have it (yet). Its bytes are checked against the manifest before anything is parsed.
+ */
+export type LoadGenome = (entry: GenomeEntry) => Promise<Uint8Array | null>
+
 export async function restoreBytes(
   db: Database,
   bytes: Uint8Array,
   passphrase: string | undefined,
   onProgress: Progress = () => {},
+  loadGenome: LoadGenome = async () => null,
 ): Promise<RestoreResult> {
   const b64 = looksLikeHtml(bytes) ? extractPayload(strFromU8(bytes)) : null
-  if (b64) return restoreBytes(db, decodePayload(b64), passphrase, onProgress)
+  if (b64) return restoreBytes(db, decodePayload(b64), passphrase, onProgress, loadGenome)
   if (readHeader(bytes)) {
     onProgress('restore.openingDump')
-    return restoreContainer(db, await openContainer(bytes, passphrase), onProgress)
+    return restoreContainer(db, await openContainer(bytes, passphrase), onProgress, loadGenome)
   }
   onProgress('restore.openingDump')
   return restoreV1(db, await deserialiseDump(bytes, passphrase), onProgress)
@@ -77,7 +84,7 @@ async function insertConsents(db: Database, consents: Rows): Promise<void> {
   }
 }
 
-const HEALTH_COLS = [
+export const HEALTH_COLS = [
   'id',
   'person_id',
   'date',
@@ -100,6 +107,16 @@ const HEALTH_COLS = [
   'value_text',
   'conditions',
   'details',
+  'created_at',
+]
+export const ATTACHMENT_COLS = [
+  'id',
+  'health_log_id',
+  'person_id',
+  'sha256',
+  'mime',
+  'bytes',
+  'name',
   'created_at',
 ]
 const PERSON_COLS = ['id', 'label', 'display_name', 'sex', 'birth_year', 'notes', 'created_at']
@@ -128,10 +145,30 @@ function withDefaults(rows: Rows): Rows {
   }))
 }
 
+/**
+ * Attachment rows, skipping any whose entry is not here: ON CONFLICT does not cover foreign-key
+ * violations, so a plain INSERT OR IGNORE would throw on an orphan row from a damaged file.
+ *
+ * Only metadata travels in a dump. Rows whose bytes this device does not have show as missing
+ * until the backup folder hands them over (attachments/mirror.ts).
+ */
+async function insertAttachmentRows(db: Database, rows: Rows): Promise<void> {
+  const cols = ATTACHMENT_COLS.join(',')
+  for (const a of rows) {
+    await db.exec(
+      `INSERT OR IGNORE INTO attachment(${cols})
+       SELECT ${ATTACHMENT_COLS.map(() => '?').join(',')}
+       WHERE EXISTS (SELECT 1 FROM health_log WHERE id = ?)`,
+      [...ATTACHMENT_COLS.map((c) => a[c] ?? null), a.health_log_id ?? null],
+    )
+  }
+}
+
 export async function restoreContainer(
   db: Database,
   c: Container,
   onProgress: Progress = () => {},
+  loadGenome: LoadGenome = async () => null,
 ): Promise<RestoreResult> {
   const j = c.journal
   const hadGenotypes = await personsWithGenotypes(db)
@@ -151,6 +188,7 @@ export async function restoreContainer(
       importedAt: s.imported_at as string,
     })
   await insertRows(db, 'health_log', HEALTH_COLS, withDefaults(j.health_log as Rows))
+  await insertAttachmentRows(db, (j.attachments ?? []) as Rows)
   await insertRows(db, 'note', NOTE_COLS, j.notes as Rows)
   await insertRows(db, 'chat', CHAT_COLS, j.chats as Rows)
   await insertConsents(db, j.consents as Rows)
@@ -165,17 +203,26 @@ export async function restoreContainer(
   const missing = new Set<string>()
   for (const g of c.manifest.genomes) {
     if (hadGenotypes.has(g.person_id)) continue
-    if (!c.genomes[g.path]) {
+    let gz: Uint8Array | null = c.genomes[g.path] ?? null
+    if (!gz && c.manifest.external_genomes) {
+      onProgress('restore.fetchingGenome', { n: genomes + 1, total: c.manifest.genomes.length })
+      const fetched = await loadGenome(g)
+      // Not in the folder yet (the other device is still uploading it): this person keeps no
+      // genotypes for now, and the next load, which skips people who have them, tries again.
+      if (!fetched) continue
+      if ((await sha256(fetched)) === g.sha256) gz = fetched
+    }
+    if (!gz) {
       missing.add(g.person_id)
       continue
     }
-    const text = strFromU8(gunzipSync(c.genomes[g.path]))
+    const text = strFromU8(gunzipSync(gz))
     onProgress('restore.parsingGenome', { n: genomes + 1, total: c.manifest.genomes.length })
     const r = await parseRawText(text, undefined, g.kind === 'original' ? g.provider : 'generic')
     onProgress('restore.storingCalls', { n: r.calls.length.toLocaleString() })
     await storeCalls(db, g.person_id, r.calls)
     // Keep the original so this browser's own backups ship it too.
-    if (g.kind === 'original') await db.filePut(genomeBlobName(await sha256Hex(text)), c.genomes[g.path])
+    if (g.kind === 'original') await db.filePut(genomeBlobName(await sha256Hex(text)), gz)
     genomes++
   }
   const after = await existingIds(db, 'person')

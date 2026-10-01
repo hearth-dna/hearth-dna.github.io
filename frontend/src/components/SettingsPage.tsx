@@ -1,9 +1,19 @@
 import { useEffect, useState } from 'react'
 import { APP_VERSION, useApp } from '../app/context'
 import { setTheme, THEMES, useTheme } from '../app/theme'
+import { megabytes } from '../attachments/quota'
+import { persistedState } from '../attachments/store'
 import { listConsents, revokeConsent, revokeDeletesData } from '../consent/consent'
 import { CONSENTS } from '../consent/kinds'
-import { getMeta, listSharing, META_GEMINI_KEY, META_GEMINI_MODEL, newId, setMeta } from '../db/repo'
+import {
+  countAttachments,
+  getMeta,
+  listSharing,
+  META_GEMINI_KEY,
+  META_GEMINI_MODEL,
+  newId,
+  setMeta,
+} from '../db/repo'
 import { GEMINI_DEFAULT_MODEL } from '../egress/egress'
 import { exportDumpFile } from '../export/exportDump'
 import { restoreBytes } from '../export/restore'
@@ -27,11 +37,15 @@ export function SettingsPage() {
   const [geminiModel, setGeminiModel] = useState(GEMINI_DEFAULT_MODEL)
   const [keyStored, setKeyStored] = useState(false)
   const [erasing, setErasing] = useState(false)
+  const [documents, setDocuments] = useState<Awaited<ReturnType<typeof countAttachments>> | null>(null)
+  const [persisted, setPersisted] = useState<string | null>(null)
   const reload = async () => {
     setConsents(await listConsents(db))
     setSharing(await listSharing(db))
     setKeyStored((await getMeta(db, META_GEMINI_KEY)) !== null)
     setGeminiModel((await getMeta(db, META_GEMINI_MODEL)) || GEMINI_DEFAULT_MODEL)
+    setDocuments(await countAttachments(db))
+    setPersisted(await persistedState(db))
   }
   // biome-ignore lint/correctness/useExhaustiveDependencies: reload is stable per db
   useEffect(() => {
@@ -266,6 +280,15 @@ export function SettingsPage() {
         </button>
         {erasing && <EraseDialog onClose={() => setErasing(false)} />}
       </div>
+      {documents && documents.rows > 0 && (
+        <p className="muted">
+          {t('settingsPage.attachmentStorage', {
+            n: documents.rows,
+            mb: megabytes(documents.bytes),
+          })}{' '}
+          {t(persisted === 'true' ? 'settingsPage.storagePersisted' : 'settingsPage.storageBestEffort')}
+        </p>
+      )}
       <p className="muted">
         {t('settingsPage.footer', {
           version: APP_VERSION,

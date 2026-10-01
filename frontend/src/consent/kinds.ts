@@ -14,6 +14,7 @@ export type ConsentKind =
   | 'tier3_byok'
   | 'read_document_byok'
   | 'backup_folder'
+  | 'cloud_backup'
 
 export interface ConsentText {
   kind: ConsentKind
@@ -41,4 +42,5 @@ export const CONSENTS: Record<ConsentKind, ConsentText> = {
   tier3_byok: text('tier3_byok', 1, 3),
   read_document_byok: text('read_document_byok', 1, 3),
   backup_folder: text('backup_folder', 1, 3),
+  cloud_backup: text('cloud_backup', 3, 3),
 }

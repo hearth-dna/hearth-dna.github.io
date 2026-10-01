@@ -90,8 +90,9 @@ export function App() {
           if (readHeader(archive)?.encrypted) setLocked({ bytes: archive, load })
           else await load()
         } else {
-          backups.onLoaded = () => void refresh()
           await startup.run('backup', () => backups.start(db, APP_VERSION))
+          // An automatic load from the backup folder changes what every page shows.
+          backups.onPulled(() => void refresh())
           setConsented(await hasConsent(db, 'first_launch'))
           await firstLoad()
         }

@@ -21,6 +21,7 @@ export function BackupCard() {
   const { db, refresh } = useApp()
   const t = useT()
   const status = useBackupStatus()
+  // The consent form stands in front of the first folder pick.
   const [consenting, setConsenting] = useState(false)
   const [pass, setPass] = useState(backups.passphrase())
   const [msg, setMsg] = useState<string | null>(null)
@@ -28,8 +29,7 @@ export function BackupCard() {
   const writing = status.state === 'writing'
   const working = writing || busy !== null
   // Only these states can actually write; elsewhere the notice above the buttons says what to do.
-  const canBackUp =
-    !working && (status.state === 'ready' || status.state === 'conflict' || status.state === 'error')
+  const canBackUp = !working && (status.state === 'ready' || status.state === 'error')
 
   // A finished autosave should be visible too, not only one started from the button.
   const [wasWriting, setWasWriting] = useState(false)
@@ -50,7 +50,7 @@ export function BackupCard() {
       await backups.choose()
       setMsg(null)
     } catch (e) {
-      if (!(e instanceof DOMException && e.name === 'AbortError')) setMsg(String(e))
+      setMsg(String(e))
     }
   }
 
@@ -73,9 +73,9 @@ export function BackupCard() {
     return t('backupCard.loaded', { people, genomes, exportedAt, name: backups.name })
   }
   const load = () => run(loadFromFolder, t('backupCard.loading', { name: backups.name }))
-  const backUp = (force = false) => {
+  const backUp = () => {
     setMsg(null)
-    return run(() => backups.backupNow(force).then(() => undefined))
+    return run(() => backups.backupNow().then(() => undefined))
   }
 
   const activity = writing
@@ -84,7 +84,9 @@ export function BackupCard() {
           ? 'backupCard.loading'
           : status.step === 'building'
             ? 'backupCard.building'
-            : 'backupCard.writingFile',
+            : status.step === 'attachments'
+              ? 'backupCard.copyingAttachments'
+              : 'backupCard.writingFile',
         { name: status.name },
       )
     : busy
@@ -106,9 +108,11 @@ export function BackupCard() {
         />
       )}
       {status.state === 'none' && !consenting && (
-        <button type="button" className="primary" onClick={choose}>
-          {t('backupCard.chooseFolder')}
-        </button>
+        <div className="row">
+          <button type="button" className="primary" disabled={working} onClick={choose}>
+            {t('backupCard.chooseFolder')}
+          </button>
+        </div>
       )}
       {status.state !== 'none' && (
         <div>
@@ -120,7 +124,37 @@ export function BackupCard() {
             {status.state === 'ready' && status.pending && (
               <span className="muted">{t('backupCard.pending')}</span>
             )}
+            {status.state === 'ready' && status.attachmentsPending > 0 && (
+              <span className="muted">
+                {t('backupCard.attachmentsPending', { n: status.attachmentsPending })}
+              </span>
+            )}
           </p>
+          {status.state === 'ready' && status.attachmentsMissing > 0 && (
+            <p className="notice">
+              {t('backupCard.attachmentsMissing', { n: status.attachmentsMissing })}{' '}
+              <button
+                type="button"
+                disabled={working}
+                onClick={() =>
+                  run(async () => {
+                    const r = await backups.pullNow()
+                    return t('backupCard.attachmentsFetched', { n: r.pulled, missing: r.missing })
+                  })
+                }
+              >
+                {t('backupCard.fetchAttachments')}
+              </button>
+            </p>
+          )}
+          {status.state === 'ready' && status.missing.length > 0 && (
+            <p className="notice">
+              {t('backupCard.missingGenomes', {
+                name: status.name,
+                names: status.missing.map((m) => m.name).join(', '),
+              })}
+            </p>
+          )}
           {activity && (
             <p className="activity" role="status" aria-live="polite">
               <span className="spinner" aria-hidden="true" /> {activity}
@@ -133,10 +167,11 @@ export function BackupCard() {
                 type="password"
                 value={pass}
                 disabled={backups.plain}
-                onChange={(e) => {
-                  setPass(e.target.value)
-                  backups.setPassphrase(e.target.value)
-                }}
+                onChange={(e) => setPass(e.target.value)}
+                // Applied when typing is done, never per keystroke: each change re-reads the folder
+                // and could encrypt a backup with half a passphrase.
+                onBlur={() => pass !== backups.passphrase() && backups.setPassphrase(pass)}
+                onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
               />
             </label>
             <label className="check">
@@ -169,43 +204,14 @@ export function BackupCard() {
             </p>
           )}
           {status.state === 'needs-passphrase' && <p className="notice">{t('backupCard.needsPassphrase')}</p>}
-          {status.state === 'conflict' && (
-            <div className="notice">
-              {rich(t('backupCard.conflict', { file: status.file }))}
-              <div className="row">
-                <button type="button" disabled={working} onClick={load}>
-                  {t('backupCard.loadTheirs')}
-                </button>
-                <button type="button" className="danger" disabled={working} onClick={() => backUp(true)}>
-                  {t('backupCard.keepMine')}
-                </button>
-              </div>
-            </div>
-          )}
           {status.state === 'error' && (
             <p className="danger">{t('backupCard.failed', { message: status.message })}</p>
-          )}
-          {status.state === 'ready' && status.missing.length > 0 && (
-            <p className="notice">
-              {t('backupCard.missingGenomes', {
-                name: status.name,
-                names: status.missing.map((m) => m.name).join(', '),
-              })}
-            </p>
-          )}
-          {status.state === 'ready' && status.newer && (
-            <p className="notice">
-              {t('backupCard.newerNotice')}{' '}
-              <button type="button" className="primary" disabled={working} onClick={load}>
-                {t('backupCard.loadFromFolder')}
-              </button>
-            </p>
           )}
           <div className="row">
             <button type="button" className="primary" disabled={!canBackUp} onClick={() => backUp()}>
               {t('backupCard.backUpNow')}
             </button>
-            {status.state === 'ready' && !status.newer && (
+            {status.state === 'ready' && (
               <button type="button" disabled={working} onClick={load}>
                 {t('backupCard.loadFromFolder')}
               </button>
@@ -220,9 +226,11 @@ export function BackupCard() {
               onClick={() =>
                 run(async () => {
                   const del = confirm(t('backupCard.forgetConfirm'))
-                  const n = await backups.forget(del)
+                  const { snapshots, attachments } = await backups.forget(del)
                   await revokeConsent(db, 'backup_folder')
-                  return del ? t('backupCard.forgottenDeleted', { n }) : t('backupCard.forgottenKept')
+                  return del
+                    ? t('backupCard.forgottenDeletedWithFiles', { n: snapshots, files: attachments })
+                    : t('backupCard.forgottenKept')
                 })
               }
             >

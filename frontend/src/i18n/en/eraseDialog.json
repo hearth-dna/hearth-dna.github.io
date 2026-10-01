@@ -6,5 +6,6 @@
   "eraseDialog.exportDump": "Export dump",
   "eraseDialog.exportFailed": "Export failed: {error}",
   "eraseDialog.eraseFailed": "Erase failed: {error}",
-  "eraseDialog.eraseEverything": "Erase everything"
+  "eraseDialog.eraseEverything": "Erase everything",
+  "eraseDialog.attachmentsNotice": "Attached documents are erased from this device too. Copies in a backup folder stay until you forget the folder and delete its files."
 }

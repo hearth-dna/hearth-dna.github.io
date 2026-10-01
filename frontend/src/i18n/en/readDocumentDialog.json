@@ -39,5 +39,7 @@
   "readDocumentDialog.retrying": "Gemini is busy, trying again ({n} of {m})…",
   "readDocumentDialog.tryAgain": "Try again",
   "readDocumentDialog.selected": "Selected: {files}",
-  "readDocumentDialog.pdfLocal": "A PDF or text file that is a lab report is read on this device first; it only goes to Gemini if it cannot be read here."
+  "readDocumentDialog.pdfLocal": "A PDF or text file that is a lab report is read on this device first; it only goes to Gemini if it cannot be read here.",
+  "readDocumentDialog.keepOriginals": "Keep the original pages with the entry",
+  "readDocumentDialog.keepOriginalsHint": "The files stay on this device. Only the pages listed above are sent to the model."
 }
