@@ -954,5 +954,21 @@
   "healthTable.downloadSelected": "CSV 다운로드",
   "healthTable.deleteSelected": "삭제",
   "healthTable.confirmDeleteMany": "{n}개 항목을 삭제할까요? 첨부 문서도 함께 삭제됩니다. 되돌릴 수 없습니다.",
-  "healthTable.clearSelection": "선택 해제"
+  "healthTable.clearSelection": "선택 해제",
+  "charts.bmi": "BMI (체중과 키로 계산)",
+  "charts.showReference": "기준값",
+  "charts.referenceFor": "기준 대상",
+  "charts.refGrowth": "음영: {name}의 WHO 성장 곡선 (P3–P97, 진한 부분 P15–P85), 점선: 중앙값.",
+  "charts.refRange": "음영: {name} 나이의 일반적인 범위{label}. 참고용이며 진단이 아닙니다.",
+  "charts.refMissing.birthDate": "WHO 성장 곡선과 비교하려면 사람 페이지에서 {name}의 생년월일을 입력하세요.",
+  "charts.refMissing.sex": "WHO 성장 곡선과 비교하려면 사람 페이지에서 {name}의 성별을 설정하세요.",
+  "charts.percentile": "P{n}",
+  "charts.ref.P50": "중앙값",
+  "charts.ref.underweight": "저체중",
+  "charts.ref.overweight": "과체중",
+  "charts.ref.obese": "비만",
+  "charts.ref.high": "높음",
+  "charts.ref.fever": "발열",
+  "charts.ref.fasting": "공복",
+  "peoplePage.birthDate": "생년월일"
 }

@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react'
+import type { Pt, Reference } from '../charts/reference'
 import { niceTicks, type Panel, type Point } from '../charts/series'
 import { formatValue } from '../health/log'
 import { useI18n, useT } from '../i18n/context'
@@ -45,11 +46,23 @@ export function TimeChart({
   series,
   title,
   domain,
+  reference,
+  note,
+  percentile,
+  tools,
 }: {
   panel: Panel
   series: ChartSeries[]
   title: string
   domain: [number, number]
+  /** Reference curves or ranges for one person, drawn under the readings. */
+  reference?: Reference | null
+  /** One line under the title: what the reference is, or why there is none. */
+  note?: string
+  /** A reading's growth percentile, for the tooltip. */
+  percentile?: (personId: string, p: Point) => number | null
+  /** Controls next to the chart/table switch (the reference person picker). */
+  tools?: ReactNode
 }) {
   const t = useT()
   const { lang } = useI18n()
@@ -73,8 +86,15 @@ export function TimeChart({
   const [x0, x1] = domain
   const values = lines.flatMap((s) => s.points.map((p) => p.value))
   const bandValues = [panel.band?.low, panel.band?.high].filter((v): v is number => v != null)
-  let lo = Math.min(...values, ...bandValues)
-  let hi = Math.max(...values, ...bandValues)
+  const refPoints: Pt[] = reference
+    ? [
+        ...reference.bands.flatMap((b) => [...b.lower, ...b.upper]),
+        ...reference.lines.flatMap((l) => l.points),
+      ]
+    : []
+  const refValues = refPoints.filter(([at]) => at >= x0 && at <= x1).map(([, v]) => v)
+  let lo = Math.min(...values, ...bandValues, ...refValues)
+  let hi = Math.max(...values, ...bandValues, ...refValues)
   const pad = hi > lo ? (hi - lo) * 0.08 : Math.abs(hi) * 0.1 || 1
   lo -= pad
   hi += pad
@@ -115,11 +135,11 @@ export function TimeChart({
 
   // As printed; a pair (blood pressure) shows the half this panel draws.
   const printed = (p: Point) =>
-    p.entry.value2 !== null
+    panel.source.kind === 'derived' || p.entry.value2 !== null
       ? `${fmtNum(p.value)} ${panel.unit}`
       : formatValue(p.entry) || `${fmtNum(p.value)} ${panel.unit}`
   const converted = (p: Point) =>
-    p.entry.unit && p.entry.unit !== panel.unit && p.entry.value2 === null
+    panel.source.kind !== 'derived' && p.entry.unit && p.entry.unit !== panel.unit && p.entry.value2 === null
       ? ` = ${fmtNum(p.value)} ${panel.unit}`
       : ''
 
@@ -138,10 +158,12 @@ export function TimeChart({
         <h3 className="m-0 me-auto">
           {title} {panel.unit && <span className="muted">· {panel.unit}</span>}
         </h3>
+        {tools}
         <button type="button" className="small" onClick={() => setTable(!table)}>
           {table ? t('charts.showChart') : t('charts.showTable')}
         </button>
       </div>
+      {note && <p className="muted chart-note">{note}</p>}
       {lines.length > 1 && (
         <div className="legend">
           {lines.map((s) => (
@@ -207,6 +229,62 @@ export function TimeChart({
             }}
           >
             <svg height={HEIGHT} viewBox={`0 0 ${width} ${HEIGHT}`} aria-hidden="true">
+              {reference && (
+                <g className="ref">
+                  <clipPath id={`clip-${panel.key}`}>
+                    <rect x={M.left} y={M.top} width={w} height={h} />
+                  </clipPath>
+                  <g clipPath={`url(#clip-${panel.key})`}>
+                    {reference.bands.map((b, i) => (
+                      <path
+                        // biome-ignore lint/suspicious/noArrayIndexKey: bands keep their order
+                        key={i}
+                        className={`ref-band${i === 1 && reference.kind === 'growth' ? ' strong' : ''}`}
+                        d={`M${[...b.upper, ...[...b.lower].reverse()].map(([at, v]) => `${x(at)},${y(v)}`).join('L')}Z`}
+                      />
+                    ))}
+                    {reference.lines.map((l) => (
+                      <polyline
+                        key={l.label + l.points[0][0]}
+                        className="ref-line"
+                        fill="none"
+                        points={l.points.map(([at, v]) => `${x(at)},${y(v)}`).join(' ')}
+                      />
+                    ))}
+                  </g>
+                  {[
+                    ...reference.bands.flatMap((b) =>
+                      b.labels
+                        ? [
+                            { text: b.labels[0], at: b.lower.at(-1) },
+                            { text: b.labels[1], at: b.upper.at(-1) },
+                          ]
+                        : [],
+                    ),
+                    ...reference.lines.map((l) => ({
+                      text: t(`charts.ref.${l.label}`),
+                      at: l.points.at(-1),
+                    })),
+                  ]
+                    .filter((l): l is { text: string; at: Pt } => !!l.at && l.at[1] >= lo && l.at[1] <= hi)
+                    // Where curves run close together, keep only labels that do not overlap.
+                    .sort((a, b) => y(a.at[1]) - y(b.at[1]))
+                    .filter((l, i, all) =>
+                      all.slice(0, i).every((k) => Math.abs(y(k.at[1]) - y(l.at[1])) >= 10),
+                    )
+                    .map((l) => (
+                      <text
+                        key={l.text + l.at[0]}
+                        className="label ref-label"
+                        x={Math.min(x(l.at[0]), M.left + w) - 3}
+                        y={y(l.at[1]) - 3}
+                        textAnchor="end"
+                      >
+                        {l.text}
+                      </text>
+                    ))}
+                </g>
+              )}
               {panel.band && (
                 <rect
                   className="band"
@@ -300,6 +378,12 @@ export function TimeChart({
                     {printed(p)}
                     {converted(p)}
                     {p.entry.flag && ` ${p.entry.flag === 'H' ? '↑' : '↓'}`}
+                    {(() => {
+                      const pc = percentile?.(s.personId, p)
+                      return pc == null ? null : (
+                        <span className="muted"> · {t('charts.percentile', { n: Math.round(pc) })}</span>
+                      )
+                    })()}
                     {p.t !== hover && <span className="muted"> ({fmtDate.format(p.t)})</span>}
                   </div>
                 )

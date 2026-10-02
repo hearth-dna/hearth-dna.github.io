@@ -172,6 +172,8 @@ export class Database {
     ]) {
       await ready.exec(`ALTER TABLE health_log ADD COLUMN ${col}`).catch(() => {})
     }
+    // Added after the native apps first shipped; a full date for growth curves (birth_year stays).
+    await ready.exec("ALTER TABLE person ADD COLUMN birth_date TEXT NOT NULL DEFAULT ''").catch(() => {})
     // CSV imports used to start an entry's text with "Imported: 11200 g" after converting a reading;
     // the entry's value and unit already say it. Drop that first line, keep any note after it.
     await ready.exec(

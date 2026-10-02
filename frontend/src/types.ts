@@ -34,6 +34,8 @@ export interface Person {
   displayName: string
   sex: Sex
   birthYear: number | null
+  /** YYYY-MM-DD, or '' when only the year (or nothing) is known. Growth curves need it. */
+  birthDate: string
   notes: string
   createdAt: string
 }

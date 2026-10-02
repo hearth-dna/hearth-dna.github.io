@@ -27,6 +27,12 @@ class Db private constructor(context: Context) :
         schemaStatements().forEach(db::execSQL)
         // Additive column migrations, as db.ts runs them: CREATE TABLE IF NOT EXISTS leaves an
         // existing table as it was, so columns added since are added here; "duplicate column" is fine.
+        for (col in PERSON_ADDED_COLUMNS) {
+            try {
+                db.execSQL("ALTER TABLE person ADD COLUMN $col")
+            } catch (_: android.database.SQLException) {
+            }
+        }
         for (col in HEALTH_LOG_ADDED_COLUMNS) {
             try {
                 db.execSQL("ALTER TABLE health_log ADD COLUMN $col")

@@ -954,5 +954,21 @@
   "healthTable.downloadSelected": "CSV डाउनलोड करें",
   "healthTable.deleteSelected": "हटाएँ",
   "healthTable.confirmDeleteMany": "{n} प्रविष्टियाँ हटाएँ? संलग्न दस्तावेज़ भी हट जाएँगे। इसे पूर्ववत नहीं किया जा सकता।",
-  "healthTable.clearSelection": "चयन हटाएँ"
+  "healthTable.clearSelection": "चयन हटाएँ",
+  "charts.bmi": "BMI (वज़न और लंबाई से)",
+  "charts.showReference": "संदर्भ मान",
+  "charts.referenceFor": "संदर्भ किसके लिए",
+  "charts.refGrowth": "छायांकित: {name} के लिए WHO वृद्धि वक्र (P3–P97, गहरा P15–P85); डैश: माध्यिका।",
+  "charts.refRange": "छायांकित: {name} की उम्र में सामान्य सीमा{label}। एक मार्गदर्शन, निदान नहीं।",
+  "charts.refMissing.birthDate": "WHO वृद्धि वक्रों से तुलना के लिए लोग पृष्ठ पर {name} की जन्म तिथि जोड़ें।",
+  "charts.refMissing.sex": "WHO वृद्धि वक्रों से तुलना के लिए लोग पृष्ठ पर {name} का लिंग चुनें।",
+  "charts.percentile": "P{n}",
+  "charts.ref.P50": "माध्यिका",
+  "charts.ref.underweight": "कम वज़न",
+  "charts.ref.overweight": "अधिक वज़न",
+  "charts.ref.obese": "मोटापा",
+  "charts.ref.high": "उच्च",
+  "charts.ref.fever": "बुखार",
+  "charts.ref.fasting": "खाली पेट",
+  "peoplePage.birthDate": "जन्म तिथि"
 }

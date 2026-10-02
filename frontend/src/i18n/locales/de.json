@@ -954,5 +954,21 @@
   "healthTable.downloadSelected": "CSV herunterladen",
   "healthTable.deleteSelected": "Löschen",
   "healthTable.confirmDeleteMany": "{n} Einträge löschen? Angehängte Dokumente werden ebenfalls gelöscht. Dies kann nicht rückgängig gemacht werden.",
-  "healthTable.clearSelection": "Auswahl aufheben"
+  "healthTable.clearSelection": "Auswahl aufheben",
+  "charts.bmi": "BMI (aus Gewicht und Größe)",
+  "charts.showReference": "Referenzwerte",
+  "charts.referenceFor": "Referenz für",
+  "charts.refGrowth": "Schattiert: WHO-Wachstumskurven für {name} (P3–P97, dunkler P15–P85); gestrichelt: der Median.",
+  "charts.refRange": "Schattiert: der übliche Bereich in {name}s Alter{label}. Eine Orientierung, keine Diagnose.",
+  "charts.refMissing.birthDate": "Tragen Sie auf der Seite „Personen“ das Geburtsdatum von {name} ein, um mit den WHO-Wachstumskurven zu vergleichen.",
+  "charts.refMissing.sex": "Legen Sie auf der Seite „Personen“ das Geschlecht von {name} fest, um mit den WHO-Wachstumskurven zu vergleichen.",
+  "charts.percentile": "P{n}",
+  "charts.ref.P50": "Median",
+  "charts.ref.underweight": "Untergewicht",
+  "charts.ref.overweight": "Übergewicht",
+  "charts.ref.obese": "Adipositas",
+  "charts.ref.high": "hoch",
+  "charts.ref.fever": "Fieber",
+  "charts.ref.fasting": "nüchtern",
+  "peoplePage.birthDate": "Geburtsdatum"
 }

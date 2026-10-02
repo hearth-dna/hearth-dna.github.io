@@ -9,6 +9,7 @@ const person = (id: string): Person => ({
   displayName: id.toUpperCase(),
   sex: 'unknown',
   birthYear: null,
+  birthDate: '',
   notes: '',
   createdAt: '',
 })

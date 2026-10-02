@@ -954,5 +954,21 @@
   "healthTable.downloadSelected": "CSV downloaden",
   "healthTable.deleteSelected": "Verwijderen",
   "healthTable.confirmDeleteMany": "{n} items verwijderen? Bijgevoegde documenten worden ook verwijderd. Dit kan niet ongedaan worden gemaakt.",
-  "healthTable.clearSelection": "Selectie wissen"
+  "healthTable.clearSelection": "Selectie wissen",
+  "charts.bmi": "BMI (uit gewicht en lengte)",
+  "charts.showReference": "Referentiewaarden",
+  "charts.referenceFor": "Referentie voor",
+  "charts.refGrowth": "Gearceerd: WHO-groeicurves voor {name} (P3–P97, donkerder P15–P85); gestippeld: de mediaan.",
+  "charts.refRange": "Gearceerd: het gebruikelijke bereik op de leeftijd van {name}{label}. Een richtlijn, geen diagnose.",
+  "charts.refMissing.birthDate": "Voeg op de pagina Personen de geboortedatum van {name} toe om te vergelijken met de WHO-groeicurves.",
+  "charts.refMissing.sex": "Stel op de pagina Personen het geslacht van {name} in om te vergelijken met de WHO-groeicurves.",
+  "charts.percentile": "P{n}",
+  "charts.ref.P50": "mediaan",
+  "charts.ref.underweight": "ondergewicht",
+  "charts.ref.overweight": "overgewicht",
+  "charts.ref.obese": "obesitas",
+  "charts.ref.high": "hoog",
+  "charts.ref.fever": "koorts",
+  "charts.ref.fasting": "nuchter",
+  "peoplePage.birthDate": "Geboortedatum"
 }

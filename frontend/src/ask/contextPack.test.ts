@@ -30,6 +30,7 @@ const vova: Person = {
   displayName: 'Vova',
   sex: 'male',
   birthYear: 1984,
+  birthDate: '',
   notes: '',
   createdAt: 't',
 }

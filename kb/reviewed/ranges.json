@@ -1,0 +1,47 @@
+{
+  "reviewed_at": "2026-10-02",
+  "ranges": [
+    {
+      "metric": "d:bmi",
+      "age_min": 19,
+      "normal": [18.5, 25],
+      "lines": [
+        { "value": 18.5, "label": "underweight" },
+        { "value": 25, "label": "overweight" },
+        { "value": 30, "label": "obese" }
+      ],
+      "source": "WHO, Body mass index (BMI) categories for adults"
+    },
+    {
+      "metric": "m:blood-pressure:0",
+      "age_min": 18,
+      "normal": [90, 120],
+      "lines": [{ "value": 130, "label": "high" }],
+      "source": "AHA/ACC 2017 guideline: normal below 120/80, stage 1 hypertension from 130/80"
+    },
+    {
+      "metric": "m:blood-pressure:1",
+      "age_min": 18,
+      "normal": [60, 80],
+      "lines": [{ "value": 80, "label": "high" }],
+      "source": "AHA/ACC 2017 guideline: normal below 120/80, stage 1 hypertension from 130/80"
+    },
+    { "metric": "m:heart-rate", "age_max": 0.25, "normal": [85, 205], "source": "AHA PALS, normal awake heart rate by age" },
+    { "metric": "m:heart-rate", "age_min": 0.25, "age_max": 2, "normal": [100, 190], "source": "AHA PALS, normal awake heart rate by age" },
+    { "metric": "m:heart-rate", "age_min": 2, "age_max": 10, "normal": [60, 140], "source": "AHA PALS, normal awake heart rate by age" },
+    { "metric": "m:heart-rate", "age_min": 10, "normal": [60, 100], "source": "AHA PALS (over 10 years) and AHA adult resting heart rate" },
+    {
+      "metric": "m:temperature",
+      "normal": [36.1, 37.2],
+      "lines": [{ "value": 38, "label": "fever" }],
+      "source": "Common clinical normal range for body temperature; fever from 38 °C"
+    },
+    { "metric": "m:spo2", "normal": [95, 100], "source": "WHO pulse oximetry training manual: normal 95-100 %" },
+    {
+      "metric": "m:glucose",
+      "normal": [3.9, 5.5],
+      "label": "fasting",
+      "source": "WHO and ADA: normal fasting plasma glucose 3.9-5.5 mmol/L"
+    }
+  ]
+}

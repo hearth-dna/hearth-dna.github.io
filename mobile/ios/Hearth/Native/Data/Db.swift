@@ -84,6 +84,9 @@ final class Db {
         try execScript(SCHEMA_SQL)
         // Additive column migrations, as db.ts runs them: an existing table keeps its old columns
         // under CREATE TABLE IF NOT EXISTS, so later ones are added here ("duplicate column" is fine).
+        for col in PERSON_ADDED_COLUMNS {
+            try? execScript("ALTER TABLE person ADD COLUMN \(col)")
+        }
         for col in HEALTH_LOG_ADDED_COLUMNS {
             try? execScript("ALTER TABLE health_log ADD COLUMN \(col)")
         }

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useApp } from '../app/context'
+import { hasReference, percentileOf, referenceFor } from '../charts/reference'
 import { availableMetrics, buildPanels, colourSlot, type Metric, type MetricSource } from '../charts/series'
 import { listFamilyHealthLog } from '../db/repo'
 import { findPreset } from '../health/presets'
@@ -18,6 +19,8 @@ interface Saved {
   people: string[]
   metrics: string[]
   range: Range
+  /** Draw reference curves and ranges; absent in selections saved before the switch. */
+  refs?: boolean
 }
 
 /** The last selection, a per-viewer convenience: ids only, never values. */
@@ -43,6 +46,7 @@ export function metricLabel(kb: Kb, s: MetricSource, t: Translate, lang: string)
     const name = s.preset ? t(`preset.${s.preset}`) : s.title
     return `${name}: ${s.field === 'severity' ? t('healthLog.severity') : t(`detail.${s.field}`)}`
   }
+  if (s.kind === 'derived') return t('charts.bmi')
   return s.title
 }
 
@@ -60,13 +64,19 @@ export function ChartsPage() {
   const [people, setPeople] = useState<string[] | null>(saved?.people ?? null)
   const [metrics, setMetrics] = useState<string[] | null>(saved?.metrics ?? null)
   const [range, setRange] = useState<Range>(saved?.range ?? 'all')
+  const [refs, setRefs] = useState(saved?.refs ?? true)
+  /** Whose reference a panel with several people shows, by panel key. */
+  const [refPerson, setRefPerson] = useState<Record<string, string>>({})
   const [query, setQuery] = useState('')
 
   useEffect(() => {
     listFamilyHealthLog(db).then(setEntries)
   }, [db])
 
-  const available = useMemo(() => (entries ? availableMetrics(kb, entries) : []), [kb, entries])
+  const available = useMemo(
+    () => (entries ? availableMetrics(kb, entries, persons) : []),
+    [kb, entries, persons],
+  )
   const withReadings = persons.filter((p) => available.some((m) => m.personIds.includes(p.id)))
   // Defaults, and a saved selection pruned of what no longer exists.
   const chosenPeople = (people ?? withReadings.map((p) => p.id))
@@ -79,12 +89,17 @@ export function ChartsPage() {
   const span = RANGES[range]
   const now = Date.now()
   const panels = entries
-    ? buildPanels(kb, entries, {
-        metrics: chosenMetrics,
-        people: chosenPeople,
-        from: span === null ? null : now - span,
-        to: null,
-      })
+    ? buildPanels(
+        kb,
+        entries,
+        {
+          metrics: chosenMetrics,
+          people: chosenPeople,
+          from: span === null ? null : now - span,
+          to: null,
+        },
+        persons,
+      )
     : []
   // One time axis for every panel: the range, or for "all" the extent of what is shown.
   const ts = panels.flatMap((p) => p.series.flatMap((s) => s.points.map((x) => x.t)))
@@ -100,10 +115,11 @@ export function ChartsPage() {
   const toggle = (list: string[], id: string, on: boolean) =>
     on ? [...list, id] : list.filter((x) => x !== id)
   const save = (next: Partial<Saved>) => {
-    const all = { people: chosenPeople, metrics: chosenMetrics, range, ...next }
+    const all = { people: chosenPeople, metrics: chosenMetrics, range, refs, ...next }
     setPeople(all.people)
     setMetrics(all.metrics)
     setRange(all.range)
+    setRefs(all.refs)
     try {
       localStorage.setItem(STORE, JSON.stringify(all))
     } catch {}
@@ -178,6 +194,10 @@ export function ChartsPage() {
               ))}
             </div>
           </fieldset>
+          <label className="check">
+            <input type="checkbox" checked={refs} onChange={(e) => save({ refs: e.target.checked })} />
+            <span>{t('charts.showReference')}</span>
+          </label>
           <label className="field">
             {t('charts.range')}
             <select value={range} onChange={(e) => save({ range: e.target.value as Range })}>
@@ -193,15 +213,70 @@ export function ChartsPage() {
       {panels.length === 0 ? (
         <p className="muted">{t('charts.nothingSelected')}</p>
       ) : (
-        panels.map((p) => (
-          <TimeChart
-            key={p.key}
-            panel={p}
-            title={label(p)}
-            domain={domain}
-            series={series.filter((s) => p.series.some((x) => x.personId === s.personId))}
-          />
-        ))
+        panels.map((p) => {
+          const shown = series.filter((s) => p.series.some((x) => x.personId === s.personId))
+          const withRef = refs && hasReference(kb, p.key)
+          // Unless picked: the first child with growth curves, else anyone with a range, else the first.
+          const refs_ = withRef
+            ? shown.flatMap((s) => {
+                const who = persons.find((x) => x.id === s.personId)
+                return who ? [{ id: s.personId, who, ref: referenceFor(kb, p.key, who, domain) }] : []
+              })
+            : []
+          const rank = (r: (typeof refs_)[number]) =>
+            r.ref.reference?.kind === 'growth' ? 0 : r.ref.reference ? 1 : r.ref.missing ? 2 : 3
+          const pickedRef =
+            refs_.find((r) => r.id === refPerson[p.key]) ?? [...refs_].sort((a, b) => rank(a) - rank(b))[0]
+          const whoseId = pickedRef?.id
+          const whose = pickedRef?.who
+          const ref = pickedRef?.ref ?? null
+          const note = !ref
+            ? undefined
+            : ref.missing
+              ? t(`charts.refMissing.${ref.missing}`, { name: whose?.displayName ?? '' })
+              : ref.reference
+                ? t(ref.reference.kind === 'growth' ? 'charts.refGrowth' : 'charts.refRange', {
+                    name: whose?.displayName ?? '',
+                    label:
+                      ref.reference.kind === 'range' && ref.reference.label
+                        ? ` (${t(`charts.ref.${ref.reference.label}`)})`
+                        : '',
+                  })
+                : undefined
+          return (
+            <TimeChart
+              key={p.key}
+              panel={p}
+              title={label(p)}
+              domain={domain}
+              series={shown}
+              reference={ref?.reference}
+              note={note}
+              percentile={(personId, pt) => {
+                const person = persons.find((x) => x.id === personId)
+                return refs && person ? percentileOf(kb, p.key, person, pt.t, pt.value) : null
+              }}
+              tools={
+                withRef &&
+                shown.length > 1 && (
+                  <label className="field">
+                    <span className="muted">{t('charts.referenceFor')}</span>
+                    <select
+                      value={whoseId}
+                      onChange={(e) => setRefPerson({ ...refPerson, [p.key]: e.target.value })}
+                    >
+                      {shown.map((s) => (
+                        <option key={s.personId} value={s.personId}>
+                          {s.name}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                )
+              }
+            />
+          )
+        })
       )}
     </div>
   )

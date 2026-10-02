@@ -119,7 +119,7 @@ export const ATTACHMENT_COLS = [
   'name',
   'created_at',
 ]
-const PERSON_COLS = ['id', 'label', 'display_name', 'sex', 'birth_year', 'notes', 'created_at']
+const PERSON_COLS = ['id', 'label', 'display_name', 'sex', 'birth_year', 'birth_date', 'notes', 'created_at']
 const NOTE_COLS = ['id', 'person_id', 'topic', 'markdown', 'updated_at']
 const CHAT_COLS = ['id', 'person_ids', 'question', 'context_pack', 'answer', 'tier', 'created_at']
 
@@ -173,7 +173,13 @@ export async function restoreContainer(
   const j = c.journal
   const hadGenotypes = await personsWithGenotypes(db)
   const before = await existingIds(db, 'person')
-  await insertRows(db, 'person', PERSON_COLS, j.persons as Rows)
+  // birth_date came later: an older dump's people have none.
+  await insertRows(
+    db,
+    'person',
+    PERSON_COLS,
+    (j.persons as Rows).map((p) => ({ birth_date: '', ...p })),
+  )
   for (const r of j.relationships as { parentId: string; childId: string }[])
     await setParent(db, r.parentId, r.childId)
   for (const s of j.source_files as Rows)

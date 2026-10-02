@@ -954,5 +954,21 @@
   "healthTable.downloadSelected": "Baixar CSV",
   "healthTable.deleteSelected": "Excluir",
   "healthTable.confirmDeleteMany": "Excluir {n} registros? Os documentos anexados também serão excluídos. Não é possível desfazer.",
-  "healthTable.clearSelection": "Limpar seleção"
+  "healthTable.clearSelection": "Limpar seleção",
+  "charts.bmi": "IMC (a partir de peso e altura)",
+  "charts.showReference": "Valores de referência",
+  "charts.referenceFor": "Referência para",
+  "charts.refGrowth": "Sombreado: curvas de crescimento da OMS para {name} (P3–P97, mais escuro P15–P85); tracejado: a mediana.",
+  "charts.refRange": "Sombreado: a faixa habitual na idade de {name}{label}. Uma orientação, não um diagnóstico.",
+  "charts.refMissing.birthDate": "Adicione a data de nascimento de {name} na página Pessoas para comparar com as curvas de crescimento da OMS.",
+  "charts.refMissing.sex": "Defina o sexo de {name} na página Pessoas para comparar com as curvas de crescimento da OMS.",
+  "charts.percentile": "P{n}",
+  "charts.ref.P50": "mediana",
+  "charts.ref.underweight": "baixo peso",
+  "charts.ref.overweight": "sobrepeso",
+  "charts.ref.obese": "obesidade",
+  "charts.ref.high": "alta",
+  "charts.ref.fever": "febre",
+  "charts.ref.fasting": "em jejum",
+  "peoplePage.birthDate": "Data de nascimento"
 }

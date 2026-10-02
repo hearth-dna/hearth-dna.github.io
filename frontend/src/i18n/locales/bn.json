@@ -954,5 +954,21 @@
   "healthTable.downloadSelected": "CSV ডাউনলোড করুন",
   "healthTable.deleteSelected": "মুছুন",
   "healthTable.confirmDeleteMany": "{n}টি এন্ট্রি মুছবেন? সংযুক্ত নথিও মুছে যাবে। এটি পূর্বাবস্থায় ফেরানো যাবে না।",
-  "healthTable.clearSelection": "নির্বাচন সরান"
+  "healthTable.clearSelection": "নির্বাচন সরান",
+  "charts.bmi": "BMI (ওজন ও উচ্চতা থেকে)",
+  "charts.showReference": "রেফারেন্স মান",
+  "charts.referenceFor": "রেফারেন্স যার জন্য",
+  "charts.refGrowth": "ছায়া: {name}-এর জন্য WHO বৃদ্ধি বক্ররেখা (P3–P97, গাঢ় P15–P85); ড্যাশ: মধ্যমা।",
+  "charts.refRange": "ছায়া: {name}-এর বয়সে স্বাভাবিক পরিসর{label}। একটি নির্দেশিকা, রোগনির্ণয় নয়।",
+  "charts.refMissing.birthDate": "WHO বৃদ্ধি বক্ররেখার সঙ্গে তুলনা করতে মানুষ পাতায় {name}-এর জন্মতারিখ যোগ করুন।",
+  "charts.refMissing.sex": "WHO বৃদ্ধি বক্ররেখার সঙ্গে তুলনা করতে মানুষ পাতায় {name}-এর লিঙ্গ ঠিক করুন।",
+  "charts.percentile": "P{n}",
+  "charts.ref.P50": "মধ্যমা",
+  "charts.ref.underweight": "কম ওজন",
+  "charts.ref.overweight": "অতিরিক্ত ওজন",
+  "charts.ref.obese": "স্থূলতা",
+  "charts.ref.high": "উচ্চ",
+  "charts.ref.fever": "জ্বর",
+  "charts.ref.fasting": "খালি পেটে",
+  "peoplePage.birthDate": "জন্মতারিখ"
 }

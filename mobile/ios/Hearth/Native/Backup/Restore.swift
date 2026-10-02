@@ -34,7 +34,7 @@ struct RestoreResult: Equatable {
 /// Attachment bytes come from the backup folder, which this build does not read; the result counts
 /// them so the screen can say so. Slow with genomes in the file: call it off the main thread.
 enum Restore {
-    static let personCols = ["id", "label", "display_name", "sex", "birth_year", "notes", "created_at"]
+    static let personCols = ["id", "label", "display_name", "sex", "birth_year", "birth_date", "notes", "created_at"]
     static let sourceFileCols = [
         "id", "person_id", "provider", "build", "sha256", "original_name", "row_count", "imported_at",
     ]
@@ -71,7 +71,11 @@ enum Restore {
             let peopleBefore = try count(db, "person")
             let entriesBefore = try count(db, "health_log")
 
-            try insertRows(db, "person", personCols, dump.rows("persons"))
+            // birth_date came later: an older dump's people have none, and NOT NULL would skip them.
+            let personRows = try dump.rows("persons").map { row in
+                row.merging(["birth_date": .string("")]) { present, _ in present }
+            }
+            try insertRows(db, "person", personCols, personRows)
             for r in try dump.rows("relationships") {
                 try db.run(
                     "INSERT OR IGNORE INTO relationship(parent_id, child_id) VALUES (?,?)",

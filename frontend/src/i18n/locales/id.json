@@ -954,5 +954,21 @@
   "healthTable.downloadSelected": "Unduh CSV",
   "healthTable.deleteSelected": "Hapus",
   "healthTable.confirmDeleteMany": "Hapus {n} entri? Dokumen terlampir juga ikut terhapus. Tindakan ini tidak dapat dibatalkan.",
-  "healthTable.clearSelection": "Hapus pilihan"
+  "healthTable.clearSelection": "Hapus pilihan",
+  "charts.bmi": "IMT (dari berat dan tinggi)",
+  "charts.showReference": "Nilai rujukan",
+  "charts.referenceFor": "Rujukan untuk",
+  "charts.refGrowth": "Arsiran: kurva pertumbuhan WHO untuk {name} (P3–P97, lebih gelap P15–P85); putus-putus: median.",
+  "charts.refRange": "Arsiran: rentang umum pada usia {name}{label}. Panduan, bukan diagnosis.",
+  "charts.refMissing.birthDate": "Tambahkan tanggal lahir {name} di halaman Orang untuk membandingkan dengan kurva pertumbuhan WHO.",
+  "charts.refMissing.sex": "Atur jenis kelamin {name} di halaman Orang untuk membandingkan dengan kurva pertumbuhan WHO.",
+  "charts.percentile": "P{n}",
+  "charts.ref.P50": "median",
+  "charts.ref.underweight": "berat kurang",
+  "charts.ref.overweight": "berat berlebih",
+  "charts.ref.obese": "obesitas",
+  "charts.ref.high": "tinggi",
+  "charts.ref.fever": "demam",
+  "charts.ref.fasting": "puasa",
+  "peoplePage.birthDate": "Tanggal lahir"
 }

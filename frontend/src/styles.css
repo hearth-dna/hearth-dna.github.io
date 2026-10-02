@@ -275,6 +275,11 @@ ul.picklist li > button, ul.picklist li > .small { flex: none; min-width: 5.5rem
 .chart .axis text, .chart .label { fill: var(--muted); font-size: 11px; }
 .chart .label.person { fill: var(--fg); font-size: 12px; }
 .chart .band { fill: var(--chart-band); }
+.chart .ref-band { fill: var(--chart-band); }
+.chart .ref-band.strong { fill: color-mix(in srgb, var(--accent) 10%, transparent); }
+.chart .ref-line { stroke: var(--muted); stroke-width: 1.25; stroke-dasharray: 4 3; }
+.chart .ref-label { font-size: 10px; }
+.chart .chart-note { margin: 0; font-size: var(--text-xs); }
 .chart .cross { stroke: var(--muted); stroke-dasharray: 3 3; }
 .chart .tip { position: absolute; pointer-events: none; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 0.35rem 0.55rem; font-size: var(--text-xs); box-shadow: var(--shadow-2); white-space: nowrap; z-index: 1; }
 .chart .tip .swatch, .legend .swatch { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-inline-end: 0.35rem; vertical-align: -1px; }
