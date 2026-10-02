@@ -947,5 +947,12 @@
   "native.driveDefault": "マイドライブの Hearth フォルダを使う",
   "native.saved": "{name} を保存しました：{rows} 行、{mb} MB。",
   "native.documentReadingIntro": "任意。「書類を読み取る」で写真・スキャン・PDF をこのスマートフォンから直接 Google Gemini に送り、文字起こしします。キーはこのスマートフォンにのみ、端末のキーストアで保護して保存され、バックアップには含まれません。書類ごとに確認するまで何も送信されません。",
-  "native.eraseIntro": "このスマートフォンからすべての人物、遺伝子型、同意、メモ、ログを削除します。Hearth はどこにもコピーを残さないため、ダンプをエクスポートしていない限り、後から復元できるものはありません。"
+  "native.eraseIntro": "このスマートフォンからすべての人物、遺伝子型、同意、メモ、ログを削除します。Hearth はどこにもコピーを残さないため、ダンプをエクスポートしていない限り、後から復元できるものはありません。",
+  "healthTable.selected": "{n} 件選択",
+  "healthTable.selectAll": "表示中をすべて選択",
+  "healthTable.selectRow": "{title}、{date} を選択",
+  "healthTable.downloadSelected": "CSV をダウンロード",
+  "healthTable.deleteSelected": "削除",
+  "healthTable.confirmDeleteMany": "{n} 件を削除しますか？添付文書も削除されます。元に戻せません。",
+  "healthTable.clearSelection": "選択を解除"
 }

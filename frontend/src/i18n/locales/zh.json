@@ -947,5 +947,12 @@
   "native.driveDefault": "使用\"我的云端硬盘\"中的 Hearth 文件夹",
   "native.saved": "已保存 {name}：{rows} 行，{mb} MB。",
   "native.documentReadingIntro": "可选。让\"读取文档\"把照片、扫描件或 PDF 直接从这部手机发送给 Google Gemini 转录。密钥只保存在这部手机上，由其密钥库保护，永远不会包含在备份中。每份文档确认之前不会发送任何内容。",
-  "native.eraseIntro": "从这部手机删除所有人员、基因型、同意记录、笔记和日志。Hearth 不在任何地方保留副本，除非你已导出，否则之后无法恢复任何内容。"
+  "native.eraseIntro": "从这部手机删除所有人员、基因型、同意记录、笔记和日志。Hearth 不在任何地方保留副本，除非你已导出，否则之后无法恢复任何内容。",
+  "healthTable.selected": "已选择 {n} 项",
+  "healthTable.selectAll": "全选当前显示",
+  "healthTable.selectRow": "选择 {title}，{date}",
+  "healthTable.downloadSelected": "下载 CSV",
+  "healthTable.deleteSelected": "删除",
+  "healthTable.confirmDeleteMany": "删除 {n} 条记录？附件也会一并删除。此操作无法撤销。",
+  "healthTable.clearSelection": "取消选择"
 }

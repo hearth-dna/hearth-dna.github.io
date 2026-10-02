@@ -253,9 +253,6 @@ const round = (v: number, d: number) => Number(v.toFixed(d))
 const dupKey = (e: Pick<HealthEntryInput, 'kind' | 'title' | 'date' | 'time' | 'value' | 'value2'>) =>
   [e.kind, e.title.toLowerCase(), e.date, e.time ?? '', e.value ?? '', e.value2 ?? ''].join('\u0000')
 
-/** A value as the file wrote it, for the entry's text: "165 lb". */
-const printed = (cell: string, unit: string) => `${cell.trim()}${unit ? ` ${unit}` : ''}`
-
 export function buildEntries(
   kb: Kb,
   table: Table,
@@ -313,7 +310,7 @@ export function buildEntries(
             const unit = unitCol >= 0 && row[unitCol]?.trim() ? row[unitCol].trim() : m.unit
             return [[{ target: m.target, unit }, cell, unit, name] as Cell]
           })()
-    const pairs = new Map<string, { sys?: number; dia?: number; text: string[]; from: number[] }>()
+    const pairs = new Map<string, { sys?: number; dia?: number; from: number[] }>()
     for (const [m, cell, unit, from] of cells) {
       const s = sinkFor(m)
       const v = parseValue(cell)
@@ -326,12 +323,10 @@ export function buildEntries(
         continue
       }
       const value = round(s.convert(v.value), s.decimals)
-      const converted = unit && value !== v.value
       if (s.preset?.pair) {
-        const p = pairs.get(s.title) ?? { text: [], from: [] }
+        const p = pairs.get(s.title) ?? { from: [] }
         if (s.part === 1) p.dia = value
         else p.sys = value
-        if (converted) p.text.push(printed(cell, unit))
         if (typeof from === 'number') p.from.push(from)
         pairs.set(s.title, p)
         continue
@@ -344,7 +339,7 @@ export function buildEntries(
         time,
         kind: s.kind,
         title: s.title,
-        body: [converted ? `Imported: ${printed(cell, unit)}` : '', note].filter(Boolean).join('\n'),
+        body: note,
         source: o.source,
         value,
         unit: s.unit,
@@ -365,7 +360,7 @@ export function buildEntries(
         time,
         kind: 'measurement',
         title,
-        body: [p.text.length ? `Imported: ${p.text.join(' / ')}` : '', note].filter(Boolean).join('\n'),
+        body: note,
         source: o.source,
         value: p.sys,
         value2: p.dia,

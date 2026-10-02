@@ -131,12 +131,13 @@ describe('buildEntries', () => {
       ['Blood glucose', 5.38, null, 'mmol/L'],
       ['Blood pressure', 128, 82, 'mmHg'],
     ])
-    expect(first[0].body).toBe('Imported: 165.2 lb')
+    // The converted value is the entry's value; the file's own reading is not repeated in the text.
+    expect(first[0].body).toBe('')
     // A home spreadsheet's glucose is the glucometer preset; the user can pick the lab test instead.
     expect(first[1]).toMatchObject({ kind: 'measurement', analyte: '' })
     expect(r.skipped).toEqual([{ row: 2, reason: 'pairIncomplete' }])
     expect(r.entries.find((e) => e.date === '2026-01-26' && e.title === 'Weight')?.body).toBe(
-      'Imported: 162.9 lb\nafter run, felt fine',
+      'after run, felt fine',
     )
   })
 

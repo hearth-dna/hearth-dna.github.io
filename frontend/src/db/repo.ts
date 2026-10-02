@@ -480,6 +480,15 @@ export async function deleteHealthEntry(db: Database, id: string): Promise<void>
   await pruneBlobs(db)
 }
 
+/** Deletes several entries at once (the health table's selection), collecting blobs once. */
+export async function deleteHealthEntries(db: Database, ids: string[]): Promise<void> {
+  for (let i = 0; i < ids.length; i += 500) {
+    const chunk = ids.slice(i, i + 500)
+    await db.exec(`DELETE FROM health_log WHERE id IN (${chunk.map(() => '?').join(',')})`, chunk)
+  }
+  if (ids.length) await pruneBlobs(db)
+}
+
 // ---- attachments ---------------------------------------------------------------------------
 
 function rowToAttachment(r: Row): Attachment {

@@ -947,5 +947,12 @@
   "native.driveDefault": "Een Hearth-map in Mijn Drive gebruiken",
   "native.saved": "{name} opgeslagen: {rows} rijen, {mb} MB.",
   "native.documentReadingIntro": "Optioneel. Hiermee stuurt \"Document lezen\" een foto, scan of pdf rechtstreeks van deze telefoon naar Google Gemini om te laten uitschrijven. De sleutel staat alleen op deze telefoon, beveiligd door de sleutelopslag, en zit nooit in een back-up. Er wordt niets verstuurd voordat je elk document bevestigt.",
-  "native.eraseIntro": "Verwijdert alle personen, genotypen, toestemmingen, notities en logboeken van deze telefoon. Hearth bewaart nergens een kopie, dus daarna valt er niets terug te halen, tenzij je een dump hebt geëxporteerd."
+  "native.eraseIntro": "Verwijdert alle personen, genotypen, toestemmingen, notities en logboeken van deze telefoon. Hearth bewaart nergens een kopie, dus daarna valt er niets terug te halen, tenzij je een dump hebt geëxporteerd.",
+  "healthTable.selected": "{n} geselecteerd",
+  "healthTable.selectAll": "Alle getoonde selecteren",
+  "healthTable.selectRow": "{title}, {date} selecteren",
+  "healthTable.downloadSelected": "CSV downloaden",
+  "healthTable.deleteSelected": "Verwijderen",
+  "healthTable.confirmDeleteMany": "{n} items verwijderen? Bijgevoegde documenten worden ook verwijderd. Dit kan niet ongedaan worden gemaakt.",
+  "healthTable.clearSelection": "Selectie wissen"
 }

@@ -273,8 +273,9 @@ kb fields at tier 0, so the user gets a decision frame even without any LLM.
   metric name) to a measurement preset, a lab test or a custom metric; suggestions come from
   headers in English or Russian, units in brackets and device identifiers. Dates are read per
   column (ISO, d.m.y, m/d/y, spreadsheet serials, Unix time; ambiguous columns are flagged).
-  Values are converted into the app's unit (lb → kg, in → cm, °F → °C, mg/dL → mmol/L) with the
-  printed value kept in the text; a unit that cannot be converted blocks its column. Readings the
+  Values are converted into the app's unit (lb → kg, in → cm, °F → °C, mg/dL → mmol/L); the entry
+  holds the converted value, and its text only what ticked note columns say. A unit that cannot be
+  converted blocks its column. Readings the
   log already has are skipped, so a re-import adds nothing twice. `timeline/`, local only.
 - **Import section:** everything that comes in from outside has one page in the header
   (`/import`, `components/ImportPage.tsx`): raw DNA files (one person or several at once),

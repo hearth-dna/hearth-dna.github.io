@@ -947,5 +947,12 @@
   "native.driveDefault": "My Drive-এ একটি Hearth ফোল্ডার ব্যবহার করুন",
   "native.saved": "{name} সংরক্ষিত: {rows} সারি, {mb} MB।",
   "native.documentReadingIntro": "ঐচ্ছিক। \"একটি নথি পড়ুন\" দিয়ে কোনো ছবি, স্ক্যান বা PDF সরাসরি এই ফোন থেকে Google Gemini-তে লিপ্যন্তরের জন্য পাঠানো যায়। কী-টি শুধু এই ফোনে, এর কীস্টোরে সুরক্ষিত থাকে এবং কখনো ব্যাকআপের অংশ হয় না। প্রতিটি নথি নিশ্চিত না করা পর্যন্ত কিছু পাঠানো হয় না।",
-  "native.eraseIntro": "এই ফোন থেকে সব মানুষ, জিনোটাইপ, সম্মতি, নোট ও লগ মুছে দেয়। Hearth কোথাও কোনো কপি রাখে না, তাই আগে ডাম্প এক্সপোর্ট না করলে পরে কিছু ফেরানো যাবে না।"
+  "native.eraseIntro": "এই ফোন থেকে সব মানুষ, জিনোটাইপ, সম্মতি, নোট ও লগ মুছে দেয়। Hearth কোথাও কোনো কপি রাখে না, তাই আগে ডাম্প এক্সপোর্ট না করলে পরে কিছু ফেরানো যাবে না।",
+  "healthTable.selected": "{n}টি নির্বাচিত",
+  "healthTable.selectAll": "দেখানো সবগুলো নির্বাচন করুন",
+  "healthTable.selectRow": "{title}, {date} নির্বাচন করুন",
+  "healthTable.downloadSelected": "CSV ডাউনলোড করুন",
+  "healthTable.deleteSelected": "মুছুন",
+  "healthTable.confirmDeleteMany": "{n}টি এন্ট্রি মুছবেন? সংযুক্ত নথিও মুছে যাবে। এটি পূর্বাবস্থায় ফেরানো যাবে না।",
+  "healthTable.clearSelection": "নির্বাচন সরান"
 }
