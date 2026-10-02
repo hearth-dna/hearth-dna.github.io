@@ -947,5 +947,12 @@
   "native.driveDefault": "내 드라이브의 Hearth 폴더 사용",
   "native.saved": "{name} 저장됨: {rows}행, {mb}MB.",
   "native.documentReadingIntro": "선택 사항. \"문서 읽기\"로 사진, 스캔 또는 PDF를 이 휴대폰에서 바로 Google Gemini에 보내 텍스트로 옮깁니다. 키는 이 휴대폰에만 키 저장소로 보호되어 보관되며 백업에는 절대 포함되지 않습니다. 문서마다 확인하기 전에는 아무것도 전송되지 않습니다.",
-  "native.eraseIntro": "이 휴대폰에서 모든 사람, 유전자형, 동의, 메모, 기록을 삭제합니다. Hearth는 어디에도 사본을 두지 않으므로, 덤프를 내보내 두지 않았다면 나중에 복구할 수 없습니다."
+  "native.eraseIntro": "이 휴대폰에서 모든 사람, 유전자형, 동의, 메모, 기록을 삭제합니다. Hearth는 어디에도 사본을 두지 않으므로, 덤프를 내보내 두지 않았다면 나중에 복구할 수 없습니다.",
+  "healthTable.selected": "{n}개 선택됨",
+  "healthTable.selectAll": "표시된 항목 모두 선택",
+  "healthTable.selectRow": "{title}, {date} 선택",
+  "healthTable.downloadSelected": "CSV 다운로드",
+  "healthTable.deleteSelected": "삭제",
+  "healthTable.confirmDeleteMany": "{n}개 항목을 삭제할까요? 첨부 문서도 함께 삭제됩니다. 되돌릴 수 없습니다.",
+  "healthTable.clearSelection": "선택 해제"
 }

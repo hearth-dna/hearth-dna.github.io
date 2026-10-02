@@ -947,5 +947,12 @@
   "native.driveDefault": "استخدام مجلد Hearth في My Drive",
   "native.saved": "تم حفظ {name}: {rows} صفًا، {mb} ميغابايت.",
   "native.documentReadingIntro": "اختياري. يتيح لـ «قراءة مستند» إرسال صورة أو مسح ضوئي أو PDF مباشرة من هذا الهاتف إلى Google Gemini لتفريغه نصيًا. يُحفظ المفتاح على هذا الهاتف فقط، محميًا بمخزن مفاتيحه، ولا يكون أبدًا جزءًا من نسخة احتياطية. لا يُرسل شيء حتى تؤكد كل مستند.",
-  "native.eraseIntro": "يحذف جميع الأشخاص والأنماط الجينية والموافقات والملاحظات والسجلات من هذا الهاتف. لا يحتفظ Hearth بأي نسخة في أي مكان، فلا يمكن استرجاع شيء بعد ذلك ما لم تكن قد صدّرت ملف تفريغ."
+  "native.eraseIntro": "يحذف جميع الأشخاص والأنماط الجينية والموافقات والملاحظات والسجلات من هذا الهاتف. لا يحتفظ Hearth بأي نسخة في أي مكان، فلا يمكن استرجاع شيء بعد ذلك ما لم تكن قد صدّرت ملف تفريغ.",
+  "healthTable.selected": "تم تحديد {n}",
+  "healthTable.selectAll": "تحديد كل المعروض",
+  "healthTable.selectRow": "تحديد {title}، {date}",
+  "healthTable.downloadSelected": "تنزيل CSV",
+  "healthTable.deleteSelected": "حذف",
+  "healthTable.confirmDeleteMany": "حذف {n} من الإدخالات؟ ستُحذف المستندات المرفقة أيضًا. لا يمكن التراجع عن ذلك.",
+  "healthTable.clearSelection": "مسح التحديد"
 }

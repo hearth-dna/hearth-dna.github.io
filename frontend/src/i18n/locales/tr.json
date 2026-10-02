@@ -947,5 +947,12 @@
   "native.driveDefault": "Drive’ım’da bir Hearth klasörü kullan",
   "native.saved": "{name} kaydedildi: {rows} satır, {mb} MB.",
   "native.documentReadingIntro": "İsteğe bağlı. \"Belge oku\" ile bir fotoğraf, tarama veya PDF doğrudan bu telefondan yazıya dökülmek üzere Google Gemini’ye gönderilir. Anahtar yalnızca bu telefonda, anahtar deposuyla korunarak saklanır ve hiçbir zaman bir yedeğin parçası olmaz. Her belgeyi onaylayana kadar hiçbir şey gönderilmez.",
-  "native.eraseIntro": "Bu telefondan tüm kişileri, genotipleri, onayları, notları ve günlükleri siler. Hearth hiçbir yerde kopya tutmaz; bir döküm dışa aktarmadıysanız sonradan kurtarılacak bir şey kalmaz."
+  "native.eraseIntro": "Bu telefondan tüm kişileri, genotipleri, onayları, notları ve günlükleri siler. Hearth hiçbir yerde kopya tutmaz; bir döküm dışa aktarmadıysanız sonradan kurtarılacak bir şey kalmaz.",
+  "healthTable.selected": "{n} seçildi",
+  "healthTable.selectAll": "Gösterilenlerin tümünü seç",
+  "healthTable.selectRow": "Seç: {title}, {date}",
+  "healthTable.downloadSelected": "CSV indir",
+  "healthTable.deleteSelected": "Sil",
+  "healthTable.confirmDeleteMany": "{n} kayıt silinsin mi? Ekli belgeler de silinir. Bu işlem geri alınamaz.",
+  "healthTable.clearSelection": "Seçimi temizle"
 }

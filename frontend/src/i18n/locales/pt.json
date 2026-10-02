@@ -947,5 +947,12 @@
   "native.driveDefault": "Usar uma pasta Hearth em O meu disco",
   "native.saved": "{name} guardado: {rows} linhas, {mb} MB.",
   "native.documentReadingIntro": "Opcional. Permite que «Ler um documento» envie uma fotografia, digitalização ou PDF diretamente deste telemóvel para o Google Gemini para transcrição. A chave fica apenas neste telemóvel, protegida pelo cofre de chaves, e nunca faz parte de uma cópia de segurança. Nada é enviado antes de confirmar cada documento.",
-  "native.eraseIntro": "Apaga deste telemóvel todas as pessoas, genótipos, consentimentos, notas e registos. O Hearth não guarda cópia em lado nenhum, por isso depois não há nada a recuperar, a menos que tenha exportado uma cópia."
+  "native.eraseIntro": "Apaga deste telemóvel todas as pessoas, genótipos, consentimentos, notas e registos. O Hearth não guarda cópia em lado nenhum, por isso depois não há nada a recuperar, a menos que tenha exportado uma cópia.",
+  "healthTable.selected": "{n} selecionados",
+  "healthTable.selectAll": "Selecionar todos os exibidos",
+  "healthTable.selectRow": "Selecionar {title}, {date}",
+  "healthTable.downloadSelected": "Baixar CSV",
+  "healthTable.deleteSelected": "Excluir",
+  "healthTable.confirmDeleteMany": "Excluir {n} registros? Os documentos anexados também serão excluídos. Não é possível desfazer.",
+  "healthTable.clearSelection": "Limpar seleção"
 }

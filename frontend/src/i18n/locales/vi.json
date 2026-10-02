@@ -947,5 +947,12 @@
   "native.driveDefault": "Dùng thư mục Hearth trong Drive của tôi",
   "native.saved": "Đã lưu {name}: {rows} hàng, {mb} MB.",
   "native.documentReadingIntro": "Không bắt buộc. Cho phép \"Đọc tài liệu\" gửi ảnh, bản quét hoặc PDF trực tiếp từ điện thoại này đến Google Gemini để chép lại. Khóa chỉ được lưu trên điện thoại này, được kho khóa bảo vệ, và không bao giờ nằm trong bản sao lưu. Không có gì được gửi cho đến khi bạn xác nhận từng tài liệu.",
-  "native.eraseIntro": "Xóa khỏi điện thoại này mọi người, kiểu gen, sự đồng ý, ghi chú và nhật ký. Hearth không giữ bản sao ở đâu cả, nên sau đó không khôi phục được gì trừ khi bạn đã xuất bản kết xuất."
+  "native.eraseIntro": "Xóa khỏi điện thoại này mọi người, kiểu gen, sự đồng ý, ghi chú và nhật ký. Hearth không giữ bản sao ở đâu cả, nên sau đó không khôi phục được gì trừ khi bạn đã xuất bản kết xuất.",
+  "healthTable.selected": "Đã chọn {n}",
+  "healthTable.selectAll": "Chọn tất cả mục đang hiển thị",
+  "healthTable.selectRow": "Chọn {title}, {date}",
+  "healthTable.downloadSelected": "Tải CSV",
+  "healthTable.deleteSelected": "Xóa",
+  "healthTable.confirmDeleteMany": "Xóa {n} mục? Tài liệu đính kèm cũng sẽ bị xóa. Không thể hoàn tác.",
+  "healthTable.clearSelection": "Bỏ chọn"
 }

@@ -947,5 +947,12 @@
   "native.driveDefault": "Utiliser un dossier Hearth dans Mon Drive",
   "native.saved": "{name} enregistré : {rows} lignes, {mb} Mo.",
   "native.documentReadingIntro": "Facultatif. Permet à « Lire un document » d’envoyer une photo, un scan ou un PDF directement depuis ce téléphone à Google Gemini pour transcription. La clé n’est conservée que sur ce téléphone, protégée par son trousseau, et ne fait jamais partie d’une sauvegarde. Rien n’est envoyé avant que vous confirmiez chaque document.",
-  "native.eraseIntro": "Supprime de ce téléphone toutes les personnes, génotypes, consentements, notes et journaux. Hearth ne garde aucune copie nulle part : rien ne pourra être récupéré ensuite, sauf si vous avez exporté une sauvegarde."
+  "native.eraseIntro": "Supprime de ce téléphone toutes les personnes, génotypes, consentements, notes et journaux. Hearth ne garde aucune copie nulle part : rien ne pourra être récupéré ensuite, sauf si vous avez exporté une sauvegarde.",
+  "healthTable.selected": "{n} sélectionnés",
+  "healthTable.selectAll": "Tout sélectionner (affichés)",
+  "healthTable.selectRow": "Sélectionner {title}, {date}",
+  "healthTable.downloadSelected": "Télécharger le CSV",
+  "healthTable.deleteSelected": "Supprimer",
+  "healthTable.confirmDeleteMany": "Supprimer {n} entrées ? Leurs documents joints seront aussi supprimés. Action irréversible.",
+  "healthTable.clearSelection": "Effacer la sélection"
 }

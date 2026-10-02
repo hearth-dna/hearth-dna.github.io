@@ -22,5 +22,12 @@
   "healthTable.showResults": "Show {n}",
   "healthTable.removeFilter": "Remove filter: {label}",
   "healthTable.today": "Today",
-  "healthTable.yesterday": "Yesterday"
+  "healthTable.yesterday": "Yesterday",
+  "healthTable.selected": "{n} selected",
+  "healthTable.selectAll": "Select all shown",
+  "healthTable.selectRow": "Select {title}, {date}",
+  "healthTable.downloadSelected": "Download CSV",
+  "healthTable.deleteSelected": "Delete",
+  "healthTable.confirmDeleteMany": "Delete {n} entries? Their attached documents go too. This cannot be undone.",
+  "healthTable.clearSelection": "Clear selection"
 }

@@ -947,5 +947,12 @@
   "native.driveDefault": "Einen Hearth-Ordner in „Meine Ablage“ verwenden",
   "native.saved": "{name} gespeichert: {rows} Zeilen, {mb} MB.",
   "native.documentReadingIntro": "Optional. „Dokument lesen“ sendet damit ein Foto, einen Scan oder ein PDF direkt von diesem Telefon zur Transkription an Google Gemini. Der Schlüssel wird nur auf diesem Telefon gespeichert, durch dessen Schlüsselspeicher geschützt, und ist nie Teil eines Backups. Nichts wird gesendet, bevor Sie jedes Dokument bestätigen.",
-  "native.eraseIntro": "Löscht alle Personen, Genotypen, Einwilligungen, Notizen und Protokolle von diesem Telefon. Hearth behält nirgends eine Kopie; ohne vorher exportierten Dump lässt sich danach nichts wiederherstellen."
+  "native.eraseIntro": "Löscht alle Personen, Genotypen, Einwilligungen, Notizen und Protokolle von diesem Telefon. Hearth behält nirgends eine Kopie; ohne vorher exportierten Dump lässt sich danach nichts wiederherstellen.",
+  "healthTable.selected": "{n} ausgewählt",
+  "healthTable.selectAll": "Alle angezeigten auswählen",
+  "healthTable.selectRow": "{title}, {date} auswählen",
+  "healthTable.downloadSelected": "CSV herunterladen",
+  "healthTable.deleteSelected": "Löschen",
+  "healthTable.confirmDeleteMany": "{n} Einträge löschen? Angehängte Dokumente werden ebenfalls gelöscht. Dies kann nicht rückgängig gemacht werden.",
+  "healthTable.clearSelection": "Auswahl aufheben"
 }

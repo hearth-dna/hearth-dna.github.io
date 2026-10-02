@@ -947,5 +947,12 @@
   "native.driveDefault": "Gunakan folder Hearth di Drive Saya",
   "native.saved": "{name} disimpan: {rows} baris, {mb} MB.",
   "native.documentReadingIntro": "Opsional. Memungkinkan \"Baca dokumen\" mengirim foto, pindaian, atau PDF langsung dari ponsel ini ke Google Gemini untuk ditranskripsi. Kunci hanya disimpan di ponsel ini, dikunci oleh keystore-nya, dan tidak pernah menjadi bagian dari cadangan. Tidak ada yang dikirim sebelum Anda mengonfirmasi setiap dokumen.",
-  "native.eraseIntro": "Menghapus semua orang, genotipe, persetujuan, catatan, dan log dari ponsel ini. Hearth tidak menyimpan salinan di mana pun, jadi tidak ada yang bisa dipulihkan setelahnya kecuali Anda telah mengekspor dump."
+  "native.eraseIntro": "Menghapus semua orang, genotipe, persetujuan, catatan, dan log dari ponsel ini. Hearth tidak menyimpan salinan di mana pun, jadi tidak ada yang bisa dipulihkan setelahnya kecuali Anda telah mengekspor dump.",
+  "healthTable.selected": "{n} dipilih",
+  "healthTable.selectAll": "Pilih semua yang ditampilkan",
+  "healthTable.selectRow": "Pilih {title}, {date}",
+  "healthTable.downloadSelected": "Unduh CSV",
+  "healthTable.deleteSelected": "Hapus",
+  "healthTable.confirmDeleteMany": "Hapus {n} entri? Dokumen terlampir juga ikut terhapus. Tindakan ini tidak dapat dibatalkan.",
+  "healthTable.clearSelection": "Hapus pilihan"
 }

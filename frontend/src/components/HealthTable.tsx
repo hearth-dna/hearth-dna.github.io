@@ -1,6 +1,7 @@
-import { Fragment, type ReactNode, useMemo, useState } from 'react'
+import { Fragment, type ReactNode, useEffect, useMemo, useState } from 'react'
 import { useApp } from '../app/context'
-import { setHealthConditions } from '../db/repo'
+import { deleteHealthEntries, setHealthConditions } from '../db/repo'
+import { exportHealthEntries } from '../export/openFormats'
 import {
   daysBefore,
   facets,
@@ -97,6 +98,8 @@ export function HealthTable({
   const detailsText = useDetailsText()
   const [sort, setSort] = useState<{ key: HealthSortKey; dir: SortDir }>({ key: 'date', dir: 'desc' })
   const [open, setOpen] = useState<string | null>(null)
+  const [picked, setPicked] = useState<Set<string>>(new Set())
+  const [busy, setBusy] = useState(false)
   const [view, setView] = useState<View>(loadView)
   const [panel, setPanel] = useState(false)
   const name = (id: string) => persons.find((p) => p.id === id)?.displayName ?? id
@@ -121,6 +124,62 @@ export function HealthTable({
     [entries, filter, sort, persons],
   )
   const set = (patch: Partial<HealthFilter>) => onFilter({ ...filter, ...patch })
+  // A deleted or reloaded entry leaves the selection.
+  useEffect(() => {
+    setPicked((p) => {
+      const ids = new Set(entries.map((e) => e.id))
+      const kept = [...p].filter((id) => ids.has(id))
+      return kept.length === p.size ? p : new Set(kept)
+    })
+  }, [entries])
+  const pick = (id: string) =>
+    setPicked((p) => {
+      const n = new Set(p)
+      if (n.has(id)) n.delete(id)
+      else n.add(id)
+      return n
+    })
+  const allShown = shown.length > 0 && shown.every((e) => picked.has(e.id))
+  const someShown = shown.some((e) => picked.has(e.id))
+  const pickShown = () =>
+    setPicked((p) => {
+      const n = new Set(p)
+      for (const e of shown) {
+        if (allShown) n.delete(e.id)
+        else n.add(e.id)
+      }
+      return n
+    })
+  const selection = () => entries.filter((e) => picked.has(e.id))
+  const downloadPicked = async () => {
+    setBusy(true)
+    try {
+      await exportHealthEntries(db, persons, selection(), 'csv')
+    } finally {
+      setBusy(false)
+    }
+  }
+  const deletePicked = async () => {
+    if (!confirm(t('healthTable.confirmDeleteMany', { n: picked.size }))) return
+    setBusy(true)
+    try {
+      await deleteHealthEntries(db, [...picked])
+      setPicked(new Set())
+      onChange?.()
+    } finally {
+      setBusy(false)
+    }
+  }
+  const checkbox = (e: HealthEntry, className?: string) => (
+    <input
+      type="checkbox"
+      className={className}
+      checked={picked.has(e.id)}
+      aria-label={t('healthTable.selectRow', { title: e.title, date: e.date })}
+      onClick={(ev) => ev.stopPropagation()}
+      onChange={() => pick(e.id)}
+    />
+  )
   const toggle = (id: string) => setOpen(open === id ? null : id)
   const pickView = (v: View) => {
     setView(v)
@@ -262,6 +321,7 @@ export function HealthTable({
 
   const card = (e: HealthEntry, grouped: boolean) => (
     <li key={e.id} className={`hl-card kind-${e.kind}${open === e.id ? ' open' : ''}`}>
+      {checkbox(e, 'hl-pick')}
       <button
         type="button"
         className="hl-card-main"
@@ -530,7 +590,37 @@ export function HealthTable({
         </div>
       )}
 
+      {picked.size > 0 && (
+        <div className="notice row hl-selection" role="status">
+          <span>{t('healthTable.selected', { n: picked.size })}</span>
+          <button type="button" className="small" disabled={busy} onClick={downloadPicked}>
+            {t('healthTable.downloadSelected')}
+          </button>
+          {onDelete && (
+            <button type="button" className="small danger" disabled={busy} onClick={deletePicked}>
+              {t('healthTable.deleteSelected')}
+            </button>
+          )}
+          <button type="button" className="link" onClick={() => setPicked(new Set())}>
+            {t('healthTable.clearSelection')}
+          </button>
+        </div>
+      )}
+
       <div className="row hl-status">
+        {shown.length > 0 && (
+          <label className="check">
+            <input
+              type="checkbox"
+              checked={allShown}
+              ref={(el) => {
+                if (el) el.indeterminate = someShown && !allShown
+              }}
+              onChange={pickShown}
+            />
+            <span>{t('healthTable.selectAll')}</span>
+          </label>
+        )}
         {chips.map((c) => (
           <button
             key={c.key}
@@ -571,6 +661,7 @@ export function HealthTable({
           <table className="healthtable">
             <thead>
               <tr>
+                <th className="pick" aria-label={t('healthTable.selectAll')} />
                 <SortTh k="date" />
                 {showPerson && <SortTh k="person" />}
                 <SortTh k="kind" />
@@ -585,6 +676,7 @@ export function HealthTable({
               {shown.map((e) => (
                 <Fragment key={e.id}>
                   <tr className={open === e.id ? 'open' : ''} onClick={() => toggle(e.id)}>
+                    <td className="pick">{checkbox(e)}</td>
                     <td className="nowrap">
                       {e.date}
                       {e.time && <span className="muted"> {e.time}</span>}
@@ -624,7 +716,7 @@ export function HealthTable({
                   </tr>
                   {open === e.id && (
                     <tr className="detail">
-                      <td colSpan={showPerson ? 8 : 7}>{detail(e)}</td>
+                      <td colSpan={showPerson ? 9 : 8}>{detail(e)}</td>
                     </tr>
                   )}
                 </Fragment>
