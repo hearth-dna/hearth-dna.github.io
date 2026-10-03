@@ -9,5 +9,6 @@
   "archiveCard.passphrase": "Passphrase (recommended)",
   "archiveCard.saveArchive": "Save archive…",
   "archiveCard.downloadArchive": "Download portable archive",
-  "archiveCard.plaintextWarning": "Without a passphrase the file contains plaintext genetic data and is named accordingly."
+  "archiveCard.plaintextWarning": "Without a passphrase the file contains plaintext genetic data and is named accordingly.",
+  "archiveCard.attachmentsNotice": "The archive carries the health log, but not the attached documents; those live in your backup folder."
 }

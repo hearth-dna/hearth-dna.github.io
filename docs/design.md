@@ -236,7 +236,7 @@ kb fields at tier 0, so the user gets a decision frame even without any LLM.
 ### 6.4 Medical documents — processed locally, never stored remotely
 - **Shipped first (health log):** a per-person `health_log(id, person_id, date, time, kind, title, body,
   body_part, side, severity, tags, value, value2, unit, analyte, ref_low, ref_high, flag,
-  value_text, conditions)` of dated entries — lab result, diagnosis,
+  value_text, conditions, details)` of dated entries — lab result, diagnosis,
   medication, doctor letter, a self-reported **symptom** ("pain in both hands", body part `hands`,
   severity 6/10, tags `arthritis`), or a home **measurement** stored as numbers (`value`, a second
   `value2` for pairs like blood pressure, and `unit`: 37.8 °C, 120/80 mmHg, 71.5 kg) — typed or
@@ -247,7 +247,11 @@ kb fields at tier 0, so the user gets a decision frame even without any LLM.
   `hypertension`) the user linked the entry to: the form and each table row suggest them from the
   entry's words, its lab test and its measurement preset (`suggestConditions`), and nothing is
   linked without a click. It is the key the condition view, Ask and the per-condition export join
-  DNA findings and health records on.
+  DNA findings and health records on. `details` (JSON) holds a symptom's structured details, defined
+  per preset in `health/presets.ts`: stool form on the Bristol scale, colour, blood; cough type
+  and sputum colour; nasal discharge; times a day for vomiting and diarrhoea. The log's Quick
+  symptom bar records one in a tap. Severity and the numeric details are chartable, and Ask packs
+  carry them in words.
   Gated by the `import_document` consent; part of the dump; offered entry-by-entry to the Ask
   context pack under "Health log". The steps below build on it.
 - **Shipped second (BYOK document reader):** "Read a document" sends the photo/scan/PDF straight
@@ -270,14 +274,22 @@ kb fields at tier 0, so the user gets a decision frame even without any LLM.
   printed reference range is a band when every reading shares it. Pure grouping and conversion in
   `charts/series.ts`; hand-drawn SVG in `components/TimeChart.tsx` with a crosshair tooltip, arrow
   keys (a slider over the readings) and a table view.
+- **Charts: reference values.** A "Reference values" switch draws, under one person's readings:
+  the WHO growth curves for a child's weight, length/height, BMI and head circumference (P3–P97,
+  P15–P85 and the median, from WHO's LMS tables, `kb/reviewed/growth/who.json`; they need the
+  person's sex and optional birth date), and curated normal ranges for adults and vital signs
+  (`kb/reviewed/ranges.json`: BMI categories, blood pressure, pulse by age, temperature, SpO₂,
+  fasting glucose). The tooltip gives a child's percentile. BMI is its own metric, worked out from
+  each weighing and the height at that time (`charts/series.ts`, `charts/reference.ts`).
 - **Shipped fifth (CSV timeline import):** "Import CSV…" in a person's health log takes a
   spreadsheet or a device export, one row per date with a column per measurement or one reading
   per row (name, value, unit). The user assigns every column (and, for the long shape, every
   metric name) to a measurement preset, a lab test or a custom metric; suggestions come from
   headers in English or Russian, units in brackets and device identifiers. Dates are read per
   column (ISO, d.m.y, m/d/y, spreadsheet serials, Unix time; ambiguous columns are flagged).
-  Values are converted into the app's unit (lb → kg, in → cm, °F → °C, mg/dL → mmol/L) with the
-  printed value kept in the text; a unit that cannot be converted blocks its column. Readings the
+  Values are converted into the app's unit (lb → kg, in → cm, °F → °C, mg/dL → mmol/L); the entry
+  holds the converted value, and its text only what ticked note columns say. A unit that cannot be
+  converted blocks its column. Readings the
   log already has are skipped, so a re-import adds nothing twice. `timeline/`, local only.
 - **Import section:** everything that comes in from outside has one page in the header
   (`/import`, `components/ImportPage.tsx`): raw DNA files (one person or several at once),
@@ -286,8 +298,18 @@ kb fields at tier 0, so the user gets a decision frame even without any LLM.
   files and health-log import batches (grouped by their `source`, `import/history.ts`). The old
   buttons on People and in the health log are shortcuts to `/import/<source>/<person>`. Backups
   stay in Settings next to export.
-- Accept PDF, images, plain text. `pdf.js` extracts the text layer; `Tesseract.js` OCRs scans; both in
-  a worker. Originals stored as blobs in OPFS, referenced from `document`.
+- **Shipped sixth (attachments):** the original image or PDF is kept with the entry —
+  `attachment(id, health_log_id, person_id, sha256, mime, bytes, name, created_at)` with the bytes
+  in the OPFS file cache as `att-<sha256>.bin`, never in a BLOB column (ADR 0001). Content
+  addressed, so the same scan attached twice is stored once; the user's file name lives only in
+  the row, never on disk. The dump carries the rows; the bytes travel to the backup folder as
+  encrypted sidecars (`docs/architecture/storage/backup-folder.md`), which keeps the few-second
+  autosave as cheap as it was. Restoring elsewhere without the folder leaves them marked "not on
+  this device" rather than failing. No new consent: `import_document` already covers documents,
+  and revoking it deletes the entries and their attachments. `describeEntry` deliberately says
+  nothing about attachments, so no file name can reach the Ask context pack.
+- Still to build: `Tesseract.js` for scans, in a worker, to read an attachment without sending it
+  anywhere (text PDFs are already read locally with `pdf.js`).
 - Structured extraction into `observation` rows (lab values with units and reference ranges,
   diagnoses, medications). Tier 0: regex/table heuristics for common lab layouts; tiers 1–2: LLM
   extraction with a fixed JSON schema.
@@ -328,8 +350,9 @@ kb fields at tier 0, so the user gets a decision frame even without any LLM.
 - Optional app lock: passphrase-derived key wraps a random data key; SQLite pages stay plain in OPFS
   in v1 (OPFS is origin-private), with an option to encrypt the DB file at rest in v2.
 - Strict CSP; no third-party origins except the user-configured LLM endpoint.
-- On phones the same build runs inside the shells in `mobile/`, which exist to give it a real
-  origin (so OPFS survives), a file picker and a way to save a dump — ADR 0006.
+- On phones Hearth is two native apps in `mobile/` (Compose, SwiftUI) with the same schema, the
+  same backup format and the same strings as this web app — ADR 0010 (it superseded the web-view
+  shells of ADR 0006).
 
 ## 7. Comparison with codegen.eu
 

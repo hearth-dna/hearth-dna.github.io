@@ -10,7 +10,6 @@
   "timelineImport.column": "Column",
   "timelineImport.sample": "First values",
   "timelineImport.isWhat": "Is",
-  "timelineImport.role.ignore": "leave out",
   "timelineImport.role.date": "date",
   "timelineImport.role.time": "time of day",
   "timelineImport.role.note": "note",
@@ -27,7 +26,6 @@
   "timelineImport.ambiguousDate": "Every date in this file reads both as day/month and as month/day. Check the date format above.",
   "timelineImport.names": "Measurement names in the file",
   "timelineImport.metric": "Measurement",
-  "timelineImport.leaveOut": "leave out",
   "timelineImport.custom": "something else…",
   "timelineImport.customName": "Name",
   "timelineImport.unitInFile": "unit in the file",
@@ -37,6 +35,13 @@
   "timelineImport.skip.notNumber": "{n} cells that are not numbers",
   "timelineImport.skip.pairIncomplete": "{n} blood-pressure rows with only one of the two numbers",
   "timelineImport.skip.duplicate": "{n} readings already in the log",
-  "timelineImport.blocked": "{metric} in {unit} cannot be converted; pick the right unit or leave the column out.",
-  "timelineImport.import": "Import {n} entries"
+  "timelineImport.blocked": "{metric} in {unit} cannot be converted; pick the right unit or untick the column.",
+  "timelineImport.import": "Import {n} entries",
+  "timelineImport.include": "Import",
+  "timelineImport.includeAll": "All",
+  "timelineImport.includeNone": "None",
+  "timelineImport.columnsIncluded": "{n} of {m} columns imported",
+  "timelineImport.includeColumn": "Import the column {column}",
+  "timelineImport.adds": "Readings",
+  "timelineImport.leftOut": "Left out: {list}"
 }

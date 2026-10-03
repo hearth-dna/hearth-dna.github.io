@@ -85,4 +85,4 @@ jobs:
       # Landing check --------------------------------------------------------------------------
       - name: Landing pages present
         if: steps.changes.outputs.landing == 'true'
-        run: for f in landing/index.html landing/privacy.html landing/terms.html; do [ -s "$f" ] || { echo "::error::$f missing"; exit 1; }; done
+        run: for f in landing/index.html landing/privacy.html landing/terms.html landing/landing.css landing/landing.js landing/sw.js landing/i18n/ru.json; do [ -s "$f" ] || { echo "::error::$f missing"; exit 1; }; done

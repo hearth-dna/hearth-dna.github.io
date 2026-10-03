@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Header } from '../export/container'
-import { baseName, conflictName, hasNewer, isForeign, rotationPlan, spareNames } from './naming'
+import { attachmentsDirName, baseName, hasNewer, rotationPlan, sharedName, spareNames } from './naming'
 
 const header = (device: string, generation: number): Header => ({
   format: 'hearth-dump',
@@ -17,6 +17,12 @@ describe('backup naming', () => {
     expect(baseName('kids')).toBe('hearth-backup-kids.hearth')
   })
 
+  it('stamps shared snapshots with the local time', () => {
+    const at = new Date(2026, 8, 29, 14, 2)
+    expect(sharedName('default', at)).toBe('hearth-backup-2026-09-29-1402.hearth')
+    expect(sharedName('kids', at)).toBe('hearth-backup-kids-2026-09-29-1402.hearth')
+  })
+
   it('plans rotation oldest first and never beyond the keep count', () => {
     const base = 'hearth-backup.hearth'
     expect(rotationPlan([], base)).toEqual([])
@@ -26,12 +32,6 @@ describe('backup naming', () => {
       { from: `${base}.1`, to: `${base}.2` },
       { from: base, to: `${base}.1` },
     ])
-  })
-
-  it('builds a conflict name without colons', () => {
-    expect(conflictName('hearth-backup.hearth', 'abcdef01-2345', '2026-09-14T10:00:00.000Z')).toBe(
-      'hearth-backup.conflict-abcdef01-2026-09-14-10-00-00.hearth',
-    )
   })
 
   it('lists older copies oldest-last, then conflict files newest-first', () => {
@@ -58,18 +58,17 @@ describe('backup naming', () => {
     ])
   })
 
-  it('detects another device having written since we last looked', () => {
-    expect(isForeign(null, 'A', null)).toBe(false)
-    expect(isForeign(header('A', 9), 'A', null)).toBe(false)
-    expect(isForeign(header('B', 5), 'A', null)).toBe(true)
-    expect(isForeign(header('B', 5), 'A', { device: 'B', generation: 5 })).toBe(false)
-    expect(isForeign(header('B', 6), 'A', { device: 'B', generation: 5 })).toBe(true)
-  })
-
   it('offers a load when the folder is ahead of what we loaded', () => {
     expect(hasNewer(header('B', 5), 'A', null)).toBe(true)
     expect(hasNewer(header('B', 5), 'A', { device: 'B', generation: 5 })).toBe(false)
     expect(hasNewer(header('B', 7), 'A', { device: 'B', generation: 5 })).toBe(true)
     expect(hasNewer(header('A', 7), 'A', null)).toBe(false)
+  })
+})
+
+describe('attachmentsDirName', () => {
+  it('is shared by default and separate per profile', () => {
+    expect(attachmentsDirName('default')).toBe('attachments')
+    expect(attachmentsDirName('mum')).toBe('attachments-mum')
   })
 })

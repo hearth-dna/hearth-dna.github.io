@@ -29,6 +29,7 @@ const e = (o: Partial<HealthEntry>): HealthEntry => ({
   flag: '',
   valueText: '',
   conditions: [],
+  details: {},
   createdAt: 't',
   ...o,
 })
@@ -77,6 +78,7 @@ describe('availableMetrics', () => {
       'lab:lpa|mg/dL',
       'm:blood-pressure:0',
       'm:blood-pressure:1',
+      's:headache:severity',
       't:grip strength|kg',
     ])
     expect(ms[0]).toMatchObject({ unit: 'mmol/L', group: 'lab', count: 3, personIds: ['mum', 'dad'] })
@@ -85,6 +87,23 @@ describe('availableMetrics', () => {
       unit: 'kg',
       personIds: ['mum', 'dad'],
     })
+  })
+
+  it('charts a symptom by its severity and its numeric details', () => {
+    const stool = e({
+      kind: 'symptom',
+      title: 'Stool',
+      severity: 2,
+      details: { bristol: 6, colour: 'yellow', blood: true },
+    })
+    const ms = availableMetrics(kb, [stool, e({ kind: 'symptom', title: 'Diarrhea', details: { times: 4 } })])
+    // Equal counts sort by key.
+    expect(ms.map((m) => [m.key, m.group, m.unit])).toEqual([
+      ['s:diarrhea:times', 'symptom', ''],
+      ['s:stool:bristol', 'symptom', ''],
+      ['s:stool:severity', 'symptom', '/10'],
+    ])
+    expect(ms[1].source).toEqual({ kind: 'symptom', preset: 'stool', title: 'Stool', field: 'bristol' })
   })
 })
 

@@ -1,8 +1,9 @@
-import { MEASUREMENT_PRESETS } from '../health/presets'
+import { MEASUREMENT_PRESETS, symptomPreset } from '../health/presets'
 import type { Kb } from '../kb/kb'
 import { labCatalogue, normaliseUnit, recogniseAnalyte, toCanonical } from '../labs/normalise'
 import type { KbAnalyte } from '../labs/types'
 import type { HealthEntry, Person } from '../types'
+import { ageYears } from './reference'
 
 /**
  * What the Charts page draws: every numeric health-log reading, grouped into metrics (one lab
@@ -15,12 +16,16 @@ export type MetricSource =
   | { kind: 'lab'; analyte: string }
   | { kind: 'preset'; preset: string; part?: 0 | 1 }
   | { kind: 'custom'; title: string }
+  /** A symptom's severity or one of its numeric details (Bristol type, times a day). */
+  | { kind: 'symptom'; preset?: string; title: string; field: string }
+  /** Worked out from other readings: BMI from a weight and the height at that time. */
+  | { kind: 'derived'; id: 'bmi' }
 
 export interface Metric {
   key: string
   source: MetricSource
   unit: string
-  group: 'lab' | 'measurement' | 'other'
+  group: 'lab' | 'measurement' | 'symptom' | 'other'
   count: number
   personIds: string[]
 }
@@ -91,6 +96,7 @@ function labReading(kb: Kb, e: HealthEntry, value: number): Reading | null {
 
 /** Every chartable number in an entry: none, one, or two (a blood pressure pair). */
 export function readings(kb: Kb, e: HealthEntry): Reading[] {
+  if (e.kind === 'symptom') return symptomReadings(e)
   if (e.value === null || !Number.isFinite(e.value)) return []
   if (e.kind === 'lab') {
     const r = labReading(kb, e, e.value)
@@ -123,23 +129,101 @@ export function readings(kb: Kb, e: HealthEntry): Reading[] {
   ]
 }
 
-/** The metrics that have readings, most-recorded first. */
-export function availableMetrics(kb: Kb, entries: HealthEntry[]): Metric[] {
-  const by = new Map<string, Metric>()
-  for (const e of entries)
-    for (const r of readings(kb, e)) {
-      const m = by.get(r.key) ?? {
-        key: r.key,
-        source: r.source,
-        unit: r.unit,
-        group: r.group,
-        count: 0,
-        personIds: [],
+/** A symptom's chartable numbers: its severity, and its scale and count details. */
+function symptomReadings(e: HealthEntry): Reading[] {
+  const preset = symptomPreset(e.title)
+  const id = preset?.id ?? e.title.trim().toLowerCase()
+  const one = (field: string, value: number, unit: string): Reading => ({
+    key: `s:${id}:${field}`,
+    source: { kind: 'symptom', preset: preset?.id, title: e.title.trim(), field },
+    unit,
+    group: 'symptom',
+    value,
+    entry: e,
+  })
+  const out = e.severity === null ? [] : [one('severity', e.severity, '/10')]
+  for (const f of preset?.details ?? []) {
+    const v = e.details[f.id]
+    if ((f.kind === 'scale' || f.kind === 'count') && typeof v === 'number') out.push(one(f.id, v, ''))
+  }
+  return out
+}
+
+const DAY = 86_400_000
+/** A child's height is only trusted this far from the weighing when it cannot be interpolated. */
+const CHILD_HEIGHT_DAYS = 90
+
+/**
+ * BMI for every weighing that has a height to go with it: interpolated between the person's
+ * heights before and after, else the nearest height (within 90 days for a child; any for an
+ * adult or someone whose age is unknown, whose height does not change). kg and cm only.
+ */
+export function bmiReadings(entries: HealthEntry[], persons: Person[]): Reading[] {
+  const byPerson = new Map<string, { w: Point[]; h: Point[] }>()
+  for (const e of entries) {
+    if (e.kind !== 'measurement' || e.value === null || !(e.value > 0)) continue
+    const id = presetFor(e)?.id
+    const side = id === 'weight' && e.unit === 'kg' ? 'w' : id === 'height' && e.unit === 'cm' ? 'h' : null
+    if (!side) continue
+    const p = byPerson.get(e.personId) ?? { w: [], h: [] }
+    p[side].push({ t: pointTime(e), value: e.value, entry: e })
+    byPerson.set(e.personId, p)
+  }
+  const out: Reading[] = []
+  for (const [personId, { w, h }] of byPerson) {
+    if (!h.length) continue
+    h.sort((a, b) => a.t - b.t)
+    const person = persons.find((p) => p.id === personId)
+    for (const wt of w) {
+      const age = person ? ageYears(person, wt.t) : null
+      const before = h.filter((x) => x.t <= wt.t).at(-1)
+      const after = h.find((x) => x.t >= wt.t)
+      let cm: number | undefined
+      if (before && after)
+        cm =
+          after.t === before.t
+            ? before.value
+            : before.value + ((after.value - before.value) * (wt.t - before.t)) / (after.t - before.t)
+      else {
+        const near = (before ?? after) as Point
+        if (age === null || age >= 20 || Math.abs(near.t - wt.t) <= CHILD_HEIGHT_DAYS * DAY) cm = near.value
       }
-      m.count++
-      if (!m.personIds.includes(e.personId)) m.personIds.push(e.personId)
-      by.set(r.key, m)
+      if (!cm) continue
+      out.push({
+        key: 'd:bmi',
+        source: { kind: 'derived', id: 'bmi' },
+        unit: 'kg/m²',
+        group: 'measurement',
+        value: Number((wt.value / (cm / 100) ** 2).toFixed(1)),
+        entry: wt.entry,
+      })
     }
+  }
+  return out
+}
+
+/** Every reading the charts know: each entry's own, then the derived ones (BMI). */
+const allReadings = (kb: Kb, entries: HealthEntry[], persons: Person[]) => [
+  ...entries.flatMap((e) => readings(kb, e)),
+  ...bmiReadings(entries, persons),
+]
+
+/** The metrics that have readings, most-recorded first. */
+export function availableMetrics(kb: Kb, entries: HealthEntry[], persons: Person[] = []): Metric[] {
+  const by = new Map<string, Metric>()
+  for (const r of allReadings(kb, entries, persons)) {
+    const m = by.get(r.key) ?? {
+      key: r.key,
+      source: r.source,
+      unit: r.unit,
+      group: r.group,
+      count: 0,
+      personIds: [],
+    }
+    m.count++
+    if (!m.personIds.includes(r.entry.personId)) m.personIds.push(r.entry.personId)
+    by.set(r.key, m)
+  }
   return [...by.values()].sort((a, b) => b.count - a.count || a.key.localeCompare(b.key))
 }
 
@@ -164,15 +248,17 @@ export function buildPanels(
   kb: Kb,
   entries: HealthEntry[],
   o: { metrics: string[]; people: string[]; from: number | null; to: number | null },
+  persons: Person[] = [],
 ): Panel[] {
   const chosen = new Set(o.metrics)
   const people = new Set(o.people)
   const byKey = new Map<string, Reading[]>()
-  for (const e of entries) {
-    if (!people.has(e.personId)) continue
-    const t = pointTime(e)
+  // BMI pairs a weighing with heights outside the range too, so derive before cutting.
+  const mine = entries.filter((e) => people.has(e.personId))
+  for (const r of allReadings(kb, mine, persons)) {
+    const t = pointTime(r.entry)
     if ((o.from !== null && t < o.from) || (o.to !== null && t > o.to)) continue
-    for (const r of readings(kb, e)) if (chosen.has(r.key)) byKey.set(r.key, [...(byKey.get(r.key) ?? []), r])
+    if (chosen.has(r.key)) byKey.set(r.key, [...(byKey.get(r.key) ?? []), r])
   }
   return o.metrics.flatMap((key) => {
     const rs = byKey.get(key)

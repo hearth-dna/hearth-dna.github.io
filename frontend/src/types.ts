@@ -34,6 +34,8 @@ export interface Person {
   displayName: string
   sex: Sex
   birthYear: number | null
+  /** YYYY-MM-DD, or '' when only the year (or nothing) is known. Growth curves need it. */
+  birthDate: string
   notes: string
   createdAt: string
 }
@@ -137,6 +139,25 @@ export interface HealthEntry {
   valueText: string
   /** Condition ids from the kb (`Kb.conditions`) the user linked this entry to. */
   conditions: string[]
+  /** Structured symptom details by field id (health/presets.ts `DetailField`); {} when none. */
+  details: Record<string, number | string | true>
+  createdAt: string
+}
+
+/**
+ * An original document (image or PDF) kept with a health log entry. The bytes live in the OPFS
+ * file cache under `att-<sha256>.bin`; this row is the only place the user's file name exists.
+ */
+export interface Attachment {
+  id: string
+  healthLogId: string
+  personId: string
+  /** sha256 of the plaintext bytes: identity, dedup key and integrity check. */
+  sha256: string
+  mime: string
+  bytes: number
+  /** The file name to show; never used to build a file name on disk. */
+  name: string
   createdAt: string
 }
 

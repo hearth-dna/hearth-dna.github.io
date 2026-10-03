@@ -5,7 +5,8 @@ export const SCHEMA_SQL = `
 CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS person (
   id TEXT PRIMARY KEY, label TEXT NOT NULL, display_name TEXT NOT NULL, sex TEXT NOT NULL,
-  birth_year INTEGER, notes TEXT NOT NULL DEFAULT '', created_at TEXT NOT NULL
+  birth_year INTEGER, notes TEXT NOT NULL DEFAULT '', created_at TEXT NOT NULL,
+  birth_date TEXT NOT NULL DEFAULT ''
 );
 CREATE TABLE IF NOT EXISTS relationship (
   parent_id TEXT NOT NULL REFERENCES person(id) ON DELETE CASCADE,
@@ -35,8 +36,22 @@ CREATE TABLE IF NOT EXISTS health_log (
   tags TEXT NOT NULL DEFAULT '', value REAL, value2 REAL, unit TEXT NOT NULL DEFAULT '',
   analyte TEXT NOT NULL DEFAULT '', ref_low REAL, ref_high REAL, flag TEXT NOT NULL DEFAULT '',
   value_text TEXT NOT NULL DEFAULT '', conditions TEXT NOT NULL DEFAULT '',
+  details TEXT NOT NULL DEFAULT '',
   created_at TEXT NOT NULL
 );
+/* Added after schema version 1; created idempotently like every other table. The bytes live in
+   the OPFS file cache as att-<sha256>.bin, never in a BLOB column (ADR 0001). */
+CREATE TABLE IF NOT EXISTS attachment (
+  id TEXT PRIMARY KEY,
+  health_log_id TEXT NOT NULL REFERENCES health_log(id) ON DELETE CASCADE,
+  person_id TEXT NOT NULL REFERENCES person(id) ON DELETE CASCADE,
+  sha256 TEXT NOT NULL, -- of the plaintext bytes: identity, dedup key and integrity check
+  mime TEXT NOT NULL, bytes INTEGER NOT NULL,
+  name TEXT NOT NULL, -- display only; never used to build a file name
+  created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS attachment_entry ON attachment(health_log_id);
+CREATE INDEX IF NOT EXISTS attachment_sha ON attachment(sha256);
 CREATE TABLE IF NOT EXISTS note (
   id TEXT PRIMARY KEY, person_id TEXT, topic TEXT NOT NULL, markdown TEXT NOT NULL, updated_at TEXT NOT NULL
 );

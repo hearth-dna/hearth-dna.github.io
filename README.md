@@ -7,16 +7,20 @@ trust. No account, no server-side copy of your data.
 
 Design: [`docs/design.md`](docs/design.md) (the full proposal, ported from the `family_dna` repo).
 Hosting: GitHub Pages, and nothing else — see
-[ADR 0005](docs/decisions/0005-github-pages-hosting.md).
+[ADR 0005](docs/decisions/0005-github-pages-hosting.md). The site root is the landing page
+(`landing/`); the app lives under `/app/` ([ADR 0011](docs/decisions/0011-landing-at-root-app-under-app.md)).
+
+Licence: [GNU AGPL-3.0](LICENSE). The WHO growth tables in `kb/reviewed/growth/` are © World
+Health Organization, reproduced with attribution for non-commercial use (`kb/README.md`).
 
 ## Repository layout
 
 ```
 hearth/
 ├── frontend/      React + TypeScript + Vite PWA; SQLite WASM on OPFS; all analysis runs here
-├── mobile/        Android + iOS shells that run the same web build in a native window (ADR 0006)
+├── mobile/        native Android (Compose) and iOS (SwiftUI) apps with their own data layer (ADR 0010)
 ├── kb/            knowledge-base source (reviewed SNP entries) and build script → frontend/public/kb.json
-├── landing/       static privacy / terms pages, published beside the app
+├── landing/       the landing page at the site root, privacy and terms; the app is served under /app/
 ├── scripts/       dev helpers
 └── docs/          architecture, decisions (ADRs), runbooks
 ```

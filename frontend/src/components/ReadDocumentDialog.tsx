@@ -10,8 +10,13 @@ import {
   draftFromJson,
   type HealthDraft,
 } from '../documents/draft'
-import { type DocumentPart, GEMINI_DEFAULT_MODEL, readDocumentWithGemini } from '../egress/egress'
-import { rich, useT } from '../i18n/context'
+import {
+  type DocumentPart,
+  GEMINI_DEFAULT_MODEL,
+  ProviderError,
+  readDocumentWithGemini,
+} from '../egress/egress'
+import { rich, type Translate, useT } from '../i18n/context'
 import { sha256Hex } from '../import/unpack'
 import { parseLabText, type TextParse } from '../labs/parseText'
 import { pdfText } from '../labs/pdfText'
@@ -33,13 +38,40 @@ type Stage =
   | { s: 'partial'; parse: TextParse; source: string }
   | { s: 'key' }
   | { s: 'consent' }
-  | { s: 'confirm' }
-  | { s: 'sending' }
+  /** Ready to send; `error` is the last attempt's failure, shown with a Try again. */
+  | { s: 'confirm'; error?: unknown }
+  /** `attempt` counts up while a busy provider is retried. */
+  | { s: 'sending'; attempt: number }
+  /** Reading on this device failed. */
   | { s: 'error'; message: string }
 
 const isText = (f: File) => /^text\//.test(f.type) || /\.(txt|csv|tsv)$/i.test(f.name)
 const isPdf = (f: File) => f.type === 'application/pdf' || /\.pdf$/i.test(f.name)
 const encode = (s: string) => new TextEncoder().encode(s)
+const kib = (n: number) => `${Math.max(1, Math.round(n / 1024))} KB`
+
+/** A failed send in words: what happened and what to do, plus the provider's own message. */
+export function sendFailure(t: Translate, e: unknown, model: string): { text: string; detail: string } {
+  if (!(e instanceof ProviderError))
+    return { text: t('readDocumentDialog.error.other', { status: '?' }), detail: String(e) }
+  const key =
+    e.status === 0
+      ? 'network'
+      : e.status === 429
+        ? 'quota'
+        : e.status >= 500
+          ? 'busy'
+          : e.status === 401 || e.status === 403
+            ? 'key'
+            : e.status === 404
+              ? 'model'
+              : e.status === 400 || e.status === 413
+                ? 'rejected'
+                : e.status === 200
+                  ? 'empty'
+                  : 'other'
+  return { text: t(`readDocumentDialog.error.${key}`, { status: e.status, model }), detail: e.detail }
+}
 
 async function toBase64(bytes: Uint8Array): Promise<string> {
   const url = await new Promise<string>((resolve, reject) => {
@@ -65,7 +97,7 @@ export function ReadDocumentDialog({
   onClose,
 }: {
   person: Person
-  onDraft: (d: HealthDraft, source: string) => void
+  onDraft: (d: HealthDraft, source: string, files?: File[]) => void
   onLabDraft: (d: LabReportDraft, source: string) => void
   onClose: () => void
 }) {
@@ -79,6 +111,7 @@ export function ReadDocumentDialog({
   const [newKey, setNewKey] = useState('')
   const [model, setModel] = useState(GEMINI_DEFAULT_MODEL)
   const [consented, setConsented] = useState(false)
+  const [keepOriginals, setKeepOriginals] = useState(true)
   const [stage, setStage] = useState<Stage>({ s: 'pick' })
   /** What goes to the model: the chosen files, and text this device could not fully read. */
   const [parts, setParts] = useState<{ name: string; mime: string; bytes: Uint8Array }[]>([])
@@ -116,7 +149,25 @@ export function ReadDocumentDialog({
         bytes: new Uint8Array(await f.arrayBuffer()),
       })),
     )
-    if (!lab) return toModel(all)
+    // Not marked as a lab report: a PDF or text file may still be one. Try reading it here first,
+    // and only use it if it reads clearly as a lab report; otherwise it goes to the model as is.
+    if (!lab) {
+      if (!files.length || !files.every((f) => isPdf(f) || isText(f))) return toModel(all)
+      setStage({ s: 'reading' })
+      const texts: string[] = []
+      for (const [i, f] of files.entries()) {
+        const text = isText(f)
+          ? new TextDecoder().decode(all[i].bytes)
+          : await pdfText(all[i].bytes).catch(() => null)
+        if (!text) return toModel(all)
+        texts.push(text)
+      }
+      const text = texts.join('\n')
+      const parse = parseLabText(kb, text)
+      if (parse.draft.rows.length >= 3 && parse.draft.rows.length * 2 >= parse.candidates)
+        return done(parse.draft, `text:${await sha256Hex(encode(text))}`)
+      return toModel(all)
+    }
     setStage({ s: 'reading' })
     try {
       const texts = pasted.trim() ? [pasted] : []
@@ -143,13 +194,13 @@ export function ReadDocumentDialog({
       setParts([{ name: 'report.txt', mime: 'text/plain', bytes: encode(text) }])
       setStage({ s: 'partial', parse, source })
     } catch (e) {
-      setStage({ s: 'error', message: String(e) })
+      setStage({ s: 'error', message: e instanceof Error ? e.message : String(e) })
     }
   }
 
   const send = async () => {
     if (!key) return
-    setStage({ s: 'sending' })
+    setStage({ s: 'sending', attempt: 1 })
     try {
       const payload: DocumentPart[] = []
       const hashes: string[] = []
@@ -175,16 +226,24 @@ export function ReadDocumentDialog({
         lab ? labPrompt(kb) : documentPrompt(hint),
         lab ? labSchema(kb) : DOCUMENT_SCHEMA,
         confirmed,
+        { onRetry: (attempt) => setStage({ s: 'sending', attempt }) },
       )
       await logSharing(db, 'document', `gemini:${usedModel}`, JSON.stringify(meta, null, 2))
       const source = `gemini:${usedModel}:${hashes.join('+')}`
       if (lab) return done(labDraftFromJson(kb, text), source)
-      onDraft(draftFromJson(text, new Date().toISOString().slice(0, 10)), source)
+      onDraft(
+        draftFromJson(text, new Date().toISOString().slice(0, 10)),
+        source,
+        keepOriginals ? files : undefined,
+      )
       ref.current?.close()
     } catch (e) {
-      setStage({ s: 'error', message: String(e) })
+      // Stay on the send step: the files are still here, and a busy provider is worth a retry.
+      setStage({ s: 'confirm', error: e })
     }
   }
+  const failure =
+    stage.s === 'confirm' && stage.error !== undefined ? sendFailure(t, stage.error, model) : null
 
   const close = (
     <button type="button" onClick={() => ref.current?.close()}>
@@ -244,7 +303,10 @@ export function ReadDocumentDialog({
           <ul>
             {parts.map((p) => (
               <li key={p.name}>
-                {t('readDocumentDialog.fileLine', { name: p.name, kb: (p.bytes.length / 1024).toFixed(0) })}
+                {t('readDocumentDialog.fileLine', {
+                  name: p.name,
+                  kb: Math.max(1, Math.round(p.bytes.length / 1024)),
+                })}
               </li>
             ))}
           </ul>
@@ -256,6 +318,34 @@ export function ReadDocumentDialog({
               })}
             </p>
           )}
+          {failure && (
+            <div className="notice danger" role="alert">
+              <p className="m-0">{failure.text}</p>
+              {failure.detail && (
+                <p className="muted mt-2 m-0">
+                  {t('readDocumentDialog.providerSaid', { detail: failure.detail })}
+                </p>
+              )}
+            </div>
+          )}
+          {stage.s === 'sending' && stage.attempt > 1 && (
+            <p className="muted" role="status">
+              {t('readDocumentDialog.retrying', { n: stage.attempt, m: 3 })}
+            </p>
+          )}
+          {!lab && (
+            <>
+              <label className="check">
+                <input
+                  type="checkbox"
+                  checked={keepOriginals}
+                  onChange={(e) => setKeepOriginals(e.target.checked)}
+                />
+                <span>{t('readDocumentDialog.keepOriginals')}</span>
+              </label>
+              <p className="muted">{t('readDocumentDialog.keepOriginalsHint')}</p>
+            </>
+          )}
           <div className="row">
             <button
               type="button"
@@ -263,7 +353,11 @@ export function ReadDocumentDialog({
               disabled={stage.s === 'sending' || sendBytes > MAX_BYTES}
               onClick={send}
             >
-              {stage.s === 'sending' ? t('readDocumentDialog.sending') : t('readDocumentDialog.send')}
+              {stage.s === 'sending'
+                ? t('readDocumentDialog.sending')
+                : failure
+                  ? t('readDocumentDialog.tryAgain')
+                  : t('readDocumentDialog.send')}
             </button>
             <button type="button" disabled={stage.s === 'sending'} onClick={() => setStage({ s: 'pick' })}>
               {t('readDocumentDialog.back')}
@@ -307,6 +401,7 @@ export function ReadDocumentDialog({
             </select>
           </label>
           <p className="muted">{t(lab ? 'readDocumentDialog.labIntro' : 'readDocumentDialog.pickIntro')}</p>
+          {!lab && <p className="muted">{t('readDocumentDialog.pdfLocal')}</p>}
           <label className="field">
             {t('readDocumentDialog.pages')}
             <input
@@ -316,6 +411,18 @@ export function ReadDocumentDialog({
               onChange={(e) => setFiles(Array.from(e.target.files ?? []))}
             />
           </label>
+          {files.length > 0 && (
+            <div className="row tight mt-2">
+              <span className="muted">
+                {t('readDocumentDialog.selected', {
+                  files: files.map((f) => `${f.name} (${kib(f.size)})`).join(', '),
+                })}
+              </span>
+              <button type="button" className="small ghost" onClick={() => setFiles([])}>
+                {t('common.clear')}
+              </button>
+            </div>
+          )}
           {lab && (
             <label className="field mt-3">
               {t('readDocumentDialog.pasteLabel')}
@@ -336,7 +443,9 @@ export function ReadDocumentDialog({
             </p>
           )}
           {stage.s === 'error' && (
-            <p className="danger">{t('readDocumentDialog.failed', { message: stage.message })}</p>
+            <p className="notice danger" role="alert">
+              {t('readDocumentDialog.failed', { message: stage.message })}
+            </p>
           )}
           <div className="row mt-3">
             <button

@@ -1,7 +1,7 @@
 import type { Database } from '../db/db'
-import { listHealthLog, personCallsFor } from '../db/repo'
+import { listAttachments, listHealthLog, personCallsFor } from '../db/repo'
 import { computeFindings, type Kb } from '../kb/kb'
-import type { Person } from '../types'
+import type { HealthEntry, Person } from '../types'
 import { downloadBytes } from './exportDump'
 import { findingsTable, healthTable, type OpenFormat, openFileName, personColumns, render } from './table'
 
@@ -55,9 +55,26 @@ export async function exportHealthLog(
   persons: Person[],
   format: OpenFormat,
 ): Promise<Exported> {
-  const byPerson = []
-  for (const person of persons) byPerson.push({ person, entries: await listHealthLog(db, person.id) })
-  const table = healthTable(byPerson)
+  const entries: HealthEntry[] = []
+  for (const person of persons) entries.push(...(await listHealthLog(db, person.id)))
+  return exportHealthEntries(db, persons, entries, format)
+}
+
+/** The given entries in the health-log open format: Settings' whole log, or a table selection. */
+export async function exportHealthEntries(
+  db: Database,
+  persons: Person[],
+  entries: HealthEntry[],
+  format: OpenFormat,
+): Promise<Exported> {
+  const byPerson = persons.map((person) => ({
+    person,
+    entries: entries.filter((e) => e.personId === person.id),
+  }))
+  const ids = entries.map((e) => e.id)
+  const attachments = await listAttachments(db, ids)
+  const counts = Object.fromEntries(Object.entries(attachments).map(([id, a]) => [id, a.length]))
+  const table = healthTable(byPerson, counts)
   const bytes = text(render(table, format))
   const name = openFileName('health-log', format)
   downloadBytes(bytes, name, format === 'csv' ? 'text/csv' : 'application/x-ndjson')

@@ -1,15 +1,18 @@
-import { type Header, readHeader } from '../export/container'
+import { type Header, readHeader, readHeaderPrefix } from '../export/container'
 import { README, ROTATIONS, rotationPlan, type Seen } from './naming'
 
 /**
- * The File System Access side of the backup folder: pick, remember, reconnect, read and write.
- * Chromium-only; `supported()` gates the UI. The remembered handle lives in IndexedDB because a
- * handle cannot be stored in SQLite — the one piece of app state outside the database.
+ * Where backups go, behind one small interface: pick, remember, reconnect, read and write.
+ *
+ * The place is a folder from the File System Access directory picker (Chromium). The phone apps
+ * are native and keep their own backup places (ADR 0010). The remembered place lives in IndexedDB
+ * because a browser handle cannot be stored in SQLite — the one piece of app state outside the
+ * database.
  */
 
 // The picker and permission methods are not in TypeScript's DOM lib yet.
 type Permission = 'granted' | 'denied' | 'prompt'
-interface Dir extends FileSystemDirectoryHandle {
+interface Handle extends FileSystemDirectoryHandle {
   queryPermission(d: { mode: 'readwrite' }): Promise<Permission>
   requestPermission(d: { mode: 'readwrite' }): Promise<Permission>
 }
@@ -19,22 +22,42 @@ declare global {
   }
 }
 
+export type Place = { kind: 'browser'; handle: FileSystemDirectoryHandle }
+
+/** What the rest of the app reads and writes through; the handle is invisible past here. */
+export interface Dir {
+  readonly name: string
+  names(): Promise<string[]>
+  read(name: string): Promise<Uint8Array | null>
+  /** The first `bytes` of a file (or all of a shorter one); null when it is not there. */
+  readHead(name: string, bytes: number): Promise<Uint8Array | null>
+  write(name: string, bytes: Uint8Array | string): Promise<void>
+  /** Removes a file or a whole folder. */
+  remove(name: string): Promise<void>
+  /** A subfolder, or null when it is not there and we are not creating it. */
+  subdir(name: string, create?: boolean): Promise<Dir | null>
+}
+
 export const supported = () =>
   typeof window !== 'undefined' && typeof window.showDirectoryPicker === 'function'
 
+export const placeName = (p: Place) => p.handle.name
+
 export interface Saved {
-  handle: Dir
-  /** Header of the snapshot last written to or loaded from this folder by this browser. */
+  place: Place
+  /** Header of the snapshot last written to or loaded from this place by this browser. */
   lastSeen: Seen | null
   /** The user chose to store without a passphrase. */
   plain: boolean
-  /** Back up automatically after every change; absent in handles saved before the switch existed. */
+  /** Back up automatically after every change; absent in places saved before the switch existed. */
   auto?: boolean
-  /** When this browser last wrote a snapshot to the folder (ISO). */
+  /** When this browser last wrote a snapshot to the place (ISO). */
   lastAt?: string
+  /** How many attachment sidecars the folder held after the last successful mirror. */
+  mirrored?: number
 }
 
-// ---- remembered handle (IndexedDB) ---------------------------------------------------------
+// ---- remembered place (IndexedDB) ----------------------------------------------------------
 
 const IDB = 'hearth-handles'
 const STORE = 'folders'
@@ -59,10 +82,22 @@ function tx<T>(mode: IDBTransactionMode, run: (s: IDBObjectStore) => IDBRequest<
   )
 }
 
+/**
+ * Records saved before phones had backups hold the browser handle at the top level; records from
+ * the old phone shells hold another kind of place, which a browser cannot open.
+ */
+type Stored =
+  | (Omit<Saved, 'place'> & { place: { kind: string } })
+  | (Omit<Saved, 'place'> & { handle: FileSystemDirectoryHandle })
+
 export async function loadSaved(profile: string): Promise<Saved | null> {
   if (!supported()) return null
   try {
-    return ((await tx('readonly', (s) => s.get(profile))) as Saved | undefined) ?? null
+    const r = (await tx('readonly', (s) => s.get(profile))) as Stored | undefined
+    if (!r) return null
+    if ('place' in r) return r.place.kind === 'browser' ? (r as Saved) : null
+    const { handle, ...rest } = r
+    return { ...rest, place: { kind: 'browser', handle } }
   } catch {
     return null
   }
@@ -76,62 +111,132 @@ export async function forget(profile: string): Promise<void> {
   await tx('readwrite', (s) => s.delete(profile))
 }
 
-// ---- permissions ----------------------------------------------------------------------------
-
-export async function pick(): Promise<Dir> {
-  if (!window.showDirectoryPicker) throw new Error('folder access is not available in this browser')
-  return (await window.showDirectoryPicker({ mode: 'readwrite', id: 'hearth-backup' })) as Dir
+/**
+ * What this browser remembers about backups it handed to the share sheet (no folder to read back):
+ * the snapshot it last shared or loaded, when, and whether it was stored unencrypted.
+ */
+export interface Shared {
+  lastSeen: Seen | null
+  plain: boolean
+  lastAt?: string
 }
 
-export const permission = (dir: Dir) => dir.queryPermission({ mode: 'readwrite' })
+const sharedKey = (profile: string) => `${profile}:shared`
 
-/** Must be called from a user gesture. */
-export const reconnect = async (dir: Dir) =>
-  (await dir.requestPermission({ mode: 'readwrite' })) === 'granted'
+export async function loadShared(profile: string): Promise<Shared | null> {
+  try {
+    return ((await tx('readonly', (s) => s.get(sharedKey(profile)))) as Shared | undefined) ?? null
+  } catch {
+    return null
+  }
+}
+
+export async function saveShared(profile: string, shared: Shared): Promise<void> {
+  await tx('readwrite', (s) => s.put(shared, sharedKey(profile)))
+}
+
+// ---- picking and permissions ---------------------------------------------------------------
+
+/** Opens the folder picker; null when the user backed out. Must run from a click. */
+export async function pick(): Promise<Place | null> {
+  if (!window.showDirectoryPicker) throw new Error('folder access is not available in this browser')
+  try {
+    const handle = await window.showDirectoryPicker({ mode: 'readwrite', id: 'hearth-backup' })
+    return { kind: 'browser', handle }
+  } catch (e) {
+    if (e instanceof DOMException && e.name === 'AbortError') return null
+    throw e
+  }
+}
+
+/** Whether the place can be used right now. */
+export async function permission(place: Place): Promise<'granted' | 'prompt'> {
+  return (await (place.handle as Handle).queryPermission({ mode: 'readwrite' })) === 'granted'
+    ? 'granted'
+    : 'prompt'
+}
+
+/** Asks the browser for access again; null when refused. Must be called from a user gesture. */
+export async function reconnect(place: Place): Promise<Place | null> {
+  return (await (place.handle as Handle).requestPermission({ mode: 'readwrite' })) === 'granted'
+    ? place
+    : null
+}
 
 // ---- files ----------------------------------------------------------------------------------
 
-async function names(dir: Dir): Promise<string[]> {
-  const out: string[] = []
-  for await (const name of dir.keys()) out.push(name)
-  return out
-}
+export const open = (place: Place): Dir => browserDir(place.handle)
 
-async function readFile(dir: Dir, name: string): Promise<Uint8Array | null> {
-  try {
-    const f = await (await dir.getFileHandle(name)).getFile()
-    return new Uint8Array(await f.arrayBuffer())
-  } catch {
-    return null
+function browserDir(dir: FileSystemDirectoryHandle): Dir {
+  return {
+    name: dir.name,
+    async names() {
+      const out: string[] = []
+      for await (const name of dir.keys()) out.push(name)
+      return out
+    },
+    async read(name) {
+      try {
+        const f = await (await dir.getFileHandle(name)).getFile()
+        return new Uint8Array(await f.arrayBuffer())
+      } catch {
+        return null
+      }
+    },
+    async readHead(name, bytes) {
+      try {
+        const f = await (await dir.getFileHandle(name)).getFile()
+        return new Uint8Array(await f.slice(0, bytes).arrayBuffer())
+      } catch {
+        return null
+      }
+    },
+    async write(name, bytes) {
+      const w = await (await dir.getFileHandle(name, { create: true })).createWritable()
+      try {
+        await w.write(bytes as BlobPart)
+      } finally {
+        await w.close()
+      }
+    },
+    remove: (name) => dir.removeEntry(name, { recursive: true }).catch(() => {}),
+    async subdir(name, create = false) {
+      try {
+        return browserDir(await dir.getDirectoryHandle(name, { create }))
+      } catch {
+        return null
+      }
+    },
   }
 }
 
-async function writeFile(dir: Dir, name: string, bytes: Uint8Array | string): Promise<void> {
-  const w = await (await dir.getFileHandle(name, { create: true })).createWritable()
-  try {
-    await w.write(bytes as BlobPart)
-  } finally {
-    await w.close()
-  }
+export async function removeDir(dir: Dir, name: string): Promise<number> {
+  const sub = await dir.subdir(name)
+  if (!sub) return 0
+  const n = (await sub.names()).length
+  await dir.remove(name).catch(() => {})
+  return n
 }
 
-/** Header of the current snapshot in the folder; null when there is none or it is unreadable. */
+/** Enough for any header Hearth writes; the rest of the snapshot stays where it is. */
+const HEAD_BYTES = 64 * 1024
+
+/**
+ * Header of the current snapshot in the folder; null when there is none or it is unreadable. Reads
+ * only the file's first bytes when they settle it, which they do for everything Hearth writes.
+ */
 export async function currentHeader(dir: Dir, base: string): Promise<Header | null> {
-  const bytes = await readFile(dir, base)
-  if (!bytes) return null
+  const head = await dir.readHead(base, HEAD_BYTES)
+  if (!head) return null
   try {
-    return readHeader(bytes)
+    const fromPrefix = readHeaderPrefix(head)
+    if (fromPrefix !== undefined) return fromPrefix
+    const bytes = head.length < HEAD_BYTES ? head : await dir.read(base)
+    return bytes ? readHeader(bytes) : null
   } catch {
     return null
   }
 }
-
-export const readCurrent = (dir: Dir, base: string) => readFile(dir, base)
-
-/** File names in the folder; the caller filters (see naming.spareNames). */
-export const list = (dir: Dir) => names(dir)
-
-export const readNamed = (dir: Dir, name: string) => readFile(dir, name)
 
 /**
  * Rotates the previous snapshots by copying (handles on removable media cannot be renamed
@@ -143,27 +248,28 @@ export async function writeSnapshot(
   bytes: Uint8Array,
   appUrl: string,
 ): Promise<void> {
-  const have = await names(dir)
+  const have = await dir.names()
   for (const { from, to } of rotationPlan(have, base, ROTATIONS)) {
-    const data = await readFile(dir, from)
-    if (data) await writeFile(dir, to, data)
+    const data = await dir.read(from)
+    if (data) await dir.write(to, data)
   }
-  await writeFile(dir, base, bytes)
-  if (!have.includes('README.txt')) await writeFile(dir, 'README.txt', README(appUrl))
+  await dir.write(base, bytes)
+  if (!have.includes('README.txt')) await dir.write('README.txt', README(appUrl))
 }
 
-export const writeConflict = (dir: Dir, name: string, bytes: Uint8Array) => writeFile(dir, name, bytes)
-
-/** Best effort: removes every snapshot of this profile (revoke = delete). */
+/**
+ * Best effort: removes every snapshot of this profile (revoke = delete), including the conflict
+ * copies earlier versions wrote beside it.
+ */
 export async function deleteSnapshots(dir: Dir, base: string): Promise<number> {
   let n = 0
-  for (const name of await names(dir)) {
+  for (const name of await dir.names()) {
     if (
       name === base ||
       name.startsWith(`${base}.`) ||
       name.startsWith(base.replace(/\.hearth$/, '.conflict-'))
     ) {
-      await dir.removeEntry(name).catch(() => {})
+      await dir.remove(name).catch(() => {})
       n++
     }
   }

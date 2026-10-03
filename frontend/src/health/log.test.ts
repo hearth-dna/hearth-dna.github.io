@@ -1,27 +1,36 @@
 import { describe, expect, it } from 'vitest'
-import type { HealthEntry } from '../types'
+import { BODY_PARTS, type HealthEntry } from '../types'
 import {
+  daysBefore,
   describeEntry,
+  detailsCell,
   facets,
   filterHealthLog,
+  formatDetails,
+  formatDetailsJson,
   formatTags,
   formatValue,
+  groupByDate,
   isFiltering,
   NO_FILTER,
   normTime,
+  panelFilterCount,
+  parseDetails,
   parseTags,
   sortHealthLog,
   when,
   where,
 } from './log'
+import { today } from './now'
 import {
   entryTitle,
   findPreset,
   MEASUREMENT_PRESETS,
-  measurementOrder,
   PRESET_GROUPS,
   presetOf,
+  presetOrder,
   SYMPTOM_PRESETS,
+  symptomPreset,
 } from './presets'
 
 const entry = (o: Partial<HealthEntry>): HealthEntry => ({
@@ -41,6 +50,7 @@ const entry = (o: Partial<HealthEntry>): HealthEntry => ({
   flag: '' as const,
   valueText: '',
   conditions: [],
+  details: {},
   severity: null,
   tags: [],
   value: null,
@@ -106,10 +116,10 @@ describe('formatValue', () => {
   })
 })
 
-describe('measurementOrder', () => {
+describe('presetOrder', () => {
   it('puts what the person records most recently first, then the rest', () => {
     const e = (kind: string, title: string) => ({ kind, title })
-    const order = measurementOrder([
+    const order = presetOrder('measurement', [
       e('measurement', 'Weight'),
       e('symptom', 'Headache'),
       e('measurement', ' height '),
@@ -118,7 +128,7 @@ describe('measurementOrder', () => {
     expect(order.slice(0, 2).map((p) => p.id)).toEqual(['weight', 'height'])
     expect(order.length).toBe(MEASUREMENT_PRESETS.length)
     expect(new Set(order.map((p) => p.id)).size).toBe(order.length)
-    expect(measurementOrder([]).map((p) => p.id)).toEqual(MEASUREMENT_PRESETS.map((p) => p.id))
+    expect(presetOrder('measurement', []).map((p) => p.id)).toEqual(MEASUREMENT_PRESETS.map((p) => p.id))
   })
 })
 
@@ -275,5 +285,83 @@ describe('time of day', () => {
     ]
     expect(sortHealthLog(day, 'date', 'desc').map((e) => e.id)).toEqual(['evening', 'morning', 'untimed'])
     expect(sortHealthLog(day, 'date', 'asc').map((e) => e.id)).toEqual(['untimed', 'morning', 'evening'])
+  })
+})
+
+describe('symptom details', () => {
+  it('reads and writes the details column, dropping anything malformed', () => {
+    expect(parseDetails('')).toEqual({})
+    expect(parseDetails('not json')).toEqual({})
+    expect(parseDetails('[1]')).toEqual({})
+    expect(parseDetails('{"bristol":6,"blood":true,"colour":"yellow","x":null,"y":""}')).toEqual({
+      bristol: 6,
+      blood: true,
+      colour: 'yellow',
+    })
+    expect(formatDetailsJson({})).toBe('')
+    expect(parseDetails(formatDetailsJson({ bristol: 4 }))).toEqual({ bristol: 4 })
+    expect(detailsCell({ bristol: 6, colour: 'yellow', blood: true })).toBe('bristol=6; colour=yellow; blood')
+  })
+
+  it('describes details in the preset order for Ask, and searches them', () => {
+    const stool = entry({
+      id: 's',
+      kind: 'symptom',
+      title: 'Stool',
+      details: { blood: true, bristol: 6, colour: 'yellow' },
+    })
+    expect(formatDetails(stool)).toBe('Bristol type 6, colour yellow, blood')
+    expect(describeEntry(stool)).toContain('Stool (Bristol type 6, colour yellow, blood')
+    expect(filterHealthLog([stool], { ...NO_FILTER, text: 'blood' }).map((e) => e.id)).toEqual(['s'])
+    const cough = entry({ kind: 'symptom', title: 'Eye irritation', details: { discharge: 'sticky' } })
+    expect(formatDetails(cough)).toBe('discharge sticky')
+  })
+
+  it('gives every new symptom a known body part and consistent detail fields', () => {
+    for (const p of SYMPTOM_PRESETS) {
+      if (p.bodyPart) expect(BODY_PARTS, p.id).toContain(p.bodyPart)
+      for (const f of p.details ?? []) {
+        if (f.kind === 'choice') expect(new Set(f.options).size, `${p.id}.${f.id}`).toBe(f.options.length)
+        if (f.kind === 'scale') expect(f.max, `${p.id}.${f.id}`).toBeGreaterThan(f.min)
+      }
+    }
+    expect(symptomPreset('Eye irritation')?.id).toBe('eye-irritation')
+    expect(presetOrder('symptom', [{ kind: 'symptom', title: 'Cough' }])[0].id).toBe('cough')
+  })
+})
+
+describe('dates', () => {
+  it('formats the local calendar date', () => {
+    expect(today(new Date(2026, 0, 5, 23, 59))).toBe('2026-01-05')
+  })
+  it('steps back across months, years and leap days', () => {
+    expect(daysBefore('2026-09-14', 0)).toBe('2026-09-14')
+    expect(daysBefore('2026-03-01', 1)).toBe('2026-02-28')
+    expect(daysBefore('2024-03-01', 1)).toBe('2024-02-29')
+    expect(daysBefore('2026-01-03', 6)).toBe('2025-12-28')
+  })
+})
+
+describe('card view helpers', () => {
+  it('counts panel filters, a date range once, and ignores kind and search text', () => {
+    expect(panelFilterCount(NO_FILTER)).toBe(0)
+    expect(panelFilterCount({ ...NO_FILTER, kind: 'lab', text: 'x' })).toBe(0)
+    expect(panelFilterCount({ ...NO_FILTER, condition: 'asthma' })).toBe(1)
+    expect(panelFilterCount({ ...NO_FILTER, from: '2026-01-01', to: '2026-02-01', tag: 'a' })).toBe(2)
+    expect(
+      panelFilterCount({ ...NO_FILTER, person: 'p', bodyPart: 'hands', minSeverity: 1, to: '2026-01-01' }),
+    ).toBe(4)
+  })
+  it('groups consecutive entries by date, keeping order', () => {
+    const g = groupByDate([
+      entry({ id: 'a', date: '2026-09-14' }),
+      entry({ id: 'b', date: '2026-09-14' }),
+      entry({ id: 'c', date: '2026-09-12' }),
+    ])
+    expect(g.map((x) => [x.date, x.entries.map((e) => e.id)])).toEqual([
+      ['2026-09-14', ['a', 'b']],
+      ['2026-09-12', ['c']],
+    ])
+    expect(groupByDate([])).toEqual([])
   })
 })

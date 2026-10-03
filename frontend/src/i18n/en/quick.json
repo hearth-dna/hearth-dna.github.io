@@ -4,5 +4,9 @@
   "quick.custom": "something else…",
   "quick.customPlaceholder": "e.g. Grip strength",
   "quick.save": "Save",
-  "quick.saved": "Saved {what}"
+  "quick.saved": "Saved {what}",
+  "quickSymptom.label": "Quick symptom:",
+  "quickSymptom.symptom": "Symptom",
+  "quickSymptom.placeholder": "e.g. Runny nose",
+  "quickSymptom.severity": "severity"
 }

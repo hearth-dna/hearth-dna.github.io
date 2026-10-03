@@ -8,6 +8,7 @@ const person = (id: string): Person => ({
   displayName: id,
   sex: 'unknown',
   birthYear: null,
+  birthDate: '',
   notes: '',
   createdAt: 't',
 })

@@ -84,11 +84,18 @@ export function formatRoute(p: Page): string {
  * the query string (e.g. `?profile=`) untouched.
  */
 const inHash = () => __HEARTH_ARCHIVE__ || location.protocol === 'file:'
-const current = () => (inHash() ? location.hash.replace(/^#/, '') : location.pathname)
+/** Where the app is served from, without the trailing slash: '/app', or '' at a site root. */
+const base = () => import.meta.env.BASE_URL.replace(/\/$/, '')
+const current = () => {
+  if (inHash()) return location.hash.replace(/^#/, '')
+  const path = location.pathname
+  // An address from before the app moved under /app/ (ADR 0011) still means the same page.
+  return path === base() || path.startsWith(`${base()}/`) ? path.slice(base().length) || '/' : path
+}
 const href = (p: Page) =>
   inHash()
     ? `${location.pathname}${location.search}#${formatRoute(p)}`
-    : `${formatRoute(p)}${location.search}`
+    : `${base()}${formatRoute(p)}${location.search}`
 
 export function useRoute(): [Page, (p: Page) => void] {
   const [page, setPage] = useState<Page>(() => parseRoute(current()) ?? HOME)
@@ -96,7 +103,8 @@ export function useRoute(): [Page, (p: Page) => void] {
   // biome-ignore lint/correctness/useExhaustiveDependencies: normalise once on mount
   useEffect(() => {
     // Normalise unknown or aliased URLs ('/', '/people/') without adding a history entry.
-    if (current() !== formatRoute(page)) history.replaceState(null, '', href(page))
+    if (current() !== formatRoute(page) || !location.pathname.startsWith(base()))
+      history.replaceState(null, '', href(page))
     const onPop = () => setPage(parseRoute(current()) ?? HOME)
     window.addEventListener('popstate', onPop)
     return () => window.removeEventListener('popstate', onPop)

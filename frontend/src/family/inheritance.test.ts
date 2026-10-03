@@ -46,6 +46,7 @@ describe('layoutPedigree', () => {
     displayName: id,
     sex: 'unknown',
     birthYear: null,
+    birthDate: '',
     notes: '',
     createdAt,
   })

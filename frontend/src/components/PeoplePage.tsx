@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useApp } from '../app/context'
 import { addPerson, deletePerson, setParent, unsetParent, updatePerson } from '../db/repo'
+import { today } from '../health/now'
 import { useT } from '../i18n/context'
 import { type Person, PROVIDER_LABELS, type Sex } from '../types'
 import { FamilyTree } from './FamilyTree'
@@ -18,10 +19,15 @@ const loadView = (): View => {
   }
 }
 
+/** A picked birth date also sets the year; clearing it keeps the year. */
+const withBirthDate = (date: string) =>
+  date ? { birthDate: date, birthYear: date.slice(0, 4) } : { birthDate: '' }
+
 export function PeoplePage({ onOpen }: { onOpen: (id: string) => void }) {
   const t = useT()
   const { db, persons, counts, relationships, refresh, go } = useApp()
-  const [form, setForm] = useState({ label: '', displayName: '', sex: 'unknown' as Sex, birthYear: '' })
+  const blank = { label: '', displayName: '', sex: 'unknown' as Sex, birthYear: '', birthDate: '' }
+  const [form, setForm] = useState(blank)
   const [view, setView] = useState<View>(loadView)
   const pickView = (v: View) => {
     setView(v)
@@ -39,8 +45,9 @@ export function PeoplePage({ onOpen }: { onOpen: (id: string) => void }) {
       displayName: form.displayName.trim() || form.label.trim(),
       sex: form.sex,
       birthYear: form.birthYear ? Number(form.birthYear) : null,
+      birthDate: form.birthDate,
     })
-    setForm({ label: '', displayName: '', sex: 'unknown', birthYear: '' })
+    setForm(blank)
     await refresh()
   }
   const sexLabel: Record<Sex, string> = {
@@ -88,6 +95,8 @@ export function PeoplePage({ onOpen }: { onOpen: (id: string) => void }) {
               value={form.label}
               onChange={(e) => setForm({ ...form, label: e.target.value })}
               placeholder={t('peoplePage.shortLabelPlaceholder')}
+              autoComplete="off"
+              autoCapitalize="none"
             />
           </label>
           <label className="field">
@@ -96,6 +105,7 @@ export function PeoplePage({ onOpen }: { onOpen: (id: string) => void }) {
               value={form.displayName}
               onChange={(e) => setForm({ ...form, displayName: e.target.value })}
               placeholder={t('peoplePage.displayNamePlaceholder')}
+              autoComplete="off"
             />
           </label>
           <label className="field">
@@ -110,7 +120,17 @@ export function PeoplePage({ onOpen }: { onOpen: (id: string) => void }) {
               value={form.birthYear}
               onChange={(e) => setForm({ ...form, birthYear: e.target.value })}
               placeholder={t('peoplePage.birthYearPlaceholder')}
-              style={{ width: '6rem' }}
+              inputMode="numeric"
+              className="year"
+            />
+          </label>
+          <label className="field">
+            {t('peoplePage.birthDate')}
+            <input
+              type="date"
+              value={form.birthDate}
+              max={today()}
+              onChange={(e) => setForm({ ...form, ...withBirthDate(e.target.value) })}
             />
           </label>
           <button type="button" className="primary" onClick={submit}>
@@ -241,13 +261,20 @@ function PersonCard({
 }) {
   const t = useT()
   const { db, persons, counts, refresh } = useApp()
-  const [edit, setEdit] = useState<{ displayName: string; sex: Sex; birthYear: string } | null>(null)
+  const [edit, setEdit] = useState<{
+    displayName: string
+    sex: Sex
+    birthYear: string
+    birthDate: string
+  } | null>(null)
   const saveEdit = async () => {
     if (!edit?.displayName.trim()) return
     await updatePerson(db, p.id, {
       displayName: edit.displayName.trim(),
       sex: edit.sex,
       birthYear: edit.birthYear ? Number(edit.birthYear) : null,
+      // A year typed by hand that disagrees with the date wins: the date was the stale one.
+      birthDate: edit.birthDate.startsWith(`${edit.birthYear}-`) ? edit.birthDate : '',
     })
     setEdit(null)
     await refresh()
@@ -269,6 +296,7 @@ function PersonCard({
                 displayName: p.displayName,
                 sex: p.sex,
                 birthYear: p.birthYear ? String(p.birthYear) : '',
+                birthDate: p.birthDate,
               })
             }
           >
@@ -296,7 +324,21 @@ function PersonCard({
           </label>
           <label className="field">
             {t('peoplePage.birthYear')}
-            <input value={edit.birthYear} onChange={(e) => setEdit({ ...edit, birthYear: e.target.value })} />
+            <input
+              value={edit.birthYear}
+              inputMode="numeric"
+              className="year"
+              onChange={(e) => setEdit({ ...edit, birthYear: e.target.value })}
+            />
+          </label>
+          <label className="field">
+            {t('peoplePage.birthDate')}
+            <input
+              type="date"
+              value={edit.birthDate}
+              max={today()}
+              onChange={(e) => setEdit({ ...edit, ...withBirthDate(e.target.value) })}
+            />
           </label>
           <button type="button" className="primary" onClick={saveEdit}>
             {t('common.save')}
@@ -308,7 +350,7 @@ function PersonCard({
       ) : (
         <p className="muted">
           {sexLabel[p.sex]}
-          {p.birthYear ? ` · ${t('peoplePage.born', { year: p.birthYear })}` : ''} ·{' '}
+          {p.birthYear ? ` · ${t('peoplePage.born', { year: p.birthDate || p.birthYear })}` : ''} ·{' '}
           {counts[p.id]
             ? t('peoplePage.snps', { n: counts[p.id].toLocaleString() })
             : t('peoplePage.noGenotypes')}

@@ -37,7 +37,7 @@
       ],
       "symptoms": [
         "thirst",
-        "frequent-urination",
+        "urination",
         "fatigue"
       ],
       "body_parts": [],
@@ -442,7 +442,7 @@
       "labs": [],
       "measurements": [],
       "symptoms": [
-        "flushing"
+        "hot-flushes"
       ],
       "body_parts": [
         "skin"

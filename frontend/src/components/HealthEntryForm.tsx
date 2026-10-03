@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useApp } from '../app/context'
+import { addAttachment, requestPersistence } from '../attachments/store'
 import { grantConsent, hasConsent } from '../consent/consent'
 import { addHealthEntry } from '../db/repo'
 import type { HealthDraft } from '../documents/draft'
 import { parseTags } from '../health/log'
-import { findPreset, presetsFor } from '../health/presets'
+import { nowTime, today } from '../health/now'
+import { type DetailValue, findPreset, presetsFor, symptomPreset } from '../health/presets'
 import { useT } from '../i18n/context'
 import { suggestConditions } from '../kb/conditions'
 import {
@@ -15,19 +17,11 @@ import {
   type HealthKind,
   type Person,
 } from '../types'
+import { AttachmentPicker } from './AttachmentPicker'
 import { ConditionPicker } from './ConditionPicker'
 import { ConsentForm } from './ConsentForm'
+import { DetailFields } from './DetailFields'
 
-/** Local date and time; toISOString() is UTC and gives yesterday's date late in the evening. */
-const pad = (n: number) => String(n).padStart(2, '0')
-const today = () => {
-  const d = new Date()
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
-}
-const nowTime = () => {
-  const d = new Date()
-  return `${pad(d.getHours())}:${pad(d.getMinutes())}`
-}
 /** Kinds usually recorded as they happen; the others mostly come from paper with no time on it. */
 const TIMED: ReadonlySet<HealthKind> = new Set(['symptom', 'measurement', 'medication'])
 const KINDS = Object.keys(HEALTH_KIND_LABELS) as HealthKind[]
@@ -60,6 +54,7 @@ const blank = (kind: HealthKind | null) => ({
   unit: '',
   preset: '',
   conditions: [] as string[],
+  details: {} as Record<string, DetailValue>,
 })
 
 /**
@@ -78,8 +73,8 @@ export function HealthEntryForm({
 }: {
   persons: Person[]
   personId: string
-  /** Prefill from a document reader; skips the type picker. */
-  draft?: { draft: HealthDraft; source: string }
+  /** Prefill from a document reader; skips the type picker. `files` are its pages, to keep. */
+  draft?: { draft: HealthDraft; source: string; files?: File[] }
   tagSuggestions: string[]
   onSaved: () => void
   onCancel: () => void
@@ -91,6 +86,8 @@ export function HealthEntryForm({
   const [form, setForm] = useState(() =>
     draft ? { ...blank(null), ...draft.draft, source: draft.source } : blank(null),
   )
+  const [staged, setStaged] = useState<File[]>(draft?.files ?? [])
+  const [failed, setFailed] = useState<string[]>([])
 
   useEffect(() => {
     setConsented(null)
@@ -98,6 +95,9 @@ export function HealthEntryForm({
   }, [db, personId])
 
   const kind = form.kind
+  // The symptom's detail fields: from the chosen preset, or a typed title that matches one.
+  const detailFields =
+    kind === 'symptom' ? (findPreset(form.preset) ?? symptomPreset(form.title))?.details : undefined
   const suggested = useMemo(
     () =>
       suggestConditions(kb, {
@@ -131,12 +131,13 @@ export function HealthEntryForm({
       unit: p.unit ?? '',
       value: '',
       value2: '',
+      details: {},
     })
   }
 
   const save = async () => {
     if (!valid || !kind) return
-    await addHealthEntry(db, {
+    const entry = await addHealthEntry(db, {
       personId,
       date: form.date,
       time: form.time,
@@ -152,7 +153,25 @@ export function HealthEntryForm({
       value2: pair ? Number(form.value2) : null,
       unit: fields.value ? form.unit.trim() : '',
       conditions: form.conditions,
+      details: detailFields ? form.details : {},
     })
+    if (staged.length > 0) {
+      await requestPersistence(db)
+      const bad: string[] = []
+      for (const [i, file] of staged.entries()) {
+        // A file that will not store must not cost the user the text they just typed.
+        try {
+          await addAttachment(db, entry.id, personId, file, i)
+        } catch {
+          bad.push(file.name)
+        }
+      }
+      if (bad.length > 0) {
+        setFailed(bad)
+        setStaged([])
+        return
+      }
+    }
     onSaved()
   }
 
@@ -370,6 +389,15 @@ export function HealthEntryForm({
           </datalist>
         </label>
       </div>
+      {detailFields && (
+        <div className="row mt-3">
+          <DetailFields
+            fields={detailFields}
+            value={form.details}
+            onChange={(details) => setForm({ ...form, details })}
+          />
+        </div>
+      )}
       <div className="mt-3">
         <ConditionPicker
           value={form.conditions}
@@ -385,6 +413,17 @@ export function HealthEntryForm({
           onChange={(e) => setForm({ ...form, body: e.target.value })}
         />
       </label>
+      <AttachmentPicker
+        files={staged}
+        onChange={setStaged}
+        disabled={!db.persistent}
+        notice={db.persistent ? undefined : t('attachments.notPersistent')}
+      />
+      {failed.map((name) => (
+        <p key={name} className="muted">
+          {t('attachments.saveFailed', { name })}
+        </p>
+      ))}
       {form.source && <p className="muted">{t('healthLog.transcribedNotice')}</p>}
       <div className="row mt-3">
         <button type="button" className="primary" disabled={!valid || consented !== true} onClick={save}>

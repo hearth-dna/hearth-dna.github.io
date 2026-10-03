@@ -35,7 +35,7 @@ the published app can never be updated again.
 ```bash
 cp .env.example .env            # fill in HEARTH_APPLICATION_ID and the ANDROID_* values
 make android-keystore           # once, ever
-make android-bundle             # builds the web app, then the signed AAB, then verifies it
+make android-bundle             # copies the strings and kb, builds the signed AAB, verifies it
 make android-publish            # → Play internal track
 make android-publish TRACK=production ROLLOUT=0.1
 ```
@@ -54,8 +54,9 @@ Needs macOS with Xcode, plus `xcodegen` and `bundle install` in `mobile/`.
 
 ### Once, before the first build
 
-1. **App ID.** Developer portal → Identifiers → register `HEARTH_APPLICATION_ID`. No capabilities
-   are needed: the app has no push, no iCloud, no sign-in, no app groups.
+1. **App ID.** Developer portal → Identifiers → register `HEARTH_APPLICATION_ID`, with the iCloud
+   capability (CloudDocuments) when the iCloud Drive backup button is wanted (ADR 0009). No push,
+   no app groups.
 2. **App record.** App Store Connect → Apps → new app with that bundle id, primary language, SKU.
 3. **API key.** Users and Access → Integrations → App Store Connect API → generate a key with the
    *App Manager* role. Download the `.p8` **once** — Apple never shows it again — keep it outside
@@ -69,15 +70,15 @@ Needs macOS with Xcode, plus `xcodegen` and `bundle install` in `mobile/`.
 ### Every release
 
 ```bash
-make ios-ipa          # web build → archive → export → verify
+make ios-ipa          # assets → archive → export → verify
 make ios-testflight   # upload (NOTES="what changed" sets the TestFlight note)
 make ios-testflight-status   # has Apple finished processing it?
 ```
 
 `ios-verify` runs inside `ios-ipa` and reads the *artifact*, not the variables: it refuses an
 `.ipa` whose `CFBundleIdentifier` is not `HEARTH_APPLICATION_ID` (a stale build would otherwise be
-uploaded to the wrong listing), one with no `Web/index.html` inside the bundle (that build installs,
-launches and shows the cannot-start screen), one missing `PrivacyInfo.xcprivacy` (the upload is
+uploaded to the wrong listing), one without the string catalogue or `kb.json` inside the bundle (that
+build installs and shows raw string keys), one missing `PrivacyInfo.xcprivacy` (the upload is
 accepted and then rejected by email hours later, ITMS-91053), one whose
 `ITSAppUsesNonExemptEncryption` is not `false` (every build would then wait on the
 export-compliance questionnaire), and one that is not validly signed.

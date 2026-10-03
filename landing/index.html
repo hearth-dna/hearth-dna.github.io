@@ -1,24 +1,184 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Hearth — your family's genome, on your own device</title>
-<meta name="description" content="A local-first family genome browser. Import raw DNA files from AncestryDNA, 23andMe, MyHeritage and others; nothing leaves your browser.">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-i18n="meta.title">Hearth — your family&#x27;s DNA and health record, on your own device</title>
+<meta name="description" data-i18n-content="meta.description" content="Hearth is a free, open-source family genome and health browser. Import raw DNA files, keep a health log, chart growth and lab results. Everything is stored in your browser; there is no server and no account.">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#faf8f4" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#15171a" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="landing.css">
+<script src="landing.js" defer></script>
 </head>
-<body>
+<body class="home">
+<header class="bar">
+  <a class="brand" href="/"><img src="favicon.svg" alt="" width="28" height="28"> Hearth</a>
+  <nav>
+    <a href="#features" data-i18n="nav.features">Features</a>
+    <a href="#privacy" data-i18n="nav.privacy">Privacy</a>
+    <a href="#open-source" data-i18n="nav.oss">Open source</a>
+    <label class="lang" title="Language" data-i18n-title="lang.label">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></svg>
+      <select id="lang" aria-label="Language" data-i18n-aria="lang.label">
+        <option value="en">English</option>
+        <option value="zh">中文（简体）</option>
+        <option value="hi">हिन्दी</option>
+        <option value="es">Español</option>
+        <option value="ar" data-dir="rtl">العربية</option>
+        <option value="fr">Français</option>
+        <option value="bn">বাংলা</option>
+        <option value="pt">Português</option>
+        <option value="ru">Русский</option>
+        <option value="ur" data-dir="rtl">اردو</option>
+        <option value="id">Bahasa Indonesia</option>
+        <option value="de">Deutsch</option>
+        <option value="ja">日本語</option>
+        <option value="tr">Türkçe</option>
+        <option value="ko">한국어</option>
+        <option value="vi">Tiếng Việt</option>
+        <option value="it">Italiano</option>
+        <option value="pl">Polski</option>
+        <option value="uk">Українська</option>
+        <option value="nl">Nederlands</option>
+      </select>
+    </label>
+    <a class="gh" href="{{REPO_URL}}" aria-label="Hearth on GitHub" data-i18n-aria="nav.github">
+      <svg viewBox="0 0 16 16" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+    </a>
+  </nav>
+</header>
+
 <main>
-  <h1>Hearth</h1>
-  <p class="lead">A family genome browser that keeps every file on your own device. No account. No upload. Export a dump when you want to move it.</p>
-  <ul>
-    <li>Imports AncestryDNA, 23andMe, MyHeritage, FamilyTreeDNA, Living DNA, Genotek VCF and generic raw files.</li>
-    <li>Stores the whole family with a pedigree; checks Mendelian consistency between parents and children.</li>
-    <li>Reads your genotypes against a reviewed knowledge base with evidence grades and sources.</li>
-    <li>Builds a context pack you can paste into any chat assistant you already trust — after you have previewed every line.</li>
-  </ul>
-  <p><a class="btn" href="https://app.hearth.example/">Open the app</a></p>
-  <p class="small">Informational tool, not a medical device. <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a></p>
+  <section class="hero">
+    <div>
+      <p class="badges">
+        <span class="badge" data-i18n="hero.badge1">Open source · AGPL-3.0</span>
+        <span class="badge" data-i18n="hero.badge2">No server · no account</span>
+        <span class="badge" data-i18n="hero.badge3">Free</span>
+      </p>
+      <h1 data-i18n="hero.title">Your family&#x27;s DNA and health record, on your own device.</h1>
+      <p class="lead" data-i18n="hero.lead">Hearth reads the raw DNA files you already downloaded, keeps a health log for everyone in the family, and charts what matters over time. All of it lives in your browser. Nothing is uploaded, because there is nowhere to upload it to.</p>
+      <p class="cta">
+        <a class="btn primary" href="/app/" data-i18n="hero.open">Open the app</a>
+        <a class="btn" href="{{REPO_URL}}">
+          <svg viewBox="0 0 16 16" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          <span data-i18n="hero.github">View on GitHub</span>
+        </a>
+      </p>
+      <p class="small" data-i18n="hero.note">Works in any modern browser; install it like an app from the address bar. Your data stays where you opened it.</p>
+    </div>
+    <figure class="preview" dir="ltr" aria-label="A child&#x27;s height plotted against the WHO growth curves" data-i18n-aria="preview.aria">
+      <svg viewBox="0 0 320 200" role="img">
+        <title data-i18n="preview.aria">A child&#x27;s height plotted against the WHO growth curves</title>
+        <rect class="pv-card" x="0" y="0" width="320" height="200" rx="14"/>
+        <text class="pv-title" x="18" y="28" data-i18n="preview.title">Height · cm</text>
+        <text class="pv-sub" x="18" y="46" data-i18n="preview.sub">WHO growth curves, P3–P97</text>
+        <path class="pv-band" d="M28 168 C 90 120, 170 92, 300 66 L 300 104 C 170 128, 90 150, 28 186 Z"/>
+        <path class="pv-band strong" d="M28 172 C 90 128, 170 101, 300 76 L 300 95 C 170 120, 90 143, 28 182 Z"/>
+        <path class="pv-median" d="M28 177 C 90 135, 170 110, 300 85"/>
+        <polyline class="pv-line" points="34,176 70,152 110,135 150,121 196,108 240,97 290,88"/>
+        <g class="pv-dots">
+          <circle cx="34" cy="176" r="4.5"/><circle cx="70" cy="152" r="4.5"/><circle cx="110" cy="135" r="4.5"/><circle cx="150" cy="121" r="4.5"/><circle cx="196" cy="108" r="4.5"/><circle cx="240" cy="97" r="4.5"/><circle cx="290" cy="88" r="4.5"/>
+        </g>
+        <g class="pv-tip"><rect x="196" y="112" width="104" height="34" rx="7"/><text x="206" y="133">90 cm · P42</text></g>
+      </svg>
+    </figure>
+  </section>
+
+  <section id="privacy" class="pillars">
+    <h2 data-i18n="privacy.title">Private by design, not by promise</h2>
+    <div class="grid three">
+      <article>
+        <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></span>
+        <h3 data-i18n="p1.title">Stored only in your browser</h3>
+        <p data-i18n="p1.text">DNA files, the family tree, health log, documents and notes are kept in your browser&#x27;s private storage on this device. Clearing site data erases them; we could not restore them because we never had them.</p>
+      </article>
+      <article>
+        <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="7" rx="2"/><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M4 3l17 18"/></svg></span>
+        <h3 data-i18n="p2.title">No server, no account, no tracking</h3>
+        <p data-i18n="p2.text">Hearth is a set of static files. There is no backend that could receive your data, no sign-up, no analytics, no advertising and no third-party scripts. A test in the code fails if anything but the app&#x27;s own files is fetched.</p>
+      </article>
+      <article>
+        <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg></span>
+        <h3 data-i18n="p3.title">You decide what leaves</h3>
+        <p data-i18n="p3.text">Backups are encrypted with your passphrase and written to a folder or drive you pick. Asking an AI is opt-in: you see every line of the context first, then copy it yourself or send it with your own API key.</p>
+      </article>
+    </div>
+  </section>
+
+  <section id="features">
+    <h2 data-i18n="features.title">What it does</h2>
+    <div class="grid">
+      <article class="feature">
+        <h3 data-i18n="f1.title">Reads your raw DNA</h3>
+        <p data-i18n="f1.text">AncestryDNA, 23andMe, MyHeritage, FamilyTreeDNA, Living DNA, Genotek, VCF and generic files, detected automatically. Import several family members at once.</p>
+      </article>
+      <article class="feature">
+        <h3 data-i18n="f2.title">A family, not just a genome</h3>
+        <p data-i18n="f2.text">Parents and children in one pedigree, with Mendelian consistency checks and shared-genotype comparisons across relatives.</p>
+      </article>
+      <article class="feature">
+        <h3 data-i18n="f3.title">Findings with evidence</h3>
+        <p data-i18n="f3.text">Your genotypes against a hand-reviewed knowledge base — pharmacogenomics, cardiometabolic and traits — with evidence grades and sources for every statement.</p>
+      </article>
+      <article class="feature">
+        <h3 data-i18n="f4.title">A health log for everyone</h3>
+        <p data-i18n="f4.text">Symptoms with details, home measurements, lab results, diagnoses and medications. Read a lab report from text or a PDF on the device, and keep the original pages attached.</p>
+      </article>
+      <article class="feature">
+        <h3 data-i18n="f5.title">Charts that explain themselves</h3>
+        <p data-i18n="f5.text">Every number over time, one line per person. Children&#x27;s weight, height and BMI against the WHO growth curves; adults against standard ranges for BMI, blood pressure and pulse.</p>
+      </article>
+      <article class="feature">
+        <h3 data-i18n="f6.title">Ask, on your terms</h3>
+        <p data-i18n="f6.text">Build a context pack from the findings and health log you choose, preview it, then paste it into an assistant you trust or send it with your own key.</p>
+      </article>
+      <article class="feature">
+        <h3 data-i18n="f7.title">Backups and sync</h3>
+        <p data-i18n="f7.text">Encrypted snapshots to a folder synced by Google Drive, Dropbox or a USB stick; on a phone, through the share sheet. Load them on another computer to continue.</p>
+      </article>
+      <article class="feature">
+        <h3 data-i18n="f8.title">In your language</h3>
+        <p data-i18n="f8.text">Twenty languages, light and dark themes, and a layout that works on a phone. Export open CSV and JSON files whenever you want your data elsewhere.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="steps">
+    <h2 data-i18n="steps.title">How it works</h2>
+    <ol>
+      <li><strong data-i18n="s1.title">Open the app.</strong> <span data-i18n="s1.text">It loads once and then works offline. Nothing to install, nothing to sign up for.</span></li>
+      <li><strong data-i18n="s2.title">Add your family.</strong> <span data-i18n="s2.text">Import the raw DNA files from your testing company and start a health log.</span></li>
+      <li><strong data-i18n="s3.title">Keep a backup.</strong> <span data-i18n="s3.text">Choose a folder or drive; Hearth writes an encrypted snapshot after every change.</span></li>
+    </ol>
+  </section>
+
+  <section id="open-source" class="oss">
+    <div>
+      <h2 data-i18n="oss.title">Open source</h2>
+      <p data-i18n-html="oss.text">The whole of Hearth — the app, the knowledge base and the phone apps — is public under the <strong>GNU AGPL-3.0</strong>. Anyone can read how it handles your data, check that it does what this page says, and run their own copy. Changes made by anyone who hosts it must stay open too.</p>
+      <p class="small" data-i18n="oss.who">WHO growth tables © World Health Organization, used with attribution for non-commercial use.</p>
+    </div>
+    <a class="repo" href="{{REPO_URL}}">
+      <svg viewBox="0 0 16 16" width="40" height="40" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+      <span><strong data-i18n="oss.repo">Source code on GitHub</strong><span class="small" data-i18n="oss.repoSub">Read it, star it, report an issue</span></span>
+    </a>
+  </section>
+
+  <section class="final">
+    <h2 data-i18n="final.title">Start with your own family</h2>
+    <p class="cta"><a class="btn primary" href="/app/" data-i18n="final.open">Open the app</a></p>
+    <p class="small" data-i18n="final.disclaimer">Hearth is an informational tool, not a medical device. Nothing it shows is a diagnosis or treatment advice; talk to a qualified clinician before acting on it.</p>
+  </section>
 </main>
+
+<footer>
+  <span>Hearth · AGPL-3.0</span>
+  <a href="privacy.html" data-i18n="footer.privacy">Privacy</a>
+  <a href="terms.html" data-i18n="footer.terms">Terms</a>
+  <a href="{{REPO_URL}}">GitHub</a>
+</footer>
 </body>
 </html>

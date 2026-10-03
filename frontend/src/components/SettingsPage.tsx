@@ -1,9 +1,20 @@
 import { useEffect, useState } from 'react'
 import { APP_VERSION, useApp } from '../app/context'
 import { setTheme, THEMES, useTheme } from '../app/theme'
+import { isArchive } from '../archive/mode'
+import { megabytes } from '../attachments/quota'
+import { persistedState } from '../attachments/store'
 import { listConsents, revokeConsent, revokeDeletesData } from '../consent/consent'
 import { CONSENTS } from '../consent/kinds'
-import { getMeta, listSharing, META_GEMINI_KEY, META_GEMINI_MODEL, newId, setMeta } from '../db/repo'
+import {
+  countAttachments,
+  getMeta,
+  listSharing,
+  META_GEMINI_KEY,
+  META_GEMINI_MODEL,
+  newId,
+  setMeta,
+} from '../db/repo'
 import { GEMINI_DEFAULT_MODEL } from '../egress/egress'
 import { exportDumpFile } from '../export/exportDump'
 import { restoreBytes } from '../export/restore'
@@ -14,6 +25,9 @@ import { BackupCard } from './BackupCard'
 import { EraseDialog } from './EraseDialog'
 import { GeminiKeySteps } from './GeminiKeySteps'
 import { OpenFormatsCard } from './OpenFormatsCard'
+
+/** The source repository, set at build time by the Pages workflow; none in a local build. */
+const REPO_URL = import.meta.env.VITE_REPO_URL as string | undefined
 
 export function SettingsPage() {
   const { db, persons, refresh } = useApp()
@@ -27,11 +41,15 @@ export function SettingsPage() {
   const [geminiModel, setGeminiModel] = useState(GEMINI_DEFAULT_MODEL)
   const [keyStored, setKeyStored] = useState(false)
   const [erasing, setErasing] = useState(false)
+  const [documents, setDocuments] = useState<Awaited<ReturnType<typeof countAttachments>> | null>(null)
+  const [persisted, setPersisted] = useState<string | null>(null)
   const reload = async () => {
     setConsents(await listConsents(db))
     setSharing(await listSharing(db))
     setKeyStored((await getMeta(db, META_GEMINI_KEY)) !== null)
     setGeminiModel((await getMeta(db, META_GEMINI_MODEL)) || GEMINI_DEFAULT_MODEL)
+    setDocuments(await countAttachments(db))
+    setPersisted(await persistedState(db))
   }
   // biome-ignore lint/correctness/useExhaustiveDependencies: reload is stable per db
   useEffect(() => {
@@ -266,6 +284,15 @@ export function SettingsPage() {
         </button>
         {erasing && <EraseDialog onClose={() => setErasing(false)} />}
       </div>
+      {documents && documents.rows > 0 && (
+        <p className="muted">
+          {t('settingsPage.attachmentStorage', {
+            n: documents.rows,
+            mb: megabytes(documents.bytes),
+          })}{' '}
+          {t(persisted === 'true' ? 'settingsPage.storagePersisted' : 'settingsPage.storageBestEffort')}
+        </p>
+      )}
       <p className="muted">
         {t('settingsPage.footer', {
           version: APP_VERSION,
@@ -273,6 +300,19 @@ export function SettingsPage() {
           id: newId().slice(0, 8),
         })}
       </p>
+      {!isArchive() && (
+        <p className="muted">
+          <a href="/">{t('settingsPage.about')}</a>
+          {REPO_URL && (
+            <>
+              {' · '}
+              <a href={REPO_URL} target="_blank" rel="noopener noreferrer">
+                {t('settingsPage.source')}
+              </a>
+            </>
+          )}
+        </p>
+      )}
     </div>
   )
 }

@@ -65,3 +65,13 @@ The build rejects unknown units, panels and conversions, non-positive factors an
 spelling claimed by two units. LOINC codes were entered by hand and should be checked against
 loinc.org when an entry is next reviewed.
 
+## Growth curves and reference ranges
+
+`reviewed/growth/who.json` holds the WHO Child Growth Standards (0–5 y) and WHO Growth Reference
+(5–19 y) as monthly `[month, L, M, S]` rows per sex: weight-, length/height-, BMI- and head
+circumference-for-age. It is written once by `build_growth.py` from WHO's own R packages (`anthro`,
+`anthroplus`) as CRAN publishes them; the data is © WHO, reproduced with attribution for
+non-commercial use. `reviewed/ranges.json` holds hand-curated normal ranges per chart metric key
+(`m:<preset>`, `m:blood-pressure:0|1`, `d:bmi`), optionally by age in years, each with its source.
+`build_kb.py` validates both and copies them into kb.json as `growth` and `ranges`.
+

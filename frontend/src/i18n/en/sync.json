@@ -7,16 +7,18 @@
   "sync.passphraseHint": "Enter the backup passphrase in Settings to resume syncing",
   "sync.syncing": "Syncing…",
   "sync.syncingHint": "Writing to {name}",
-  "sync.conflict": "Sync conflict",
-  "sync.conflictHint": "Another computer saved a newer backup; open Settings to choose which to keep",
   "sync.error": "Sync failed",
-  "sync.newer": "Newer copy",
-  "sync.newerHint": "{name} has changes from another computer; click to load them and sync",
   "sync.pending": "Syncing soon",
   "sync.pendingHint": "Changes will be written to the folder in a few seconds",
   "sync.unsynced": "Not synced",
   "sync.unsyncedHint": "There are changes {name} does not have yet; click to sync now",
   "sync.synced": "Synced",
   "sync.syncedAt": "Synced {time}",
-  "sync.syncedHint": "{name} has everything; click to sync again"
+  "sync.syncedHint": "{name} has everything; click to sync again",
+  "sync.backingUp": "Backing up…",
+  "sync.shareReady": "Share backup",
+  "sync.backUp": "Back up",
+  "sync.backUpHint": "There are changes no backup has yet; click to save a backup file",
+  "sync.backedUpAt": "Backed up {time}",
+  "sync.backedUpHint": "Nothing changed since the last backup file; click to make another"
 }

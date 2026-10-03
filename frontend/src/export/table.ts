@@ -1,3 +1,4 @@
+import { detailsCell } from '../health/log'
 import { conditionLabel } from '../kb/conditions'
 import type { Finding, Kb } from '../kb/kb'
 import type { HealthEntry, Person } from '../types'
@@ -121,13 +122,19 @@ export const HEALTH_HEADER = [
   'flag',
   'value_text',
   'conditions',
+  'details',
   'tags',
   'source',
   'body',
+  // How many documents are attached, never their names: this file is plain text by design.
+  'attachments',
   'created_at',
 ]
 
-export function healthTable(byPerson: { person: Person; entries: HealthEntry[] }[]): Table {
+export function healthTable(
+  byPerson: { person: Person; entries: HealthEntry[] }[],
+  attachmentCounts: Record<string, number> = {},
+): Table {
   const rows: Cell[][] = []
   for (const { person, entries } of byPerson) {
     for (const e of entries) {
@@ -149,9 +156,11 @@ export function healthTable(byPerson: { person: Person; entries: HealthEntry[] }
         e.flag,
         e.valueText,
         e.conditions.join('; '),
+        detailsCell(e.details),
         e.tags.join('; '),
         e.source,
         e.body,
+        attachmentCounts[e.id] ?? 0,
         e.createdAt,
       ])
     }

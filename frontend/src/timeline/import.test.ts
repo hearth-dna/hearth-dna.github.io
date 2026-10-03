@@ -62,11 +62,15 @@ describe('suggestions', () => {
     const m = suggestMapping(kb, table('growth.csv'), names)
     expect(m.shape).toBe('wide')
     expect(m.columns).toEqual([
-      { role: 'date', format: 'dmy' },
-      { role: 'metric', metric: { target: { kind: 'preset', preset: 'height' }, unit: 'см' } },
-      { role: 'metric', metric: { target: { kind: 'preset', preset: 'weight' }, unit: 'кг' } },
-      { role: 'metric', metric: { target: { kind: 'preset', preset: 'head-circumference' }, unit: 'см' } },
-      { role: 'note' },
+      { role: 'date', format: 'dmy', skip: false },
+      { role: 'metric', metric: { target: { kind: 'preset', preset: 'height' }, unit: 'см' }, skip: false },
+      { role: 'metric', metric: { target: { kind: 'preset', preset: 'weight' }, unit: 'кг' }, skip: false },
+      {
+        role: 'metric',
+        metric: { target: { kind: 'preset', preset: 'head-circumference' }, unit: 'см' },
+        skip: false,
+      },
+      { role: 'note', skip: false },
     ])
   })
   it('maps a long file by its columns and its distinct metric names', () => {
@@ -74,18 +78,25 @@ describe('suggestions', () => {
     expect(m.shape).toBe('long')
     expect(m.columns.map((c) => c.role)).toEqual(['name', 'unit', 'value', 'date'])
     expect(m.names).toEqual({
-      HKQuantityTypeIdentifierBodyMass: { target: { kind: 'preset', preset: 'weight' }, unit: 'kg' },
+      HKQuantityTypeIdentifierBodyMass: {
+        target: { kind: 'preset', preset: 'weight' },
+        unit: 'kg',
+        skip: false,
+      },
       HKQuantityTypeIdentifierHeartRate: {
         target: { kind: 'preset', preset: 'heart-rate' },
         unit: 'count/min',
+        skip: false,
       },
       HKQuantityTypeIdentifierBodyTemperature: {
         target: { kind: 'preset', preset: 'temperature' },
         unit: 'degF',
+        skip: false,
       },
       HKQuantityTypeIdentifierFlightsClimbed: {
         target: { kind: 'custom', title: 'HKQuantityTypeIdentifierFlightsClimbed' },
         unit: 'count',
+        skip: false,
       },
     })
   })
@@ -120,19 +131,20 @@ describe('buildEntries', () => {
       ['Blood glucose', 5.38, null, 'mmol/L'],
       ['Blood pressure', 128, 82, 'mmHg'],
     ])
-    expect(first[0].body).toBe('Imported: 165.2 lb')
+    // The converted value is the entry's value; the file's own reading is not repeated in the text.
+    expect(first[0].body).toBe('')
     // A home spreadsheet's glucose is the glucometer preset; the user can pick the lab test instead.
     expect(first[1]).toMatchObject({ kind: 'measurement', analyte: '' })
     expect(r.skipped).toEqual([{ row: 2, reason: 'pairIncomplete' }])
     expect(r.entries.find((e) => e.date === '2026-01-26' && e.title === 'Weight')?.body).toBe(
-      'Imported: 162.9 lb\nafter run, felt fine',
+      'after run, felt fine',
     )
   })
 
   it('imports a long export once the unknown names are assigned, and refuses an unconvertible unit', () => {
     const t = table('device-export.csv')
     const m = suggestMapping(kb, t, names)
-    m.names.HKQuantityTypeIdentifierFlightsClimbed = null
+    m.names.HKQuantityTypeIdentifierFlightsClimbed.skip = true
     const r = buildEntries(kb, t, m, { personId: 'kid', source: 'csv:x', existing: [], labTitle })
     expect(r.entries.map((e) => [e.title, e.date, e.time, e.value, e.unit])).toEqual([
       ['Weight', '2026-02-01', '07:31', 71.4, 'kg'],
@@ -143,10 +155,18 @@ describe('buildEntries', () => {
     ])
     // The file's unit column wins over the one given for the name.
     expect(r.blocked).toEqual([])
+    // A left-out name is a choice, not a problem: its rows are not reported as skipped.
+    expect(r.skipped).toEqual([])
+    expect(r.perName).toEqual({
+      HKQuantityTypeIdentifierBodyMass: 2,
+      HKQuantityTypeIdentifierHeartRate: 2,
+      HKQuantityTypeIdentifierBodyTemperature: 1,
+    })
     const vitals = suggestMapping(kb, table('vitals.csv'), names)
     vitals.columns[1] = {
       role: 'metric',
       metric: { target: { kind: 'preset', preset: 'weight' }, unit: 'furlongs' },
+      skip: false,
     }
     const bad = build('vitals.csv', vitals)
     expect(bad.blocked).toEqual([{ label: 'Weight', unit: 'furlongs' }])
@@ -162,5 +182,41 @@ describe('buildEntries', () => {
     const again = build('growth.csv', m, saved)
     expect(again.entries).toEqual([])
     expect(again.skipped.filter((s) => s.reason === 'duplicate')).toHaveLength(12)
+  })
+
+  it('counts what each column adds, and skips a column without forgetting its mapping', () => {
+    const m = suggestMapping(kb, table('vitals.csv'), names)
+    const all = build('vitals.csv', m)
+    // Date, weight, systolic, diastolic (the pair counts for both), glucose, notes.
+    expect(all.perColumn).toEqual([0, 4, 3, 3, 3, 0])
+
+    const glucose = m.columns[4]
+    const without = build('vitals.csv', {
+      ...m,
+      columns: m.columns.map((c, i) => (i === 4 ? { ...c, skip: true } : c)),
+    })
+    expect(without.entries.some((e) => e.title === 'Blood glucose')).toBe(false)
+    expect(without.entries).toHaveLength(all.entries.length - 3)
+    expect(without.perColumn[4]).toBe(0)
+    // The mapping is still there, and ticking the column again gives the same entries.
+    expect(glucose).toMatchObject({ role: 'metric', skip: false })
+    expect(build('vitals.csv', m).entries).toEqual(all.entries)
+
+    // A skipped note column no longer reaches the entries' text; a skipped date means no date.
+    const noNotes = build('vitals.csv', {
+      ...m,
+      columns: m.columns.map((c, i) => (i === 5 ? { ...c, skip: true } : c)),
+    })
+    expect(noNotes.entries.some((e) => e.body.includes('after run'))).toBe(false)
+    const noDate = build('vitals.csv', {
+      ...m,
+      columns: m.columns.map((c, i) => (i === 0 ? { ...c, skip: true } : c)),
+    })
+    expect(noDate.entries).toEqual([])
+  })
+
+  it('suggests a column it cannot place as left out', () => {
+    const t = { header: ['Date', 'Weight', 'Device'], rows: [['2026-01-01', '70', 'scale A']] }
+    expect(suggestMapping(kb, t, names).columns[2]).toEqual({ role: 'note', skip: true })
   })
 })

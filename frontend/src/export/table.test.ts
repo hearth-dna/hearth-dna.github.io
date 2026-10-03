@@ -19,6 +19,7 @@ const person = (id: string, label: string, displayName = label): Person => ({
   displayName,
   sex: 'unknown',
   birthYear: null,
+  birthDate: '',
   notes: '',
   createdAt: 't',
 })
@@ -119,6 +120,7 @@ describe('tables', () => {
       flag: '' as const,
       valueText: '',
       conditions: ['migraine'],
+      details: {},
       severity: 4,
       tags: ['migraine', 'stress'],
       value: null,
@@ -126,7 +128,7 @@ describe('tables', () => {
       unit: '',
       createdAt: 'c',
     }
-    const t = healthTable([{ person: person('1', 'me', 'Me'), entries: [e] }])
+    const t = healthTable([{ person: person('1', 'me', 'Me'), entries: [e] }], { [e.id]: 2 })
     expect(t.rows[0]).toEqual([
       'Me',
       '2026-01-02',
@@ -145,9 +147,11 @@ describe('tables', () => {
       '',
       '',
       'migraine',
+      '',
       'migraine; stress',
       '',
       'mild',
+      2, // attachments: the count, never the file names
       'c',
     ])
   })

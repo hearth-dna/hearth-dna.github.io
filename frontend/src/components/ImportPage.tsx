@@ -31,7 +31,7 @@ export function ImportPage({ source, person: personId }: { source: ImportSource;
   const [entries, setEntries] = useState<HealthEntry[]>([])
   const [files, setFiles] = useState<SourceFile[]>([])
   const [lab, setLab] = useState<{ draft: LabReportDraft; source: string } | null>(null)
-  const [doc, setDoc] = useState<{ draft: HealthDraft; source: string } | null>(null)
+  const [doc, setDoc] = useState<{ draft: HealthDraft; source: string; files?: File[] } | null>(null)
   const [done, setDone] = useState<Done>(null)
 
   const reload = async () => {
@@ -218,7 +218,7 @@ export function ImportPage({ source, person: personId }: { source: ImportSource;
         <ReadDocumentDialog
           person={person}
           onClose={closed}
-          onDraft={(draft, s) => setDoc({ draft, source: s })}
+          onDraft={(draft, s, files) => setDoc({ draft, source: s, files })}
           onLabDraft={(draft, s) => setLab({ draft, source: s })}
         />
       )}

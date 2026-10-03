@@ -168,9 +168,19 @@ export class Database {
       "flag TEXT NOT NULL DEFAULT ''",
       "value_text TEXT NOT NULL DEFAULT ''",
       "conditions TEXT NOT NULL DEFAULT ''",
+      "details TEXT NOT NULL DEFAULT ''",
     ]) {
       await ready.exec(`ALTER TABLE health_log ADD COLUMN ${col}`).catch(() => {})
     }
+    // Added after the native apps first shipped; a full date for growth curves (birth_year stays).
+    await ready.exec("ALTER TABLE person ADD COLUMN birth_date TEXT NOT NULL DEFAULT ''").catch(() => {})
+    // CSV imports used to start an entry's text with "Imported: 11200 g" after converting a reading;
+    // the entry's value and unit already say it. Drop that first line, keep any note after it.
+    await ready.exec(
+      `UPDATE health_log SET body = CASE WHEN instr(body, char(10)) > 0
+         THEN substr(body, instr(body, char(10)) + 1) ELSE '' END
+       WHERE source LIKE 'csv:%' AND body LIKE 'Imported: %'`,
+    )
     await ready.exec('INSERT OR IGNORE INTO meta(key, value) VALUES (?, ?)', [
       'schema_version',
       String(SCHEMA_VERSION),

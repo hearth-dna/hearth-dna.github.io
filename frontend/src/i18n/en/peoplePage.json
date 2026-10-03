@@ -34,5 +34,6 @@
   "peoplePage.parentsHeader": "Parents",
   "peoplePage.snpsHeader": "SNPs",
   "peoplePage.treeAria": "Family tree",
-  "peoplePage.treeHint": "Everyone sits on one row until parents are set; add them on the cards to build the tree."
+  "peoplePage.treeHint": "Everyone sits on one row until parents are set; add them on the cards to build the tree.",
+  "peoplePage.birthDate": "Birth date"
 }

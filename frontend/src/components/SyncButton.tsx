@@ -5,6 +5,12 @@ import { useT } from '../i18n/context'
 /** Local wall-clock time of an ISO timestamp. */
 const clock = (iso: string) => new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 
+/** The time today, the date otherwise: a shared backup can be days old. */
+const when = (iso: string) =>
+  new Date(iso).toDateString() === new Date().toDateString()
+    ? clock(iso)
+    : new Date(iso).toLocaleDateString([], { month: 'short', day: 'numeric' })
+
 type Look = {
   icon: string
   label: string
@@ -17,7 +23,7 @@ type Look = {
  * Header button for the backup folder (docs/architecture/storage/backup-folder.md). Shows at a
  * glance whether this browser and the folder agree, and syncs on click: loads a newer snapshot
  * from another computer first, then writes this browser's state. States that need the user
- * (no folder yet, passphrase, a conflict) open Settings instead.
+ * (no folder yet, a passphrase) open Settings instead.
  */
 export function SyncButton({ onOpenSettings }: { onOpenSettings: () => void }) {
   const t = useT()
@@ -25,10 +31,24 @@ export function SyncButton({ onOpenSettings }: { onOpenSettings: () => void }) {
   const [progress, setProgress] = useState<string | null>(null)
   useEffect(() => backups.subscribe(() => setStatus({ ...backups.status })), [])
 
-  if (status.state === 'unsupported') return null
+  const needsPass = !backups.plain && !backups.passphrase()
 
   const look = ((): Look => {
     switch (status.state) {
+      case 'manual':
+        if (status.step)
+          return { icon: '', label: t('sync.backingUp'), title: t('sync.backingUp'), tone: '', busy: true }
+        if (needsPass)
+          return { icon: '!', label: t('sync.passphrase'), title: t('sync.passphraseHint'), tone: 'warn' }
+        if (status.file) return { icon: '↑', label: t('sync.shareReady'), title: status.file, tone: 'warn' }
+        if (status.dirty || !status.lastAt)
+          return { icon: '●', label: t('sync.backUp'), title: t('sync.backUpHint'), tone: 'warn' }
+        return {
+          icon: '✓',
+          label: t('sync.backedUpAt', { time: when(status.lastAt) }),
+          title: t('sync.backedUpHint'),
+          tone: 'ok',
+        }
       case 'none':
         return { icon: '⇅', label: t('sync.setUp'), title: t('sync.setUpHint'), tone: '' }
       case 'reconnect':
@@ -48,18 +68,9 @@ export function SyncButton({ onOpenSettings }: { onOpenSettings: () => void }) {
           tone: '',
           busy: true,
         }
-      case 'conflict':
-        return { icon: '!', label: t('sync.conflict'), title: t('sync.conflictHint'), tone: 'danger' }
       case 'error':
         return { icon: '!', label: t('sync.error'), title: status.message, tone: 'danger' }
       case 'ready':
-        if (status.newer)
-          return {
-            icon: '↓',
-            label: t('sync.newer'),
-            title: t('sync.newerHint', { name: status.name }),
-            tone: 'warn',
-          }
         if (status.dirty)
           return {
             icon: '●',
@@ -77,6 +88,11 @@ export function SyncButton({ onOpenSettings }: { onOpenSettings: () => void }) {
   })()
 
   const click = async () => {
+    if (status.state === 'manual') {
+      if (needsPass) return onOpenSettings()
+      // On a failure the Settings card is where backing up can be retried and the reason shown.
+      return void backups.shareNow().catch(onOpenSettings)
+    }
     if (status.state === 'reconnect') return void backups.reconnect()
     if (status.state === 'ready' || status.state === 'error') {
       if (status.state === 'error') await backups.refresh()

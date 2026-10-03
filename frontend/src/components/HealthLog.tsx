@@ -1,13 +1,15 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useApp } from '../app/context'
-import { deleteHealthEntry, listHealthLog } from '../db/repo'
+import { removeAttachment } from '../attachments/store'
+import { deleteHealthEntry, listAttachments, listHealthLog } from '../db/repo'
 import { facets, type HealthFilter, NO_FILTER } from '../health/log'
 import { entryTitle } from '../health/presets'
 import { useT } from '../i18n/context'
-import type { HealthEntry, Person } from '../types'
+import type { Attachment, HealthEntry, Person } from '../types'
 import { HealthEntryForm } from './HealthEntryForm'
 import { HealthTable } from './HealthTable'
 import { QuickMeasurement } from './QuickMeasurement'
+import { QuickSymptom } from './QuickSymptom'
 
 /**
  * A person's health log: symptoms, home measurements, and dated text from lab reports, letters,
@@ -20,10 +22,20 @@ export function HealthLog({ person }: { person: Person }) {
   const { db, go } = useApp()
   const t = useT()
   const [entries, setEntries] = useState<HealthEntry[]>([])
+  const [attachments, setAttachments] = useState<Record<string, Attachment[]>>({})
   const [filter, setFilter] = useState<HealthFilter>(NO_FILTER)
   const [adding, setAdding] = useState(false)
 
-  const reload = async () => setEntries(await listHealthLog(db, person.id))
+  const reload = async () => {
+    const rows = await listHealthLog(db, person.id)
+    setEntries(rows)
+    setAttachments(
+      await listAttachments(
+        db,
+        rows.map((e) => e.id),
+      ),
+    )
+  }
   // biome-ignore lint/correctness/useExhaustiveDependencies: reload is stable per db/person
   useEffect(() => {
     reload()
@@ -47,8 +59,9 @@ export function HealthLog({ person }: { person: Person }) {
           {t('healthLog.importCsv')}
         </button>
       </div>
-      <p className="muted">{t('healthLog.intro')}</p>
+      <p className="muted intro">{t('healthLog.intro')}</p>
       <QuickMeasurement persons={[person]} personId={person.id} entries={entries} onSaved={reload} />
+      <QuickSymptom persons={[person]} personId={person.id} entries={entries} onSaved={reload} />
       {adding && (
         <HealthEntryForm
           persons={[person]}
@@ -64,6 +77,7 @@ export function HealthLog({ person }: { person: Person }) {
       <HealthTable
         entries={entries}
         persons={[person]}
+        attachments={attachments}
         showPerson={false}
         filter={filter}
         onFilter={setFilter}
@@ -71,6 +85,12 @@ export function HealthLog({ person }: { person: Person }) {
         onDelete={async (e) => {
           if (confirm(t('healthLog.confirmDelete', { title: entryTitle(e, t), date: e.date }))) {
             await deleteHealthEntry(db, e.id)
+            await reload()
+          }
+        }}
+        onDeleteAttachment={async (a) => {
+          if (confirm(t('attachments.confirmDelete', { name: a.name }))) {
+            await removeAttachment(db, a.id)
             await reload()
           }
         }}

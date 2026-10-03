@@ -1,0 +1,16 @@
+{
+  "driveFolder.title": "Choose the Google Drive folder for backups",
+  "driveFolder.myDrive": "My Drive",
+  "driveFolder.loading": "Loading folders…",
+  "driveFolder.empty": "No folders here.",
+  "driveFolder.newFolder": "New folder name",
+  "driveFolder.create": "Create folder",
+  "driveFolder.use": "Use this folder",
+  "driveFolder.search": "Search folders by name",
+  "driveFolder.searching": "Searching…",
+  "driveFolder.noMatches": "No folders match.",
+  "driveFolder.withBackup": "Folders with a Hearth backup",
+  "driveFolder.selected": "Selected: {path}",
+  "driveFolder.pickOne": "Choose a folder: search, or open My Drive below.",
+  "driveFolder.expand": "Show the folders in {name}"
+}

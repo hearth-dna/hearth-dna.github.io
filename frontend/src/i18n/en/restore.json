@@ -4,5 +4,7 @@
   "restore.storingCalls": "Storing {n} calls…",
   "restore.storingGenotypes": "Storing genotypes for {name}…",
   "restore.repairing": "Looking for missing genome files in older backups…",
-  "restore.missingGenomes": "The genome files for {names} were not in this backup, so their genotypes were not restored. Import their raw files again from their person pages, or restore an older copy of the backup."
+  "restore.missingGenomes": "The genome files for {names} were not in this backup, so their genotypes were not restored. Import their raw files again from their person pages, or restore an older copy of the backup.",
+  "restore.pullingAttachments": "Fetching attached documents…",
+  "restore.fetchingGenome": "Fetching genome {n} of {total}…"
 }

@@ -1,4 +1,5 @@
 import { HEALTH_KIND_LABELS, type HealthEntry, type HealthKind } from '../types'
+import { type DetailValue, symptomPreset } from './presets'
 
 /** Pure helpers for the health log: tag encoding, one-line descriptions and filtering. */
 
@@ -17,11 +18,64 @@ export function formatTags(tags: string[]): string {
   return tags.join(', ')
 }
 
+/** The `details` column → an object; anything unreadable is treated as no details. */
+export function parseDetails(text: string): Record<string, DetailValue> {
+  if (!text) return {}
+  try {
+    const v = JSON.parse(text) as unknown
+    if (!v || typeof v !== 'object' || Array.isArray(v)) return {}
+    return Object.fromEntries(
+      Object.entries(v).filter(
+        ([, x]) =>
+          x === true || (typeof x === 'number' && Number.isFinite(x)) || (typeof x === 'string' && x !== ''),
+      ),
+    ) as Record<string, DetailValue>
+  } catch {
+    return {}
+  }
+}
+
+/** Inverse of parseDetails; '' when there are none, so the column stays empty. */
+export const formatDetailsJson = (d: Record<string, DetailValue>) =>
+  Object.keys(d).length ? JSON.stringify(d) : ''
+
+/** For exports: `bristol=6; colour=yellow; blood`. */
+export const detailsCell = (d: Record<string, DetailValue>) =>
+  Object.entries(d)
+    .map(([k, v]) => (v === true ? k : `${k}=${v}`))
+    .join('; ')
+
+/**
+ * Details in plain English, in the preset's field order: "Bristol type 6, yellow, blood". Used
+ * where the app writes text for itself and for Ask (the UI shows translated labels instead).
+ */
+export function formatDetails(e: Pick<HealthEntry, 'title' | 'details'>): string {
+  const d = e.details ?? {}
+  const fields = symptomPreset(e.title)?.details ?? []
+  const order = [...fields.map((f) => f.id), ...Object.keys(d).filter((k) => !fields.some((f) => f.id === k))]
+  return order
+    .filter((k) => d[k] !== undefined)
+    .map((k) => {
+      const v = d[k]
+      if (k === 'bristol') return `Bristol type ${v}`
+      if (k === 'times') return `${v}× a day`
+      return v === true ? k : `${k} ${v}`
+    })
+    .join(', ')
+}
+
 /** '8:05' → '08:05'; anything that is not a valid 24-hour HH:MM (or H:MM) becomes ''. */
 export function normTime(s: string): string {
   const m = /^(\d{1,2}):(\d{2})(?::\d{2})?$/.exec(s.trim())
   if (!m || Number(m[1]) > 23 || Number(m[2]) > 59) return ''
   return `${m[1].padStart(2, '0')}:${m[2]}`
+}
+
+/** The YYYY-MM-DD `days` calendar days before `date`. */
+export function daysBefore(date: string, days: number): string {
+  const d = new Date(`${date}T00:00:00Z`)
+  d.setUTCDate(d.getUTCDate() - days)
+  return d.toISOString().slice(0, 10)
 }
 
 /** '2026-09-14 08:05', or just the date when no time was recorded. */
@@ -46,12 +100,18 @@ export function where(e: Pick<HealthEntry, 'bodyPart' | 'side'>): string {
  * The entry on one line, as shown in the log and in the Ask context pack:
  * `2026-09-14 · Symptom · Pain in both hands (hands; severity 6/10; arthritis)`,
  * `2026-09-14 08:05 · Measurement · Blood pressure 120/80 mmHg`.
+ *
+ * This line is what the Ask context pack sends to a model, so it must never grow to mention an
+ * entry's attachments: a file name like `biopsy-2026.pdf` would leave the device with it.
  */
 export function describeEntry(e: HealthEntry): string {
   const value = formatValue(e)
-  const extra = [where(e), e.severity === null ? '' : `severity ${e.severity}/10`, formatTags(e.tags)].filter(
-    Boolean,
-  )
+  const extra = [
+    formatDetails(e),
+    where(e),
+    e.severity === null ? '' : `severity ${e.severity}/10`,
+    formatTags(e.tags),
+  ].filter(Boolean)
   return `${when(e)} · ${HEALTH_KIND_LABELS[e.kind]} · ${e.title}${value ? ` ${value}` : ''}${extra.length ? ` (${extra.join('; ')})` : ''}`
 }
 
@@ -88,6 +148,12 @@ export function isFiltering(f: HealthFilter): boolean {
   return Object.values(f).some((v) => v !== '' && v !== null)
 }
 
+/** Filters set in the Filters panel (not the kind chips or the search box); the count on its button. */
+export function panelFilterCount(f: HealthFilter): number {
+  return [f.person, f.bodyPart, f.tag, f.condition, f.from || f.to, f.minSeverity !== null].filter(Boolean)
+    .length
+}
+
 /** Entries that pass the filter; the text search also looks in `title`, the name the table shows. */
 export function filterHealthLog(
   entries: HealthEntry[],
@@ -106,7 +172,9 @@ export function filterHealthLog(
       (!f.to || e.date <= f.to) &&
       (f.minSeverity === null || (e.severity !== null && e.severity >= f.minSeverity)) &&
       (!q ||
-        [e.title, title(e), e.body, e.bodyPart, e.unit, ...e.tags].some((s) => s.toLowerCase().includes(q))),
+        [e.title, title(e), e.body, e.bodyPart, e.unit, formatDetails(e), ...e.tags].some((s) =>
+          s.toLowerCase().includes(q),
+        )),
   )
 }
 
@@ -174,4 +242,15 @@ export function facets(entries: HealthEntry[]): {
     for (const c of e.conditions) conditions.add(c)
   }
   return { bodyParts: [...bodyParts].sort(), tags: [...tags].sort(), conditions: [...conditions].sort() }
+}
+
+/** Runs of consecutive entries sharing a date, in the order given: the card view's day headings. */
+export function groupByDate(entries: HealthEntry[]): { date: string; entries: HealthEntry[] }[] {
+  const out: { date: string; entries: HealthEntry[] }[] = []
+  for (const e of entries) {
+    const last = out[out.length - 1]
+    if (last?.date === e.date) last.entries.push(e)
+    else out.push({ date: e.date, entries: [e] })
+  }
+  return out
 }

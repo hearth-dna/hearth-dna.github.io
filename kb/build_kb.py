@@ -29,6 +29,8 @@ OUT = os.path.join(ROOT, '..', 'frontend', 'public', 'kb.json')
 CONDITIONS = os.path.join(ROOT, 'reviewed', 'conditions.json')
 AREAS = os.path.join(ROOT, 'reviewed', 'areas.json')
 LABS = os.path.join(ROOT, 'reviewed', 'labs')
+GROWTH = os.path.join(ROOT, 'reviewed', 'growth', 'who.json')
+RANGES = os.path.join(ROOT, 'reviewed', 'ranges.json')
 ANALYTE_KEYS = ('id', 'names', 'panels', 'specimen', 'unit', 'units', 'plausible', 'decimals')
 CONVERSIONS = {'hba1c'}  # non-linear conversions implemented in frontend/src/labs/normalise.ts
 CONDITION_KEYS = ('id', 'names', 'category', 'rsids', 'labs', 'measurements', 'symptoms', 'body_parts', 'drugs')
@@ -36,6 +38,30 @@ CONDITION_KEYS = ('id', 'names', 'category', 'rsids', 'labs', 'measurements', 's
 
 def norm_gt(gt: str) -> str:
     return ''.join(sorted(gt.upper()))
+
+
+def load_growth():
+    """WHO growth curves, written by build_growth.py: monthly [month, L, M, S] rows per sex."""
+    with open(GROWTH, encoding='utf-8') as f:
+        g = json.load(f)
+    for key in ('wfa', 'lhfa', 'bfa', 'hcfa'):
+        for sex in ('boys', 'girls'):
+            rows = g['indicators'][key][sex]
+            months = [r[0] for r in rows]
+            if months != list(range(len(rows))) or any(len(r) != 4 or r[2] <= 0 or r[3] <= 0 for r in rows):
+                raise ValueError(f'{key} {sex}: rows must be [month, L, M>0, S>0] for months 0..n')
+    return g
+
+
+def load_ranges():
+    """Reference ranges for chart metrics: a normal band, optional thresholds, optional age bounds."""
+    with open(RANGES, encoding='utf-8') as f:
+        doc = json.load(f)
+    for r in doc['ranges']:
+        lo, hi = r['normal']
+        if not lo < hi or not r.get('source') or not r['metric'].startswith(('m:', 'd:')):
+            raise ValueError(f'{r["metric"]}: needs normal [low < high], a source and an m:/d: metric key')
+    return doc['ranges']
 
 
 def fail(msg: str) -> int:
@@ -128,13 +154,17 @@ def main() -> int:
         units, panels, analytes = load_labs()
     except ValueError as e:
         return fail(f'{LABS}: {e}')
+    try:
+        growth, ranges = load_growth(), load_ranges()
+    except (ValueError, KeyError) as e:
+        return fail(f'growth/ranges: {e}')
     analyte_ids = {a['id'] for a in analytes}
     for c in conditions:
         for lab in c['labs']:
             if lab not in analyte_ids:
                 return fail(f'condition {c["id"]}: unknown lab {lab}')
     for path in sorted(glob.glob(os.path.join(ROOT, 'reviewed', '*.json'))):
-        if path in (CONDITIONS, AREAS):
+        if path in (CONDITIONS, AREAS, RANGES):
             continue
         with open(path, encoding='utf-8') as f:
             doc = json.load(f)
@@ -182,11 +212,15 @@ def main() -> int:
         'analytes': analytes,
         'panels': panels,
         'units': units,
+        'growth': growth,
+        'ranges': ranges,
         'licences': [
             'dbSNP, ClinVar, GWAS Catalog: public domain / open',
             'CPIC guidelines: CC BY-SA 4.0',
             'Reviewed entries: curated in the family_dna repository',
             'LOINC codes: copyright Regenstrief Institute, Inc., available at no cost at loinc.org',
+            'Growth curves: WHO Child Growth Standards and WHO Growth Reference, (c) World Health '
+            'Organization, reproduced with attribution for non-commercial use',
         ],
     }
     body = json.dumps(payload, ensure_ascii=False, indent=1)
