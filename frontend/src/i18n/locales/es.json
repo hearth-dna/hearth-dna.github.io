@@ -395,8 +395,6 @@
   "settingsPage.languageNote": "Las traducciones distintas del inglés se generaron automáticamente y no han sido revisadas por un hablante nativo ni por un abogado; los textos de consentimiento son vinculantes en su versión en inglés.",
   "settingsPage.buildingDump": "Creando el volcado…",
   "settingsPage.readingDump": "Leyendo el volcado…",
-  "settingsPage.imported": "Importadas {people} personas nuevas y {genomes} genomas del volcado v{version} ({exportedAt}); las personas ya presentes no se modificaron.",
-  "settingsPage.importFailed": "Error al importar: {error}",
   "settingsPage.title": "Ajustes y exportación",
   "settingsPage.fullDump": "Volcado completo",
   "settingsPage.fullDumpIntro": "Todo: personas, pedigrí, los archivos de genoma originales, consentimientos, registro de salud, notas, chats, registro de compartición. Un único archivo .hearth; añada una frase de contraseña para cifrarlo con AES-GCM. Hearth no guarda copia en ningún sitio. La importación acepta archivos .hearth, volcados .json.gz antiguos y archivos portátiles .html.",
@@ -1015,7 +1013,7 @@
   "settingsPage.about": "Acerca de Hearth",
   "settingsPage.source": "Código fuente (AGPL-3.0)",
   "restore.genomesElsewhere": "El ADN de {names} no está en este archivo: una carpeta de copias lo guarda en la carpeta genomes, junto al archivo de copia.",
-  "backupCard.pickGenomes": "Toque «Cargar archivos de ADN» y elija todos los archivos de esa carpeta genomes.",
+  "backupCard.pickGenomes": "Elija todos los archivos de esa carpeta genomes con «Cargar archivos de ADN», o selecciónelos junto con el archivo de copia en «Cargar copia».",
   "backupCard.loadGenomes": "Cargar archivos de ADN…",
   "backupCard.genomesLoaded": "Se cargó el ADN de {n} personas.",
   "backupCard.genomesUnmatched": "{n} de los archivos elegidos no son ADN de esta copia o se cifraron con otra contraseña."

@@ -395,8 +395,6 @@
   "settingsPage.languageNote": "英語以外の翻訳は機械生成で、ネイティブスピーカーや法律家の確認を受けていません。同意文は英語版が拘束力を持ちます。",
   "settingsPage.buildingDump": "ダンプを作成中…",
   "settingsPage.readingDump": "ダンプを読み込み中…",
-  "settingsPage.imported": "ダンプ v{version} ({exportedAt}) から新しいメンバー {people} 人とゲノム {genomes} 件をインポートしました。既存のメンバーは変更していません。",
-  "settingsPage.importFailed": "インポート失敗: {error}",
   "settingsPage.title": "設定とエクスポート",
   "settingsPage.fullDump": "完全ダンプ",
   "settingsPage.fullDumpIntro": "すべて: メンバー、家系図、元のゲノムファイル、同意、健康記録、メモ、チャット、共有ログ。1 つの .hearth ファイルで、パスフレーズを付けると AES-GCM で暗号化されます。Hearth はどこにもコピーを持ちません。インポートは .hearth ファイル、旧形式の .json.gz ダンプ、ポータブル .html アーカイブに対応します。",
@@ -1015,7 +1013,7 @@
   "settingsPage.about": "Hearth について",
   "settingsPage.source": "ソースコード (AGPL-3.0)",
   "restore.genomesElsewhere": "{names} の DNA はこのファイルに含まれていません。バックアップフォルダーは、バックアップファイルの隣の genomes フォルダーに DNA を保存します。",
-  "backupCard.pickGenomes": "「DNA ファイルを読み込む」をタップし、その genomes フォルダー内のファイルをすべて選んでください。",
+  "backupCard.pickGenomes": "「DNA ファイルを読み込む」でその genomes フォルダー内のファイルをすべて選ぶか、「バックアップを読み込む」でバックアップファイルと一緒に選んでください。",
   "backupCard.loadGenomes": "DNA ファイルを読み込む…",
   "backupCard.genomesLoaded": "{n} 人の DNA を読み込みました。",
   "backupCard.genomesUnmatched": "選んだファイルのうち {n} 件は、このバックアップの DNA ではないか、別のパスフレーズで暗号化されています。"

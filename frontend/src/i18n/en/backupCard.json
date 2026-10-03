@@ -63,7 +63,7 @@
   "backupCard.introCloud": "Hearth keeps a snapshot of everything after every change — in a cloud drive you sign in to, or in a folder or file you pick — and can load it back on another device.",
   "backupCard.otherPlacesHint": "Or somewhere else, through the system picker: OneDrive, a USB drive or a folder on this device. A single file holds the snapshot only; a folder also keeps attached documents.",
   "backupCard.passphraseKept": "Kept on this device, encrypted by the phone, so backups continue after a restart.",
-  "backupCard.pickGenomes": "Tap Load DNA files and pick every file in that genomes folder.",
+  "backupCard.pickGenomes": "Pick every file in that genomes folder with Load DNA files, or select them together with the backup file in Load backup.",
   "backupCard.loadGenomes": "Load DNA files…",
   "backupCard.genomesLoaded": "Loaded the DNA of {n} people.",
   "backupCard.genomesUnmatched": "{n} of the picked files are not DNA from this backup, or were encrypted with another passphrase."

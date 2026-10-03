@@ -18,11 +18,10 @@ import {
 } from '../db/repo'
 import { GEMINI_DEFAULT_MODEL } from '../egress/egress'
 import { exportDumpFile } from '../export/exportDump'
-import { restoreBytes } from '../export/restore'
 import { LANGUAGES, useI18n } from '../i18n/context'
 import { isLanguage } from '../i18n/languages'
 import { ArchiveCard } from './ArchiveCard'
-import { BackupCard } from './BackupCard'
+import { BackupCard, PickFiles, useFileLoader } from './BackupCard'
 import { EraseDialog } from './EraseDialog'
 import { GeminiKeySteps } from './GeminiKeySteps'
 import { OpenFormatsCard } from './OpenFormatsCard'
@@ -63,29 +62,7 @@ export function SettingsPage() {
     setMsg(t(r.encrypted ? 'exportDump.encrypted' : 'exportDump.plaintext', { name: r.name, mb: r.mb }))
   }
 
-  const importDump = async (file: File) => {
-    try {
-      setMsg(t('settingsPage.readingDump'))
-      const bytes = new Uint8Array(await file.arrayBuffer())
-      const r = await restoreBytes(db, bytes, pass || undefined, (key, params) => setMsg(t(key, params)))
-      await refresh()
-      await reload()
-      backups.noteRestored(r)
-      const { people, genomes, version, exportedAt, missing, elsewhere } = r
-      const names = (xs: { name: string }[]) => xs.map((x) => x.name).join(', ')
-      setMsg(
-        [
-          t('settingsPage.imported', { people, genomes, version, exportedAt }),
-          missing.length ? t('restore.missingGenomes', { names: names(missing) }) : '',
-          elsewhere.length ? t('restore.genomesElsewhere', { names: names(elsewhere) }) : '',
-        ]
-          .filter(Boolean)
-          .join(' '),
-      )
-    } catch (e) {
-      setMsg(t('settingsPage.importFailed', { error: String(e) }))
-    }
-  }
+  const loader = useFileLoader(() => pass || backups.passphrase())
 
   return (
     <div>
@@ -131,17 +108,17 @@ export function SettingsPage() {
           <button type="button" className="primary" onClick={exportDump} disabled={persons.length === 0}>
             {t('settingsPage.exportDump')}
           </button>
-          <label className="btn">
-            {t('settingsPage.importDump')}{' '}
-            <input
-              type="file"
-              hidden
-              accept=".hearth,.enc,.gz,.json,.html"
-              onChange={(e) => e.target.files?.[0] && importDump(e.target.files[0])}
-            />
-          </label>
+          <PickFiles
+            label={t('settingsPage.importDump')}
+            onFiles={async (files) => {
+              await loader.load(files)
+              await reload()
+            }}
+          />
         </div>
+        {loader.progress && <p>{loader.progress}</p>}
         {msg && <p>{msg}</p>}
+        {loader.msg && <p>{loader.msg}</p>}
       </div>
 
       <BackupCard />

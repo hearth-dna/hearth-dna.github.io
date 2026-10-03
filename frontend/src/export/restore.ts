@@ -56,6 +56,9 @@ export async function restoreBytes(
 
 const looksLikeHtml = (b: Uint8Array) => strFromU8(b.subarray(0, 512)).trimStart().startsWith('<')
 
+/** A file the restore recognises on sight: a dump v2 (or folder snapshot) or a portable archive. */
+export const isDumpFile = (b: Uint8Array) => readHeader(b) !== null || looksLikeHtml(b)
+
 async function existingIds(db: Database, table: string): Promise<Set<string>> {
   return new Set((await db.query(`SELECT id FROM ${table}`)).map((r) => r.id as string))
 }

@@ -395,8 +395,6 @@
   "settingsPage.languageNote": "Les traductions autres que l'anglais ont été générées automatiquement et n'ont été relues ni par un locuteur natif ni par un juriste ; les textes de consentement font foi dans leur version anglaise.",
   "settingsPage.buildingDump": "Création de la sauvegarde…",
   "settingsPage.readingDump": "Lecture de la sauvegarde…",
-  "settingsPage.imported": "{people} nouvelles personnes et {genomes} génomes importés depuis la sauvegarde v{version} ({exportedAt}) ; les personnes déjà présentes n'ont pas été modifiées.",
-  "settingsPage.importFailed": "Échec de l'import : {error}",
   "settingsPage.title": "Réglages et export",
   "settingsPage.fullDump": "Sauvegarde complète",
   "settingsPage.fullDumpIntro": "Tout : personnes, pedigree, fichiers de génome d'origine, consentements, journal de santé, notes, discussions, journal de partage. Un seul fichier .hearth ; ajoutez une phrase secrète pour le chiffrer avec AES-GCM. Hearth ne garde de copie nulle part. L'import accepte les fichiers .hearth, les anciennes sauvegardes .json.gz et les archives portables .html.",
@@ -1015,7 +1013,7 @@
   "settingsPage.about": "À propos de Hearth",
   "settingsPage.source": "Code source (AGPL-3.0)",
   "restore.genomesElsewhere": "L'ADN de {names} n'est pas dans ce fichier : un dossier de sauvegarde le garde dans le dossier genomes, à côté du fichier de sauvegarde.",
-  "backupCard.pickGenomes": "Touchez « Charger les fichiers ADN » et choisissez tous les fichiers de ce dossier genomes.",
+  "backupCard.pickGenomes": "Choisissez tous les fichiers de ce dossier genomes avec « Charger les fichiers ADN », ou sélectionnez-les avec le fichier de sauvegarde dans « Charger une sauvegarde ».",
   "backupCard.loadGenomes": "Charger les fichiers ADN…",
   "backupCard.genomesLoaded": "ADN chargé pour {n} personnes.",
   "backupCard.genomesUnmatched": "{n} des fichiers choisis ne sont pas de l'ADN de cette sauvegarde, ou ont été chiffrés avec une autre phrase de passe."

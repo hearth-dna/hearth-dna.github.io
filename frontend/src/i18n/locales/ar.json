@@ -395,8 +395,6 @@
   "settingsPage.languageNote": "التراجم غير الإنجليزية مُولَّدة آليًا ولم يراجعها ناطق أصلي ولا محامٍ؛ ونصوص الموافقة مُلزِمة في صيغتها الإنجليزية.",
   "settingsPage.buildingDump": "جارٍ بناء النسخة…",
   "settingsPage.readingDump": "جارٍ قراءة النسخة…",
-  "settingsPage.imported": "استُورد {people} أشخاص جدد و{genomes} جينومًا من النسخة v{version} ({exportedAt})؛ وتُرك من كان موجودًا بلا تغيير.",
-  "settingsPage.importFailed": "فشل الاستيراد: {error}",
   "settingsPage.title": "الإعدادات والتصدير",
   "settingsPage.fullDump": "نسخة كاملة",
   "settingsPage.fullDumpIntro": "كل شيء: الأشخاص وشجرة النسب وملفات الجينوم الأصلية والموافقات وسجل الصحة والملاحظات والمحادثات وسجل المشاركة. ملف ‎.hearth واحد؛ أضف عبارة مرور لتشفيره بـ AES-GCM. ولا يحتفظ Hearth بأي نسخة في أي مكان. ويقبل الاستيراد ملفات ‎.hearth ونسخ ‎.json.gz الأقدم وأرشيفات ‎.html المحمولة.",
@@ -1015,7 +1013,7 @@
   "settingsPage.about": "حول Hearth",
   "settingsPage.source": "الشيفرة المصدرية (AGPL-3.0)",
   "restore.genomesElsewhere": "الحمض النووي لـ {names} ليس داخل هذا الملف: يحفظه مجلد النسخ الاحتياطية في مجلد genomes بجوار ملف النسخة.",
-  "backupCard.pickGenomes": "اضغط «تحميل ملفات الحمض النووي» واختر كل الملفات في مجلد genomes هذا.",
+  "backupCard.pickGenomes": "اختر كل الملفات في مجلد genomes هذا عبر «تحميل ملفات الحمض النووي»، أو حددها مع ملف النسخة في «تحميل نسخة احتياطية».",
   "backupCard.loadGenomes": "تحميل ملفات الحمض النووي…",
   "backupCard.genomesLoaded": "تم تحميل الحمض النووي لـ {n} أشخاص.",
   "backupCard.genomesUnmatched": "{n} من الملفات المختارة ليست حمضًا نوويًا من هذه النسخة، أو شُفّرت بعبارة مرور أخرى."

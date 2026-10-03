@@ -395,8 +395,6 @@
   "settingsPage.languageNote": "Le traduzioni diverse dall'inglese sono state generate automaticamente e non sono state riviste da un madrelingua né da un avvocato; i testi di consenso sono vincolanti nella versione inglese.",
   "settingsPage.buildingDump": "Creazione del dump…",
   "settingsPage.readingDump": "Lettura del dump…",
-  "settingsPage.imported": "Importate {people} nuove persone e {genomes} genomi dal dump v{version} ({exportedAt}); le persone già presenti non sono state modificate.",
-  "settingsPage.importFailed": "Importazione non riuscita: {error}",
   "settingsPage.title": "Impostazioni ed esportazione",
   "settingsPage.fullDump": "Dump completo",
   "settingsPage.fullDumpIntro": "Tutto: persone, pedigree, i file genoma originali, consensi, diario della salute, note, chat, registro delle condivisioni. Un unico file .hearth; aggiungi una passphrase per cifrarlo con AES-GCM. Hearth non conserva copie da nessuna parte. L'importazione accetta file .hearth, vecchi dump .json.gz e archivi portatili .html.",
@@ -1015,7 +1013,7 @@
   "settingsPage.about": "Informazioni su Hearth",
   "settingsPage.source": "Codice sorgente (AGPL-3.0)",
   "restore.genomesElsewhere": "Il DNA di {names} non è in questo file: una cartella di backup lo tiene nella cartella genomes, accanto al file di backup.",
-  "backupCard.pickGenomes": "Tocca «Carica file DNA» e scegli tutti i file in quella cartella genomes.",
+  "backupCard.pickGenomes": "Scegli tutti i file di quella cartella genomes con «Carica file DNA», oppure selezionali insieme al file di backup in «Carica backup».",
   "backupCard.loadGenomes": "Carica file DNA…",
   "backupCard.genomesLoaded": "Caricato il DNA di {n} persone.",
   "backupCard.genomesUnmatched": "{n} dei file scelti non sono DNA di questo backup, o sono stati cifrati con un'altra passphrase."

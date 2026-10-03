@@ -395,8 +395,6 @@
   "settingsPage.languageNote": "अंग्रेज़ी के अतिरिक्त अनुवाद मशीन से बनाए गए हैं और किसी मूल-भाषी या वकील ने उनकी समीक्षा नहीं की है; सहमति-पाठ उनके अंग्रेज़ी रूप में ही बाध्यकारी हैं।",
   "settingsPage.buildingDump": "डंप बना रहे हैं…",
   "settingsPage.readingDump": "डंप पढ़ रहे हैं…",
-  "settingsPage.imported": "डंप v{version} ({exportedAt}) से {people} नए लोग और {genomes} जीनोम आयात हुए; पहले से मौजूद लोग अपरिवर्तित रहे।",
-  "settingsPage.importFailed": "आयात विफल: {error}",
   "settingsPage.title": "सेटिंग्स और निर्यात",
   "settingsPage.fullDump": "पूर्ण डंप",
   "settingsPage.fullDumpIntro": "सब कुछ: लोग, वंशावली, मूल जीनोम फ़ाइलें, सहमतियाँ, स्वास्थ्य लॉग, टिप्पणियाँ, चैट, साझाकरण लॉग। एक .hearth फ़ाइल; AES-GCM से एन्क्रिप्ट करने के लिए पासफ़्रेज़ जोड़ें। Hearth कहीं कोई प्रतिलिपि नहीं रखता। आयात .hearth फ़ाइलें, पुराने .json.gz डंप और पोर्टेबल .html संग्रह स्वीकार करता है।",
@@ -1015,7 +1013,7 @@
   "settingsPage.about": "Hearth के बारे में",
   "settingsPage.source": "सोर्स कोड (AGPL-3.0)",
   "restore.genomesElsewhere": "{names} का डीएनए इस फ़ाइल में नहीं है: बैकअप फ़ोल्डर इसे बैकअप फ़ाइल के पास genomes फ़ोल्डर में रखता है।",
-  "backupCard.pickGenomes": "«डीएनए फ़ाइलें लोड करें» पर टैप करें और उस genomes फ़ोल्डर की सभी फ़ाइलें चुनें।",
+  "backupCard.pickGenomes": "«डीएनए फ़ाइलें लोड करें» से उस genomes फ़ोल्डर की सभी फ़ाइलें चुनें, या «बैकअप लोड करें» में उन्हें बैकअप फ़ाइल के साथ एक साथ चुनें।",
   "backupCard.loadGenomes": "डीएनए फ़ाइलें लोड करें…",
   "backupCard.genomesLoaded": "{n} लोगों का डीएनए लोड हुआ।",
   "backupCard.genomesUnmatched": "चुनी गई फ़ाइलों में से {n} इस बैकअप का डीएनए नहीं हैं, या किसी और पासफ़्रेज़ से एन्क्रिप्ट की गई थीं।"

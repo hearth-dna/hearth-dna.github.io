@@ -395,8 +395,6 @@
   "settingsPage.languageNote": "Các bản dịch ngoài tiếng Anh được tạo bằng máy và chưa được người bản ngữ hay luật sư xem lại; văn bản đồng ý chỉ có hiệu lực ràng buộc ở bản tiếng Anh.",
   "settingsPage.buildingDump": "Đang tạo bản kết xuất…",
   "settingsPage.readingDump": "Đang đọc bản kết xuất…",
-  "settingsPage.imported": "Đã nhập {people} người mới và {genomes} bộ gen từ bản kết xuất v{version} ({exportedAt}); những người đã có ở đây được giữ nguyên.",
-  "settingsPage.importFailed": "Nhập thất bại: {error}",
   "settingsPage.title": "Cài đặt & xuất dữ liệu",
   "settingsPage.fullDump": "Bản kết xuất đầy đủ",
   "settingsPage.fullDumpIntro": "Mọi thứ: người, cây gia phả, các tệp bộ gen gốc, sự đồng ý, sổ sức khỏe, ghi chú, hội thoại, sổ chia sẻ. Một tệp .hearth; thêm cụm mật khẩu để mã hóa bằng AES-GCM. Hearth không giữ bản sao ở đâu cả. Chức năng nhập nhận tệp .hearth, bản kết xuất .json.gz cũ và bản lưu .html di động.",
@@ -1015,7 +1013,7 @@
   "settingsPage.about": "Giới thiệu Hearth",
   "settingsPage.source": "Mã nguồn (AGPL-3.0)",
   "restore.genomesElsewhere": "DNA của {names} không nằm trong tệp này: thư mục sao lưu giữ nó trong thư mục genomes bên cạnh tệp sao lưu.",
-  "backupCard.pickGenomes": "Chạm «Tải tệp DNA» và chọn mọi tệp trong thư mục genomes đó.",
+  "backupCard.pickGenomes": "Chọn mọi tệp trong thư mục genomes đó bằng «Tải tệp DNA», hoặc chọn chúng cùng với tệp sao lưu trong «Tải bản sao lưu».",
   "backupCard.loadGenomes": "Tải tệp DNA…",
   "backupCard.genomesLoaded": "Đã tải DNA của {n} người.",
   "backupCard.genomesUnmatched": "{n} tệp đã chọn không phải DNA của bản sao lưu này, hoặc được mã hóa bằng cụm mật khẩu khác."

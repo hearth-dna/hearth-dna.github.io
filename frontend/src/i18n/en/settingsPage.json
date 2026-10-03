@@ -2,8 +2,6 @@
   "settingsPage.languageNote": "Translations other than English were machine-generated and have not been reviewed by a native speaker or a lawyer; consent texts are binding in their English version.",
   "settingsPage.buildingDump": "Building dump…",
   "settingsPage.readingDump": "Reading dump…",
-  "settingsPage.imported": "Imported {people} new people and {genomes} genomes from dump v{version} ({exportedAt}); people already here were left unchanged.",
-  "settingsPage.importFailed": "Import failed: {error}",
   "settingsPage.title": "Settings & export",
   "settingsPage.fullDump": "Full dump",
   "settingsPage.fullDumpIntro": "Everything: people, pedigree, the original genome files, consents, health log, notes, chats, sharing log. One .hearth file; add a passphrase to encrypt it with AES-GCM. Hearth keeps no copy anywhere. Import accepts .hearth files, older .json.gz dumps and portable .html archives.",

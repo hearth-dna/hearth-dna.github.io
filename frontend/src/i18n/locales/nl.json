@@ -395,8 +395,6 @@
   "settingsPage.languageNote": "Vertalingen anders dan Engels zijn automatisch gegenereerd en niet nagekeken door een moedertaalspreker of jurist; toestemmingsteksten zijn bindend in hun Engelse versie.",
   "settingsPage.buildingDump": "Dump maken…",
   "settingsPage.readingDump": "Dump lezen…",
-  "settingsPage.imported": "{people} nieuwe personen en {genomes} genomen geïmporteerd uit dump v{version} ({exportedAt}); al aanwezige personen zijn ongewijzigd gelaten.",
-  "settingsPage.importFailed": "Import mislukt: {error}",
   "settingsPage.title": "Instellingen & export",
   "settingsPage.fullDump": "Volledige dump",
   "settingsPage.fullDumpIntro": "Alles: personen, stamboom, de originele genoombestanden, toestemmingen, gezondheidslogboek, notities, chats, deellogboek. Eén .hearth-bestand; voeg een wachtwoordzin toe om het met AES-GCM te versleutelen. Hearth bewaart nergens een kopie. Import accepteert .hearth-bestanden, oudere .json.gz-dumps en draagbare .html-archieven.",
@@ -1015,7 +1013,7 @@
   "settingsPage.about": "Over Hearth",
   "settingsPage.source": "Broncode (AGPL-3.0)",
   "restore.genomesElsewhere": "Het DNA van {names} zit niet in dit bestand: een back-upmap bewaart het in de map genomes naast het back-upbestand.",
-  "backupCard.pickGenomes": "Tik op ‘DNA-bestanden laden’ en kies alle bestanden in die map genomes.",
+  "backupCard.pickGenomes": "Kies alle bestanden in die map genomes met ‘DNA-bestanden laden’, of selecteer ze samen met het back-upbestand bij ‘Back-up laden’.",
   "backupCard.loadGenomes": "DNA-bestanden laden…",
   "backupCard.genomesLoaded": "DNA van {n} personen geladen.",
   "backupCard.genomesUnmatched": "{n} van de gekozen bestanden zijn geen DNA uit deze back-up, of zijn versleuteld met een ander wachtwoord."
