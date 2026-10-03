@@ -47,7 +47,7 @@ REPO_URL ?= \#
 
 pages-site: frontend-build-pages ## Assemble the GitHub Pages site in .site/: landing at /, the app at /app/
 	rm -rf .site && mkdir -p .site
-	cp landing/* .site/
+	cp -R landing/. .site/
 	cp -R $(FRONTEND_DIR)/dist .site/app
 	mv .site/app/404.html .site/404.html
 	perl -pi -e 's|\{\{REPO_URL\}\}|$(REPO_URL)|g' .site/*.html
