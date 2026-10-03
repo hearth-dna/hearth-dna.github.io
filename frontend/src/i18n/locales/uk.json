@@ -395,8 +395,6 @@
   "settingsPage.languageNote": "Переклади, крім англійського, виконано машинно й не перевірено носієм мови чи юристом; тексти згод мають силу в англійській версії.",
   "settingsPage.buildingDump": "Створення дампу…",
   "settingsPage.readingDump": "Читання дампу…",
-  "settingsPage.imported": "Імпортовано {people} нових осіб і {genomes} геномів із дампу v{version} ({exportedAt}); наявних осіб не змінено.",
-  "settingsPage.importFailed": "Збій імпорту: {error}",
   "settingsPage.title": "Налаштування та експорт",
   "settingsPage.fullDump": "Повний дамп",
   "settingsPage.fullDumpIntro": "Усе: люди, родовід, вихідні файли геномів, згоди, щоденник здоров'я, нотатки, чати, журнал передачі. Один файл .hearth; додайте парольну фразу, щоб зашифрувати його AES-GCM. Hearth ніде не зберігає копію. Імпорт приймає файли .hearth, старі дампи .json.gz і портативні архіви .html.",
@@ -1015,7 +1013,7 @@
   "settingsPage.about": "Про Hearth",
   "settingsPage.source": "Вихідний код (AGPL-3.0)",
   "restore.genomesElsewhere": "ДНК для {names} немає в цьому файлі: тека резервних копій зберігає її в теці genomes поруч із файлом копії.",
-  "backupCard.pickGenomes": "Натисніть «Завантажити файли ДНК» і виберіть усі файли в цій теці genomes.",
+  "backupCard.pickGenomes": "Виберіть усі файли з цієї теки genomes кнопкою «Завантажити файли ДНК» або позначте їх разом із файлом копії в «Завантажити копію».",
   "backupCard.loadGenomes": "Завантажити файли ДНК…",
   "backupCard.genomesLoaded": "Завантажено ДНК людей: {n}.",
   "backupCard.genomesUnmatched": "Вибраних файлів, які не є ДНК із цієї копії або зашифровані іншим паролем: {n}."

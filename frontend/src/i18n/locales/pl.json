@@ -395,8 +395,6 @@
   "settingsPage.languageNote": "Tłumaczenia inne niż angielskie zostały wygenerowane maszynowo i nie zostały sprawdzone przez native speakera ani prawnika; teksty zgód są wiążące w wersji angielskiej.",
   "settingsPage.buildingDump": "Tworzenie zrzutu…",
   "settingsPage.readingDump": "Odczytywanie zrzutu…",
-  "settingsPage.imported": "Zaimportowano {people} nowych osób i {genomes} genomów ze zrzutu v{version} ({exportedAt}); osoby już obecne pozostały bez zmian.",
-  "settingsPage.importFailed": "Import nie powiódł się: {error}",
   "settingsPage.title": "Ustawienia i eksport",
   "settingsPage.fullDump": "Pełny zrzut",
   "settingsPage.fullDumpIntro": "Wszystko: osoby, rodowód, oryginalne pliki genomów, zgody, dziennik zdrowia, notatki, czaty, dziennik udostępnień. Jeden plik .hearth; dodaj hasło, aby zaszyfrować go AES-GCM. Hearth nigdzie nie trzyma kopii. Import akceptuje pliki .hearth, starsze zrzuty .json.gz i archiwa przenośne .html.",
@@ -1015,7 +1013,7 @@
   "settingsPage.about": "O Hearth",
   "settingsPage.source": "Kod źródłowy (AGPL-3.0)",
   "restore.genomesElsewhere": "DNA osób {names} nie ma w tym pliku: folder kopii zapasowych trzyma je w folderze genomes obok pliku kopii.",
-  "backupCard.pickGenomes": "Stuknij „Wczytaj pliki DNA” i wybierz wszystkie pliki z tego folderu genomes.",
+  "backupCard.pickGenomes": "Wybierz wszystkie pliki z tego folderu genomes przyciskiem „Wczytaj pliki DNA” albo zaznacz je razem z plikiem kopii w „Wczytaj kopię”.",
   "backupCard.loadGenomes": "Wczytaj pliki DNA…",
   "backupCard.genomesLoaded": "Wczytano DNA osób: {n}.",
   "backupCard.genomesUnmatched": "Wybrane pliki, które nie są DNA z tej kopii lub zostały zaszyfrowane innym hasłem: {n}."

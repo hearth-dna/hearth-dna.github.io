@@ -395,8 +395,6 @@
   "settingsPage.languageNote": "英语以外的翻译由机器生成，未经母语者或律师审阅；同意文本以英文版本为准。",
   "settingsPage.buildingDump": "正在生成转储…",
   "settingsPage.readingDump": "正在读取转储…",
-  "settingsPage.imported": "已从转储 v{version}（{exportedAt}）导入 {people} 位新成员和 {genomes} 个基因组；已存在的成员保持不变。",
-  "settingsPage.importFailed": "导入失败：{error}",
   "settingsPage.title": "设置与导出",
   "settingsPage.fullDump": "完整转储",
   "settingsPage.fullDumpIntro": "全部内容：成员、家谱、原始基因组文件、同意记录、健康日志、笔记、聊天、共享日志。一个 .hearth 文件；添加口令可用 AES-GCM 加密。Hearth 在任何地方都不保留副本。导入支持 .hearth 文件、旧版 .json.gz 转储和便携 .html 归档。",
@@ -1015,7 +1013,7 @@
   "settingsPage.about": "关于 Hearth",
   "settingsPage.source": "源代码 (AGPL-3.0)",
   "restore.genomesElsewhere": "{names} 的 DNA 不在此文件中：备份文件夹把它保存在备份文件旁边的 genomes 文件夹里。",
-  "backupCard.pickGenomes": "点按“加载 DNA 文件”，然后选择该 genomes 文件夹中的所有文件。",
+  "backupCard.pickGenomes": "用“加载 DNA 文件”选择该 genomes 文件夹中的所有文件，或在“加载备份”中与备份文件一起选择。",
   "backupCard.loadGenomes": "加载 DNA 文件…",
   "backupCard.genomesLoaded": "已加载 {n} 人的 DNA。",
   "backupCard.genomesUnmatched": "所选文件中有 {n} 个不是此备份的 DNA，或使用了其他密码加密。"

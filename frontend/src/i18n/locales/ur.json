@@ -395,8 +395,6 @@
   "settingsPage.languageNote": "انگریزی کے علاوہ تراجم مشین سے تیار ہوئے ہیں اور کسی مادری بولنے والے یا وکیل نے اُن کا جائزہ نہیں لیا؛ رضامندی کے متون اپنی انگریزی صورت میں ہی پابند کرنے والے ہیں۔",
   "settingsPage.buildingDump": "ڈمپ بنایا جا رہا ہے…",
   "settingsPage.readingDump": "ڈمپ پڑھا جا رہا ہے…",
-  "settingsPage.imported": "ڈمپ v{version} ({exportedAt}) سے {people} نئے افراد اور {genomes} جینوم درآمد ہوئے؛ پہلے سے موجود افراد بغیر تبدیلی رہے۔",
-  "settingsPage.importFailed": "درآمد ناکام: {error}",
   "settingsPage.title": "ترتیبات اور برآمد",
   "settingsPage.fullDump": "مکمل ڈمپ",
   "settingsPage.fullDumpIntro": "سب کچھ: افراد، شجرۂ نسب، اصل جینوم فائلیں، رضامندیاں، صحت لاگ، نوٹ، گفتگو، اشتراک لاگ۔ ایک ‎.hearth فائل؛ AES-GCM سے مرموز کرنے کے لیے ایک پاس فریز شامل کریں۔ Hearth کہیں کوئی نقل نہیں رکھتا۔ درآمد ‎.hearth فائلیں، پرانے ‎.json.gz ڈمپ اور قابلِ حمل ‎.html محفوظ خانے قبول کرتا ہے۔",
@@ -1015,7 +1013,7 @@
   "settingsPage.about": "Hearth کے بارے میں",
   "settingsPage.source": "سورس کوڈ (AGPL-3.0)",
   "restore.genomesElsewhere": "{names} کا ڈی این اے اس فائل میں نہیں ہے: بیک اپ فولڈر اسے بیک اپ فائل کے ساتھ genomes فولڈر میں رکھتا ہے۔",
-  "backupCard.pickGenomes": "«ڈی این اے فائلیں لوڈ کریں» پر ٹیپ کریں اور اس genomes فولڈر کی تمام فائلیں چنیں۔",
+  "backupCard.pickGenomes": "«ڈی این اے فائلیں لوڈ کریں» سے اس genomes فولڈر کی تمام فائلیں چنیں، یا «بیک اپ لوڈ کریں» میں انہیں بیک اپ فائل کے ساتھ ایک ساتھ چنیں۔",
   "backupCard.loadGenomes": "ڈی این اے فائلیں لوڈ کریں…",
   "backupCard.genomesLoaded": "{n} افراد کا ڈی این اے لوڈ ہو گیا۔",
   "backupCard.genomesUnmatched": "چنی گئی فائلوں میں سے {n} اس بیک اپ کا ڈی این اے نہیں ہیں، یا کسی اور پاس فریز سے انکرپٹ کی گئی تھیں۔"

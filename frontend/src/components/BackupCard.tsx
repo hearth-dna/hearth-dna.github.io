@@ -26,6 +26,7 @@ export function BackupCard() {
   const [pass, setPass] = useState(backups.passphrase())
   const [msg, setMsg] = useState<string | null>(null)
   const [busy, setBusy] = useState<string | null>(null)
+  const files = useFileLoader()
   const writing = status.state === 'writing'
   const working = writing || busy !== null
   // Only these states can actually write; elsewhere the notice above the buttons says what to do.
@@ -89,12 +90,13 @@ export function BackupCard() {
               : 'backupCard.writingFile',
         { name: status.name },
       )
-    : busy
+    : (busy ?? files.progress)
 
   return (
     <div className="card">
       <h2>{t('backupCard.title')}</h2>
       <p className="muted">{t('backupCard.intro')}</p>
+      <ElsewhereNotice disabled={working} onFiles={files.load} />
       {consenting && (
         <ConsentForm
           kind="backup_folder"
@@ -240,6 +242,7 @@ export function BackupCard() {
         </div>
       )}
       {msg && <p>{msg}</p>}
+      {files.msg && <p>{files.msg}</p>}
     </div>
   )
 }
@@ -249,11 +252,9 @@ export function BackupCard() {
  * the share sheet (Google Drive, Files…) or is downloaded, and a saved one is loaded from a file.
  */
 function ManualBackup({ status }: { status: Extract<Status, { state: 'manual' }> }) {
-  const { refresh } = useApp()
   const t = useT()
   const [pass, setPass] = useState(backups.passphrase())
-  const [msg, setMsg] = useState<string | null>(null)
-  const [progress, setProgress] = useState<string | null>(null)
+  const { msg, setMsg, progress, load } = useFileLoader()
   const share = canShareFiles()
   const needsPass = !backups.plain && !pass
   const working = status.step !== null
@@ -266,40 +267,6 @@ function ManualBackup({ status }: { status: Extract<Status, { state: 'manual' }>
         setMsg(t(how === 'shared' ? 'backupCard.shared' : 'backupCard.downloaded'))
     } catch (e) {
       setMsg(t('backupCard.failed', { message: e instanceof Error ? e.message : String(e) }))
-    }
-  }
-
-  const load = async (file: File) => {
-    setMsg(null)
-    try {
-      const r = await backups.loadFile(file, (key, params) => setProgress(t(key, params)))
-      await refresh()
-      const { people, genomes, exportedAt } = r
-      setMsg(t('backupCard.loaded', { people, genomes, exportedAt, name: file.name }))
-    } catch (e) {
-      setMsg(t('backupCard.loadFailed', { message: e instanceof Error ? e.message : String(e) }))
-    } finally {
-      setProgress(null)
-    }
-  }
-
-  const loadGenomes = async (files: File[]) => {
-    setMsg(null)
-    try {
-      const r = await backups.loadGenomeFiles(files, (key, params) => setProgress(t(key, params)))
-      await refresh()
-      setMsg(
-        [
-          t('backupCard.genomesLoaded', { n: r.loaded }),
-          r.unmatched ? t('backupCard.genomesUnmatched', { n: r.unmatched }) : '',
-        ]
-          .filter(Boolean)
-          .join(' '),
-      )
-    } catch (e) {
-      setMsg(t('backupCard.loadFailed', { message: e instanceof Error ? e.message : String(e) }))
-    } finally {
-      setProgress(null)
     }
   }
 
@@ -354,29 +321,7 @@ function ManualBackup({ status }: { status: Extract<Status, { state: 'manual' }>
           {t('restore.missingGenomes', { names: status.missing.map((m) => m.name).join(', ') })}
         </p>
       )}
-      {status.elsewhere.length > 0 && (
-        <div className="notice">
-          <p className="mt-0">
-            {t('restore.genomesElsewhere', { names: status.elsewhere.map((m) => m.name).join(', ') })}{' '}
-            {t('backupCard.pickGenomes')}
-          </p>
-          <label className="btn">
-            {t('backupCard.loadGenomes')}
-            {/* No `accept`, as for the backup itself; the files are matched by content. */}
-            <input
-              type="file"
-              multiple
-              hidden
-              disabled={working}
-              onChange={(e) => {
-                const fs = [...(e.target.files ?? [])]
-                e.target.value = ''
-                if (fs.length) void loadGenomes(fs)
-              }}
-            />
-          </label>
-        </div>
-      )}
+      <ElsewhereNotice disabled={working} onFiles={load} />
       {status.file && <p className="notice">{t('backupCard.fileReady', { name: status.file })}</p>}
       <div className="row">
         <button type="button" className="primary" disabled={working || needsPass} onClick={backUp}>
@@ -388,22 +333,87 @@ function ManualBackup({ status }: { status: Extract<Status, { state: 'manual' }>
                 : 'backupCard.backUpDownload',
           )}
         </button>
-        <label className="btn">
-          {t('backupCard.loadFile')}
-          {/* No `accept`: iOS greys out files whose extension it does not know, like .hearth. */}
-          <input
-            type="file"
-            hidden
-            disabled={working}
-            onChange={(e) => {
-              const f = e.target.files?.[0]
-              e.target.value = ''
-              if (f) void load(f)
-            }}
-          />
-        </label>
+        <PickFiles label={t('backupCard.loadFile')} disabled={working} onFiles={load} />
       </div>
       {msg && <p>{msg}</p>}
+    </div>
+  )
+}
+
+/**
+ * Opens the file picker for several files at once. No `accept`: phones grey out files whose type
+ * they do not know, like .hearth and the genome files, and the loader tells them apart by content.
+ */
+export function PickFiles({
+  label,
+  disabled,
+  onFiles,
+}: {
+  label: string
+  disabled?: boolean
+  onFiles: (files: File[]) => void
+}) {
+  return (
+    <label className="btn">
+      {label}
+      <input
+        type="file"
+        multiple
+        hidden
+        disabled={disabled}
+        onChange={(e) => {
+          const files = [...(e.target.files ?? [])]
+          e.target.value = ''
+          if (files.length) onFiles(files)
+        }}
+      />
+    </label>
+  )
+}
+
+/** Loads picked files (backups, genome files, or both at once) and words what came in. */
+export function useFileLoader(passphrase?: () => string) {
+  const { refresh } = useApp()
+  const t = useT()
+  const [msg, setMsg] = useState<string | null>(null)
+  const [progress, setProgress] = useState<string | null>(null)
+  const load = async (files: File[]) => {
+    setMsg(null)
+    try {
+      const r = await backups.loadFiles(files, (key, params) => setProgress(t(key, params)), passphrase?.())
+      await refresh()
+      const { people, genomes, exportedAt, name } = r
+      setMsg(
+        [
+          r.dumps
+            ? t('backupCard.loaded', { people, genomes, exportedAt, name })
+            : t('backupCard.genomesLoaded', { n: genomes }),
+          r.unmatched ? t('backupCard.genomesUnmatched', { n: r.unmatched }) : '',
+        ]
+          .filter(Boolean)
+          .join(' '),
+      )
+    } catch (e) {
+      setMsg(t('backupCard.loadFailed', { message: e instanceof Error ? e.message : String(e) }))
+    } finally {
+      setProgress(null)
+    }
+  }
+  return { msg, setMsg, progress, load }
+}
+
+/** People whose genome files a loaded folder snapshot keeps beside itself, and the way to add them. */
+function ElsewhereNotice({ disabled, onFiles }: { disabled: boolean; onFiles: (files: File[]) => void }) {
+  const t = useT()
+  const names = backups.elsewhereNames
+  if (!names.length) return null
+  return (
+    <div className="notice">
+      <p className="mt-0">
+        {t('restore.genomesElsewhere', { names: names.map((m) => m.name).join(', ') })}{' '}
+        {t('backupCard.pickGenomes')}
+      </p>
+      <PickFiles label={t('backupCard.loadGenomes')} disabled={disabled} onFiles={onFiles} />
     </div>
   )
 }

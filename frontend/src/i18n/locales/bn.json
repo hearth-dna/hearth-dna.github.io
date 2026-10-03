@@ -395,8 +395,6 @@
   "settingsPage.languageNote": "ইংরেজি ছাড়া অনুবাদগুলি যন্ত্রে তৈরি এবং কোনো মাতৃভাষী বা আইনজীবী তা পরীক্ষা করেননি; সম্মতির লেখা তার ইংরেজি রূপেই বাধ্যতামূলক।",
   "settingsPage.buildingDump": "ডাম্প তৈরি হচ্ছে…",
   "settingsPage.readingDump": "ডাম্প পড়া হচ্ছে…",
-  "settingsPage.imported": "ডাম্প v{version} ({exportedAt}) থেকে {people} জন নতুন ব্যক্তি ও {genomes}টি জিনোম আমদানি হয়েছে; আগে থেকে থাকা ব্যক্তিরা অপরিবর্তিত রইলেন।",
-  "settingsPage.importFailed": "আমদানি ব্যর্থ: {error}",
   "settingsPage.title": "সেটিংস ও রপ্তানি",
   "settingsPage.fullDump": "সম্পূর্ণ ডাম্প",
   "settingsPage.fullDumpIntro": "সবকিছু: ব্যক্তি, বংশতালিকা, মূল জিনোম ফাইল, সম্মতি, স্বাস্থ্য লগ, নোট, চ্যাট, ভাগাভাগির লগ। একটি .hearth ফাইল; AES-GCM দিয়ে এনক্রিপ্ট করতে একটি পাসফ্রেজ যোগ করুন। Hearth কোথাও কোনো অনুলিপি রাখে না। আমদানি .hearth ফাইল, পুরনো .json.gz ডাম্প এবং বহনযোগ্য .html সংগ্রহশালা গ্রহণ করে।",
@@ -1015,7 +1013,7 @@
   "settingsPage.about": "Hearth সম্পর্কে",
   "settingsPage.source": "সোর্স কোড (AGPL-3.0)",
   "restore.genomesElsewhere": "{names}-এর ডিএনএ এই ফাইলে নেই: ব্যাকআপ ফোল্ডার এটি ব্যাকআপ ফাইলের পাশের genomes ফোল্ডারে রাখে।",
-  "backupCard.pickGenomes": "«ডিএনএ ফাইল লোড করুন» চাপুন এবং সেই genomes ফোল্ডারের সব ফাইল বেছে নিন।",
+  "backupCard.pickGenomes": "«ডিএনএ ফাইল লোড করুন» দিয়ে সেই genomes ফোল্ডারের সব ফাইল বেছে নিন, অথবা «ব্যাকআপ লোড করুন»-এ ব্যাকআপ ফাইলের সঙ্গে একসাথে বেছে নিন।",
   "backupCard.loadGenomes": "ডিএনএ ফাইল লোড করুন…",
   "backupCard.genomesLoaded": "{n} জনের ডিএনএ লোড হয়েছে।",
   "backupCard.genomesUnmatched": "বেছে নেওয়া ফাইলের {n}টি এই ব্যাকআপের ডিএনএ নয়, বা অন্য পাসফ্রেজ দিয়ে এনক্রিপ্ট করা।"

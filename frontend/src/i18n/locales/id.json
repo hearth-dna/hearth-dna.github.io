@@ -395,8 +395,6 @@
   "settingsPage.languageNote": "Terjemahan selain bahasa Inggris dihasilkan mesin dan belum ditinjau penutur asli maupun ahli hukum; teks persetujuan mengikat dalam versi bahasa Inggrisnya.",
   "settingsPage.buildingDump": "Membangun cadangan…",
   "settingsPage.readingDump": "Membaca cadangan…",
-  "settingsPage.imported": "Mengimpor {people} orang baru dan {genomes} genom dari cadangan v{version} ({exportedAt}); orang yang sudah ada dibiarkan tidak berubah.",
-  "settingsPage.importFailed": "Impor gagal: {error}",
   "settingsPage.title": "Pengaturan & ekspor",
   "settingsPage.fullDump": "Cadangan penuh",
   "settingsPage.fullDumpIntro": "Semuanya: orang, silsilah, berkas genom asli, persetujuan, log kesehatan, catatan, obrolan, log pembagian. Satu berkas .hearth; tambahkan frasa sandi untuk mengenkripsinya dengan AES-GCM. Hearth tidak menyimpan salinan di mana pun. Impor menerima berkas .hearth, cadangan .json.gz lama, dan arsip .html portabel.",
@@ -1015,7 +1013,7 @@
   "settingsPage.about": "Tentang Hearth",
   "settingsPage.source": "Kode sumber (AGPL-3.0)",
   "restore.genomesElsewhere": "DNA {names} tidak ada di dalam file ini: folder cadangan menyimpannya di folder genomes di sebelah file cadangan.",
-  "backupCard.pickGenomes": "Ketuk «Muat file DNA» lalu pilih semua file di folder genomes itu.",
+  "backupCard.pickGenomes": "Pilih semua file di folder genomes itu dengan «Muat file DNA», atau pilih bersama file cadangan di «Muat cadangan».",
   "backupCard.loadGenomes": "Muat file DNA…",
   "backupCard.genomesLoaded": "DNA {n} orang telah dimuat.",
   "backupCard.genomesUnmatched": "{n} file yang dipilih bukan DNA dari cadangan ini, atau dienkripsi dengan frasa sandi lain."

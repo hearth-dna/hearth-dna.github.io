@@ -395,8 +395,6 @@
   "settingsPage.languageNote": "İngilizce dışındaki çeviriler makine tarafından üretildi ve ana dili konuşan biri ya da bir hukukçu tarafından incelenmedi; rıza metinleri İngilizce sürümlerinde bağlayıcıdır.",
   "settingsPage.buildingDump": "Döküm oluşturuluyor…",
   "settingsPage.readingDump": "Döküm okunuyor…",
-  "settingsPage.imported": "v{version} dökümünden ({exportedAt}) {people} yeni kişi ve {genomes} genom içe aktarıldı; zaten burada olan kişiler değiştirilmedi.",
-  "settingsPage.importFailed": "İçe aktarma başarısız: {error}",
   "settingsPage.title": "Ayarlar ve dışa aktarma",
   "settingsPage.fullDump": "Tam döküm",
   "settingsPage.fullDumpIntro": "Her şey: kişiler, soyağacı, orijinal genom dosyaları, rızalar, sağlık günlüğü, notlar, sohbetler, paylaşım günlüğü. Tek bir .hearth dosyası; AES-GCM ile şifrelemek için parola cümlesi ekleyin. Hearth hiçbir yerde kopya tutmaz. İçe aktarma .hearth dosyalarını, eski .json.gz dökümlerini ve taşınabilir .html arşivlerini kabul eder.",
@@ -1015,7 +1013,7 @@
   "settingsPage.about": "Hearth hakkında",
   "settingsPage.source": "Kaynak kodu (AGPL-3.0)",
   "restore.genomesElsewhere": "{names} için DNA bu dosyada değil: bir yedek klasörü onu yedek dosyasının yanındaki genomes klasöründe tutar.",
-  "backupCard.pickGenomes": "‘DNA dosyalarını yükle’ye dokunun ve o genomes klasöründeki tüm dosyaları seçin.",
+  "backupCard.pickGenomes": "O genomes klasöründeki tüm dosyaları ‘DNA dosyalarını yükle’ ile seçin ya da ‘Yedeği yükle’de yedek dosyasıyla birlikte seçin.",
   "backupCard.loadGenomes": "DNA dosyalarını yükle…",
   "backupCard.genomesLoaded": "{n} kişinin DNA'sı yüklendi.",
   "backupCard.genomesUnmatched": "Seçilen dosyalardan {n} tanesi bu yedeğe ait DNA değil ya da başka bir parolayla şifrelenmiş."

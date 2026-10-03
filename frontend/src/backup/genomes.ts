@@ -60,31 +60,30 @@ export async function genomeLoader(
 }
 
 /**
- * Genome files the user picked by hand (a folder snapshot's `genomes` folder, on a phone that
- * loaded the snapshot alone from a cloud drive), matched to `entries` by content: whatever the
- * drive renamed a copy to, its hash decides. Encrypted ones are opened with the passphrase.
+ * Files the user picked by hand that may be genome files (a folder snapshot's `genomes`, picked
+ * on a phone that loads the snapshot from a cloud drive), by content hash: whatever the drive
+ * renamed a copy to, the hash finds its manifest entry. Sealed ones are opened with the
+ * passphrase; a file that is not a genome simply matches nothing (`null` when it cannot be read).
  */
-export async function matchGenomeFiles(
+export async function openGenomeFiles(
   files: Uint8Array[],
-  entries: GenomeEntry[],
   passphrase: string | null,
-): Promise<{ found: { entry: GenomeEntry; gz: Uint8Array }[]; unmatched: number }> {
+): Promise<{ byHash: Map<string, Uint8Array>; hashes: (string | null)[] }> {
   const open = passphrase ? await opener(passphrase) : null
-  const found: { entry: GenomeEntry; gz: Uint8Array }[] = []
-  let unmatched = 0
+  const byHash = new Map<string, Uint8Array>()
+  const hashes: (string | null)[] = []
   for (const raw of files) {
     if (isEncrypted(raw) && !open) throw new Error('the genome files are encrypted; enter the passphrase')
     let gz: Uint8Array
     try {
       gz = isEncrypted(raw) && open ? await open(raw) : raw
     } catch {
-      unmatched++ // sealed with another passphrase, or not ours
+      hashes.push(null) // sealed with another passphrase
       continue
     }
     const hash = await sha256(gz)
-    const entry = entries.find((e) => e.sha256 === hash && !found.some((f) => f.entry === e))
-    if (entry) found.push({ entry, gz })
-    else unmatched++
+    byHash.set(hash, gz)
+    hashes.push(hash)
   }
-  return { found, unmatched }
+  return { byHash, hashes }
 }
