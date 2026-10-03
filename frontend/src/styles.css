@@ -203,7 +203,7 @@ header.top .tools button { white-space: nowrap; }
 nav.tabbar { display: none; }
 @media (max-width: 640px) {
   header.top nav.topnav, header.top .status, header.top .erase { display: none; }
-  nav.tabbar { display: grid; grid-template-columns: repeat(6, 1fr); position: fixed; inset: auto 0 0 0; z-index: 3; background: color-mix(in srgb, var(--surface) 95%, transparent); backdrop-filter: saturate(1.4) blur(8px); border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom); box-shadow: 0 -4px 16px rgb(0 0 0 / 0.06); }
+  nav.tabbar { display: grid; grid-template-columns: repeat(7, 1fr); position: fixed; inset: auto 0 0 0; z-index: 3; background: color-mix(in srgb, var(--surface) 95%, transparent); backdrop-filter: saturate(1.4) blur(8px); border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom); box-shadow: 0 -4px 16px rgb(0 0 0 / 0.06); }
   nav.tabbar button { flex-direction: column; gap: 2px; min-height: var(--tabbar-h); border: 0; border-radius: 0; background: none; padding: var(--space-1) 0; font-size: 0.6875rem; color: var(--muted); }
   nav.tabbar button svg { width: 22px; height: 22px; }
   nav.tabbar button[aria-current='page'] { color: var(--accent); font-weight: 600; }

@@ -27,5 +27,6 @@
   "app.navCharts": "Charts",
   "app.navImport": "Import",
   "app.navMore": "More",
-  "app.theme": "Theme: {mode}"
+  "app.theme": "Theme: {mode}",
+  "app.navDna": "DNA"
 }

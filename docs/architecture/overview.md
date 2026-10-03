@@ -7,7 +7,7 @@ See `../design.md` for the full proposal; `storage/` for backups, portable archi
 Browser (PWA)                                   Static hosting          The user's provider
 ┌──────────────────────────────┐                ┌──────────────┐        ┌──────────────────┐
 │ React UI                     │ ── kb.json ──▶ │ GitHub Pages │        │ api.anthropic.com│
-│  People · Report · Family    │                └──────────────┘        │ generativelang…  │
+│  People · DNA · Family       │                └──────────────┘        │ generativelang…  │
 │  Ask · Health · Settings     │                                        │ reached with the │
 │ egress.ts (only fetch site)  │ ── previewed context, per-request ───▶ │ user's own key   │
 │ db.ts ⇄ db.worker.ts         │      confirmation, opt-in consent      └──────────────────┘
@@ -23,3 +23,9 @@ Data flow for an import: file → `unpack.ts` (zip/gz) → `providers.ts` (detec
 Data flow for Ask: question → `retrieve.ts` (kb rsids) → `personCallsFor` per selected person →
 `computeFindings` → `buildContextPack` (pseudonymised, deterministic) → preview → user copies
 (logged) or, with tier-3 consent, `egress.sendContext` after a confirmation dialog.
+
+Data flow for the DNA viewer (`/dna`): `kb/viewer.ts` ranks every kb marker by clinical value
+(evidence grade, clinical before lifestyle topic, largest impact) → filters by person, area
+(`kb.areas`, from `kb/reviewed/areas.json`), text and notability → the shown rows become a
+`buildContextPack` → the same preview, confirmation and sharing log as Ask (`PackPreview`), copied
+or handed to the system share sheet.

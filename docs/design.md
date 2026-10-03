@@ -166,7 +166,10 @@ Users can drop in a newer `kb.db` without touching their data.
 - Per-person dashboard: notable findings ranked by evidence grade × magnitude, PGx card, PRS
   percentiles, coverage stats per platform.
 - Family topic view: one SNP or topic across all members in one table (the `family_all` query).
-- Category browser mirroring the repo's analysis files (clinical, lifestyle, traits).
+- Category browser mirroring the repo's analysis files (clinical, lifestyle, traits). Built as the
+  DNA viewer (`/dna`): every kb marker, most clinically useful first, filtered by person and by
+  area of medicine (heart, diabetes and weight, memory, mental health, strength and fitness,
+  medication response…), and copied out as a context pack for the rows shown.
 - Everything links out to dbSNP, ClinVar, PharmGKB, GWAS Catalog; SNPedia links only where the entry
   came from SNPedia.
 

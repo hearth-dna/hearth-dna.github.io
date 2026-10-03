@@ -74,5 +74,9 @@
   "askPage.reason.notable": "notable marker",
   "askPage.reason.sharedVariant": "carried by several selected people",
   "askPage.reason.matchesQuestion": "mentions “{term}”",
-  "askPage.reason.recent": "recent entry ({kind})"
+  "askPage.reason.recent": "recent entry ({kind})",
+  "askPage.shareButton": "Share…",
+  "askPage.shared": "Handed to the app you chose.",
+  "askPage.confirmShareBody": "The text in the preview will be handed to the app you pick in the share sheet. Once it reaches a third-party service it is governed by <em>their</em> terms and privacy policy, not Hearth's.",
+  "askPage.confirmShare": "I have checked the preview — share"
 }

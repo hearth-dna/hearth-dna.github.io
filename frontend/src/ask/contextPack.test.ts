@@ -16,6 +16,7 @@ const entry: KbEntry = {
   sources: ['https://cpicpgx.org/x'],
   topic: 'pharmacogenomics',
   generated_by: 'human',
+  areas: [],
 }
 const finding: Finding = {
   entry,

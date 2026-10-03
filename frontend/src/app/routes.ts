@@ -16,6 +16,8 @@ export type Page =
   /** `person` is '' for the whole family. */
   | { name: 'health'; person: string }
   | { name: 'charts' }
+  /** `person` is '' for everyone with DNA. */
+  | { name: 'dna'; person: string }
   /** `/import`, `/import/<source>`, `/import/<source>/<person>`; `person` '' for none chosen. */
   | { name: 'import'; source: ImportSource; person: string }
   | { name: 'ask' }
@@ -44,6 +46,8 @@ export function parseRoute(path: string): Page | null {
       return id === undefined ? HOME : { name: 'person', id }
     case 'health-log':
       return { name: 'health', person: id ?? '' }
+    case 'dna':
+      return { name: 'dna', person: id ?? '' }
     case 'family':
     case 'charts':
     case 'ask':
@@ -60,6 +64,8 @@ export function formatRoute(p: Page): string {
       return `/people/${encodeURIComponent(p.id)}`
     case 'health':
       return p.person ? `/health-log/${encodeURIComponent(p.person)}` : '/health-log'
+    case 'dna':
+      return p.person ? `/dna/${encodeURIComponent(p.person)}` : '/dna'
     case 'import':
       // A person needs a source in front of it; '-' holds the place when none is chosen.
       return p.person

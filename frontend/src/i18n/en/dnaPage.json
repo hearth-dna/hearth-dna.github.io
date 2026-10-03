@@ -1,0 +1,20 @@
+{
+  "dnaPage.title": "DNA",
+  "dnaPage.intro": "Every marker the knowledge base describes, most clinically useful first: established findings before preliminary ones, medical before lifestyle. Filter by person and area, then copy or share what you see with ChatGPT, Claude or any assistant.",
+  "dnaPage.noDna": "No DNA imported yet. The list shows what each marker means; import a raw DNA file to see genotypes.",
+  "dnaPage.everyone": "Everyone",
+  "dnaPage.allAreas": "All areas",
+  "dnaPage.search": "gene, rsid, drug or condition",
+  "dnaPage.notable": "only notable genotypes (impact ≥ 2)",
+  "dnaPage.count": "{n} markers",
+  "dnaPage.noRows": "No markers match these filters.",
+  "dnaPage.colMarker": "Marker",
+  "dnaPage.colEvidence": "Evidence",
+  "dnaPage.undescribed": "genotype not described",
+  "dnaPage.notGenotyped": "not genotyped",
+  "dnaPage.draft": "draft, not yet reviewed",
+  "dnaPage.evidenceLegend": "Evidence: A = clinical guideline or well replicated, B = replicated association, C = preliminary. Coloured genotypes have impact 2 or more.",
+  "dnaPage.sendHeading": "Send to an assistant",
+  "dnaPage.sendIntro": "The context pack holds the markers shown above for the selected people, pseudonymised unless you switch real names on. Narrow the filters to send less.",
+  "dnaPage.question": "Question (optional)"
+}

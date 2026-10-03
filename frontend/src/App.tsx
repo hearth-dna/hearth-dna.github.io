@@ -8,6 +8,7 @@ import { backups } from './backup/scheduler'
 import { AskPage } from './components/AskPage'
 import { ChartsPage } from './components/ChartsPage'
 import { ConsentGate } from './components/ConsentGate'
+import { DnaPage } from './components/DnaPage'
 import { EraseDialog } from './components/EraseDialog'
 import { FamilyPage } from './components/FamilyPage'
 import { HealthPage } from './components/HealthPage'
@@ -144,6 +145,7 @@ export function App() {
     { page: { name: 'people' }, label: t('app.navPeople'), icon: 'people', tab: true },
     { page: { name: 'family' }, label: t('app.navFamily'), icon: 'family', tab: false },
     { page: { name: 'health', person: '' }, label: t('app.navHealth'), icon: 'health', tab: true },
+    { page: { name: 'dna', person: '' }, label: t('app.navDna'), icon: 'dna', tab: true },
     {
       page: { name: 'import', source: '', person: '' },
       label: t('app.navImport'),
@@ -253,6 +255,9 @@ export function App() {
         {page.name === 'family' && <FamilyPage />}
         {page.name === 'health' && (
           <HealthPage person={page.person} onPerson={(person) => setPage({ name: 'health', person })} />
+        )}
+        {page.name === 'dna' && (
+          <DnaPage person={page.person} onPerson={(person) => setPage({ name: 'dna', person })} />
         )}
         {page.name === 'import' && <ImportPage source={page.source} person={page.person} />}
         {page.name === 'charts' && <ChartsPage />}

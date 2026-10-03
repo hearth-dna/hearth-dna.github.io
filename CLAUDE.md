@@ -29,7 +29,8 @@ under `.dev/`; `make dev-stop` stops it; `make test` runs the suite.
 
 - `frontend/src/db` — SQLite WASM (OPFS VFS, falls back to memory). Schema in `schema.ts`.
 - `frontend/src/import` — one parser per provider (`providers.ts`), auto-detected by header.
-- `frontend/src/kb` — bundled knowledge base (`public/kb.json`, built by `kb/build_kb.py`).
+- `frontend/src/kb` — bundled knowledge base (`public/kb.json`, built by `kb/build_kb.py`);
+  `viewer.ts` ranks and filters markers by area for the DNA page.
 - `frontend/src/family` — Mendelian consistency, shared-genotype stats.
 - `frontend/src/ask` — local retrieval, context packs, prompt templates (design §6.3).
 - `frontend/src/export` — dump v1: JSON → gzip (CompressionStream) → optional AES-GCM.

@@ -2,6 +2,7 @@ import { fetchOwnAsset } from '../egress/egress'
 import type { KbAnalyte, KbPanel, KbUnit } from '../labs/types'
 import type { Call } from '../types'
 import { conditionById, conditionNames, type KbCondition } from './conditions'
+import type { KbArea } from './viewer'
 
 export interface KbGenotype {
   label: string
@@ -20,6 +21,8 @@ export interface KbEntry {
   drugs?: string[]
   /** Condition ids (`Kb.conditions`). */
   conditions?: string[]
+  /** Area ids (`Kb.areas`), at least one. */
+  areas: string[]
   topic: string
   generated_by: string
 }
@@ -28,6 +31,7 @@ export interface Kb {
   entries: KbEntry[]
   topics: { id: string; category: string }[]
   conditions: KbCondition[]
+  areas: KbArea[]
   analytes: KbAnalyte[]
   panels: KbPanel[]
   units: KbUnit[]

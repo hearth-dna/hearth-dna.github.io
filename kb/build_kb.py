@@ -10,6 +10,9 @@ name conditions by id; the build checks every id and links markers and condition
 factors from every other accepted unit), panels (named groups such as a complete blood count) and
 units (printed spellings of each canonical unit). Conditions name their lab tests by analyte id.
 
+`reviewed/areas.json` lists the areas of medicine the DNA viewer filters by (heart, memory, mental
+health…), named in every UI language. Each marker names at least one area by id.
+
 The reviewed files are hand-curated (evidence grades follow family_dna's CLINICAL_PRIORITY.MD:
 A = guideline/replicated, B = replicated association, C = preliminary). Genotype keys are on the
 forward strand and are normalised to sorted allele order so lookups are orientation-free.
@@ -24,6 +27,7 @@ from datetime import date
 ROOT = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(ROOT, '..', 'frontend', 'public', 'kb.json')
 CONDITIONS = os.path.join(ROOT, 'reviewed', 'conditions.json')
+AREAS = os.path.join(ROOT, 'reviewed', 'areas.json')
 LABS = os.path.join(ROOT, 'reviewed', 'labs')
 ANALYTE_KEYS = ('id', 'names', 'panels', 'specimen', 'unit', 'units', 'plausible', 'decimals')
 CONVERSIONS = {'hba1c'}  # non-linear conversions implemented in frontend/src/labs/normalise.ts
@@ -52,6 +56,18 @@ def load_conditions() -> list:
     if len(ids) != len(set(ids)):
         raise ValueError('duplicate condition id')
     return conditions
+
+
+def load_areas() -> list:
+    with open(AREAS, encoding='utf-8') as f:
+        areas = json.load(f)['areas']
+    ids = [a['id'] for a in areas]
+    if len(ids) != len(set(ids)):
+        raise ValueError('duplicate area id')
+    for a in areas:
+        if not a['names'].get('en'):
+            raise ValueError(f'area {a["id"]}: names.en is required')
+    return areas
 
 
 def load_labs() -> tuple:
@@ -104,6 +120,11 @@ def main() -> int:
     except ValueError as e:
         return fail(f'{CONDITIONS}: {e}')
     try:
+        areas = load_areas()
+    except ValueError as e:
+        return fail(f'{AREAS}: {e}')
+    area_ids = {a['id'] for a in areas}
+    try:
         units, panels, analytes = load_labs()
     except ValueError as e:
         return fail(f'{LABS}: {e}')
@@ -113,7 +134,7 @@ def main() -> int:
             if lab not in analyte_ids:
                 return fail(f'condition {c["id"]}: unknown lab {lab}')
     for path in sorted(glob.glob(os.path.join(ROOT, 'reviewed', '*.json'))):
-        if path == CONDITIONS:
+        if path in (CONDITIONS, AREAS):
             continue
         with open(path, encoding='utf-8') as f:
             doc = json.load(f)
@@ -123,6 +144,8 @@ def main() -> int:
                 if k not in e:
                     print(f'{path}: {e.get("rsid")} missing {k}', file=sys.stderr)
                     return 1
+            if not e.get('areas') or not set(e['areas']) <= area_ids:
+                return fail(f'{path}: {e["rsid"]} needs one or more known areas, has {e.get("areas")}')
             e['topic'] = doc['topic']
             e['genotypes'] = {norm_gt(k): v for k, v in e['genotypes'].items()}
             e.setdefault('generated_by', 'human')
@@ -155,6 +178,7 @@ def main() -> int:
         'entries': sorted(entries, key=lambda e: e['rsid']),
         'topics': list(topics.values()),
         'conditions': sorted(conditions, key=lambda c: c['id']),
+        'areas': areas,
         'analytes': analytes,
         'panels': panels,
         'units': units,
@@ -170,7 +194,7 @@ def main() -> int:
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, 'w', encoding='utf-8') as f:
         json.dump(payload, f, ensure_ascii=False, indent=1)
-    print(f'wrote {OUT}: {len(entries)} entries, {len(topics)} topics, {len(conditions)} conditions, {len(analytes)} lab tests')
+    print(f'wrote {OUT}: {len(entries)} entries, {len(topics)} topics, {len(conditions)} conditions, {len(areas)} areas, {len(analytes)} lab tests')
     return 0
 
 

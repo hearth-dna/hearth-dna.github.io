@@ -1,6 +1,38 @@
 {
- "version": "2026.10.01",
+ "version": "2026.10.03",
  "entries": [
+  {
+   "rsid": "rs1006737",
+   "gene": "CACNA1C",
+   "name": "CACNA1C rs1006737",
+   "risk_allele": "A",
+   "orientation": "forward",
+   "evidence": "B",
+   "generated_by": "llm:draft",
+   "summary": "Genome-wide significant risk allele for bipolar disorder and schizophrenia, each A copy raising odds only ~1.1–1.2x. Lifetime risk stays low for almost every carrier; useful for research, not prediction.",
+   "genotypes": {
+    "GG": {
+     "label": "typical",
+     "magnitude": 0
+    },
+    "AG": {
+     "label": "~1.1x bipolar/schizophrenia odds",
+     "magnitude": 1
+    },
+    "AA": {
+     "label": "~1.3x bipolar/schizophrenia odds",
+     "magnitude": 1.5
+    }
+   },
+   "sources": [
+    "https://www.ncbi.nlm.nih.gov/snp/rs1006737",
+    "https://www.ebi.ac.uk/gwas/variants/rs1006737"
+   ],
+   "areas": [
+    "mental"
+   ],
+   "topic": "brain_and_body"
+  },
   {
    "rsid": "rs1057910",
    "gene": "CYP2C9",
@@ -30,6 +62,9 @@
     "warfarin",
     "phenytoin",
     "celecoxib"
+   ],
+   "areas": [
+    "medications"
    ],
    "topic": "pharmacogenomics",
    "generated_by": "human"
@@ -61,6 +96,9 @@
    ],
    "conditions": [
     "amd"
+   ],
+   "areas": [
+    "eyes_skin"
    ],
    "topic": "metabolism_and_traits",
    "generated_by": "human"
@@ -94,6 +132,9 @@
     "cad",
     "mi"
    ],
+   "areas": [
+    "heart"
+   ],
    "topic": "cardiometabolic",
    "generated_by": "human"
   },
@@ -124,6 +165,9 @@
    ],
    "conditions": [
     "prostate_cancer"
+   ],
+   "areas": [
+    "cancer"
    ],
    "topic": "metabolism_and_traits",
    "generated_by": "human"
@@ -160,6 +204,10 @@
     "omeprazole",
     "clopidogrel"
    ],
+   "areas": [
+    "medications",
+    "mental"
+   ],
    "topic": "pharmacogenomics",
    "generated_by": "human"
   },
@@ -191,8 +239,47 @@
    "conditions": [
     "alcohol_use_disorder"
    ],
+   "areas": [
+    "nutrition",
+    "mental"
+   ],
    "topic": "metabolism_and_traits",
    "generated_by": "human"
+  },
+  {
+   "rsid": "rs13266634",
+   "gene": "SLC30A8",
+   "name": "SLC30A8 R325W",
+   "risk_allele": "C",
+   "orientation": "forward",
+   "evidence": "B",
+   "generated_by": "llm:draft",
+   "summary": "The common C (Arg325) allele of the beta-cell zinc transporter ZnT8 raises type 2 diabetes risk ~1.15x per copy; the T (Trp) allele is mildly protective.",
+   "genotypes": {
+    "TT": {
+     "label": "lower T2D risk",
+     "magnitude": 0
+    },
+    "CT": {
+     "label": "typical T2D risk",
+     "magnitude": 0.5
+    },
+    "CC": {
+     "label": "~1.15x T2D risk",
+     "magnitude": 1
+    }
+   },
+   "sources": [
+    "https://www.ncbi.nlm.nih.gov/snp/rs13266634",
+    "https://www.ebi.ac.uk/gwas/variants/rs13266634"
+   ],
+   "conditions": [
+    "t2d"
+   ],
+   "areas": [
+    "diabetes"
+   ],
+   "topic": "cardiometabolic"
   },
   {
    "rsid": "rs1333049",
@@ -222,8 +309,108 @@
    "conditions": [
     "cad"
    ],
+   "areas": [
+    "heart"
+   ],
    "topic": "cardiometabolic",
    "generated_by": "human"
+  },
+  {
+   "rsid": "rs1360780",
+   "gene": "FKBP5",
+   "name": "FKBP5 rs1360780",
+   "risk_allele": "T",
+   "orientation": "forward",
+   "evidence": "C",
+   "generated_by": "llm:draft",
+   "summary": "T allele slows the shut-off of the cortisol stress response. In people with childhood adversity it is linked to higher PTSD and depression risk (a gene-environment interaction); alone it predicts little.",
+   "genotypes": {
+    "CC": {
+     "label": "typical stress-hormone recovery",
+     "magnitude": 0
+    },
+    "CT": {
+     "label": "slower cortisol recovery; matters mainly after trauma",
+     "magnitude": 1
+    },
+    "TT": {
+     "label": "slower cortisol recovery; matters mainly after trauma",
+     "magnitude": 1.5
+    }
+   },
+   "sources": [
+    "https://www.ncbi.nlm.nih.gov/snp/rs1360780"
+   ],
+   "conditions": [
+    "stress_sensitivity"
+   ],
+   "areas": [
+    "mental"
+   ],
+   "topic": "brain_and_body"
+  },
+  {
+   "rsid": "rs17070145",
+   "gene": "WWC1 (KIBRA)",
+   "name": "KIBRA rs17070145",
+   "risk_allele": "C",
+   "orientation": "forward",
+   "evidence": "C",
+   "generated_by": "llm:draft",
+   "summary": "T allele carriers performed better on episodic memory tests in the original and several replication studies; the effect is small and not found in every cohort.",
+   "genotypes": {
+    "TT": {
+     "label": "possibly better episodic memory",
+     "magnitude": 0
+    },
+    "CT": {
+     "label": "possibly better episodic memory",
+     "magnitude": 0
+    },
+    "CC": {
+     "label": "typical episodic memory",
+     "magnitude": 0.5
+    }
+   },
+   "sources": [
+    "https://www.ncbi.nlm.nih.gov/snp/rs17070145"
+   ],
+   "areas": [
+    "memory"
+   ],
+   "topic": "brain_and_body"
+  },
+  {
+   "rsid": "rs17782313",
+   "gene": "MC4R",
+   "name": "MC4R rs17782313",
+   "risk_allele": "C",
+   "orientation": "forward",
+   "evidence": "B",
+   "generated_by": "llm:draft",
+   "summary": "C allele near MC4R, an appetite-regulating gene, raises BMI by ~0.2 kg/m² per copy and is linked to larger meals and snacking; modest type 2 diabetes effect.",
+   "genotypes": {
+    "TT": {
+     "label": "typical",
+     "magnitude": 0
+    },
+    "CT": {
+     "label": "slightly higher BMI and appetite",
+     "magnitude": 1
+    },
+    "CC": {
+     "label": "higher BMI and appetite (~1.2x obesity risk)",
+     "magnitude": 1.5
+    }
+   },
+   "sources": [
+    "https://www.ncbi.nlm.nih.gov/snp/rs17782313",
+    "https://www.ebi.ac.uk/gwas/variants/rs17782313"
+   ],
+   "areas": [
+    "diabetes"
+   ],
+   "topic": "cardiometabolic"
   },
   {
    "rsid": "rs1799853",
@@ -256,6 +443,9 @@
     "celecoxib",
     "ibuprofen"
    ],
+   "areas": [
+    "medications"
+   ],
    "topic": "pharmacogenomics",
    "generated_by": "human"
   },
@@ -287,8 +477,42 @@
    "conditions": [
     "haemochromatosis"
    ],
+   "areas": [
+    "nutrition"
+   ],
    "topic": "metabolism_and_traits",
    "generated_by": "human"
+  },
+  {
+   "rsid": "rs1800012",
+   "gene": "COL1A1",
+   "name": "COL1A1 Sp1 (rs1800012)",
+   "risk_allele": "A",
+   "orientation": "forward",
+   "evidence": "B",
+   "generated_by": "llm:draft",
+   "summary": "A allele (the 's' allele, T on the gene's strand) alters type I collagen production; meta-analyses link it to lower bone density and more osteoporotic fractures, and to some ligament injuries. Weight-bearing exercise, calcium and vitamin D matter more.",
+   "genotypes": {
+    "CC": {
+     "label": "SS, typical bone density",
+     "magnitude": 0
+    },
+    "AC": {
+     "label": "Ss, slightly lower bone density",
+     "magnitude": 1
+    },
+    "AA": {
+     "label": "ss, lower bone density, ~1.8x vertebral fracture odds",
+     "magnitude": 2
+    }
+   },
+   "sources": [
+    "https://www.ncbi.nlm.nih.gov/snp/rs1800012"
+   ],
+   "areas": [
+    "fitness"
+   ],
+   "topic": "brain_and_body"
   },
   {
    "rsid": "rs1800462",
@@ -319,6 +543,9 @@
     "azathioprine",
     "mercaptopurine",
     "thioguanine"
+   ],
+   "areas": [
+    "medications"
    ],
    "topic": "pharmacogenomics",
    "generated_by": "human"
@@ -351,6 +578,9 @@
    "conditions": [
     "haemochromatosis"
    ],
+   "areas": [
+    "nutrition"
+   ],
    "topic": "metabolism_and_traits",
    "generated_by": "human"
   },
@@ -382,6 +612,9 @@
    ],
    "conditions": [
     "hyperhomocysteinaemia"
+   ],
+   "areas": [
+    "nutrition"
    ],
    "topic": "metabolism_and_traits",
    "generated_by": "human"
@@ -416,6 +649,9 @@
     "hydralazine",
     "sulfasalazine"
    ],
+   "areas": [
+    "medications"
+   ],
    "topic": "pharmacogenomics",
    "generated_by": "human"
   },
@@ -446,6 +682,9 @@
    ],
    "conditions": [
     "t2d"
+   ],
+   "areas": [
+    "diabetes"
    ],
    "topic": "cardiometabolic",
    "generated_by": "human"
@@ -479,8 +718,44 @@
     "melanoma",
     "red_hair"
    ],
+   "areas": [
+    "eyes_skin",
+    "cancer"
+   ],
    "topic": "metabolism_and_traits",
    "generated_by": "human"
+  },
+  {
+   "rsid": "rs1815739",
+   "gene": "ACTN3",
+   "name": "ACTN3 R577X",
+   "risk_allele": "T",
+   "orientation": "forward",
+   "evidence": "B",
+   "generated_by": "llm:draft",
+   "summary": "T (577X) is a stop codon: XX people make no alpha-actinin-3 in fast-twitch muscle fibres. RR is over-represented among sprint and power athletes, XX slightly among endurance athletes. Training matters far more.",
+   "genotypes": {
+    "CC": {
+     "label": "RR: power/sprint-oriented fibres",
+     "magnitude": 0
+    },
+    "CT": {
+     "label": "RX: mixed",
+     "magnitude": 0
+    },
+    "TT": {
+     "label": "XX: no alpha-actinin-3, endurance-leaning",
+     "magnitude": 1
+    }
+   },
+   "sources": [
+    "https://www.ncbi.nlm.nih.gov/snp/rs1815739",
+    "https://medlineplus.gov/genetics/gene/actn3/"
+   ],
+   "areas": [
+    "fitness"
+   ],
+   "topic": "brain_and_body"
   },
   {
    "rsid": "rs2187668",
@@ -509,6 +784,9 @@
    ],
    "conditions": [
     "coeliac"
+   ],
+   "areas": [
+    "nutrition"
    ],
    "topic": "metabolism_and_traits",
    "generated_by": "human"
@@ -547,6 +825,10 @@
     "amitriptyline",
     "paroxetine"
    ],
+   "areas": [
+    "medications",
+    "mental"
+   ],
    "topic": "pharmacogenomics",
    "generated_by": "human"
   },
@@ -578,6 +860,9 @@
    "drugs": [
     "fluorouracil",
     "capecitabine"
+   ],
+   "areas": [
+    "medications"
    ],
    "topic": "pharmacogenomics",
    "generated_by": "human"
@@ -612,6 +897,10 @@
     "simvastatin",
     "atorvastatin",
     "rosuvastatin"
+   ],
+   "areas": [
+    "medications",
+    "heart"
    ],
    "topic": "pharmacogenomics",
    "generated_by": "human"
@@ -649,6 +938,10 @@
     "escitalopram",
     "voriconazole"
    ],
+   "areas": [
+    "medications",
+    "mental"
+   ],
    "topic": "pharmacogenomics",
    "generated_by": "human"
   },
@@ -682,6 +975,10 @@
     "alzheimers",
     "hyperlipidaemia"
    ],
+   "areas": [
+    "heart",
+    "memory"
+   ],
    "topic": "cardiometabolic",
    "generated_by": "human"
   },
@@ -714,6 +1011,10 @@
     "stress_sensitivity",
     "pain_sensitivity"
    ],
+   "areas": [
+    "mental",
+    "memory"
+   ],
    "topic": "metabolism_and_traits",
    "generated_by": "human"
   },
@@ -745,8 +1046,84 @@
    "conditions": [
     "lactose_intolerance"
    ],
+   "areas": [
+    "nutrition"
+   ],
    "topic": "metabolism_and_traits",
    "generated_by": "human"
+  },
+  {
+   "rsid": "rs5219",
+   "gene": "KCNJ11",
+   "name": "KCNJ11 E23K",
+   "risk_allele": "T",
+   "orientation": "forward",
+   "evidence": "B",
+   "generated_by": "llm:draft",
+   "summary": "T (Lys23) allele of the beta-cell potassium channel lowers insulin secretion: ~1.15x type 2 diabetes risk per copy. The same channel is the target of sulfonylurea drugs.",
+   "genotypes": {
+    "CC": {
+     "label": "typical T2D risk",
+     "magnitude": 0
+    },
+    "CT": {
+     "label": "~1.15x T2D risk",
+     "magnitude": 1
+    },
+    "TT": {
+     "label": "~1.3x T2D risk",
+     "magnitude": 1.5
+    }
+   },
+   "sources": [
+    "https://www.ncbi.nlm.nih.gov/snp/rs5219",
+    "https://www.ebi.ac.uk/gwas/variants/rs5219"
+   ],
+   "conditions": [
+    "t2d"
+   ],
+   "drugs": [
+    "gliclazide",
+    "glibenclamide"
+   ],
+   "areas": [
+    "diabetes",
+    "medications"
+   ],
+   "topic": "cardiometabolic"
+  },
+  {
+   "rsid": "rs6265",
+   "gene": "BDNF",
+   "name": "BDNF Val66Met",
+   "risk_allele": "T",
+   "orientation": "forward",
+   "evidence": "C",
+   "generated_by": "llm:draft",
+   "summary": "T (Met66) allele lowers activity-dependent release of BDNF, a growth factor for neurons. Linked to slightly weaker episodic memory and a smaller hippocampus in some studies; links to depression and anxiety are inconsistent. Exercise raises BDNF whatever the genotype.",
+   "genotypes": {
+    "CC": {
+     "label": "Val/Val, typical",
+     "magnitude": 0
+    },
+    "CT": {
+     "label": "Val/Met, possibly slightly weaker episodic memory",
+     "magnitude": 1
+    },
+    "TT": {
+     "label": "Met/Met, possibly weaker episodic memory",
+     "magnitude": 1.5
+    }
+   },
+   "sources": [
+    "https://www.ncbi.nlm.nih.gov/snp/rs6265",
+    "https://medlineplus.gov/genetics/gene/bdnf/"
+   ],
+   "areas": [
+    "memory",
+    "mental"
+   ],
+   "topic": "brain_and_body"
   },
   {
    "rsid": "rs662799",
@@ -776,6 +1153,9 @@
    "conditions": [
     "hypertriglyceridaemia",
     "cad"
+   ],
+   "areas": [
+    "heart"
    ],
    "topic": "cardiometabolic",
    "generated_by": "human"
@@ -809,6 +1189,10 @@
     "alcohol_flush",
     "oesophageal_cancer"
    ],
+   "areas": [
+    "nutrition",
+    "cancer"
+   ],
    "topic": "metabolism_and_traits",
    "generated_by": "human"
   },
@@ -840,6 +1224,10 @@
    "conditions": [
     "alzheimers",
     "type3_hlp"
+   ],
+   "areas": [
+    "heart",
+    "memory"
    ],
    "topic": "cardiometabolic",
    "generated_by": "human"
@@ -874,6 +1262,10 @@
     "clozapine",
     "olanzapine"
    ],
+   "areas": [
+    "medications",
+    "nutrition"
+   ],
    "topic": "pharmacogenomics",
    "generated_by": "human"
   },
@@ -905,6 +1297,9 @@
    ],
    "conditions": [
     "t2d"
+   ],
+   "areas": [
+    "diabetes"
    ],
    "topic": "cardiometabolic",
    "generated_by": "human"
@@ -938,6 +1333,9 @@
     "thyroid_cancer",
     "hypothyroidism"
    ],
+   "areas": [
+    "cancer"
+   ],
    "topic": "metabolism_and_traits",
    "generated_by": "human"
   },
@@ -970,11 +1368,53 @@
     "warfarin",
     "acenocoumarol"
    ],
+   "areas": [
+    "medications"
+   ],
    "topic": "pharmacogenomics",
    "generated_by": "human"
+  },
+  {
+   "rsid": "rs9939609",
+   "gene": "FTO",
+   "name": "FTO rs9939609",
+   "risk_allele": "A",
+   "orientation": "forward",
+   "evidence": "A",
+   "generated_by": "llm:draft",
+   "summary": "Largest common obesity variant: each A allele adds about 0.4 kg/m² BMI (~1.3x obesity odds) and raises type 2 diabetes risk through weight. Regular physical activity blunts the effect by about a third.",
+   "genotypes": {
+    "TT": {
+     "label": "typical",
+     "magnitude": 0
+    },
+    "AT": {
+     "label": "~1.3x obesity risk",
+     "magnitude": 1.5
+    },
+    "AA": {
+     "label": "~1.7x obesity risk, ~3 kg heavier on average",
+     "magnitude": 2
+    }
+   },
+   "sources": [
+    "https://www.ncbi.nlm.nih.gov/snp/rs9939609",
+    "https://www.ebi.ac.uk/gwas/variants/rs9939609"
+   ],
+   "conditions": [
+    "t2d"
+   ],
+   "areas": [
+    "diabetes"
+   ],
+   "topic": "cardiometabolic"
   }
  ],
  "topics": [
+  {
+   "id": "brain_and_body",
+   "category": "lifestyle"
+  },
   {
    "id": "cardiometabolic",
    "category": "clinical"
@@ -1832,6 +2272,7 @@
    "icd10": [],
    "category": "trait",
    "rsids": [
+    "rs1360780",
     "rs4680"
    ],
    "labs": [],
@@ -1869,8 +2310,11 @@
    ],
    "category": "cardiometabolic",
    "rsids": [
+    "rs13266634",
     "rs1801282",
-    "rs7903146"
+    "rs5219",
+    "rs7903146",
+    "rs9939609"
    ],
    "labs": [
     "hba1c",
@@ -1964,6 +2408,233 @@
     "https://icd.who.int/browse10/2019/en#/E78.2"
    ],
    "reviewed_at": "2026-09-25"
+  }
+ ],
+ "areas": [
+  {
+   "id": "heart",
+   "names": {
+    "en": "Heart and blood vessels",
+    "zh": "心脏与血管",
+    "hi": "हृदय और रक्त वाहिकाएँ",
+    "es": "Corazón y vasos sanguíneos",
+    "ar": "القلب والأوعية الدموية",
+    "fr": "Cœur et vaisseaux",
+    "bn": "হৃদয় ও রক্তনালী",
+    "pt": "Coração e vasos sanguíneos",
+    "ru": "Сердце и сосуды",
+    "ur": "دل اور خون کی نالیاں",
+    "id": "Jantung dan pembuluh darah",
+    "de": "Herz und Gefäße",
+    "ja": "心臓と血管",
+    "tr": "Kalp ve damarlar",
+    "ko": "심장과 혈관",
+    "vi": "Tim và mạch máu",
+    "it": "Cuore e vasi sanguigni",
+    "pl": "Serce i naczynia",
+    "uk": "Серце та судини",
+    "nl": "Hart en bloedvaten"
+   }
+  },
+  {
+   "id": "diabetes",
+   "names": {
+    "en": "Diabetes and weight",
+    "zh": "糖尿病与体重",
+    "hi": "मधुमेह और वज़न",
+    "es": "Diabetes y peso",
+    "ar": "السكري والوزن",
+    "fr": "Diabète et poids",
+    "bn": "ডায়াবেটিস ও ওজন",
+    "pt": "Diabetes e peso",
+    "ru": "Диабет и вес",
+    "ur": "ذیابیطس اور وزن",
+    "id": "Diabetes dan berat badan",
+    "de": "Diabetes und Gewicht",
+    "ja": "糖尿病と体重",
+    "tr": "Diyabet ve kilo",
+    "ko": "당뇨병과 체중",
+    "vi": "Tiểu đường và cân nặng",
+    "it": "Diabete e peso",
+    "pl": "Cukrzyca i masa ciała",
+    "uk": "Діабет і вага",
+    "nl": "Diabetes en gewicht"
+   }
+  },
+  {
+   "id": "memory",
+   "names": {
+    "en": "Memory and brain ageing",
+    "zh": "记忆与大脑衰老",
+    "hi": "स्मृति और मस्तिष्क की उम्र",
+    "es": "Memoria y envejecimiento cerebral",
+    "ar": "الذاكرة وشيخوخة الدماغ",
+    "fr": "Mémoire et vieillissement cérébral",
+    "bn": "স্মৃতি ও মস্তিষ্কের বার্ধক্য",
+    "pt": "Memória e envelhecimento cerebral",
+    "ru": "Память и старение мозга",
+    "ur": "یادداشت اور دماغ کی عمر",
+    "id": "Memori dan penuaan otak",
+    "de": "Gedächtnis und Hirnalterung",
+    "ja": "記憶と脳の老化",
+    "tr": "Hafıza ve beyin yaşlanması",
+    "ko": "기억력과 뇌 노화",
+    "vi": "Trí nhớ và lão hóa não",
+    "it": "Memoria e invecchiamento cerebrale",
+    "pl": "Pamięć i starzenie się mózgu",
+    "uk": "Пам’ять і старіння мозку",
+    "nl": "Geheugen en hersenveroudering"
+   }
+  },
+  {
+   "id": "mental",
+   "names": {
+    "en": "Mental health and emotional stability",
+    "zh": "心理健康与情绪稳定",
+    "hi": "मानसिक स्वास्थ्य और भावनात्मक स्थिरता",
+    "es": "Salud mental y estabilidad emocional",
+    "ar": "الصحة النفسية والاستقرار العاطفي",
+    "fr": "Santé mentale et stabilité émotionnelle",
+    "bn": "মানসিক স্বাস্থ্য ও আবেগের স্থিতি",
+    "pt": "Saúde mental e estabilidade emocional",
+    "ru": "Психическое здоровье и эмоциональная устойчивость",
+    "ur": "ذہنی صحت اور جذباتی استحکام",
+    "id": "Kesehatan mental dan stabilitas emosi",
+    "de": "Psychische Gesundheit und emotionale Stabilität",
+    "ja": "メンタルヘルスと情緒の安定",
+    "tr": "Ruh sağlığı ve duygusal denge",
+    "ko": "정신 건강과 정서적 안정",
+    "vi": "Sức khỏe tâm thần và ổn định cảm xúc",
+    "it": "Salute mentale e stabilità emotiva",
+    "pl": "Zdrowie psychiczne i stabilność emocjonalna",
+    "uk": "Психічне здоров’я та емоційна стійкість",
+    "nl": "Mentale gezondheid en emotionele stabiliteit"
+   }
+  },
+  {
+   "id": "fitness",
+   "names": {
+    "en": "Strength, fitness and bones",
+    "zh": "力量、体能与骨骼",
+    "hi": "ताकत, फ़िटनेस और हड्डियाँ",
+    "es": "Fuerza, forma física y huesos",
+    "ar": "القوة واللياقة والعظام",
+    "fr": "Force, condition physique et os",
+    "bn": "শক্তি, ফিটনেস ও হাড়",
+    "pt": "Força, condicionamento e ossos",
+    "ru": "Сила, выносливость и кости",
+    "ur": "طاقت، فٹنس اور ہڈیاں",
+    "id": "Kekuatan, kebugaran dan tulang",
+    "de": "Kraft, Fitness und Knochen",
+    "ja": "筋力・体力と骨",
+    "tr": "Güç, kondisyon ve kemikler",
+    "ko": "근력, 체력과 뼈",
+    "vi": "Sức mạnh, thể lực và xương",
+    "it": "Forza, forma fisica e ossa",
+    "pl": "Siła, kondycja i kości",
+    "uk": "Сила, витривалість і кістки",
+    "nl": "Kracht, conditie en botten"
+   }
+  },
+  {
+   "id": "medications",
+   "names": {
+    "en": "Medication response",
+    "zh": "药物反应",
+    "hi": "दवाओं पर प्रतिक्रिया",
+    "es": "Respuesta a medicamentos",
+    "ar": "الاستجابة للأدوية",
+    "fr": "Réponse aux médicaments",
+    "bn": "ওষুধের প্রতিক্রিয়া",
+    "pt": "Resposta a medicamentos",
+    "ru": "Реакция на лекарства",
+    "ur": "ادویات پر ردعمل",
+    "id": "Respons terhadap obat",
+    "de": "Ansprechen auf Medikamente",
+    "ja": "薬への反応",
+    "tr": "İlaç yanıtı",
+    "ko": "약물 반응",
+    "vi": "Đáp ứng với thuốc",
+    "it": "Risposta ai farmaci",
+    "pl": "Reakcja na leki",
+    "uk": "Реакція на ліки",
+    "nl": "Reactie op medicijnen"
+   }
+  },
+  {
+   "id": "cancer",
+   "names": {
+    "en": "Cancer risk",
+    "zh": "癌症风险",
+    "hi": "कैंसर का जोखिम",
+    "es": "Riesgo de cáncer",
+    "ar": "خطر السرطان",
+    "fr": "Risque de cancer",
+    "bn": "ক্যান্সারের ঝুঁকি",
+    "pt": "Risco de câncer",
+    "ru": "Риск рака",
+    "ur": "کینسر کا خطرہ",
+    "id": "Risiko kanker",
+    "de": "Krebsrisiko",
+    "ja": "がんのリスク",
+    "tr": "Kanser riski",
+    "ko": "암 위험",
+    "vi": "Nguy cơ ung thư",
+    "it": "Rischio di cancro",
+    "pl": "Ryzyko nowotworów",
+    "uk": "Ризик раку",
+    "nl": "Kankerrisico"
+   }
+  },
+  {
+   "id": "nutrition",
+   "names": {
+    "en": "Nutrition, digestion and alcohol",
+    "zh": "营养、消化与酒精",
+    "hi": "पोषण, पाचन और शराब",
+    "es": "Nutrición, digestión y alcohol",
+    "ar": "التغذية والهضم والكحول",
+    "fr": "Nutrition, digestion et alcool",
+    "bn": "পুষ্টি, হজম ও অ্যালকোহল",
+    "pt": "Nutrição, digestão e álcool",
+    "ru": "Питание, пищеварение и алкоголь",
+    "ur": "غذائیت، ہاضمہ اور الکحل",
+    "id": "Gizi, pencernaan dan alkohol",
+    "de": "Ernährung, Verdauung und Alkohol",
+    "ja": "栄養・消化とアルコール",
+    "tr": "Beslenme, sindirim ve alkol",
+    "ko": "영양, 소화와 알코올",
+    "vi": "Dinh dưỡng, tiêu hóa và rượu",
+    "it": "Nutrizione, digestione e alcol",
+    "pl": "Odżywianie, trawienie i alkohol",
+    "uk": "Харчування, травлення та алкоголь",
+    "nl": "Voeding, spijsvertering en alcohol"
+   }
+  },
+  {
+   "id": "eyes_skin",
+   "names": {
+    "en": "Eyes and skin",
+    "zh": "眼睛与皮肤",
+    "hi": "आँखें और त्वचा",
+    "es": "Ojos y piel",
+    "ar": "العيون والجلد",
+    "fr": "Yeux et peau",
+    "bn": "চোখ ও ত্বক",
+    "pt": "Olhos e pele",
+    "ru": "Глаза и кожа",
+    "ur": "آنکھیں اور جلد",
+    "id": "Mata dan kulit",
+    "de": "Augen und Haut",
+    "ja": "目と皮膚",
+    "tr": "Gözler ve cilt",
+    "ko": "눈과 피부",
+    "vi": "Mắt và da",
+    "it": "Occhi e pelle",
+    "pl": "Oczy i skóra",
+    "uk": "Очі та шкіра",
+    "nl": "Ogen en huid"
+   }
   }
  ],
  "analytes": [
@@ -5878,5 +6549,5 @@
   "Reviewed entries: curated in the family_dna repository",
   "LOINC codes: copyright Regenstrief Institute, Inc., available at no cost at loinc.org"
  ],
- "sha256": "01a2a9752d62a967cef593ecaa13c68513d3d74b58174b4ee3dc40752b051c13"
+ "sha256": "10de4836dea7f202c856f9e52104e47d35eb81dacff3c28333e581e5f44b188e"
 }
