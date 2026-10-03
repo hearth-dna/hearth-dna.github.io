@@ -2,7 +2,7 @@ import { mirrorAttachments, pullAttachments } from '../attachments/mirror'
 import { missingLocally } from '../attachments/store'
 import { Database } from '../db/db'
 import { countAttachments, getMeta, setMeta } from '../db/repo'
-import { readHeader } from '../export/container'
+import { type GenomeEntry, readHeader } from '../export/container'
 import {
   type Elsewhere,
   isDumpFile,
@@ -51,8 +51,10 @@ export interface LoadResult {
   exportedAt: string
   /** Genome files taken, by file name, with whose DNA each was. */
   dna: { file: string; name: string }[]
-  /** Picked files that were neither a backup nor a genome anything was waiting for. */
+  /** Picked files that were neither a backup nor a genome of anyone in this browser. */
   unused: string[]
+  /** Sealed files the passphrase did not open. */
+  unopened: string[]
 }
 
 /** Genomes a loaded snapshot keeps in its folder's `genomes`; kept until their files are picked. */
@@ -602,6 +604,7 @@ class Backups {
         exportedAt: '',
         dna: [],
         unused: [],
+        unopened: [],
       }
       const same = (a: Elsewhere, b: Elsewhere) =>
         a.entry.person_id === b.entry.person_id && a.entry.sha256 === b.entry.sha256
@@ -642,9 +645,43 @@ class Backups {
         }
         out.dna.push({ file: rest[at].name, name: x.name })
       }
-      await this.setElsewhere(left)
+      // Nothing listed them (their snapshot was loaded by an older version, before the list was
+      // kept): an original is still known by its source_file row, which has its text's hash.
+      const took = new Set<string>()
+      for (const [i, g] of genomes.entries()) {
+        if (!g || used.has(i)) continue
+        const sf = await this.db.one(
+          `SELECT s.id, s.person_id, s.provider, s.build, p.display_name, p.label
+           FROM source_file s JOIN person p ON p.id = s.person_id WHERE s.sha256 = ? LIMIT 1`,
+          [g.textSha],
+        )
+        if (!sf) continue
+        used.add(i)
+        const personId = sf.person_id as string
+        took.add(personId)
+        const has = await this.db.query('SELECT 1 FROM genotype WHERE person_id=? LIMIT 1', [personId])
+        if (!has.length) {
+          const entry: GenomeEntry = {
+            path: '',
+            sha256: g.sha256,
+            person_id: personId,
+            source_file_id: sf.id as string,
+            provider: sf.provider as GenomeEntry['provider'],
+            build: sf.build as string,
+            kind: 'original',
+          }
+          await restoreGenome(this.db, entry, g.gz, onProgress, {
+            n: out.dna.length + 1,
+            total: genomes.length,
+          })
+          out.genomes++
+        }
+        out.dna.push({ file: rest[i].name, name: (sf.display_name as string) || (sf.label as string) })
+      }
+      await this.setElsewhere(left.filter((x) => !took.has(x.entry.person_id)))
       if (dumps.length) this.missing = missing
-      out.unused = rest.filter((_, i) => !used.has(i)).map((f) => f.name)
+      out.unused = rest.filter((_, i) => !used.has(i) && genomes[i]).map((f) => f.name)
+      out.unopened = rest.filter((_, i) => !genomes[i]).map((f) => f.name)
       for (const l of this.pulledListeners) l()
       return out
     } finally {

@@ -1017,5 +1017,6 @@
   "backupCard.loadGenomes": "Cargar archivos de ADN…",
   "backupCard.genomesLoaded": "Se cargó el ADN de {n} personas.",
   "backupCard.dnaFrom": "ADN de {name} desde {file}.",
-  "backupCard.notUsed": "No usados: {files}. No son una copia ni archivos de ADN de esta copia."
+  "backupCard.notUsed": "No usados: {files}. Nadie en este navegador tiene este ADN: elija estos archivos junto con el archivo de copia en «Cargar copia».",
+  "backupCard.notOpened": "No se pudo abrir {files} con esta contraseña. Escriba la contraseña de la carpeta de copias."
 }
