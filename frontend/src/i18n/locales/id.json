@@ -1016,5 +1016,6 @@
   "backupCard.pickGenomes": "Pilih semua file di folder genomes itu dengan «Muat file DNA», atau pilih bersama file cadangan di «Muat cadangan».",
   "backupCard.loadGenomes": "Muat file DNA…",
   "backupCard.genomesLoaded": "DNA {n} orang telah dimuat.",
-  "backupCard.genomesUnmatched": "{n} file yang dipilih bukan DNA dari cadangan ini, atau dienkripsi dengan frasa sandi lain."
+  "backupCard.dnaFrom": "DNA {name} dari {file}.",
+  "backupCard.notUsed": "Tidak dipakai: {files}. Ini bukan cadangan, juga bukan file DNA dari cadangan ini."
 }

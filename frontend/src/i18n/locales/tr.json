@@ -1016,5 +1016,6 @@
   "backupCard.pickGenomes": "O genomes klasöründeki tüm dosyaları ‘DNA dosyalarını yükle’ ile seçin ya da ‘Yedeği yükle’de yedek dosyasıyla birlikte seçin.",
   "backupCard.loadGenomes": "DNA dosyalarını yükle…",
   "backupCard.genomesLoaded": "{n} kişinin DNA'sı yüklendi.",
-  "backupCard.genomesUnmatched": "Seçilen dosyalardan {n} tanesi bu yedeğe ait DNA değil ya da başka bir parolayla şifrelenmiş."
+  "backupCard.dnaFrom": "{name} için DNA, {file} dosyasından.",
+  "backupCard.notUsed": "Kullanılmadı: {files}. Bunlar bir yedek ya da bu yedeğin DNA dosyaları değil."
 }

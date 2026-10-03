@@ -1,8 +1,10 @@
+import { gunzipSync, gzipSync, strFromU8, strToU8 } from 'fflate'
 import { isEncrypted, opener, sealer } from '../attachments/crypto'
 import type { Database } from '../db/db'
 import { type GenomeEntry, sha256 } from '../export/container'
-import type { LoadGenome } from '../export/restore'
+import type { Elsewhere, LoadGenome } from '../export/restore'
 import type { GenomeFile } from '../export/snapshot'
+import { sha256Hex } from '../import/unpack'
 import type { Dir } from './folder'
 import { genomesDirName } from './naming'
 
@@ -59,31 +61,54 @@ export async function genomeLoader(
   }
 }
 
+/** A picked file as a possible genome: its gzip bytes and both hashes a manifest may know it by. */
+export interface PickedGenome {
+  gz: Uint8Array
+  /** sha256 of `gz` (the manifest entry's `sha256`, when the copy is byte for byte). */
+  sha256: string
+  /** sha256 of the text inside (an original's `source_file` hash). */
+  textSha: string
+}
+
+const isGzip = (b: Uint8Array) => b[0] === 0x1f && b[1] === 0x8b
+
 /**
- * Files the user picked by hand that may be genome files (a folder snapshot's `genomes`, picked
- * on a phone that loads the snapshot from a cloud drive), by content hash: whatever the drive
- * renamed a copy to, the hash finds its manifest entry. Sealed ones are opened with the
- * passphrase; a file that is not a genome simply matches nothing (`null` when it cannot be read).
+ * Files the user picked by hand that may be genome files (a folder snapshot's `genomes`, picked on
+ * a phone that loads the snapshot from a cloud drive). Sealed ones are opened with the passphrase.
+ * A drive or phone may hand a `.gz` over already decompressed, so plain text counts too, and is
+ * known by the hash of its text. `null` for a file sealed with another passphrase.
  */
-export async function openGenomeFiles(
+export async function readPickedGenomes(
   files: Uint8Array[],
   passphrase: string | null,
-): Promise<{ byHash: Map<string, Uint8Array>; hashes: (string | null)[] }> {
+): Promise<(PickedGenome | null)[]> {
   const open = passphrase ? await opener(passphrase) : null
-  const byHash = new Map<string, Uint8Array>()
-  const hashes: (string | null)[] = []
+  const out: (PickedGenome | null)[] = []
   for (const raw of files) {
     if (isEncrypted(raw) && !open) throw new Error('the genome files are encrypted; enter the passphrase')
-    let gz: Uint8Array
+    let bytes: Uint8Array
     try {
-      gz = isEncrypted(raw) && open ? await open(raw) : raw
+      bytes = isEncrypted(raw) && open ? await open(raw) : raw
     } catch {
-      hashes.push(null) // sealed with another passphrase
+      out.push(null)
       continue
     }
-    const hash = await sha256(gz)
-    byHash.set(hash, gz)
-    hashes.push(hash)
+    let text: string
+    try {
+      text = strFromU8(isGzip(bytes) ? gunzipSync(bytes) : bytes)
+    } catch {
+      out.push(null) // a broken gzip
+      continue
+    }
+    const gz = isGzip(bytes) ? bytes : gzipSync(strToU8(text))
+    out.push({ gz, sha256: await sha256(isGzip(bytes) ? bytes : gz), textSha: await sha256Hex(text) })
   }
-  return { byHash, hashes }
+  return out
+}
+
+/** Which picked file is the genome `e` waits for: the same bytes, or the same text inside. */
+export function pickFor(e: Elsewhere, picked: (PickedGenome | null)[]): number {
+  return picked.findIndex(
+    (p) => !!p && (p.sha256 === e.entry.sha256 || (!!e.textSha && p.textSha === e.textSha)),
+  )
 }

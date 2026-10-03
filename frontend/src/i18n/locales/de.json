@@ -1016,5 +1016,6 @@
   "backupCard.pickGenomes": "Wählen Sie alle Dateien aus diesem Ordner genomes mit „DNA-Dateien laden“, oder zusammen mit der Sicherungsdatei unter „Sicherung laden“.",
   "backupCard.loadGenomes": "DNA-Dateien laden…",
   "backupCard.genomesLoaded": "DNA von {n} Personen geladen.",
-  "backupCard.genomesUnmatched": "{n} der gewählten Dateien sind keine DNA aus dieser Sicherung oder wurden mit einem anderen Passwort verschlüsselt."
+  "backupCard.dnaFrom": "DNA von {name} aus {file}.",
+  "backupCard.notUsed": "Nicht verwendet: {files}. Sie sind keine Sicherung und keine DNA-Dateien dieser Sicherung."
 }

@@ -1,9 +1,11 @@
+import { gunzipSync, gzipSync, strFromU8, strToU8 } from 'fflate'
 import { describe, expect, it } from 'vitest'
 import { isEncrypted, sealer } from '../attachments/crypto'
 import type { Database } from '../db/db'
 import { sha256 } from '../export/container'
+import { sha256Hex } from '../import/unpack'
 import type { Dir } from './folder'
-import { genomeLoader, mirrorGenomes, openGenomeFiles } from './genomes'
+import { genomeLoader, mirrorGenomes, pickFor, readPickedGenomes } from './genomes'
 
 /** A folder in memory, with a count of writes so "written once" can be asserted. */
 function memoryDir(name = 'root'): Dir & { files: Map<string, Uint8Array>; writes: () => number } {
@@ -66,19 +68,35 @@ describe('genome files beside a folder snapshot', () => {
 })
 
 describe('genome files picked by hand', () => {
-  const gz = new Uint8Array([31, 139, 8, 0, 9, 9, 9])
-  const other = new Uint8Array([31, 139, 8, 0, 7, 7, 7])
+  const text = 'rs1\t1\t100\tAG\n'
+  const gz = gzipSync(strToU8(text))
+  const waiting = async () => ({
+    entry: { ...entry, sha256: await sha256(gz) },
+    name: 'Alex',
+    textSha: await sha256Hex(text),
+  })
 
-  it('are known by their content hash, whatever they are called', async () => {
-    const r = await openGenomeFiles([other, gz], null)
-    expect(r.hashes).toEqual([await sha256(other), await sha256(gz)])
-    expect(r.byHash.get(await sha256(gz))).toEqual(gz)
+  it('are matched by their bytes, whatever they are called', async () => {
+    const picked = await readPickedGenomes([new Uint8Array([1, 2, 3]), gz], null)
+    expect(pickFor(await waiting(), picked)).toBe(1)
+  })
+
+  it('are matched by the text inside when the copy was decompressed or compressed again', async () => {
+    const again = gzipSync(strToU8(text), { level: 1, mtime: 1 })
+    for (const copy of [strToU8(text), again]) {
+      const picked = await readPickedGenomes([copy], null)
+      expect(pickFor(await waiting(), picked)).toBe(0)
+      expect(strFromU8(gunzipSync((picked[0] as { gz: Uint8Array }).gz))).toBe(text)
+    }
+    expect(
+      pickFor({ ...(await waiting()), textSha: undefined }, await readPickedGenomes([again], null)),
+    ).toBe(-1)
   })
 
   it('are opened with the passphrase when sealed, and need it', async () => {
     const sealed = await (await sealer('correct horse'))(gz)
-    expect((await openGenomeFiles([sealed], 'correct horse')).hashes).toEqual([await sha256(gz)])
-    expect((await openGenomeFiles([sealed], 'wrong')).hashes).toEqual([null])
-    await expect(openGenomeFiles([sealed], null)).rejects.toThrow(/passphrase/)
+    expect(pickFor(await waiting(), await readPickedGenomes([sealed], 'correct horse'))).toBe(0)
+    expect(await readPickedGenomes([sealed], 'wrong')).toEqual([null])
+    await expect(readPickedGenomes([sealed], null)).rejects.toThrow(/passphrase/)
   })
 })

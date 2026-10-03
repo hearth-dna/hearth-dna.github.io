@@ -66,5 +66,6 @@
   "backupCard.pickGenomes": "Pick every file in that genomes folder with Load DNA files, or select them together with the backup file in Load backup.",
   "backupCard.loadGenomes": "Load DNA files…",
   "backupCard.genomesLoaded": "Loaded the DNA of {n} people.",
-  "backupCard.genomesUnmatched": "{n} of the picked files are not DNA from this backup, or were encrypted with another passphrase."
+  "backupCard.dnaFrom": "DNA for {name} from {file}.",
+  "backupCard.notUsed": "Not used: {files}. They are not a backup, nor DNA files this backup lists."
 }
