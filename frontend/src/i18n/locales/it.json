@@ -49,7 +49,6 @@
   "askPage.previewHeading": "Anteprima: esattamente ciò che verrà copiato ({chars} caratteri, circa {tokens} token)",
   "askPage.copyButton": "Copia pacchetto di contesto…",
   "askPage.copied": "Copiato per {destination}. Ora incollalo nell'assistente.",
-  "askPage.openAssistant": "Apri tu stesso l'assistente: <chatgpt>ChatGPT</chatgpt> · <claude>Claude</claude> · <gemini>Gemini</gemini>. Questi link non trasportano dati. Gli account chat consumer possono usare le conversazioni per l'addestramento a meno che tu non lo disattivi nelle impostazioni del fornitore; valuta di farlo prima di incollare informazioni sulla salute.",
   "askPage.confirmTitle": "Prima di copiare",
   "askPage.confirmBody": "Il testo dell'anteprima verrà messo negli appunti. Una volta incollato in un servizio di terzi, è regolato dai <em>loro</em> termini e dalla loro informativa sulla privacy, non da quelli di Hearth.",
   "askPage.confirmCounts": "{genotypes} genotipi e {healthEntries} voci del diario della salute per {people} {peopleWord}, {naming}",
@@ -780,6 +779,16 @@
   "dnaPage.draft": "bozza, non ancora rivista",
   "dnaPage.evidenceLegend": "Evidenza: A = linea guida clinica o ben replicato, B = associazione replicata, C = preliminare. I genotipi colorati hanno impatto 2 o superiore.",
   "dnaPage.sendHeading": "Invia a un assistente",
-  "dnaPage.sendIntro": "Il pacchetto di contesto contiene i marcatori mostrati sopra per le persone scelte, pseudonimizzati a meno che tu non attivi i nomi reali. Restringi i filtri per inviare meno.",
-  "dnaPage.question": "Domanda (facoltativa)"
+  "dnaPage.sendIntro": "Il pacchetto di contesto contiene i marcatori mostrati sopra per le persone selezionate, o solo quelli che spunti, pseudonimizzati a meno che tu non attivi i nomi reali. Restringi i filtri o spunta i marcatori per inviare meno.",
+  "dnaPage.question": "Domanda (facoltativa)",
+  "askPage.openIn": "Apri in:",
+  "askPage.tooLong": "Con {chars} caratteri il pacchetto è troppo lungo per un link; copialo invece, o includi meno elementi.",
+  "askPage.trainingNotice": "Gli account chat per consumatori possono usare le conversazioni per l'addestramento se non lo disattivi nelle impostazioni del fornitore; valuta di farlo prima di inviare informazioni sanitarie.",
+  "askPage.confirmLinkBody": "Il testo dell'anteprima verrà inserito nell'indirizzo di una nuova pagina di {assistant}: viene inviato a {assistant} e resta nella cronologia del browser. Da lì è regolato dai <em>loro</em> termini e dalla loro informativa sulla privacy, non da quelli di Hearth.",
+  "askPage.confirmOpen": "Ho controllato l'anteprima — apri {assistant}",
+  "askPage.opened": "Aperto in {assistant}.",
+  "dnaPage.pick": "invia questo marcatore",
+  "dnaPage.picked": "{n} marcatori spuntati; solo questi vanno nel pacchetto di contesto.",
+  "dnaPage.sendPicked": "Invia…",
+  "dnaPage.clearPicked": "togli tutte le spunte"
 }

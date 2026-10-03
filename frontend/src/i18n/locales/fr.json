@@ -49,7 +49,6 @@
   "askPage.previewHeading": "Aperçu — exactement ce qui sera copié ({chars} caractères, environ {tokens} jetons)",
   "askPage.copyButton": "Copier le dossier de contexte…",
   "askPage.copied": "Copié pour {destination}. Collez-le maintenant dans l'assistant.",
-  "askPage.openAssistant": "Ouvrez l'assistant vous-même : <chatgpt>ChatGPT</chatgpt> · <claude>Claude</claude> · <gemini>Gemini</gemini>. Ces liens ne transportent aucune donnée. Les comptes de chat grand public peuvent utiliser les conversations pour l'entraînement sauf si vous le désactivez dans les réglages du fournisseur ; pensez-y avant de coller des informations de santé.",
   "askPage.confirmTitle": "Avant de copier",
   "askPage.confirmBody": "Le texte de l'aperçu sera placé dans votre presse-papiers. Une fois collé dans un service tiers, il est régi par <em>ses</em> conditions et sa politique de confidentialité, pas celles de Hearth.",
   "askPage.confirmCounts": "{genotypes} génotypes et {healthEntries} entrées du journal de santé pour {people} {peopleWord}, {naming}",
@@ -780,6 +779,16 @@
   "dnaPage.draft": "brouillon, pas encore relu",
   "dnaPage.evidenceLegend": "Niveau de preuve : A = recommandation clinique ou bien répliqué, B = association répliquée, C = préliminaire. Les génotypes en couleur ont un impact de 2 ou plus.",
   "dnaPage.sendHeading": "Envoyer à un assistant",
-  "dnaPage.sendIntro": "Le paquet de contexte contient les marqueurs affichés ci-dessus pour les personnes choisies, pseudonymisés sauf si vous activez les vrais noms. Resserrez les filtres pour envoyer moins.",
-  "dnaPage.question": "Question (facultatif)"
+  "dnaPage.sendIntro": "Le pack de contexte contient les marqueurs affichés ci-dessus pour les personnes sélectionnées, ou seulement ceux que vous cochez, pseudonymisés sauf si vous activez les vrais noms. Affinez les filtres ou cochez des marqueurs pour envoyer moins.",
+  "dnaPage.question": "Question (facultatif)",
+  "askPage.openIn": "Ouvrir dans :",
+  "askPage.tooLong": "Avec {chars} caractères, le pack est trop long pour un lien ; copiez-le plutôt, ou incluez moins d'éléments.",
+  "askPage.trainingNotice": "Les comptes de chat grand public peuvent utiliser les conversations pour l'entraînement si vous ne le désactivez pas dans les réglages du fournisseur ; pensez-y avant d'envoyer des informations de santé.",
+  "askPage.confirmLinkBody": "Le texte de l'aperçu sera placé dans l'adresse d'une nouvelle page {assistant} : il est envoyé à {assistant} et reste dans l'historique du navigateur. Il relève alors de <em>leurs</em> conditions et de leur politique de confidentialité, pas de celles de Hearth.",
+  "askPage.confirmOpen": "J'ai vérifié l'aperçu — ouvrir {assistant}",
+  "askPage.opened": "Ouvert dans {assistant}.",
+  "dnaPage.pick": "envoyer ce marqueur",
+  "dnaPage.picked": "{n} marqueurs cochés ; seuls ceux-ci vont dans le pack de contexte.",
+  "dnaPage.sendPicked": "Envoyer…",
+  "dnaPage.clearPicked": "tout décocher"
 }

@@ -49,7 +49,6 @@
   "askPage.previewHeading": "Voorbeeld – precies wat gekopieerd wordt ({chars} tekens, ongeveer {tokens} tokens)",
   "askPage.copyButton": "Contextpakket kopiëren…",
   "askPage.copied": "Gekopieerd voor {destination}. Plak het nu in de assistent.",
-  "askPage.openAssistant": "Open de assistent zelf: <chatgpt>ChatGPT</chatgpt> · <claude>Claude</claude> · <gemini>Gemini</gemini>. Deze links dragen geen gegevens over. Consumentenchataccounts kunnen gesprekken gebruiken voor training tenzij u dat uitschakelt in de instellingen van de aanbieder; overweeg dat voordat u gezondheidsinformatie plakt.",
   "askPage.confirmTitle": "Voordat u kopieert",
   "askPage.confirmBody": "De tekst in het voorbeeld wordt op uw klembord gezet. Zodra die in een dienst van derden is geplakt, gelden <em>hun</em> voorwaarden en privacybeleid, niet die van Hearth.",
   "askPage.confirmCounts": "{genotypes} genotypen en {healthEntries} gezondheidslogboek-items voor {people} {peopleWord}, {naming}",
@@ -780,6 +779,16 @@
   "dnaPage.draft": "concept, nog niet nagekeken",
   "dnaPage.evidenceLegend": "Bewijs: A = klinische richtlijn of goed gerepliceerd, B = gerepliceerde associatie, C = voorlopig. Gekleurde genotypen hebben impact 2 of meer.",
   "dnaPage.sendHeading": "Naar een assistent sturen",
-  "dnaPage.sendIntro": "Het contextpakket bevat de hierboven getoonde markers voor de gekozen personen, gepseudonimiseerd tenzij u echte namen aanzet. Verfijn de filters om minder te sturen.",
-  "dnaPage.question": "Vraag (optioneel)"
+  "dnaPage.sendIntro": "Het contextpakket bevat de hierboven getoonde markers van de geselecteerde personen, of alleen de markers die u aanvinkt, gepseudonimiseerd tenzij u echte namen aanzet. Beperk de filters of vink markers aan om minder te sturen.",
+  "dnaPage.question": "Vraag (optioneel)",
+  "askPage.openIn": "Openen in:",
+  "askPage.tooLong": "Met {chars} tekens is het pakket te lang voor een link; kopieer het of neem minder gegevens op.",
+  "askPage.trainingNotice": "Consumentenchataccounts kunnen gesprekken gebruiken voor training, tenzij u dat uitzet in de instellingen van de aanbieder; overweeg dat voordat u gezondheidsgegevens verstuurt.",
+  "askPage.confirmLinkBody": "De tekst uit het voorbeeld wordt in het adres van een nieuwe {assistant}-pagina gezet: hij wordt naar {assistant} gestuurd en blijft in uw browsergeschiedenis. Vanaf dan gelden <em>hun</em> voorwaarden en privacybeleid, niet die van Hearth.",
+  "askPage.confirmOpen": "Ik heb het voorbeeld gecontroleerd — {assistant} openen",
+  "askPage.opened": "Geopend in {assistant}.",
+  "dnaPage.pick": "deze marker versturen",
+  "dnaPage.picked": "{n} markers aangevinkt; alleen deze gaan in het contextpakket.",
+  "dnaPage.sendPicked": "Versturen…",
+  "dnaPage.clearPicked": "alles uitvinken"
 }

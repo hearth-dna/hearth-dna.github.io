@@ -49,7 +49,6 @@
   "askPage.previewHeading": "プレビュー — コピーされる内容そのもの（{chars} 文字、約 {tokens} トークン）",
   "askPage.copyButton": "コンテキストパックをコピー…",
   "askPage.copied": "{destination} 用にコピーしました。アシスタントに貼り付けてください。",
-  "askPage.openAssistant": "アシスタントはご自身で開いてください: <chatgpt>ChatGPT</chatgpt> · <claude>Claude</claude> · <gemini>Gemini</gemini>。これらのリンクにデータは含まれません。一般向けチャットアカウントでは、提供元の設定でオフにしない限り会話が学習に使われることがあります。健康情報を貼り付ける前にオフにすることを検討してください。",
   "askPage.confirmTitle": "コピーする前に",
   "askPage.confirmBody": "プレビューのテキストがクリップボードに置かれます。第三者のサービスに貼り付けた後は、Hearth ではなく<em>そのサービス</em>の利用規約とプライバシーポリシーが適用されます。",
   "askPage.confirmCounts": "{people} {peopleWord}分の遺伝子型 {genotypes} 件と健康記録 {healthEntries} 件、{naming}",
@@ -780,6 +779,16 @@
   "dnaPage.draft": "下書き（未レビュー）",
   "dnaPage.evidenceLegend": "エビデンス：A = 臨床ガイドラインまたは十分に再現、B = 再現された関連、C = 予備的。色付きの遺伝型は影響が 2 以上です。",
   "dnaPage.sendHeading": "アシスタントに送る",
-  "dnaPage.sendIntro": "コンテキストパックには、選んだ人について上に表示されたマーカーが含まれます。実名をオンにしない限り仮名です。送る量を減らすには絞り込んでください。",
-  "dnaPage.question": "質問（任意）"
+  "dnaPage.sendIntro": "コンテキストパックには、選択した人について上に表示されたマーカー、またはチェックしたものだけが入ります。実名をオンにしない限り仮名です。送る量を減らすにはフィルターを絞るか、マーカーをチェックしてください。",
+  "dnaPage.question": "質問（任意）",
+  "askPage.openIn": "開く:",
+  "askPage.tooLong": "{chars} 文字のパックはリンクで送るには長すぎます。代わりにコピーするか、含める記録を減らしてください。",
+  "askPage.trainingNotice": "個人向けチャットアカウントは、プロバイダーの設定でオフにしない限り会話を学習に使うことがあります。健康情報を送る前にオフにすることを検討してください。",
+  "askPage.confirmLinkBody": "プレビューのテキストは新しい {assistant} ページのアドレスに入れられます。テキストは {assistant} に送られ、ブラウザーの履歴に残ります。以降は Hearth ではなく<em>先方</em>の規約とプライバシーポリシーが適用されます。",
+  "askPage.confirmOpen": "プレビューを確認しました — {assistant} を開く",
+  "askPage.opened": "{assistant} で開きました。",
+  "dnaPage.pick": "このマーカーを送る",
+  "dnaPage.picked": "{n} 件のマーカーをチェック中。コンテキストパックにはこれらだけが入ります。",
+  "dnaPage.sendPicked": "送る…",
+  "dnaPage.clearPicked": "すべてのチェックを外す"
 }

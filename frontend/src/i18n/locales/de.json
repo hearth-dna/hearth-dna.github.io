@@ -49,7 +49,6 @@
   "askPage.previewHeading": "Vorschau – genau das wird kopiert ({chars} Zeichen, etwa {tokens} Tokens)",
   "askPage.copyButton": "Kontextpaket kopieren…",
   "askPage.copied": "Für {destination} kopiert. Fügen Sie es jetzt im Assistenten ein.",
-  "askPage.openAssistant": "Öffnen Sie den Assistenten selbst: <chatgpt>ChatGPT</chatgpt> · <claude>Claude</claude> · <gemini>Gemini</gemini>. Diese Links übertragen keine Daten. Verbraucher-Chatkonten können Unterhaltungen zum Training verwenden, sofern Sie das nicht in den Einstellungen des Anbieters abschalten; erwägen Sie das, bevor Sie Gesundheitsinformationen einfügen.",
   "askPage.confirmTitle": "Bevor Sie kopieren",
   "askPage.confirmBody": "Der Text in der Vorschau wird in Ihre Zwischenablage gelegt. Sobald er in einen Dienst eines Drittanbieters eingefügt ist, gelten <em>dessen</em> Bedingungen und Datenschutzrichtlinien, nicht die von Hearth.",
   "askPage.confirmCounts": "{genotypes} Genotypen und {healthEntries} Gesundheitseinträge für {people} {peopleWord}, {naming}",
@@ -780,6 +779,16 @@
   "dnaPage.draft": "Entwurf, noch nicht geprüft",
   "dnaPage.evidenceLegend": "Evidenz: A = klinische Leitlinie oder gut repliziert, B = replizierte Assoziation, C = vorläufig. Farbig markierte Genotypen haben Einfluss 2 oder mehr.",
   "dnaPage.sendHeading": "An einen Assistenten senden",
-  "dnaPage.sendIntro": "Das Kontextpaket enthält die oben gezeigten Marker der ausgewählten Personen, pseudonymisiert, sofern Sie echte Namen nicht einschalten. Engen Sie die Filter ein, um weniger zu senden.",
-  "dnaPage.question": "Frage (optional)"
+  "dnaPage.sendIntro": "Das Kontextpaket enthält die oben gezeigten Marker der ausgewählten Personen oder nur die angehakten, pseudonymisiert, solange Sie echte Namen nicht einschalten. Engen Sie die Filter ein oder haken Sie Marker an, um weniger zu senden.",
+  "dnaPage.question": "Frage (optional)",
+  "askPage.openIn": "Öffnen in:",
+  "askPage.tooLong": "Mit {chars} Zeichen ist das Paket zu lang für einen Link; kopieren Sie es stattdessen oder nehmen Sie weniger Einträge auf.",
+  "askPage.trainingNotice": "Private Chat-Konten können Unterhaltungen zum Training verwenden, wenn Sie das nicht in den Einstellungen des Anbieters abschalten; erwägen Sie das, bevor Sie Gesundheitsdaten senden.",
+  "askPage.confirmLinkBody": "Der Text aus der Vorschau wird in die Adresse einer neuen {assistant}-Seite gesetzt: Er wird an {assistant} gesendet und bleibt im Browserverlauf. Ab dann gelten <em>deren</em> Bedingungen und Datenschutzrichtlinie, nicht die von Hearth.",
+  "askPage.confirmOpen": "Ich habe die Vorschau geprüft — {assistant} öffnen",
+  "askPage.opened": "In {assistant} geöffnet.",
+  "dnaPage.pick": "diesen Marker senden",
+  "dnaPage.picked": "{n} Marker angehakt; nur diese kommen ins Kontextpaket.",
+  "dnaPage.sendPicked": "Senden…",
+  "dnaPage.clearPicked": "alle abwählen"
 }

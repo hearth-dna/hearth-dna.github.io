@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useApp } from '../app/context'
 import { buildContextPack, packStats } from '../ask/contextPack'
 import { PROMPTS } from '../ask/prompts'
@@ -20,8 +20,8 @@ const EXPLAIN = PROMPTS.find((p) => p.id === 'explain')
 /**
  * The DNA viewer (`/dna`, `/dna/<person>`): every marker the knowledge base describes, most
  * clinically useful first, with each person's genotype beside it. Filter by person, area of
- * medicine, text and notability; what is shown becomes a context pack to copy or share into an
- * assistant, previewed exactly as it leaves.
+ * medicine, text and notability; what is shown, or only the markers ticked, becomes a context
+ * pack to copy, share or open in an assistant, previewed exactly as it leaves.
  */
 export function DnaPage({ person: who, onPerson }: { person: string; onPerson: (id: string) => void }) {
   const { db, kb, persons, counts } = useApp()
@@ -31,6 +31,9 @@ export function DnaPage({ person: who, onPerson }: { person: string; onPerson: (
   const [filter, setFilter] = useState<ViewerFilter>(NO_VIEWER_FILTER)
   const [question, setQuestion] = useState('')
   const [realNames, setRealNames] = useState(false)
+  /** Ticked markers (rsids); when any of them is shown, only those go into the pack. */
+  const [picked, setPicked] = useState<string[]>([])
+  const send = useRef<HTMLDivElement>(null)
 
   const withDna = useMemo(() => persons.filter((p) => counts[p.id]), [persons, counts])
   const shown = useMemo(() => withDna.filter((p) => !who || p.id === who), [withDna, who])
@@ -68,7 +71,10 @@ export function DnaPage({ person: who, onPerson }: { person: string; onPerson: (
     return a ? areaName(a, lang) : id
   }
 
-  const packed = viewerPackPeople(rows, shown)
+  const pickedRows = rows.filter((r) => picked.includes(r.entry.rsid))
+  const togglePick = (rsid: string) =>
+    setPicked((ps) => (ps.includes(rsid) ? ps.filter((x) => x !== rsid) : [...ps, rsid]))
+  const packed = viewerPackPeople(pickedRows.length ? pickedRows : rows, shown)
   const asked = question.trim() || viewerQuestion(kb, filter.areas)
   const options = { question: asked, people: packed, realNames, template: EXPLAIN, compact: true }
   const pack = buildContextPack(options)
@@ -143,6 +149,21 @@ export function DnaPage({ person: who, onPerson }: { person: string; onPerson: (
       </div>
 
       <div className="card">
+        {pickedRows.length > 0 && (
+          <div className="row mb-3">
+            <span>{t('dnaPage.picked', { n: pickedRows.length })}</span>
+            <button
+              type="button"
+              className="small primary"
+              onClick={() => send.current?.scrollIntoView({ behavior: 'smooth' })}
+            >
+              {t('dnaPage.sendPicked')}
+            </button>
+            <button type="button" className="small" onClick={() => setPicked([])}>
+              {t('dnaPage.clearPicked')}
+            </button>
+          </div>
+        )}
         {rows.length === 0 ? (
           <p className="muted">{t('dnaPage.noRows')}</p>
         ) : (
@@ -150,6 +171,7 @@ export function DnaPage({ person: who, onPerson }: { person: string; onPerson: (
             <table>
               <thead>
                 <tr>
+                  {shown.length > 0 && <th aria-label={t('dnaPage.pick')} />}
                   <th>{t('dnaPage.colMarker')}</th>
                   {shown.map((p) => (
                     <th key={p.id}>{p.displayName}</th>
@@ -160,6 +182,16 @@ export function DnaPage({ person: who, onPerson }: { person: string; onPerson: (
               <tbody>
                 {rows.map(({ entry: e, findings }) => (
                   <tr key={e.rsid}>
+                    {shown.length > 0 && (
+                      <td>
+                        <input
+                          type="checkbox"
+                          aria-label={t('dnaPage.pick')}
+                          checked={picked.includes(e.rsid)}
+                          onChange={() => togglePick(e.rsid)}
+                        />
+                      </td>
+                    )}
                     <td>
                       <strong>{e.gene}</strong>{' '}
                       <a href={`https://www.ncbi.nlm.nih.gov/snp/${e.rsid}`} target="_blank" rel="noreferrer">
@@ -214,7 +246,7 @@ export function DnaPage({ person: who, onPerson }: { person: string; onPerson: (
 
       {shown.length > 0 && (
         <>
-          <div className="card">
+          <div className="card" ref={send}>
             <h2>{t('dnaPage.sendHeading')}</h2>
             <p className="muted">{t('dnaPage.sendIntro')}</p>
             <label className="field">

@@ -92,8 +92,8 @@ button, .btn {
 button:hover:not(:disabled), .btn:hover { background: var(--surface-2); border-color: var(--muted); }
 button:active:not(:disabled) { transform: translateY(0.5px); }
 button:disabled { opacity: 0.5; cursor: not-allowed; }
-button.primary { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); font-weight: 550; }
-button.primary:hover:not(:disabled) { background: var(--accent-hover); border-color: var(--accent-hover); }
+button.primary, .btn.primary { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); font-weight: 550; }
+button.primary:hover:not(:disabled), .btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
 button.danger { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 55%, var(--line)); }
 button.danger:hover:not(:disabled) { background: var(--danger); border-color: var(--danger); color: #fff; }
 button.ghost { background: transparent; border-color: transparent; }

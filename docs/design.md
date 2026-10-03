@@ -197,7 +197,11 @@ to be the most-used tier.
    (`Person A`, 42, male) by default; a toggle restores them. A counter shows how many genotypes,
    lab values and free-text fields are included, with per-item remove buttons.
 4. Tier 0/1 answer inline. Tier 2: "Copy context" and "Copy context + prompt" buttons, plus
-   "Open in…" links for ChatGPT / Claude / Gemini that only open the site, never pass data via URL.
+   "Open in…" links for ChatGPT / Claude / Mistral / Google AI Mode that open the assistant with
+   the pack already typed in (`?q=`). The pack then travels in the address, so it also reaches the
+   browser history; each link is confirmed and logged exactly like a copy, and a pack too long
+   for an address (`MAX_URL`) can only be copied. On the DNA page, ticking markers narrows the
+   pack to them.
    Tier 3: send after an explicit confirmation dialog.
 5. The user can paste the assistant's reply back into a note attached to the question; the app
    stores Q, context and A locally in `chat`.

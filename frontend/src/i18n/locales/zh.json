@@ -49,7 +49,6 @@
   "askPage.previewHeading": "预览——即将复制的完整内容（{chars} 个字符，约 {tokens} 个 token）",
   "askPage.copyButton": "复制上下文包…",
   "askPage.copied": "已为 {destination} 复制。现在请将其粘贴到助手中。",
-  "askPage.openAssistant": "请自行打开助手：<chatgpt>ChatGPT</chatgpt> · <claude>Claude</claude> · <gemini>Gemini</gemini>。这些链接不携带任何数据。除非您在服务商设置中关闭，否则消费者版聊天账户可能会将对话用于训练；粘贴健康信息前请考虑先关闭。",
   "askPage.confirmTitle": "复制之前",
   "askPage.confirmBody": "预览中的文本将被放入您的剪贴板。一旦粘贴到第三方服务，将受<em>该服务</em>的条款和隐私政策约束，而非 Hearth 的。",
   "askPage.confirmCounts": "{people} {peopleWord}的 {genotypes} 个基因型和 {healthEntries} 条健康日志记录，{naming}",
@@ -780,6 +779,16 @@
   "dnaPage.draft": "草稿，尚未审核",
   "dnaPage.evidenceLegend": "证据：A = 临床指南或充分重复验证，B = 已重复的关联，C = 初步。带颜色的基因型影响为 2 或以上。",
   "dnaPage.sendHeading": "发送给助手",
-  "dnaPage.sendIntro": "上下文包包含上方为所选人员显示的标记，除非你开启真实姓名，否则使用化名。收窄筛选条件可以发送更少内容。",
-  "dnaPage.question": "问题（可选）"
+  "dnaPage.sendIntro": "上下文包包含上方为所选人员显示的标记，或仅包含你勾选的标记；除非你开启真实姓名，否则使用化名。缩小筛选范围或勾选标记即可少发送一些。",
+  "dnaPage.question": "问题（可选）",
+  "askPage.openIn": "打开于：",
+  "askPage.tooLong": "数据包有 {chars} 个字符，太长，无法通过链接发送；请改为复制，或少包含一些记录。",
+  "askPage.trainingNotice": "除非你在服务商的设置中关闭，个人聊天账户可能会用对话来训练模型；发送健康信息前请考虑关闭。",
+  "askPage.confirmLinkBody": "预览中的文本将放入一个新的 {assistant} 页面地址中：它会发送给 {assistant}，并留在浏览器历史记录里。此后它受<em>对方</em>的条款和隐私政策约束，而不是 Hearth 的。",
+  "askPage.confirmOpen": "我已检查预览 — 打开 {assistant}",
+  "askPage.opened": "已在 {assistant} 中打开。",
+  "dnaPage.pick": "发送此标记",
+  "dnaPage.picked": "已勾选 {n} 个标记；只有这些会放入上下文包。",
+  "dnaPage.sendPicked": "发送…",
+  "dnaPage.clearPicked": "全部取消勾选"
 }

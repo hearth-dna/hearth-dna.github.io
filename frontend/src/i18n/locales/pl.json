@@ -49,7 +49,6 @@
   "askPage.previewHeading": "Podgląd – dokładnie to, co zostanie skopiowane ({chars} znaków, około {tokens} tokenów)",
   "askPage.copyButton": "Skopiuj pakiet kontekstu…",
   "askPage.copied": "Skopiowano dla {destination}. Teraz wklej to do asystenta.",
-  "askPage.openAssistant": "Otwórz asystenta samodzielnie: <chatgpt>ChatGPT</chatgpt> · <claude>Claude</claude> · <gemini>Gemini</gemini>. Te linki nie przenoszą danych. Konsumenckie konta czatów mogą wykorzystywać rozmowy do trenowania, chyba że wyłączysz to w ustawieniach dostawcy; rozważ to przed wklejeniem informacji o zdrowiu.",
   "askPage.confirmTitle": "Zanim skopiujesz",
   "askPage.confirmBody": "Tekst z podglądu trafi do schowka. Po wklejeniu do usługi zewnętrznej podlega <em>jej</em> regulaminowi i polityce prywatności, a nie Hearth.",
   "askPage.confirmCounts": "{genotypes} genotypów i {healthEntries} wpisów dziennika zdrowia dla {people} {peopleWord}, {naming}",
@@ -780,6 +779,16 @@
   "dnaPage.draft": "szkic, jeszcze niesprawdzony",
   "dnaPage.evidenceLegend": "Dowody: A = wytyczne kliniczne lub dobrze powtórzone, B = powtórzona asocjacja, C = wstępne. Kolorem oznaczono genotypy o wpływie 2 lub więcej.",
   "dnaPage.sendHeading": "Wyślij do asystenta",
-  "dnaPage.sendIntro": "Pakiet kontekstu zawiera markery pokazane powyżej dla wybranych osób, pod pseudonimami, chyba że włączysz prawdziwe imiona. Zawęź filtry, aby wysłać mniej.",
-  "dnaPage.question": "Pytanie (opcjonalnie)"
+  "dnaPage.sendIntro": "Pakiet kontekstu zawiera markery pokazane powyżej dla wybranych osób albo tylko zaznaczone przez ciebie, bez imion, chyba że włączysz prawdziwe imiona. Zawęź filtry lub zaznacz markery, aby wysłać mniej.",
+  "dnaPage.question": "Pytanie (opcjonalnie)",
+  "askPage.openIn": "Otwórz w:",
+  "askPage.tooLong": "Pakiet ma {chars} znaków i jest za długi na link; skopiuj go albo uwzględnij mniej wpisów.",
+  "askPage.trainingNotice": "Konsumenckie konta czatu mogą wykorzystywać rozmowy do trenowania, jeśli nie wyłączysz tego w ustawieniach dostawcy; rozważ to przed wysłaniem informacji o zdrowiu.",
+  "askPage.confirmLinkBody": "Tekst z podglądu zostanie wstawiony do adresu nowej strony {assistant}: trafi do {assistant} i zostanie w historii przeglądarki. Od tej chwili obowiązują <em>ich</em> warunki i polityka prywatności, a nie Hearth.",
+  "askPage.confirmOpen": "Sprawdziłem(-am) podgląd — otwórz {assistant}",
+  "askPage.opened": "Otwarto w {assistant}.",
+  "dnaPage.pick": "wyślij ten marker",
+  "dnaPage.picked": "Zaznaczone markery: {n}; tylko one trafią do pakietu kontekstu.",
+  "dnaPage.sendPicked": "Wyślij…",
+  "dnaPage.clearPicked": "odznacz wszystkie"
 }

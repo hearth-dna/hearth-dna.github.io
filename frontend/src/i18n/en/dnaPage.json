@@ -15,6 +15,10 @@
   "dnaPage.draft": "draft, not yet reviewed",
   "dnaPage.evidenceLegend": "Evidence: A = clinical guideline or well replicated, B = replicated association, C = preliminary. Coloured genotypes have impact 2 or more.",
   "dnaPage.sendHeading": "Send to an assistant",
-  "dnaPage.sendIntro": "The context pack holds the markers shown above for the selected people, pseudonymised unless you switch real names on. Narrow the filters to send less.",
-  "dnaPage.question": "Question (optional)"
+  "dnaPage.sendIntro": "The context pack holds the markers shown above for the selected people, or only the ones you tick, pseudonymised unless you switch real names on. Narrow the filters or tick markers to send less.",
+  "dnaPage.question": "Question (optional)",
+  "dnaPage.pick": "send this marker",
+  "dnaPage.picked": "Ticked markers: {n}. Only these go into the context pack.",
+  "dnaPage.sendPicked": "Send…",
+  "dnaPage.clearPicked": "untick all"
 }

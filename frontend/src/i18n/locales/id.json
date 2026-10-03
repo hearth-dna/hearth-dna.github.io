@@ -49,7 +49,6 @@
   "askPage.previewHeading": "Pratinjau — tepat apa yang akan disalin ({chars} karakter, sekitar {tokens} token)",
   "askPage.copyButton": "Salin paket konteks…",
   "askPage.copied": "Disalin untuk {destination}. Sekarang tempelkan ke asisten.",
-  "askPage.openAssistant": "Buka asistennya sendiri: <chatgpt>ChatGPT</chatgpt> · <claude>Claude</claude> · <gemini>Gemini</gemini>. Tautan ini tidak membawa data apa pun. Akun obrolan konsumen dapat memakai percakapan untuk pelatihan kecuali Anda mematikannya di pengaturan penyedia; pertimbangkan melakukannya sebelum menempelkan informasi kesehatan.",
   "askPage.confirmTitle": "Sebelum menyalin",
   "askPage.confirmBody": "Teks pada pratinjau akan diletakkan di papan klip Anda. Setelah ditempelkan ke layanan pihak ketiga, teks itu tunduk pada ketentuan dan kebijakan privasi <em>mereka</em>, bukan milik Hearth.",
   "askPage.confirmCounts": "{genotypes} genotipe dan {healthEntries} entri log kesehatan untuk {people} {peopleWord}, {naming}",
@@ -780,6 +779,16 @@
   "dnaPage.draft": "draf, belum ditinjau",
   "dnaPage.evidenceLegend": "Bukti: A = pedoman klinis atau direplikasi dengan baik, B = asosiasi yang direplikasi, C = awal. Genotipe berwarna berdampak 2 atau lebih.",
   "dnaPage.sendHeading": "Kirim ke asisten",
-  "dnaPage.sendIntro": "Paket konteks berisi penanda yang ditampilkan di atas untuk orang yang dipilih, dengan nama samaran kecuali Anda menyalakan nama asli. Persempit filter untuk mengirim lebih sedikit.",
-  "dnaPage.question": "Pertanyaan (opsional)"
+  "dnaPage.sendIntro": "Paket konteks berisi penanda yang ditampilkan di atas untuk orang yang dipilih, atau hanya yang Anda centang, dengan nama samaran kecuali Anda menyalakan nama asli. Persempit filter atau centang penanda untuk mengirim lebih sedikit.",
+  "dnaPage.question": "Pertanyaan (opsional)",
+  "askPage.openIn": "Buka di:",
+  "askPage.tooLong": "Dengan {chars} karakter, paket terlalu panjang untuk dikirim lewat tautan; salin saja, atau sertakan lebih sedikit catatan.",
+  "askPage.trainingNotice": "Akun chat konsumen dapat memakai percakapan untuk pelatihan kecuali Anda mematikannya di pengaturan penyedia; pertimbangkan itu sebelum mengirim informasi kesehatan.",
+  "askPage.confirmLinkBody": "Teks di pratinjau akan dimasukkan ke alamat halaman {assistant} baru: teks itu dikirim ke {assistant} dan tetap ada di riwayat browser Anda. Sejak itu teks tunduk pada ketentuan dan kebijakan privasi <em>mereka</em>, bukan Hearth.",
+  "askPage.confirmOpen": "Saya sudah memeriksa pratinjau — buka {assistant}",
+  "askPage.opened": "Dibuka di {assistant}.",
+  "dnaPage.pick": "kirim penanda ini",
+  "dnaPage.picked": "{n} penanda dicentang; hanya ini yang masuk ke paket konteks.",
+  "dnaPage.sendPicked": "Kirim…",
+  "dnaPage.clearPicked": "hapus semua centang"
 }

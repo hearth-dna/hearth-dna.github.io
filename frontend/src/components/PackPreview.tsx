@@ -1,15 +1,16 @@
 import { useState } from 'react'
 import { useApp } from '../app/context'
+import { ASSISTANTS, type Assistant, assistantUrl } from '../ask/assistants'
 import { logSharing, newId, now } from '../db/repo'
 import { rich, useT } from '../i18n/context'
 import type { Person } from '../types'
 
-type Destination = 'clipboard' | 'share'
+type Destination = 'clipboard' | 'share' | Assistant['id']
 
 /**
- * The context pack as it will leave the device: the exact text, then copy (or the system share
- * sheet, where the browser has one, to hand it to an assistant app). Every copy or share is
- * confirmed first and recorded in the sharing log and the chat history.
+ * The context pack as it will leave the device: the exact text, then copy it, hand it to the
+ * system share sheet where the browser has one, or open an assistant with it already typed in.
+ * Every copy, share or link is confirmed first and recorded in the sharing log and chat history.
  */
 export function PackPreview({
   pack,
@@ -31,11 +32,16 @@ export function PackPreview({
   const [done, setDone] = useState<Destination | null>(null)
   const canShare = typeof navigator.share === 'function'
 
+  const assistant = ASSISTANTS.find((a) => a.id === confirming)
+  const links = ASSISTANTS.map((a) => ({ a, url: assistantUrl(a, pack) }))
+  const named = (d: Destination) => ASSISTANTS.find((a) => a.id === d)?.name
+
   const send = async (destination: Destination) => {
     setConfirming(null)
     try {
       if (destination === 'share') await navigator.share({ text: pack })
-      else await navigator.clipboard.writeText(pack)
+      else if (destination === 'clipboard') await navigator.clipboard.writeText(pack)
+      // An assistant: the confirming link itself opens it.
     } catch {
       return // share sheet dismissed
     }
@@ -72,34 +78,41 @@ export function PackPreview({
         )}
         {done && (
           <span className="ok">
-            {done === 'share' ? t('askPage.shared') : t('askPage.copied', { destination: done })}
+            {done === 'share'
+              ? t('askPage.shared')
+              : done === 'clipboard'
+                ? t('askPage.copied', { destination: done })
+                : t('askPage.opened', { assistant: named(done) ?? done })}
           </span>
         )}
       </div>
-      <p className="muted">
-        {rich(t('askPage.openAssistant'), {
-          chatgpt: (c) => (
-            <a href="https://chatgpt.com" target="_blank" rel="noreferrer">
-              {c}
-            </a>
-          ),
-          claude: (c) => (
-            <a href="https://claude.ai" target="_blank" rel="noreferrer">
-              {c}
-            </a>
-          ),
-          gemini: (c) => (
-            <a href="https://gemini.google.com" target="_blank" rel="noreferrer">
-              {c}
-            </a>
-          ),
-        })}
-      </p>
+      <div className="row mt-3">
+        <span>{t('askPage.openIn')}</span>
+        {links.map(({ a, url }) => (
+          <button
+            key={a.id}
+            type="button"
+            className="small"
+            disabled={people.length === 0 || !url}
+            onClick={() => setConfirming(a.id)}
+          >
+            {a.name}
+          </button>
+        ))}
+      </div>
+      {people.length > 0 && links.some((l) => !l.url) && (
+        <p className="muted">{t('askPage.tooLong', { chars: stats.chars.toLocaleString() })}</p>
+      )}
+      <p className="muted">{t('askPage.trainingNotice')}</p>
 
       {confirming && (
         <dialog open>
           <h2 className="mt-0">{t('askPage.confirmTitle')}</h2>
-          <p>{rich(t(confirming === 'share' ? 'askPage.confirmShareBody' : 'askPage.confirmBody'))}</p>
+          <p>
+            {assistant
+              ? rich(t('askPage.confirmLinkBody', { assistant: assistant.name }))
+              : rich(t(confirming === 'share' ? 'askPage.confirmShareBody' : 'askPage.confirmBody'))}
+          </p>
           <ul>
             <li>
               {t('askPage.confirmCounts', {
@@ -113,9 +126,21 @@ export function PackPreview({
             <li>{t('askPage.confirmLogged')}</li>
           </ul>
           <div className="row">
-            <button type="button" className="primary" onClick={() => send(confirming)}>
-              {t(confirming === 'share' ? 'askPage.confirmShare' : 'askPage.confirmCopy')}
-            </button>
+            {assistant ? (
+              <a
+                className="btn primary"
+                href={assistantUrl(assistant, pack) ?? undefined}
+                target="_blank"
+                rel="noreferrer"
+                onClick={() => send(assistant.id)}
+              >
+                {t('askPage.confirmOpen', { assistant: assistant.name })}
+              </a>
+            ) : (
+              <button type="button" className="primary" onClick={() => send(confirming)}>
+                {t(confirming === 'share' ? 'askPage.confirmShare' : 'askPage.confirmCopy')}
+              </button>
+            )}
             <button type="button" onClick={() => setConfirming(null)}>
               {t('common.cancel')}
             </button>

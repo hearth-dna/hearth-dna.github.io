@@ -49,7 +49,6 @@
   "askPage.previewHeading": "Önizleme — tam olarak kopyalanacak olan ({chars} karakter, yaklaşık {tokens} token)",
   "askPage.copyButton": "Bağlam paketini kopyala…",
   "askPage.copied": "{destination} için kopyalandı. Şimdi asistana yapıştırın.",
-  "askPage.openAssistant": "Asistanı kendiniz açın: <chatgpt>ChatGPT</chatgpt> · <claude>Claude</claude> · <gemini>Gemini</gemini>. Bu bağlantılar veri taşımaz. Tüketici sohbet hesapları, sağlayıcının ayarlarından kapatmadığınız sürece konuşmaları eğitim için kullanabilir; sağlık bilgisi yapıştırmadan önce bunu değerlendirin.",
   "askPage.confirmTitle": "Kopyalamadan önce",
   "askPage.confirmBody": "Önizlemedeki metin panonuza yerleştirilecek. Üçüncü taraf bir hizmete yapıştırıldıktan sonra Hearth'ın değil, <em>onların</em> şartları ve gizlilik politikası geçerlidir.",
   "askPage.confirmCounts": "{people} {peopleWord} için {genotypes} genotip ve {healthEntries} sağlık günlüğü kaydı, {naming}",
@@ -780,6 +779,16 @@
   "dnaPage.draft": "taslak, henüz incelenmedi",
   "dnaPage.evidenceLegend": "Kanıt: A = klinik kılavuz veya iyi tekrarlanmış, B = tekrarlanmış ilişki, C = ön bulgu. Renkli genotiplerin etkisi 2 veya daha fazladır.",
   "dnaPage.sendHeading": "Bir asistana gönder",
-  "dnaPage.sendIntro": "Bağlam paketi, seçilen kişiler için yukarıda gösterilen belirteçleri içerir; gerçek adları açmadıkça takma adlarla. Daha azını göndermek için filtreleri daraltın.",
-  "dnaPage.question": "Soru (isteğe bağlı)"
+  "dnaPage.sendIntro": "Bağlam paketi, seçili kişiler için yukarıda gösterilen işaretleri ya da yalnızca işaretlediklerinizi içerir; gerçek adları açmadıkça takma adlıdır. Daha az göndermek için filtreleri daraltın veya işaret seçin.",
+  "dnaPage.question": "Soru (isteğe bağlı)",
+  "askPage.openIn": "Şurada aç:",
+  "askPage.tooLong": "{chars} karakterle paket bir bağlantı için fazla uzun; bunun yerine kopyalayın veya daha az kayıt ekleyin.",
+  "askPage.trainingNotice": "Bireysel sohbet hesapları, sağlayıcının ayarlarında kapatmadığınız sürece konuşmaları eğitim için kullanabilir; sağlık bilgisi göndermeden önce bunu düşünün.",
+  "askPage.confirmLinkBody": "Önizlemedeki metin yeni bir {assistant} sayfasının adresine konacak: {assistant} hizmetine gönderilir ve tarayıcı geçmişinizde kalır. Bundan sonra Hearth'ün değil, <em>onların</em> koşulları ve gizlilik politikası geçerlidir.",
+  "askPage.confirmOpen": "Önizlemeyi kontrol ettim — {assistant} aç",
+  "askPage.opened": "{assistant} içinde açıldı.",
+  "dnaPage.pick": "bu işareti gönder",
+  "dnaPage.picked": "{n} işaret seçildi; bağlam paketine yalnızca bunlar girer.",
+  "dnaPage.sendPicked": "Gönder…",
+  "dnaPage.clearPicked": "tüm seçimleri kaldır"
 }
