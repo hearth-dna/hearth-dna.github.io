@@ -141,6 +141,15 @@ describe('restoring a folder snapshot whose genomes live beside it', () => {
     expect(r.genomes).toBe(0)
   })
 
+  it('names the genomes it could not find when the snapshot is loaded on its own', async () => {
+    const { db } = fakeDb()
+    const c = await external(gz)
+    const r = await restoreBytes(db, await serialiseContainer(c), undefined)
+    expect(r.genomes).toBe(0)
+    expect(r.missing).toEqual([])
+    expect(r.elsewhere.map((x) => x.entry)).toEqual(c.manifest.genomes)
+  })
+
   it('leaves out a genome file that does not match the manifest, like a missing one', async () => {
     const { db } = fakeDb()
     const bytes = await serialiseContainer(await external(gz))

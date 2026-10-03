@@ -1013,5 +1013,10 @@
   "charts.ref.fasting": "açlık",
   "peoplePage.birthDate": "Doğum tarihi",
   "settingsPage.about": "Hearth hakkında",
-  "settingsPage.source": "Kaynak kodu (AGPL-3.0)"
+  "settingsPage.source": "Kaynak kodu (AGPL-3.0)",
+  "restore.genomesElsewhere": "{names} için DNA bu dosyada değil: bir yedek klasörü onu yedek dosyasının yanındaki genomes klasöründe tutar.",
+  "backupCard.pickGenomes": "‘DNA dosyalarını yükle’ye dokunun ve o genomes klasöründeki tüm dosyaları seçin.",
+  "backupCard.loadGenomes": "DNA dosyalarını yükle…",
+  "backupCard.genomesLoaded": "{n} kişinin DNA'sı yüklendi.",
+  "backupCard.genomesUnmatched": "Seçilen dosyalardan {n} tanesi bu yedeğe ait DNA değil ya da başka bir parolayla şifrelenmiş."
 }

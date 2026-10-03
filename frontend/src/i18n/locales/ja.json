@@ -1013,5 +1013,10 @@
   "charts.ref.fasting": "空腹時",
   "peoplePage.birthDate": "生年月日",
   "settingsPage.about": "Hearth について",
-  "settingsPage.source": "ソースコード (AGPL-3.0)"
+  "settingsPage.source": "ソースコード (AGPL-3.0)",
+  "restore.genomesElsewhere": "{names} の DNA はこのファイルに含まれていません。バックアップフォルダーは、バックアップファイルの隣の genomes フォルダーに DNA を保存します。",
+  "backupCard.pickGenomes": "「DNA ファイルを読み込む」をタップし、その genomes フォルダー内のファイルをすべて選んでください。",
+  "backupCard.loadGenomes": "DNA ファイルを読み込む…",
+  "backupCard.genomesLoaded": "{n} 人の DNA を読み込みました。",
+  "backupCard.genomesUnmatched": "選んだファイルのうち {n} 件は、このバックアップの DNA ではないか、別のパスフレーズで暗号化されています。"
 }

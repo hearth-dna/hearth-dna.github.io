@@ -1013,5 +1013,10 @@
   "charts.ref.fasting": "खाली पेट",
   "peoplePage.birthDate": "जन्म तिथि",
   "settingsPage.about": "Hearth के बारे में",
-  "settingsPage.source": "सोर्स कोड (AGPL-3.0)"
+  "settingsPage.source": "सोर्स कोड (AGPL-3.0)",
+  "restore.genomesElsewhere": "{names} का डीएनए इस फ़ाइल में नहीं है: बैकअप फ़ोल्डर इसे बैकअप फ़ाइल के पास genomes फ़ोल्डर में रखता है।",
+  "backupCard.pickGenomes": "«डीएनए फ़ाइलें लोड करें» पर टैप करें और उस genomes फ़ोल्डर की सभी फ़ाइलें चुनें।",
+  "backupCard.loadGenomes": "डीएनए फ़ाइलें लोड करें…",
+  "backupCard.genomesLoaded": "{n} लोगों का डीएनए लोड हुआ।",
+  "backupCard.genomesUnmatched": "चुनी गई फ़ाइलों में से {n} इस बैकअप का डीएनए नहीं हैं, या किसी और पासफ़्रेज़ से एन्क्रिप्ट की गई थीं।"
 }

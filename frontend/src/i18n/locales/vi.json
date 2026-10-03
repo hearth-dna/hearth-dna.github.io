@@ -1013,5 +1013,10 @@
   "charts.ref.fasting": "lúc đói",
   "peoplePage.birthDate": "Ngày sinh",
   "settingsPage.about": "Giới thiệu Hearth",
-  "settingsPage.source": "Mã nguồn (AGPL-3.0)"
+  "settingsPage.source": "Mã nguồn (AGPL-3.0)",
+  "restore.genomesElsewhere": "DNA của {names} không nằm trong tệp này: thư mục sao lưu giữ nó trong thư mục genomes bên cạnh tệp sao lưu.",
+  "backupCard.pickGenomes": "Chạm «Tải tệp DNA» và chọn mọi tệp trong thư mục genomes đó.",
+  "backupCard.loadGenomes": "Tải tệp DNA…",
+  "backupCard.genomesLoaded": "Đã tải DNA của {n} người.",
+  "backupCard.genomesUnmatched": "{n} tệp đã chọn không phải DNA của bản sao lưu này, hoặc được mã hóa bằng cụm mật khẩu khác."
 }

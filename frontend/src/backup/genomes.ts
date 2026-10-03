@@ -1,6 +1,6 @@
 import { isEncrypted, opener, sealer } from '../attachments/crypto'
 import type { Database } from '../db/db'
-import type { GenomeEntry } from '../export/container'
+import { type GenomeEntry, sha256 } from '../export/container'
 import type { LoadGenome } from '../export/restore'
 import type { GenomeFile } from '../export/snapshot'
 import type { Dir } from './folder'
@@ -57,4 +57,34 @@ export async function genomeLoader(
     if (!open) throw new Error('the genome files in this folder are encrypted; enter the passphrase')
     return open(raw)
   }
+}
+
+/**
+ * Genome files the user picked by hand (a folder snapshot's `genomes` folder, on a phone that
+ * loaded the snapshot alone from a cloud drive), matched to `entries` by content: whatever the
+ * drive renamed a copy to, its hash decides. Encrypted ones are opened with the passphrase.
+ */
+export async function matchGenomeFiles(
+  files: Uint8Array[],
+  entries: GenomeEntry[],
+  passphrase: string | null,
+): Promise<{ found: { entry: GenomeEntry; gz: Uint8Array }[]; unmatched: number }> {
+  const open = passphrase ? await opener(passphrase) : null
+  const found: { entry: GenomeEntry; gz: Uint8Array }[] = []
+  let unmatched = 0
+  for (const raw of files) {
+    if (isEncrypted(raw) && !open) throw new Error('the genome files are encrypted; enter the passphrase')
+    let gz: Uint8Array
+    try {
+      gz = isEncrypted(raw) && open ? await open(raw) : raw
+    } catch {
+      unmatched++ // sealed with another passphrase, or not ours
+      continue
+    }
+    const hash = await sha256(gz)
+    const entry = entries.find((e) => e.sha256 === hash && !found.some((f) => f.entry === e))
+    if (entry) found.push({ entry, gz })
+    else unmatched++
+  }
+  return { found, unmatched }
 }

@@ -1013,5 +1013,10 @@
   "charts.ref.fasting": "空腹",
   "peoplePage.birthDate": "出生日期",
   "settingsPage.about": "关于 Hearth",
-  "settingsPage.source": "源代码 (AGPL-3.0)"
+  "settingsPage.source": "源代码 (AGPL-3.0)",
+  "restore.genomesElsewhere": "{names} 的 DNA 不在此文件中：备份文件夹把它保存在备份文件旁边的 genomes 文件夹里。",
+  "backupCard.pickGenomes": "点按“加载 DNA 文件”，然后选择该 genomes 文件夹中的所有文件。",
+  "backupCard.loadGenomes": "加载 DNA 文件…",
+  "backupCard.genomesLoaded": "已加载 {n} 人的 DNA。",
+  "backupCard.genomesUnmatched": "所选文件中有 {n} 个不是此备份的 DNA，或使用了其他密码加密。"
 }

@@ -1013,5 +1013,10 @@
   "charts.ref.fasting": "puasa",
   "peoplePage.birthDate": "Tanggal lahir",
   "settingsPage.about": "Tentang Hearth",
-  "settingsPage.source": "Kode sumber (AGPL-3.0)"
+  "settingsPage.source": "Kode sumber (AGPL-3.0)",
+  "restore.genomesElsewhere": "DNA {names} tidak ada di dalam file ini: folder cadangan menyimpannya di folder genomes di sebelah file cadangan.",
+  "backupCard.pickGenomes": "Ketuk «Muat file DNA» lalu pilih semua file di folder genomes itu.",
+  "backupCard.loadGenomes": "Muat file DNA…",
+  "backupCard.genomesLoaded": "DNA {n} orang telah dimuat.",
+  "backupCard.genomesUnmatched": "{n} file yang dipilih bukan DNA dari cadangan ini, atau dienkripsi dengan frasa sandi lain."
 }

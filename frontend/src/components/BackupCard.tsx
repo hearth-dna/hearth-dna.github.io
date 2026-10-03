@@ -283,6 +283,26 @@ function ManualBackup({ status }: { status: Extract<Status, { state: 'manual' }>
     }
   }
 
+  const loadGenomes = async (files: File[]) => {
+    setMsg(null)
+    try {
+      const r = await backups.loadGenomeFiles(files, (key, params) => setProgress(t(key, params)))
+      await refresh()
+      setMsg(
+        [
+          t('backupCard.genomesLoaded', { n: r.loaded }),
+          r.unmatched ? t('backupCard.genomesUnmatched', { n: r.unmatched }) : '',
+        ]
+          .filter(Boolean)
+          .join(' '),
+      )
+    } catch (e) {
+      setMsg(t('backupCard.loadFailed', { message: e instanceof Error ? e.message : String(e) }))
+    } finally {
+      setProgress(null)
+    }
+  }
+
   const activity =
     status.step === 'building'
       ? t('backupCard.building')
@@ -333,6 +353,29 @@ function ManualBackup({ status }: { status: Extract<Status, { state: 'manual' }>
         <p className="notice">
           {t('restore.missingGenomes', { names: status.missing.map((m) => m.name).join(', ') })}
         </p>
+      )}
+      {status.elsewhere.length > 0 && (
+        <div className="notice">
+          <p className="mt-0">
+            {t('restore.genomesElsewhere', { names: status.elsewhere.map((m) => m.name).join(', ') })}{' '}
+            {t('backupCard.pickGenomes')}
+          </p>
+          <label className="btn">
+            {t('backupCard.loadGenomes')}
+            {/* No `accept`, as for the backup itself; the files are matched by content. */}
+            <input
+              type="file"
+              multiple
+              hidden
+              disabled={working}
+              onChange={(e) => {
+                const fs = [...(e.target.files ?? [])]
+                e.target.value = ''
+                if (fs.length) void loadGenomes(fs)
+              }}
+            />
+          </label>
+        </div>
       )}
       {status.file && <p className="notice">{t('backupCard.fileReady', { name: status.file })}</p>}
       <div className="row">

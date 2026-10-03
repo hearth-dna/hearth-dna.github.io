@@ -3,10 +3,16 @@ import { missingLocally } from '../attachments/store'
 import { Database } from '../db/db'
 import { countAttachments, getMeta } from '../db/repo'
 import { readHeader } from '../export/container'
-import { type Progress, type RestoreResult, restoreBytes, restoreContainer } from '../export/restore'
+import {
+  type Progress,
+  type RestoreResult,
+  restoreBytes,
+  restoreContainer,
+  restoreGenome,
+} from '../export/restore'
 import { folderSnapshot, snapshotBytes } from '../export/snapshot'
 import * as folder from './folder'
-import { genomeLoader, mirrorGenomes } from './genomes'
+import { genomeLoader, matchGenomeFiles, mirrorGenomes } from './genomes'
 import {
   attachmentsDirName,
   baseName,
@@ -44,6 +50,8 @@ export type Status =
       file: string | null
       step: 'building' | 'loading' | null
       missing: Missing
+      /** People whose genomes the loaded snapshot keeps in its folder's `genomes`, not in itself. */
+      elsewhere: Missing
     }
   | { state: 'none' }
   | { state: 'reconnect'; name: string }
@@ -95,6 +103,7 @@ class Backups {
   private timer: ReturnType<typeof setTimeout> | null = null
   private busy = false
   private missing: Missing = []
+  private elsewhere: RestoreResult['elsewhere'] = []
   /** Set when the browser has no folder picker; see the `manual` status. */
   private shared: folder.Shared | null = null
   private built: { name: string; bytes: Uint8Array; seen: Seen } | null = null
@@ -266,6 +275,7 @@ class Backups {
       file: this.built?.name ?? null,
       step: this.status.state === 'manual' ? this.status.step : null,
       missing: this.missing,
+      elsewhere: this.elsewhere.map((x) => ({ id: x.entry.person_id, name: x.name })),
     })
   }
 
@@ -273,11 +283,13 @@ class Backups {
     if (this.status.state === 'manual') this.set({ ...this.status, step })
   }
 
-  /** The missing-genomes notice goes away once a genome is imported for that person by hand. */
+  /** The missing-genomes notices go away once a genome is imported for that person by hand. */
   private async pruneMissing(): Promise<void> {
-    for (const m of [...this.missing])
-      if ((await this.db.query('SELECT 1 FROM genotype WHERE person_id=? LIMIT 1', [m.id])).length)
-        this.missing = this.missing.filter((x) => x !== m)
+    const has = async (id: string) =>
+      (await this.db.query('SELECT 1 FROM genotype WHERE person_id=? LIMIT 1', [id])).length > 0
+    for (const m of [...this.missing]) if (await has(m.id)) this.missing = this.missing.filter((x) => x !== m)
+    for (const e of [...this.elsewhere])
+      if (await has(e.entry.person_id)) this.elsewhere = this.elsewhere.filter((x) => x !== e)
   }
 
   /** Whether the database changed since this browser last wrote or loaded the snapshot `seen`. */
@@ -537,9 +549,47 @@ class Backups {
     try {
       const bytes = new Uint8Array(await file.arrayBuffer())
       const r = await restoreBytes(this.db, bytes, this.passphrase() || undefined, onProgress)
-      this.missing = r.missing
-      for (const l of this.pulledListeners) l()
+      this.noteRestored(r)
       return r
+    } finally {
+      this.busy = false
+      this.setStep(null)
+      await this.refresh()
+    }
+  }
+
+  /**
+   * What a restore from a file left out, for the card's notices; Settings' dump import calls it
+   * too, so its genomes can come in through `loadGenomeFiles` as well.
+   */
+  noteRestored(r: RestoreResult): void {
+    this.missing = r.missing
+    this.elsewhere = r.elsewhere
+    for (const l of this.pulledListeners) l()
+    void this.refresh()
+  }
+
+  /**
+   * The genome files of the snapshot `loadFile` just loaded, picked from its folder's `genomes`
+   * (a backup folder on a cloud drive keeps them beside the snapshot, not in it).
+   */
+  async loadGenomeFiles(
+    files: File[],
+    onProgress: Progress = () => {},
+  ): Promise<{ loaded: number; unmatched: number }> {
+    if (this.busy) throw new Error('a backup is in progress')
+    this.busy = true
+    this.setStep('loading')
+    try {
+      const bytes = await Promise.all(files.map(async (f) => new Uint8Array(await f.arrayBuffer())))
+      const pending = this.elsewhere.map((x) => x.entry)
+      const { found, unmatched } = await matchGenomeFiles(bytes, pending, this.passphrase() || null)
+      for (const [i, { entry, gz }] of found.entries()) {
+        await restoreGenome(this.db, entry, gz, onProgress, { n: i + 1, total: found.length })
+        this.elsewhere = this.elsewhere.filter((x) => x.entry !== entry)
+      }
+      if (found.length) for (const l of this.pulledListeners) l()
+      return { loaded: found.length, unmatched }
     } finally {
       this.busy = false
       this.setStep(null)

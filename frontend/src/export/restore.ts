@@ -22,6 +22,11 @@ export interface RestoreResult {
   genomes: number
   /** People whose genome file the dump listed but did not carry, and this browser does not have. */
   missing: { id: string; name: string }[]
+  /**
+   * A folder snapshot's genomes that were not beside it: loaded on its own (picked from a cloud
+   * drive on a phone), it carries none of them. `loadGenomeFiles` takes them from the files.
+   */
+  elsewhere: { entry: GenomeEntry; name: string }[]
   version: 1 | 2
   exportedAt: string
 }
@@ -164,6 +169,25 @@ async function insertAttachmentRows(db: Database, rows: Rows): Promise<void> {
   }
 }
 
+/**
+ * One genome file (gzipped raw text, already checked against its manifest entry) into the person's
+ * genotypes. The original is kept so this browser's own backups ship it too.
+ */
+export async function restoreGenome(
+  db: Database,
+  g: GenomeEntry,
+  gz: Uint8Array,
+  onProgress: Progress,
+  at: { n: number; total: number },
+): Promise<void> {
+  const text = strFromU8(gunzipSync(gz))
+  onProgress('restore.parsingGenome', at)
+  const r = await parseRawText(text, undefined, g.kind === 'original' ? g.provider : 'generic')
+  onProgress('restore.storingCalls', { n: r.calls.length.toLocaleString() })
+  await storeCalls(db, g.person_id, r.calls)
+  if (g.kind === 'original') await db.filePut(genomeBlobName(await sha256Hex(text)), gz)
+}
+
 export async function restoreContainer(
   db: Database,
   c: Container,
@@ -207,6 +231,7 @@ export async function restoreContainer(
   }
   let genomes = 0
   const missing = new Set<string>()
+  const elsewhere: GenomeEntry[] = []
   for (const g of c.manifest.genomes) {
     if (hadGenotypes.has(g.person_id)) continue
     let gz: Uint8Array | null = c.genomes[g.path] ?? null
@@ -215,29 +240,29 @@ export async function restoreContainer(
       const fetched = await loadGenome(g)
       // Not in the folder yet (the other device is still uploading it): this person keeps no
       // genotypes for now, and the next load, which skips people who have them, tries again.
-      if (!fetched) continue
+      if (!fetched) {
+        elsewhere.push(g)
+        continue
+      }
       if ((await sha256(fetched)) === g.sha256) gz = fetched
     }
     if (!gz) {
       missing.add(g.person_id)
       continue
     }
-    const text = strFromU8(gunzipSync(gz))
-    onProgress('restore.parsingGenome', { n: genomes + 1, total: c.manifest.genomes.length })
-    const r = await parseRawText(text, undefined, g.kind === 'original' ? g.provider : 'generic')
-    onProgress('restore.storingCalls', { n: r.calls.length.toLocaleString() })
-    await storeCalls(db, g.person_id, r.calls)
-    // Keep the original so this browser's own backups ship it too.
-    if (g.kind === 'original') await db.filePut(genomeBlobName(await sha256Hex(text)), gz)
+    await restoreGenome(db, g, gz, onProgress, { n: genomes + 1, total: c.manifest.genomes.length })
     genomes++
   }
   const after = await existingIds(db, 'person')
+  const name = (id: string) => {
+    const p = (j.persons as Rows).find((x) => x.id === id)
+    return p ? (p.display_name as string) || (p.label as string) : id
+  }
   return {
     people: after.size - before.size,
     genomes,
-    missing: (j.persons as Rows)
-      .filter((p) => missing.has(p.id as string))
-      .map((p) => ({ id: p.id as string, name: (p.display_name as string) || (p.label as string) })),
+    missing: [...missing].map((id) => ({ id, name: name(id) })),
+    elsewhere: elsewhere.map((entry) => ({ entry, name: name(entry.person_id) })),
     version: 2,
     exportedAt: c.header.exported_at,
   }
@@ -276,5 +301,12 @@ async function restoreV1(db: Database, dump: DumpV1, onProgress: Progress): Prom
     withDefaults(((dump.health_log ?? []) as Rows).filter((h) => added.has(h.person_id as string))),
   )
   await insertConsents(db, dump.consents as Rows)
-  return { people: added.size, genomes: added.size, missing: [], version: 1, exportedAt: dump.exported_at }
+  return {
+    people: added.size,
+    genomes: added.size,
+    missing: [],
+    elsewhere: [],
+    version: 1,
+    exportedAt: dump.exported_at,
+  }
 }
