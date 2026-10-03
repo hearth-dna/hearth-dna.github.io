@@ -1,6 +1,6 @@
 # ADR 0005: GitHub Pages is the whole deployment
 
-**Date:** 2026-09-19 · **Status:** Accepted · **Supersedes:** [0003](0003-cloudflare-edge-gcp-free-tier.md) · **Amended by:** [0007](0007-no-backend.md)
+**Date:** 2026-09-19 · **Status:** Accepted · **Supersedes:** [0003](0003-cloudflare-edge-gcp-free-tier.md) · **Amended by:** [0007](0007-no-backend.md), [0011](0011-landing-at-root-app-under-app.md)
 
 ## Context
 

@@ -970,5 +970,7 @@
   "charts.ref.high": "alta",
   "charts.ref.fever": "febbre",
   "charts.ref.fasting": "a digiuno",
-  "peoplePage.birthDate": "Data di nascita"
+  "peoplePage.birthDate": "Data di nascita",
+  "settingsPage.about": "Informazioni su Hearth",
+  "settingsPage.source": "Codice sorgente (AGPL-3.0)"
 }

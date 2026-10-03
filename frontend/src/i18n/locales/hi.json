@@ -970,5 +970,7 @@
   "charts.ref.high": "उच्च",
   "charts.ref.fever": "बुखार",
   "charts.ref.fasting": "खाली पेट",
-  "peoplePage.birthDate": "जन्म तिथि"
+  "peoplePage.birthDate": "जन्म तिथि",
+  "settingsPage.about": "Hearth के बारे में",
+  "settingsPage.source": "सोर्स कोड (AGPL-3.0)"
 }

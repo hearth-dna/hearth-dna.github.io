@@ -31,6 +31,8 @@ const cspMeta = (): Plugin => ({
 })
 
 export default defineConfig({
+  // The site root is the landing page (landing/); the app lives under /app/ (ADR 0011).
+  base: '/app/',
   plugins: [
     react(),
     cspMeta(),
@@ -44,20 +46,16 @@ export default defineConfig({
         theme_color: '#1f4d3a',
         background_color: '#faf8f4',
         display: 'standalone',
-        start_url: '/',
+        start_url: '/app/',
+        scope: '/app/',
         icons: [{ src: 'favicon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' }],
       },
       workbox: {
         globPatterns: ['**/*.{js,mjs,css,html,svg,wasm,json}'],
         maximumFileSizeToCacheInBytes: 8 * 1024 * 1024,
         // Nothing but our own origin is ever fetched at runtime; no runtime caching rules needed.
-        //
-        // The app shell answers every navigation it does not have a precached file for — that is
-        // what makes the 404.html fallback work on GitHub Pages (ADR 0005). The landing pages are
-        // published beside the app but are not part of this build, so without this denylist the
-        // worker would swallow them and show /people instead: privacy and terms would be
-        // unreachable for anyone who had visited once.
-        navigateFallbackDenylist: [/^\/privacy\.html$/, /^\/terms\.html$/],
+        // The worker's scope is /app/, so the landing, privacy and terms pages at the site root
+        // are never answered with the app shell.
       },
     }),
   ],

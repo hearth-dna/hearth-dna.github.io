@@ -1,6 +1,6 @@
 .PHONY: help dev dev-stop dev-status test lint \
 	frontend-install frontend-run frontend-build frontend-build-archive frontend-build-pages \
-	frontend-preview-pages frontend-test frontend-fixtures frontend-lint pages-deploy \
+	frontend-preview-pages pages-site frontend-test frontend-fixtures frontend-lint pages-deploy \
 	kb-build \
 	mobile-assets mobile-i18n mobile-kb android android-build android-install android-test android-lint android-logs android-clean \
 	android-keystore android-bundle android-verify android-publish _android-release-ready \
@@ -42,8 +42,18 @@ frontend-build-archive: ## Build only the single-file portable archive template 
 frontend-build-pages: ## Build the GitHub Pages bundle (adds the 404.html SPA fallback)
 	cd $(FRONTEND_DIR) && npm run build:pages
 
-frontend-preview-pages: frontend-build-pages ## Serve the GitHub Pages build locally on :5181
-	cd $(FRONTEND_DIR) && npx vite preview --port 5181
+# The repository link on the landing page and in Settings; the Pages workflow passes the real one.
+REPO_URL ?= \#
+
+pages-site: frontend-build-pages ## Assemble the GitHub Pages site in .site/: landing at /, the app at /app/
+	rm -rf .site && mkdir -p .site
+	cp landing/* .site/
+	cp -R $(FRONTEND_DIR)/dist .site/app
+	mv .site/app/404.html .site/404.html
+	perl -pi -e 's|\{\{REPO_URL\}\}|$(REPO_URL)|g' .site/*.html
+
+frontend-preview-pages: pages-site ## Serve the assembled Pages site locally on :5181, as Pages does
+	node $(FRONTEND_DIR)/scripts/serve-site.mjs .site 5181
 
 frontend-test: ## Run frontend unit tests (Vitest)
 	cd $(FRONTEND_DIR) && npm run test

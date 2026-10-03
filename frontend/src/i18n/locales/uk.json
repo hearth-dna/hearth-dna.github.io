@@ -970,5 +970,7 @@
   "charts.ref.high": "високий",
   "charts.ref.fever": "температура",
   "charts.ref.fasting": "натщесерце",
-  "peoplePage.birthDate": "Дата народження"
+  "peoplePage.birthDate": "Дата народження",
+  "settingsPage.about": "Про Hearth",
+  "settingsPage.source": "Вихідний код (AGPL-3.0)"
 }

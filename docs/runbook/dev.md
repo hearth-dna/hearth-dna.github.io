@@ -31,7 +31,7 @@ the landing pages beside it, and publishes the artifact; Pages Source must be "G
 
 ```bash
 make frontend-build-pages     # dist/ + the 404.html SPA fallback
-make frontend-preview-pages   # serve it on :5181 and click through the routes
+make frontend-preview-pages   # assemble the site (landing at /, app at /app/) and serve it on :5181
 make pages-deploy             # gh workflow run pages.yml
 ```
 
