@@ -388,7 +388,8 @@ export function useFileLoader(passphrase?: () => string) {
           r.dumps
             ? t('backupCard.loaded', { people, genomes, exportedAt, name })
             : t('backupCard.genomesLoaded', { n: genomes }),
-          r.unmatched ? t('backupCard.genomesUnmatched', { n: r.unmatched }) : '',
+          ...r.dna.map((d) => t('backupCard.dnaFrom', { name: d.name, file: d.file })),
+          r.unused.length ? t('backupCard.notUsed', { files: r.unused.join(', ') }) : '',
         ]
           .filter(Boolean)
           .join(' '),

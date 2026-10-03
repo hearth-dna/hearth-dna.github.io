@@ -1016,5 +1016,6 @@
   "backupCard.pickGenomes": "Scegli tutti i file di quella cartella genomes con «Carica file DNA», oppure selezionali insieme al file di backup in «Carica backup».",
   "backupCard.loadGenomes": "Carica file DNA…",
   "backupCard.genomesLoaded": "Caricato il DNA di {n} persone.",
-  "backupCard.genomesUnmatched": "{n} dei file scelti non sono DNA di questo backup, o sono stati cifrati con un'altra passphrase."
+  "backupCard.dnaFrom": "DNA di {name} da {file}.",
+  "backupCard.notUsed": "Non usati: {files}. Non sono un backup né file DNA di questo backup."
 }

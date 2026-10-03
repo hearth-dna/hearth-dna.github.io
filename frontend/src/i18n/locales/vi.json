@@ -1016,5 +1016,6 @@
   "backupCard.pickGenomes": "Chọn mọi tệp trong thư mục genomes đó bằng «Tải tệp DNA», hoặc chọn chúng cùng với tệp sao lưu trong «Tải bản sao lưu».",
   "backupCard.loadGenomes": "Tải tệp DNA…",
   "backupCard.genomesLoaded": "Đã tải DNA của {n} người.",
-  "backupCard.genomesUnmatched": "{n} tệp đã chọn không phải DNA của bản sao lưu này, hoặc được mã hóa bằng cụm mật khẩu khác."
+  "backupCard.dnaFrom": "DNA của {name} từ {file}.",
+  "backupCard.notUsed": "Không dùng: {files}. Đây không phải bản sao lưu, cũng không phải tệp DNA của bản sao lưu này."
 }

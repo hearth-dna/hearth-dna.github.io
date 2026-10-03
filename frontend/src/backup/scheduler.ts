@@ -4,8 +4,8 @@ import { Database } from '../db/db'
 import { countAttachments, getMeta, setMeta } from '../db/repo'
 import { readHeader } from '../export/container'
 import {
+  type Elsewhere,
   isDumpFile,
-  type LoadGenome,
   type Progress,
   type RestoreResult,
   restoreBytes,
@@ -14,7 +14,7 @@ import {
 } from '../export/restore'
 import { folderSnapshot, snapshotBytes } from '../export/snapshot'
 import * as folder from './folder'
-import { genomeLoader, mirrorGenomes, openGenomeFiles } from './genomes'
+import { genomeLoader, mirrorGenomes, pickFor, readPickedGenomes } from './genomes'
 import {
   attachmentsDirName,
   baseName,
@@ -40,7 +40,6 @@ import { shareOrDownload } from './share'
  * status only tracks whether anything changed since the last one.
  */
 type Missing = { id: string; name: string }[]
-type Elsewhere = RestoreResult['elsewhere']
 
 /** What `loadFiles` brought in, for the card's message. */
 export interface LoadResult {
@@ -50,8 +49,10 @@ export interface LoadResult {
   people: number
   genomes: number
   exportedAt: string
+  /** Genome files taken, by file name, with whose DNA each was. */
+  dna: { file: string; name: string }[]
   /** Picked files that were neither a backup nor a genome anything was waiting for. */
-  unmatched: number
+  unused: string[]
 }
 
 /** Genomes a loaded snapshot keeps in its folder's `genomes`; kept until their files are picked. */
@@ -119,7 +120,7 @@ class Backups {
   private timer: ReturnType<typeof setTimeout> | null = null
   private busy = false
   private missing: Missing = []
-  private elsewhere: Elsewhere = []
+  private elsewhere: Elsewhere[] = []
   /** Set when the browser has no folder picker; see the `manual` status. */
   private shared: folder.Shared | null = null
   private built: { name: string; bytes: Uint8Array; seen: Seen } | null = null
@@ -308,7 +309,7 @@ class Backups {
     const has = async (id: string) =>
       (await this.db.query('SELECT 1 FROM genotype WHERE person_id=? LIMIT 1', [id])).length > 0
     for (const m of [...this.missing]) if (await has(m.id)) this.missing = this.missing.filter((x) => x !== m)
-    const left: Elsewhere = []
+    const left: Elsewhere[] = []
     for (const e of this.elsewhere) if (!(await has(e.entry.person_id))) left.push(e)
     if (left.length !== this.elsewhere.length) await this.setElsewhere(left)
   }
@@ -318,7 +319,7 @@ class Backups {
     return this.elsewhere.map((x) => ({ id: x.entry.person_id, name: x.name }))
   }
 
-  private async setElsewhere(list: Elsewhere): Promise<void> {
+  private async setElsewhere(list: Elsewhere[]): Promise<void> {
     this.elsewhere = list
     await setMeta(this.db, ELSEWHERE_KEY, list.length ? JSON.stringify(list) : null)
   }
@@ -593,30 +594,22 @@ class Backups {
       let rest = picked.filter((f) => !dumps.includes(f))
       // One file that is neither (an older dump v1, or something else): the restore says which.
       if (!dumps.length && rest.length === 1 && !this.elsewhere.length) [dumps, rest] = [rest, []]
-      const { byHash, hashes } = await openGenomeFiles(
-        rest.map((f) => f.bytes),
-        passphrase || null,
-      )
-      const used = new Set<string>()
-      const take: LoadGenome = async (e) => {
-        const gz = byHash.get(e.sha256) ?? null
-        if (gz) used.add(e.sha256)
-        return gz
-      }
       const out: LoadResult = {
         dumps: dumps.length,
         name: '',
         people: 0,
         genomes: 0,
         exportedAt: '',
-        unmatched: 0,
+        dna: [],
+        unused: [],
       }
-      const same = (a: Elsewhere[number], b: Elsewhere[number]) =>
+      const same = (a: Elsewhere, b: Elsewhere) =>
         a.entry.person_id === b.entry.person_id && a.entry.sha256 === b.entry.sha256
       let elsewhere = this.elsewhere
       const missing: Missing = []
       for (const d of dumps) {
-        const r = await restoreBytes(this.db, d.bytes, passphrase || undefined, onProgress, take)
+        // Genomes beside a folder snapshot come back as `elsewhere`, matched below like any other.
+        const r = await restoreBytes(this.db, d.bytes, passphrase || undefined, onProgress)
         out.name = d.name
         out.people += r.people
         out.genomes += r.genomes
@@ -624,24 +617,34 @@ class Backups {
         missing.push(...r.missing)
         elsewhere = [...elsewhere.filter((x) => !r.elsewhere.some((y) => same(x, y))), ...r.elsewhere]
       }
-      // Genome files for a snapshot loaded earlier (picked separately, or after a reload).
-      const waiting = elsewhere.filter((x) => byHash.has(x.entry.sha256))
-      for (const [i, x] of waiting.entries()) {
+      const genomes = await readPickedGenomes(
+        rest.map((f) => f.bytes),
+        passphrase || null,
+      )
+      const used = new Set<number>()
+      const left: Elsewhere[] = []
+      for (const x of elsewhere) {
+        const at = pickFor(x, genomes)
+        if (at < 0) {
+          left.push(x)
+          continue
+        }
+        used.add(at)
         const has = await this.db.query('SELECT 1 FROM genotype WHERE person_id=? LIMIT 1', [
           x.entry.person_id,
         ])
         if (!has.length) {
-          await restoreGenome(this.db, x.entry, byHash.get(x.entry.sha256) as Uint8Array, onProgress, {
-            n: i + 1,
-            total: waiting.length,
+          await restoreGenome(this.db, x.entry, (genomes[at] as { gz: Uint8Array }).gz, onProgress, {
+            n: out.dna.length + 1,
+            total: elsewhere.length,
           })
           out.genomes++
         }
-        used.add(x.entry.sha256)
+        out.dna.push({ file: rest[at].name, name: x.name })
       }
-      await this.setElsewhere(elsewhere.filter((x) => !used.has(x.entry.sha256)))
+      await this.setElsewhere(left)
       if (dumps.length) this.missing = missing
-      out.unmatched = hashes.filter((h) => !h || !used.has(h)).length
+      out.unused = rest.filter((_, i) => !used.has(i)).map((f) => f.name)
       for (const l of this.pulledListeners) l()
       return out
     } finally {

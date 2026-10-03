@@ -1016,5 +1016,6 @@
   "backupCard.pickGenomes": "Elija todos los archivos de esa carpeta genomes con «Cargar archivos de ADN», o selecciónelos junto con el archivo de copia en «Cargar copia».",
   "backupCard.loadGenomes": "Cargar archivos de ADN…",
   "backupCard.genomesLoaded": "Se cargó el ADN de {n} personas.",
-  "backupCard.genomesUnmatched": "{n} de los archivos elegidos no son ADN de esta copia o se cifraron con otra contraseña."
+  "backupCard.dnaFrom": "ADN de {name} desde {file}.",
+  "backupCard.notUsed": "No usados: {files}. No son una copia ni archivos de ADN de esta copia."
 }

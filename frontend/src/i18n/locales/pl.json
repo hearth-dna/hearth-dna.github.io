@@ -1016,5 +1016,6 @@
   "backupCard.pickGenomes": "Wybierz wszystkie pliki z tego folderu genomes przyciskiem „Wczytaj pliki DNA” albo zaznacz je razem z plikiem kopii w „Wczytaj kopię”.",
   "backupCard.loadGenomes": "Wczytaj pliki DNA…",
   "backupCard.genomesLoaded": "Wczytano DNA osób: {n}.",
-  "backupCard.genomesUnmatched": "Wybrane pliki, które nie są DNA z tej kopii lub zostały zaszyfrowane innym hasłem: {n}."
+  "backupCard.dnaFrom": "DNA osoby {name} z {file}.",
+  "backupCard.notUsed": "Nieużyte: {files}. To nie kopia ani pliki DNA z tej kopii."
 }

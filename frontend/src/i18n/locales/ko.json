@@ -1016,5 +1016,6 @@
   "backupCard.pickGenomes": "‘DNA 파일 불러오기’로 그 genomes 폴더의 파일을 모두 선택하거나, ‘백업 불러오기’에서 백업 파일과 함께 선택하세요.",
   "backupCard.loadGenomes": "DNA 파일 불러오기…",
   "backupCard.genomesLoaded": "{n}명의 DNA를 불러왔습니다.",
-  "backupCard.genomesUnmatched": "선택한 파일 중 {n}개는 이 백업의 DNA가 아니거나 다른 암호로 암호화되었습니다."
+  "backupCard.dnaFrom": "{file}에서 {name}의 DNA.",
+  "backupCard.notUsed": "사용되지 않음: {files}. 백업도, 이 백업의 DNA 파일도 아닙니다."
 }

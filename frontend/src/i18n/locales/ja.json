@@ -1016,5 +1016,6 @@
   "backupCard.pickGenomes": "「DNA ファイルを読み込む」でその genomes フォルダー内のファイルをすべて選ぶか、「バックアップを読み込む」でバックアップファイルと一緒に選んでください。",
   "backupCard.loadGenomes": "DNA ファイルを読み込む…",
   "backupCard.genomesLoaded": "{n} 人の DNA を読み込みました。",
-  "backupCard.genomesUnmatched": "選んだファイルのうち {n} 件は、このバックアップの DNA ではないか、別のパスフレーズで暗号化されています。"
+  "backupCard.dnaFrom": "{name} の DNA（{file} から）。",
+  "backupCard.notUsed": "使われなかったファイル：{files}。バックアップでも、このバックアップの DNA ファイルでもありません。"
 }

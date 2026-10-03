@@ -1016,5 +1016,6 @@
   "backupCard.pickGenomes": "Виберіть усі файли з цієї теки genomes кнопкою «Завантажити файли ДНК» або позначте їх разом із файлом копії в «Завантажити копію».",
   "backupCard.loadGenomes": "Завантажити файли ДНК…",
   "backupCard.genomesLoaded": "Завантажено ДНК людей: {n}.",
-  "backupCard.genomesUnmatched": "Вибраних файлів, які не є ДНК із цієї копії або зашифровані іншим паролем: {n}."
+  "backupCard.dnaFrom": "ДНК для {name} з {file}.",
+  "backupCard.notUsed": "Не використано: {files}. Це не копія і не файли ДНК із цієї копії."
 }

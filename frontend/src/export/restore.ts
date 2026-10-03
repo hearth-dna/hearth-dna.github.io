@@ -17,6 +17,17 @@ import { type DumpV1, deserialiseDump, expandDump } from './dump'
 /** Progress callback: an i18n key (`src/i18n/en/restore.json`) plus its placeholders. */
 export type Progress = (key: string, params?: Record<string, string | number>) => void
 
+/**
+ * A genome a folder snapshot keeps beside itself. `textSha` is the sha256 of the original's text
+ * (its `source_file` row): a copy that reached this device decompressed, or compressed again, is
+ * still known by it.
+ */
+export interface Elsewhere {
+  entry: GenomeEntry
+  name: string
+  textSha?: string
+}
+
 export interface RestoreResult {
   people: number
   genomes: number
@@ -26,7 +37,7 @@ export interface RestoreResult {
    * A folder snapshot's genomes that were not beside it: loaded on its own (picked from a cloud
    * drive on a phone), it carries none of them. `loadGenomeFiles` takes them from the files.
    */
-  elsewhere: { entry: GenomeEntry; name: string }[]
+  elsewhere: Elsewhere[]
   version: 1 | 2
   exportedAt: string
 }
@@ -265,7 +276,13 @@ export async function restoreContainer(
     people: after.size - before.size,
     genomes,
     missing: [...missing].map((id) => ({ id, name: name(id) })),
-    elsewhere: elsewhere.map((entry) => ({ entry, name: name(entry.person_id) })),
+    elsewhere: elsewhere.map((entry) => ({
+      entry,
+      name: name(entry.person_id),
+      textSha: (j.source_files as Rows).find((s) => s.id === entry.source_file_id)?.sha256 as
+        | string
+        | undefined,
+    })),
     version: 2,
     exportedAt: c.header.exported_at,
   }
