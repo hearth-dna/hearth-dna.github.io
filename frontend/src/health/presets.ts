@@ -8,7 +8,6 @@ import synonyms from './synonyms.json'
  */
 const SYNONYMS: Record<string, string[]> = synonyms
 
-
 /**
  * Common situations offered as one-click starting points for a health-log entry. A preset only
  * prefills the form (kind, title, body part, tags, unit); the user can change anything or ignore
