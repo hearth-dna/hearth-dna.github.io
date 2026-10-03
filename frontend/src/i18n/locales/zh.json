@@ -970,5 +970,7 @@
   "charts.ref.high": "偏高",
   "charts.ref.fever": "发热",
   "charts.ref.fasting": "空腹",
-  "peoplePage.birthDate": "出生日期"
+  "peoplePage.birthDate": "出生日期",
+  "settingsPage.about": "关于 Hearth",
+  "settingsPage.source": "源代码 (AGPL-3.0)"
 }

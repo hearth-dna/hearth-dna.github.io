@@ -970,5 +970,7 @@
   "charts.ref.high": "tinggi",
   "charts.ref.fever": "demam",
   "charts.ref.fasting": "puasa",
-  "peoplePage.birthDate": "Tanggal lahir"
+  "peoplePage.birthDate": "Tanggal lahir",
+  "settingsPage.about": "Tentang Hearth",
+  "settingsPage.source": "Kode sumber (AGPL-3.0)"
 }

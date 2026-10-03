@@ -129,9 +129,10 @@ export async function readDocumentWithGemini(
   return { text, model: body.modelVersion ?? model }
 }
 
+/** An asset of the app's own build, by its path inside the build (`/kb.json` → `/app/kb.json`). */
 export async function fetchOwnAsset(path: string): Promise<Response> {
   if (!path.startsWith('/')) throw new Error('own-origin assets only')
-  return fetch(path)
+  return fetch(`${import.meta.env.BASE_URL.replace(/\/$/, '')}${path}`)
 }
 
 export async function sendContext(

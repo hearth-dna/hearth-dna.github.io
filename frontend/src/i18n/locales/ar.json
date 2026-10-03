@@ -970,5 +970,7 @@
   "charts.ref.high": "مرتفع",
   "charts.ref.fever": "حمى",
   "charts.ref.fasting": "صائم",
-  "peoplePage.birthDate": "تاريخ الميلاد"
+  "peoplePage.birthDate": "تاريخ الميلاد",
+  "settingsPage.about": "حول Hearth",
+  "settingsPage.source": "الشيفرة المصدرية (AGPL-3.0)"
 }

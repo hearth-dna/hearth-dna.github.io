@@ -22,6 +22,9 @@ terraform/*.tfstate.*
 terraform/**/*.tfvars
 !terraform/**/*.tfvars.example
 
+# make pages-site — the assembled GitHub Pages site
+.site/
+
 # make dev / dev-stop — pidfiles + logs for the background dev servers
 .dev/
 

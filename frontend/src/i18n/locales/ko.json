@@ -970,5 +970,7 @@
   "charts.ref.high": "높음",
   "charts.ref.fever": "발열",
   "charts.ref.fasting": "공복",
-  "peoplePage.birthDate": "생년월일"
+  "peoplePage.birthDate": "생년월일",
+  "settingsPage.about": "Hearth 소개",
+  "settingsPage.source": "소스 코드 (AGPL-3.0)"
 }

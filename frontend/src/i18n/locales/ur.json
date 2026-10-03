@@ -970,5 +970,7 @@
   "charts.ref.high": "زیادہ",
   "charts.ref.fever": "بخار",
   "charts.ref.fasting": "نہار منہ",
-  "peoplePage.birthDate": "تاریخ پیدائش"
+  "peoplePage.birthDate": "تاریخ پیدائش",
+  "settingsPage.about": "Hearth کے بارے میں",
+  "settingsPage.source": "سورس کوڈ (AGPL-3.0)"
 }

@@ -4,8 +4,8 @@ Guidance for Claude Code in this repository. Kept short; detail lives in `/docs`
 
 ## Rules
 
-- **Root stays clean:** only `README.md`, `CLAUDE.md`, `AGENTS.md`, `Makefile`, `.env.example`
-  and dotfiles. Everything else goes under `frontend/`, `mobile/`, `kb/`, `landing/`, `docs/`.
+- **Root stays clean:** only `README.md`, `CLAUDE.md`, `AGENTS.md`, `LICENSE`, `Makefile`,
+  `.env.example` and dotfiles. Everything else goes under `frontend/`, `mobile/`, `kb/`, `landing/`, `docs/`.
 - **There is no server.** Every network call in the frontend goes through
   `frontend/src/egress/egress.ts`, and in the phone apps through `Egress.kt` / `Egress.swift`; a
   test in each asserts nothing else opens a connection. The only destinations are our own origin

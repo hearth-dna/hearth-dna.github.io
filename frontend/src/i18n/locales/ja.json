@@ -970,5 +970,7 @@
   "charts.ref.high": "高い",
   "charts.ref.fever": "発熱",
   "charts.ref.fasting": "空腹時",
-  "peoplePage.birthDate": "生年月日"
+  "peoplePage.birthDate": "生年月日",
+  "settingsPage.about": "Hearth について",
+  "settingsPage.source": "ソースコード (AGPL-3.0)"
 }

@@ -49,21 +49,20 @@ jobs:
       - uses: actions/configure-pages@v5
 
       # No tests here: ci.yml owns the suite, and running it twice buys no extra signal.
-      - name: Build
+      - name: Install
         working-directory: frontend
-        run: |
-          set -euo pipefail
-          npm ci
-          npm run build:pages
+        run: npm ci
 
-      # The app owns /; the landing pages are served as plain files beside it. Copy them by name so
-      # landing/index.html can never overwrite the app shell.
-      - name: Add the landing pages
-        run: cp landing/privacy.html landing/terms.html landing/landing.css frontend/dist/
+      # The landing page owns /, the app /app/ (ADR 0011); 404.html is the app shell, so a deep
+      # link anywhere opens the app. The repository URL comes from the workflow, not the source.
+      - name: Build and assemble the site
+        env:
+          VITE_REPO_URL: ${{ github.server_url }}/${{ github.repository }}
+        run: make pages-site REPO_URL="$VITE_REPO_URL"
 
       - uses: actions/upload-pages-artifact@v4
         with:
-          path: frontend/dist
+          path: .site
 
   deploy:
     name: Deploy
