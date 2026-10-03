@@ -17,11 +17,12 @@ import { ImportPage } from './components/ImportPage'
 import { MoreSheet } from './components/MoreSheet'
 import { PeoplePage } from './components/PeoplePage'
 import { PersonPage } from './components/PersonPage'
+import { RepairScreen } from './components/RepairScreen'
 import { SettingsPage } from './components/SettingsPage'
 import { StartupScreen } from './components/StartupScreen'
 import { SyncButton } from './components/SyncButton'
 import { hasConsent } from './consent/consent'
-import { Database } from './db/db'
+import { CorruptDatabaseError, Database } from './db/db'
 import { genotypeCounts, listPersons, listRelationships } from './db/repo'
 import { readHeader } from './export/container'
 import { restoreBytes } from './export/restore'
@@ -33,6 +34,8 @@ export function App() {
   const [loaded, setState] = useState<Omit<AppState, 'go'> | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [takenOver, setTakenOver] = useState(false)
+  /** The database file turned out damaged, at start-up or since: the repair screen replaces the app. */
+  const [damaged, setDamaged] = useState<{ db: Database; error: string } | null>(null)
   const [memoryOk, setMemoryOk] = useState(false)
   const [consented, setConsented] = useState(false)
   const [page, setPage] = useRoute()
@@ -81,6 +84,7 @@ export function App() {
           startup.run('kb', loadKb),
         ])
         if (import.meta.env.DEV) (window as unknown as { __hearth: unknown }).__hearth = { db }
+        db.onCorrupt(() => setDamaged({ db, error: 'database disk image is malformed' }))
         if (archive) {
           const load = async (pass?: string) => {
             await startup.run('archive', () => restoreBytes(db, archive, pass))
@@ -98,10 +102,14 @@ export function App() {
           await firstLoad()
         }
       } catch (e) {
-        setError(String(e))
+        // Damage found later in start-up reaches the repair screen through db.onCorrupt.
+        if (e instanceof CorruptDatabaseError) setDamaged({ db: e.db, error: e.message })
+        else setError(String(e))
       }
     })()
   }, [])
+
+  if (damaged) return <RepairScreen db={damaged.db} error={damaged.error} />
 
   if (takenOver)
     return (

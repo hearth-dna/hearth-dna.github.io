@@ -1022,5 +1022,16 @@
   "backupCard.phoneCopy": "Einzeldatei für ein Telefon",
   "backupCard.phoneCopyHint": "Schreibt alles, auch die DNA, in eine Datei in diesem Ordner, damit ein Telefon sie mit einer Auswahl laden kann.",
   "backupCard.phoneCopyDone": "{file} in {name} geschrieben: alles mit Stand jetzt, einschließlich DNA. Wählen Sie auf dem Telefon nur diese Datei unter „Sicherung laden“.",
-  "backupCard.oneFileHint": "Ein Sicherungsordner bewahrt die DNA in einem Unterordner auf, und ein Telefon wählt Dateien nur aus einem Ordner. Um alles mit einer Auswahl zu laden, wählen Sie hearth-phone-copy.hearth (am Computer mit „Einzeldatei für ein Telefon“ erstellt) oder eine .zip des ganzen Sicherungsordners."
+  "backupCard.oneFileHint": "Ein Sicherungsordner bewahrt die DNA in einem Unterordner auf, und ein Telefon wählt Dateien nur aus einem Ordner. Um alles mit einer Auswahl zu laden, wählen Sie hearth-phone-copy.hearth (am Computer mit „Einzeldatei für ein Telefon“ erstellt) oder eine .zip des ganzen Sicherungsordners.",
+  "repair.title": "Die Daten in diesem Browser sind beschädigt",
+  "repair.intro": "Die Datenbankdatei auf diesem Gerät ist beschädigt. Das passiert, wenn das Telefon die App mitten im Speichern schließt, etwa beim Laden eines großen Genoms. Die Reparatur behält alles, was sich noch lesen lässt (Personen, Gesundheitstagebuch, Dokumente, Einstellungen), stellt die DNA aus den auf diesem Gerät gespeicherten Genomdateien wieder her und beginnt eine saubere Datenbank. Was dann noch fehlt, kommt durch Laden Ihrer Sicherung zurück.",
+  "repair.button": "Reparieren",
+  "repair.working": "Wird repariert…",
+  "repair.done": "Repariert: {people} Personen und {entries} Tagebucheinträge behalten, die DNA von {genomes} Personen wiederhergestellt.",
+  "repair.lost": "Nicht lesbar: {tables}.",
+  "repair.failed": "Reparatur fehlgeschlagen: {error}",
+  "repair.reload": "Hearth öffnen",
+  "settingsPage.checkDb": "Datenbank prüfen",
+  "settingsPage.checkingDb": "Datenbank wird geprüft…",
+  "settingsPage.dbIntact": "Die Datenbank ist intakt."
 }

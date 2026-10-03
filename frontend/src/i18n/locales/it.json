@@ -1022,5 +1022,16 @@
   "backupCard.phoneCopy": "Copia in un file per il telefono",
   "backupCard.phoneCopyHint": "Scrive tutto, DNA incluso, in un solo file in questa cartella, così un telefono lo carica con una sola selezione.",
   "backupCard.phoneCopyDone": "{file} scritto in {name}: tutto a questo momento, DNA incluso. Sul telefono scegli solo questo file in «Carica backup».",
-  "backupCard.oneFileHint": "Una cartella di backup tiene il DNA in una sottocartella, e un telefono sceglie file da una cartella alla volta. Per caricare tutto con una selezione, scegli hearth-phone-copy.hearth (creato sul computer con «Copia in un file per il telefono») o un .zip dell'intera cartella di backup."
+  "backupCard.oneFileHint": "Una cartella di backup tiene il DNA in una sottocartella, e un telefono sceglie file da una cartella alla volta. Per caricare tutto con una selezione, scegli hearth-phone-copy.hearth (creato sul computer con «Copia in un file per il telefono») o un .zip dell'intera cartella di backup.",
+  "repair.title": "I dati in questo browser sono danneggiati",
+  "repair.intro": "Il file del database su questo dispositivo è danneggiato. Succede quando il telefono chiude l'app a metà di un salvataggio, per esempio mentre carica un genoma grande. La riparazione tiene tutto ciò che si legge ancora (persone, diario della salute, documenti, impostazioni), ricostruisce il DNA dai file di genoma tenuti su questo dispositivo e riparte da un database pulito. Ciò che manca ancora torna caricando il tuo backup.",
+  "repair.button": "Ripara",
+  "repair.working": "Riparazione…",
+  "repair.done": "Riparato: tenute {people} persone e {entries} voci del diario, ricostruito il DNA di {genomes} persone.",
+  "repair.lost": "Illeggibile: {tables}.",
+  "repair.failed": "Riparazione non riuscita: {error}",
+  "repair.reload": "Apri Hearth",
+  "settingsPage.checkDb": "Controlla il database",
+  "settingsPage.checkingDb": "Controllo del database…",
+  "settingsPage.dbIntact": "Il database è integro."
 }

@@ -1022,5 +1022,16 @@
   "backupCard.phoneCopy": "Salinan satu file untuk ponsel",
   "backupCard.phoneCopyHint": "Menulis semuanya, termasuk DNA, ke satu file di folder ini, agar ponsel bisa memuatnya dalam satu pilihan.",
   "backupCard.phoneCopyDone": "{file} ditulis ke {name}: semuanya per saat ini, termasuk DNA. Di ponsel, pilih file ini saja di «Muat cadangan».",
-  "backupCard.oneFileHint": "Folder cadangan menyimpan DNA di subfolder, dan ponsel memilih file dari satu folder saja. Untuk memuat semuanya dalam satu pilihan, pilih hearth-phone-copy.hearth (dibuat di komputer dengan «Salinan satu file untuk ponsel») atau .zip seluruh folder cadangan."
+  "backupCard.oneFileHint": "Folder cadangan menyimpan DNA di subfolder, dan ponsel memilih file dari satu folder saja. Untuk memuat semuanya dalam satu pilihan, pilih hearth-phone-copy.hearth (dibuat di komputer dengan «Salinan satu file untuk ponsel») atau .zip seluruh folder cadangan.",
+  "repair.title": "Data di browser ini rusak",
+  "repair.intro": "File database di perangkat ini rusak. Ini terjadi saat ponsel menutup aplikasi di tengah penyimpanan, misalnya saat memuat genom besar. Perbaikan menyimpan semua yang masih bisa dibaca (orang, catatan kesehatan, dokumen, pengaturan), membangun ulang DNA dari file genom yang disimpan di perangkat ini, dan memulai database yang bersih. Yang masih hilang kembali dengan memuat cadangan Anda.",
+  "repair.button": "Perbaiki",
+  "repair.working": "Memperbaiki…",
+  "repair.done": "Diperbaiki: {people} orang dan {entries} entri catatan disimpan, DNA {genomes} orang dibangun ulang.",
+  "repair.lost": "Tidak bisa dibaca: {tables}.",
+  "repair.failed": "Perbaikan gagal: {error}",
+  "repair.reload": "Buka Hearth",
+  "settingsPage.checkDb": "Periksa database",
+  "settingsPage.checkingDb": "Memeriksa database…",
+  "settingsPage.dbIntact": "Database utuh."
 }

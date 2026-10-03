@@ -1022,5 +1022,16 @@
   "backupCard.phoneCopy": "Telefon için tek dosyalık kopya",
   "backupCard.phoneCopyHint": "DNA dahil her şeyi bu klasörde tek bir dosyaya yazar, böylece telefon onu tek seçimle yükler.",
   "backupCard.phoneCopyDone": "{file}, {name} içine yazıldı: şu ana kadarki her şey, DNA dahil. Telefonda ‘Yedeği yükle’de yalnızca bu dosyayı seçin.",
-  "backupCard.oneFileHint": "Yedek klasörü DNA'yı bir alt klasörde tutar ve telefon dosyaları tek klasörden seçer. Her şeyi tek seçimle yüklemek için hearth-phone-copy.hearth dosyasını (bilgisayarda ‘Telefon için tek dosyalık kopya’ ile oluşturulur) ya da tüm yedek klasörünün .zip'ini seçin."
+  "backupCard.oneFileHint": "Yedek klasörü DNA'yı bir alt klasörde tutar ve telefon dosyaları tek klasörden seçer. Her şeyi tek seçimle yüklemek için hearth-phone-copy.hearth dosyasını (bilgisayarda ‘Telefon için tek dosyalık kopya’ ile oluşturulur) ya da tüm yedek klasörünün .zip'ini seçin.",
+  "repair.title": "Bu tarayıcıdaki veriler bozuk",
+  "repair.intro": "Bu cihazdaki veritabanı dosyası bozuk. Bu, telefon uygulamayı kaydetmenin ortasında kapattığında olur; örneğin büyük bir genom yüklenirken. Onarım hâlâ okunabilen her şeyi (kişiler, sağlık günlüğü, belgeler, ayarlar) korur, DNA'yı bu cihazda tutulan genom dosyalarından yeniden oluşturur ve temiz bir veritabanı başlatır. Hâlâ eksik olan, yedeğinizi yükleyerek geri gelir.",
+  "repair.button": "Onar",
+  "repair.working": "Onarılıyor…",
+  "repair.done": "Onarıldı: {people} kişi ve {entries} günlük kaydı korundu, {genomes} kişinin DNA'sı yeniden oluşturuldu.",
+  "repair.lost": "Okunamadı: {tables}.",
+  "repair.failed": "Onarım başarısız: {error}",
+  "repair.reload": "Hearth'ü aç",
+  "settingsPage.checkDb": "Veritabanını denetle",
+  "settingsPage.checkingDb": "Veritabanı denetleniyor…",
+  "settingsPage.dbIntact": "Veritabanı sağlam."
 }

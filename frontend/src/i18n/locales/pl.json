@@ -1022,5 +1022,16 @@
   "backupCard.phoneCopy": "Kopia w jednym pliku dla telefonu",
   "backupCard.phoneCopyHint": "Zapisuje wszystko, razem z DNA, w jednym pliku w tym folderze, aby telefon wczytał go jednym wyborem.",
   "backupCard.phoneCopyDone": "Zapisano {file} w {name}: wszystko na teraz, razem z DNA. Na telefonie wybierz tylko ten plik w „Wczytaj kopię”.",
-  "backupCard.oneFileHint": "Folder kopii trzyma DNA w podfolderze, a telefon wybiera pliki tylko z jednego folderu. Aby wczytać wszystko jednym wyborem, wybierz hearth-phone-copy.hearth (tworzony na komputerze przyciskiem „Kopia w jednym pliku dla telefonu”) albo .zip całego folderu kopii."
+  "backupCard.oneFileHint": "Folder kopii trzyma DNA w podfolderze, a telefon wybiera pliki tylko z jednego folderu. Aby wczytać wszystko jednym wyborem, wybierz hearth-phone-copy.hearth (tworzony na komputerze przyciskiem „Kopia w jednym pliku dla telefonu”) albo .zip całego folderu kopii.",
+  "repair.title": "Dane w tej przeglądarce są uszkodzone",
+  "repair.intro": "Plik bazy danych na tym urządzeniu jest uszkodzony. Dzieje się tak, gdy telefon zamyka aplikację w trakcie zapisu, na przykład przy wczytywaniu dużego genomu. Naprawa zachowa wszystko, co da się jeszcze odczytać (osoby, dziennik zdrowia, dokumenty, ustawienia), odtworzy DNA z plików genomów zapisanych na tym urządzeniu i zacznie czystą bazę. To, czego nadal brakuje, wróci po wczytaniu kopii zapasowej.",
+  "repair.button": "Napraw",
+  "repair.working": "Naprawianie…",
+  "repair.done": "Naprawiono: zachowano osoby ({people}) i wpisy dziennika ({entries}), odtworzono DNA osób: {genomes}.",
+  "repair.lost": "Nie udało się odczytać: {tables}.",
+  "repair.failed": "Naprawa nie powiodła się: {error}",
+  "repair.reload": "Otwórz Hearth",
+  "settingsPage.checkDb": "Sprawdź bazę danych",
+  "settingsPage.checkingDb": "Sprawdzanie bazy danych…",
+  "settingsPage.dbIntact": "Baza danych jest w porządku."
 }

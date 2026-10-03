@@ -1022,5 +1022,16 @@
   "backupCard.phoneCopy": "Cópia em um arquivo para o celular",
   "backupCard.phoneCopyHint": "Grava tudo, DNA incluído, em um único arquivo nesta pasta, para que um celular o carregue em uma seleção.",
   "backupCard.phoneCopyDone": "{file} gravado em {name}: tudo até agora, DNA incluído. No celular, escolha só este arquivo em «Carregar backup».",
-  "backupCard.oneFileHint": "Uma pasta de backup guarda o DNA em uma subpasta, e um celular escolhe arquivos de uma pasta por vez. Para carregar tudo em uma seleção, escolha hearth-phone-copy.hearth (criado no computador com «Cópia em um arquivo para o celular») ou um .zip da pasta de backup inteira."
+  "backupCard.oneFileHint": "Uma pasta de backup guarda o DNA em uma subpasta, e um celular escolhe arquivos de uma pasta por vez. Para carregar tudo em uma seleção, escolha hearth-phone-copy.hearth (criado no computador com «Cópia em um arquivo para o celular») ou um .zip da pasta de backup inteira.",
+  "repair.title": "Os dados deste navegador estão danificados",
+  "repair.intro": "O arquivo de banco de dados deste aparelho está danificado. Isso acontece quando o celular fecha o app no meio de um salvamento, por exemplo ao carregar um genoma grande. O reparo mantém tudo o que ainda pode ser lido (pessoas, diário de saúde, documentos, configurações), reconstrói o DNA a partir dos arquivos de genoma guardados neste aparelho e começa um banco limpo. O que ainda faltar volta ao carregar seu backup.",
+  "repair.button": "Reparar",
+  "repair.working": "Reparando…",
+  "repair.done": "Reparado: mantidas {people} pessoas e {entries} entradas do diário, e reconstruído o DNA de {genomes} pessoas.",
+  "repair.lost": "Não foi possível ler: {tables}.",
+  "repair.failed": "O reparo falhou: {error}",
+  "repair.reload": "Abrir o Hearth",
+  "settingsPage.checkDb": "Verificar o banco de dados",
+  "settingsPage.checkingDb": "Verificando o banco de dados…",
+  "settingsPage.dbIntact": "O banco de dados está íntegro."
 }

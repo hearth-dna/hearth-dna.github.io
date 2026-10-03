@@ -25,10 +25,25 @@ export interface OpenOptions {
   log?: StartupLog
 }
 
+/** SQLite's words for a damaged file: SQLITE_CORRUPT ("database disk image is malformed"), NOTADB. */
+export const isCorrupt = (e: unknown) =>
+  /malformed|SQLITE_CORRUPT|SQLITE_NOTADB|not a database/i.test(e instanceof Error ? e.message : String(e))
+
+/** Opening found the database file damaged; `db` is open and can `repair()` it. */
+export class CorruptDatabaseError extends Error {
+  constructor(
+    readonly db: Database,
+    cause: unknown,
+  ) {
+    super(cause instanceof Error ? cause.message : String(cause))
+  }
+}
+
 export class Database {
   private nextId = 1
   private readonly pending = new Map<number, Pending>()
   private readonly listeners = new Set<() => void>()
+  private readonly corruptListeners = new Set<() => void>()
 
   private constructor(
     private readonly worker: Worker,
@@ -143,12 +158,25 @@ export class Database {
     ready = new Database(worker, persistent, reason)
     // Re-point the worker at the final instance's pending map.
     worker.onmessage = (ev) => ready.onMessage(ev.data)
-    await ready.exec('PRAGMA foreign_keys = ON')
-    await ready.exec(SCHEMA_SQL)
+    try {
+      await Database.prepare(ready)
+    } catch (e) {
+      // A damaged file opens but fails its first statement: the app offers to repair it.
+      if (isCorrupt(e)) throw new CorruptDatabaseError(ready, e)
+      throw e
+    }
+    log?.end('schema')
+    return ready
+  }
+
+  /** Schema, additive migrations and the meta rows every database has; safe to run again. */
+  private static async prepare(db: Database): Promise<void> {
+    await db.exec('PRAGMA foreign_keys = ON')
+    await db.exec(SCHEMA_SQL)
     // Revoking a consent deletes it; rows stamped by the old flag-only revoke are dead weight.
-    await ready.exec('DELETE FROM consent WHERE revoked_at IS NOT NULL')
+    await db.exec('DELETE FROM consent WHERE revoked_at IS NOT NULL')
     // Duplicates from before grantConsent was idempotent: keep the earliest record of each.
-    await ready.exec(
+    await db.exec(
       'DELETE FROM consent WHERE id NOT IN (SELECT MIN(id) FROM consent GROUP BY kind, version, subject)',
     )
     // Additive column migrations: CREATE TABLE IF NOT EXISTS leaves existing tables untouched.
@@ -170,26 +198,93 @@ export class Database {
       "conditions TEXT NOT NULL DEFAULT ''",
       "details TEXT NOT NULL DEFAULT ''",
     ]) {
-      await ready.exec(`ALTER TABLE health_log ADD COLUMN ${col}`).catch(() => {})
+      await db.exec(`ALTER TABLE health_log ADD COLUMN ${col}`).catch(() => {})
     }
     // Added after the native apps first shipped; a full date for growth curves (birth_year stays).
-    await ready.exec("ALTER TABLE person ADD COLUMN birth_date TEXT NOT NULL DEFAULT ''").catch(() => {})
+    await db.exec("ALTER TABLE person ADD COLUMN birth_date TEXT NOT NULL DEFAULT ''").catch(() => {})
     // CSV imports used to start an entry's text with "Imported: 11200 g" after converting a reading;
     // the entry's value and unit already say it. Drop that first line, keep any note after it.
-    await ready.exec(
+    await db.exec(
       `UPDATE health_log SET body = CASE WHEN instr(body, char(10)) > 0
          THEN substr(body, instr(body, char(10)) + 1) ELSE '' END
        WHERE source LIKE 'csv:%' AND body LIKE 'Imported: %'`,
     )
-    await ready.exec('INSERT OR IGNORE INTO meta(key, value) VALUES (?, ?)', [
+    await db.exec('INSERT OR IGNORE INTO meta(key, value) VALUES (?, ?)', [
       'schema_version',
       String(SCHEMA_VERSION),
     ])
     // Identifies this browser profile in backup headers (random, not derived from hardware).
-    await ready.exec('INSERT OR IGNORE INTO meta(key, value) VALUES (?, ?)', ['device', crypto.randomUUID()])
-    await ready.exec('INSERT OR IGNORE INTO meta(key, value) VALUES (?, ?)', ['generation', '0'])
-    log?.end('schema')
-    return ready
+    await db.exec('INSERT OR IGNORE INTO meta(key, value) VALUES (?, ?)', ['device', crypto.randomUUID()])
+    await db.exec('INSERT OR IGNORE INTO meta(key, value) VALUES (?, ?)', ['generation', '0'])
+  }
+
+  /**
+   * SQLite's quick_check over the whole file. Damage in pages no query reads (an index, a far
+   * corner of the genotype table) raises no error until something does; this finds it. On damage
+   * the corrupt listeners fire, which puts the repair screen up.
+   */
+  async check(): Promise<boolean> {
+    let ok = false
+    try {
+      ok = (await this.query('PRAGMA quick_check(1)'))[0]?.quick_check === 'ok'
+    } catch {
+      // a damaged file can fail the check itself; onMessage has told the listeners already
+      return false
+    }
+    if (!ok) for (const l of this.corruptListeners) l()
+    return ok
+  }
+
+  /** Fires when a statement finds the database file damaged (SQLITE_CORRUPT). */
+  onCorrupt(listener: () => void): () => void {
+    this.corruptListeners.add(listener)
+    return () => this.corruptListeners.delete(listener)
+  }
+
+  /**
+   * Replaces a damaged database with a fresh one holding everything that could still be read
+   * (db.worker.ts `repair`): every table but genotypes, inserted again by column name with foreign
+   * keys off, since an orphan row is better kept than lost here. Genotypes come back from the
+   * original genome files kept beside the database, or from a backup (see repair.ts).
+   */
+  async repair(): Promise<{ rows: Record<string, number>; lost: string[] }> {
+    const { tables, lost } = (await this.send({ op: 'repair' })) as {
+      tables: Record<string, Row[]>
+      lost: string[]
+    }
+    await Database.prepare(this)
+    const rows: Record<string, number> = {}
+    await this.send({ op: 'exec', sql: 'PRAGMA foreign_keys = OFF' })
+    for (const [table, list] of Object.entries(tables)) {
+      const have = new Set(
+        ((await this.query(`PRAGMA table_info("${table.replace(/"/g, '""')}")`)) as Row[]).map(
+          (c) => c.name as string,
+        ),
+      )
+      if (!have.size) continue
+      // Cached counts would describe the genotypes that are gone.
+      const keep = table === 'meta' ? list.filter((r) => r.key !== 'genotype_counts') : list
+      // Meta first written by prepare() (device, generation) gives way to the old values.
+      const verb = table === 'meta' ? 'INSERT OR REPLACE' : 'INSERT OR IGNORE'
+      let n = 0
+      for (const r of keep) {
+        const cols = Object.keys(r).filter((c) => have.has(c))
+        if (!cols.length) continue
+        try {
+          await this.send({
+            op: 'exec',
+            sql: `${verb} INTO "${table}"(${cols.map((c) => `"${c}"`).join(',')}) VALUES (${cols.map(() => '?').join(',')})`,
+            bind: cols.map((c) => r[c]),
+          })
+          n++
+        } catch {
+          // a row the new schema refuses (a constraint): it stays behind
+        }
+      }
+      rows[table] = n
+    }
+    await this.send({ op: 'exec', sql: 'PRAGMA foreign_keys = ON' })
+    return { rows, lost }
   }
 
   private failPending(why: string) {
@@ -206,7 +301,10 @@ export class Database {
     }
     this.pending.delete(msg.id)
     if (msg.ok) p.resolve(msg.result)
-    else p.reject(new Error(msg.error ?? 'db error'))
+    else {
+      p.reject(new Error(msg.error ?? 'db error'))
+      if (isCorrupt(msg.error)) for (const l of this.corruptListeners) l()
+    }
   }
 
   private send(req: Record<string, unknown>, onProgress?: (n: number) => void): Promise<unknown> {

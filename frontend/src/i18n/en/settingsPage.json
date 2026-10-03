@@ -42,5 +42,8 @@
   "settingsPage.storagePersisted": "This browser has promised to keep them.",
   "settingsPage.storageBestEffort": "The browser may clear them if it runs short of space; keep a backup folder.",
   "settingsPage.about": "About Hearth",
-  "settingsPage.source": "Source code (AGPL-3.0)"
+  "settingsPage.source": "Source code (AGPL-3.0)",
+  "settingsPage.checkDb": "Check the database",
+  "settingsPage.checkingDb": "Checking the database…",
+  "settingsPage.dbIntact": "The database is intact."
 }

@@ -1022,5 +1022,16 @@
   "backupCard.phoneCopy": "Copia en un archivo para el teléfono",
   "backupCard.phoneCopyHint": "Escribe todo, ADN incluido, en un solo archivo de esta carpeta, para que un teléfono lo cargue en una sola selección.",
   "backupCard.phoneCopyDone": "{file} escrito en {name}: todo a este momento, ADN incluido. En el teléfono, elija solo este archivo en «Cargar copia».",
-  "backupCard.oneFileHint": "Una carpeta de copias guarda el ADN en una subcarpeta, y un teléfono elige archivos de una sola carpeta a la vez. Para cargarlo todo en una selección, elija hearth-phone-copy.hearth (creado en el ordenador con «Copia en un archivo para el teléfono») o un .zip de toda la carpeta de copias."
+  "backupCard.oneFileHint": "Una carpeta de copias guarda el ADN en una subcarpeta, y un teléfono elige archivos de una sola carpeta a la vez. Para cargarlo todo en una selección, elija hearth-phone-copy.hearth (creado en el ordenador con «Copia en un archivo para el teléfono») o un .zip de toda la carpeta de copias.",
+  "repair.title": "Los datos de este navegador están dañados",
+  "repair.intro": "El archivo de base de datos de este dispositivo está dañado. Ocurre cuando el teléfono cierra la aplicación a mitad de un guardado, por ejemplo al cargar un genoma grande. La reparación conserva todo lo que aún se puede leer (personas, diario de salud, documentos, ajustes), reconstruye el ADN a partir de los archivos de genoma guardados en este dispositivo y empieza una base limpia. Lo que aún falte vuelve al cargar su copia de seguridad.",
+  "repair.button": "Reparar",
+  "repair.working": "Reparando…",
+  "repair.done": "Reparado: se conservaron {people} personas y {entries} entradas del diario, y se reconstruyó el ADN de {genomes} personas.",
+  "repair.lost": "No se pudo leer: {tables}.",
+  "repair.failed": "La reparación falló: {error}",
+  "repair.reload": "Abrir Hearth",
+  "settingsPage.checkDb": "Comprobar la base de datos",
+  "settingsPage.checkingDb": "Comprobando la base de datos…",
+  "settingsPage.dbIntact": "La base de datos está intacta."
 }

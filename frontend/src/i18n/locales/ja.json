@@ -1022,5 +1022,16 @@
   "backupCard.phoneCopy": "スマートフォン用の単一ファイルのコピー",
   "backupCard.phoneCopyHint": "DNA を含むすべてをこのフォルダー内の 1 つのファイルに書き出し、スマートフォンで 1 回の選択で読み込めるようにします。",
   "backupCard.phoneCopyDone": "{file} を {name} に書き出しました（現時点のすべて、DNA を含む）。スマートフォンでは「バックアップを読み込む」でこのファイルだけを選んでください。",
-  "backupCard.oneFileHint": "バックアップフォルダーは DNA をサブフォルダーに保存しますが、スマートフォンは一度に 1 つのフォルダーからしかファイルを選べません。1 回の選択ですべて読み込むには、hearth-phone-copy.hearth（コンピューターで「スマートフォン用の単一ファイルのコピー」で作成）か、バックアップフォルダー全体の .zip を選んでください。"
+  "backupCard.oneFileHint": "バックアップフォルダーは DNA をサブフォルダーに保存しますが、スマートフォンは一度に 1 つのフォルダーからしかファイルを選べません。1 回の選択ですべて読み込むには、hearth-phone-copy.hearth（コンピューターで「スマートフォン用の単一ファイルのコピー」で作成）か、バックアップフォルダー全体の .zip を選んでください。",
+  "repair.title": "このブラウザーのデータが破損しています",
+  "repair.intro": "この端末のデータベースファイルが破損しています。大きなゲノムの読み込み中など、保存の途中でスマートフォンがアプリを閉じると起こります。修復では、まだ読めるもの（人、健康記録、書類、設定）をすべて残し、この端末に保存されたゲノムファイルから DNA を作り直して、きれいなデータベースから始めます。それでも足りないものはバックアップを読み込むと戻ります。",
+  "repair.button": "修復する",
+  "repair.working": "修復中…",
+  "repair.done": "修復しました：{people} 人と記録 {entries} 件を残し、{genomes} 人の DNA を作り直しました。",
+  "repair.lost": "読めなかったもの：{tables}。",
+  "repair.failed": "修復に失敗しました：{error}",
+  "repair.reload": "Hearth を開く",
+  "settingsPage.checkDb": "データベースを確認",
+  "settingsPage.checkingDb": "データベースを確認中…",
+  "settingsPage.dbIntact": "データベースは正常です。"
 }

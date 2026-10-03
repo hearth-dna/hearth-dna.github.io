@@ -14,6 +14,17 @@ Status: **implemented** (2026-09-14). Each document ends with where the code liv
 | [`open-formats.md`](open-formats.md) | CSV and JSON Lines exports of genotypes, findings and the health log for the user's own spreadsheets and scripts. |
 | [`dump-v2.md`](dump-v2.md) | Changes to the dump container that the three above need: generation counter, per-genome blobs, one envelope for encryption. |
 
+## The database on the device
+
+`user.db` lives in OPFS through SQLite's SAH-pool VFS (ADR 0002). Its rollback journal is a file
+(`journal_mode = TRUNCATE`), never memory: a genome import is one large transaction whose pages
+spill into the database before it commits, and with the journal in memory a page the browser
+closes mid-write (a phone reclaiming memory) could not be rolled back. A damaged file is still
+offered for repair rather than treated as missing storage: `Database.repair()` keeps every table it
+can still read except genotypes, starts a clean file, and `rebuildGenomesFromCache` restores each
+person's genotypes from the genome files kept beside the database. Settings → **Check the
+database** runs `quick_check`, which finds damage in pages no query happens to read.
+
 ## Options considered
 
 | Option | Data lives | Works offline | Second PC | Browser support | Trust surface added | Verdict |
