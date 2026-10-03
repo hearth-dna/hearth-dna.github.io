@@ -954,5 +954,21 @@
   "healthTable.downloadSelected": "Tải CSV",
   "healthTable.deleteSelected": "Xóa",
   "healthTable.confirmDeleteMany": "Xóa {n} mục? Tài liệu đính kèm cũng sẽ bị xóa. Không thể hoàn tác.",
-  "healthTable.clearSelection": "Bỏ chọn"
+  "healthTable.clearSelection": "Bỏ chọn",
+  "charts.bmi": "BMI (từ cân nặng và chiều cao)",
+  "charts.showReference": "Giá trị tham chiếu",
+  "charts.referenceFor": "Tham chiếu cho",
+  "charts.refGrowth": "Vùng tô: đường tăng trưởng WHO cho {name} (P3–P97, đậm hơn P15–P85); nét đứt: trung vị.",
+  "charts.refRange": "Vùng tô: khoảng thường gặp ở độ tuổi của {name}{label}. Chỉ để tham khảo, không phải chẩn đoán.",
+  "charts.refMissing.birthDate": "Thêm ngày sinh của {name} ở trang Mọi người để so sánh với đường tăng trưởng WHO.",
+  "charts.refMissing.sex": "Chọn giới tính của {name} ở trang Mọi người để so sánh với đường tăng trưởng WHO.",
+  "charts.percentile": "P{n}",
+  "charts.ref.P50": "trung vị",
+  "charts.ref.underweight": "thiếu cân",
+  "charts.ref.overweight": "thừa cân",
+  "charts.ref.obese": "béo phì",
+  "charts.ref.high": "cao",
+  "charts.ref.fever": "sốt",
+  "charts.ref.fasting": "lúc đói",
+  "peoplePage.birthDate": "Ngày sinh"
 }

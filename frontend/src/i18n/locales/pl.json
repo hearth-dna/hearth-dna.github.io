@@ -954,5 +954,21 @@
   "healthTable.downloadSelected": "Pobierz CSV",
   "healthTable.deleteSelected": "Usuń",
   "healthTable.confirmDeleteMany": "Usunąć wpisy ({n})? Załączone dokumenty również zostaną usunięte. Tej operacji nie można cofnąć.",
-  "healthTable.clearSelection": "Wyczyść zaznaczenie"
+  "healthTable.clearSelection": "Wyczyść zaznaczenie",
+  "charts.bmi": "BMI (z wagi i wzrostu)",
+  "charts.showReference": "Wartości referencyjne",
+  "charts.referenceFor": "Wartości dla",
+  "charts.refGrowth": "Zacieniowane: siatki centylowe WHO dla: {name} (P3–P97, ciemniej P15–P85); przerywana: mediana.",
+  "charts.refRange": "Zacieniowane: typowy zakres dla wieku: {name}{label}. Wskazówka, nie diagnoza.",
+  "charts.refMissing.birthDate": "Dodaj datę urodzenia ({name}) na stronie Osoby, aby porównać z siatkami centylowymi WHO.",
+  "charts.refMissing.sex": "Ustaw płeć ({name}) na stronie Osoby, aby porównać z siatkami centylowymi WHO.",
+  "charts.percentile": "P{n}",
+  "charts.ref.P50": "mediana",
+  "charts.ref.underweight": "niedowaga",
+  "charts.ref.overweight": "nadwaga",
+  "charts.ref.obese": "otyłość",
+  "charts.ref.high": "wysokie",
+  "charts.ref.fever": "gorączka",
+  "charts.ref.fasting": "na czczo",
+  "peoplePage.birthDate": "Data urodzenia"
 }

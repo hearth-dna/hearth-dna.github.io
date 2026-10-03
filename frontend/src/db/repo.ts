@@ -28,17 +28,18 @@ export async function listPersons(db: Database): Promise<Person[]> {
 
 export async function addPerson(
   db: Database,
-  p: { label: string; displayName: string; sex: Sex; birthYear: number | null },
+  p: { label: string; displayName: string; sex: Sex; birthYear: number | null; birthDate?: string },
 ): Promise<Person> {
-  const person: Person = { id: newId(), notes: '', createdAt: now(), ...p }
+  const person: Person = { id: newId(), notes: '', createdAt: now(), ...p, birthDate: p.birthDate ?? '' }
   await db.exec(
-    'INSERT INTO person(id,label,display_name,sex,birth_year,notes,created_at) VALUES (?,?,?,?,?,?,?)',
+    'INSERT INTO person(id,label,display_name,sex,birth_year,birth_date,notes,created_at) VALUES (?,?,?,?,?,?,?,?)',
     [
       person.id,
       person.label,
       person.displayName,
       person.sex,
       person.birthYear,
+      person.birthDate,
       person.notes,
       person.createdAt,
     ],
@@ -49,12 +50,13 @@ export async function addPerson(
 export async function updatePerson(
   db: Database,
   id: string,
-  p: { displayName: string; sex: Sex; birthYear: number | null },
+  p: { displayName: string; sex: Sex; birthYear: number | null; birthDate: string },
 ): Promise<void> {
-  await db.exec('UPDATE person SET display_name=?, sex=?, birth_year=? WHERE id=?', [
+  await db.exec('UPDATE person SET display_name=?, sex=?, birth_year=?, birth_date=? WHERE id=?', [
     p.displayName,
     p.sex,
     p.birthYear,
+    p.birthDate,
     id,
   ])
 }
@@ -71,6 +73,7 @@ function rowToPerson(r: Row): Person {
     displayName: r.display_name as string,
     sex: r.sex as Sex,
     birthYear: (r.birth_year as number | null) ?? null,
+    birthDate: (r.birth_date as string | undefined) ?? '',
     notes: r.notes as string,
     createdAt: r.created_at as string,
   }

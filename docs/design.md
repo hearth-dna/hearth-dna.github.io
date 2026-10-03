@@ -267,6 +267,13 @@ kb fields at tier 0, so the user gets a decision frame even without any LLM.
   printed reference range is a band when every reading shares it. Pure grouping and conversion in
   `charts/series.ts`; hand-drawn SVG in `components/TimeChart.tsx` with a crosshair tooltip, arrow
   keys (a slider over the readings) and a table view.
+- **Charts: reference values.** A "Reference values" switch draws, under one person's readings:
+  the WHO growth curves for a child's weight, length/height, BMI and head circumference (P3–P97,
+  P15–P85 and the median, from WHO's LMS tables, `kb/reviewed/growth/who.json`; they need the
+  person's sex and optional birth date), and curated normal ranges for adults and vital signs
+  (`kb/reviewed/ranges.json`: BMI categories, blood pressure, pulse by age, temperature, SpO₂,
+  fasting glucose). The tooltip gives a child's percentile. BMI is its own metric, worked out from
+  each weighing and the height at that time (`charts/series.ts`, `charts/reference.ts`).
 - **Shipped fifth (CSV timeline import):** "Import CSV…" in a person's health log takes a
   spreadsheet or a device export, one row per date with a column per measurement or one reading
   per row (name, value, unit). The user assigns every column (and, for the long shape, every

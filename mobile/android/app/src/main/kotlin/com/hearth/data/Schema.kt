@@ -11,7 +11,8 @@ const val SCHEMA_SQL = """
 CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS person (
   id TEXT PRIMARY KEY, label TEXT NOT NULL, display_name TEXT NOT NULL, sex TEXT NOT NULL,
-  birth_year INTEGER, notes TEXT NOT NULL DEFAULT '', created_at TEXT NOT NULL
+  birth_year INTEGER, notes TEXT NOT NULL DEFAULT '', created_at TEXT NOT NULL,
+  birth_date TEXT NOT NULL DEFAULT ''
 );
 CREATE TABLE IF NOT EXISTS relationship (
   parent_id TEXT NOT NULL REFERENCES person(id) ON DELETE CASCADE,
@@ -83,6 +84,9 @@ fun schemaStatements(sql: String = SCHEMA_SQL): List<String> =
 /** The meta rows a new database starts with (db.ts): schema version, a random device id, generation 0. */
 fun seedMeta(): List<Pair<String, String>> =
     listOf("schema_version" to SCHEMA_VERSION.toString(), "device" to Repo.newId(), "generation" to "0")
+
+/** person columns added after the native apps first shipped; db.ts adds the same ones. */
+val PERSON_ADDED_COLUMNS = listOf("birth_date TEXT NOT NULL DEFAULT ''")
 
 /** health_log columns added after the native apps first shipped; db.ts adds the same ones. */
 val HEALTH_LOG_ADDED_COLUMNS = listOf(

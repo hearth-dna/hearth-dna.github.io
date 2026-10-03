@@ -6,7 +6,8 @@ let SCHEMA_SQL = """
 CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS person (
   id TEXT PRIMARY KEY, label TEXT NOT NULL, display_name TEXT NOT NULL, sex TEXT NOT NULL,
-  birth_year INTEGER, notes TEXT NOT NULL DEFAULT '', created_at TEXT NOT NULL
+  birth_year INTEGER, notes TEXT NOT NULL DEFAULT '', created_at TEXT NOT NULL,
+  birth_date TEXT NOT NULL DEFAULT ''
 );
 CREATE TABLE IF NOT EXISTS relationship (
   parent_id TEXT NOT NULL REFERENCES person(id) ON DELETE CASCADE,
@@ -63,6 +64,9 @@ CREATE TABLE IF NOT EXISTS sharing_log (
   id INTEGER PRIMARY KEY, kind TEXT NOT NULL, destination TEXT NOT NULL, payload TEXT NOT NULL, created_at TEXT NOT NULL
 );
 """
+
+/// person columns added after the native apps first shipped; db.ts adds the same ones.
+let PERSON_ADDED_COLUMNS = ["birth_date TEXT NOT NULL DEFAULT ''"]
 
 /// health_log columns added after the native apps first shipped; db.ts adds the same ones.
 let HEALTH_LOG_ADDED_COLUMNS = [

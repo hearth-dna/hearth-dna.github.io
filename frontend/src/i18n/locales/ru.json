@@ -954,5 +954,21 @@
   "healthTable.downloadSelected": "Скачать CSV",
   "healthTable.deleteSelected": "Удалить",
   "healthTable.confirmDeleteMany": "Удалить записей: {n}? Прикреплённые документы тоже будут удалены. Это нельзя отменить.",
-  "healthTable.clearSelection": "Снять выбор"
+  "healthTable.clearSelection": "Снять выбор",
+  "charts.bmi": "ИМТ (по весу и росту)",
+  "charts.showReference": "Нормы",
+  "charts.referenceFor": "Нормы для",
+  "charts.refGrowth": "Заливка: кривые роста ВОЗ для {name} (P3–P97, темнее P15–P85); пунктир: медиана.",
+  "charts.refRange": "Заливка: обычный диапазон для возраста {name}{label}. Ориентир, а не диагноз.",
+  "charts.refMissing.birthDate": "Добавьте дату рождения ({name}) на странице «Люди», чтобы сравнить с кривыми роста ВОЗ.",
+  "charts.refMissing.sex": "Укажите пол ({name}) на странице «Люди», чтобы сравнить с кривыми роста ВОЗ.",
+  "charts.percentile": "P{n}",
+  "charts.ref.P50": "медиана",
+  "charts.ref.underweight": "дефицит веса",
+  "charts.ref.overweight": "избыточный вес",
+  "charts.ref.obese": "ожирение",
+  "charts.ref.high": "высокое",
+  "charts.ref.fever": "температура",
+  "charts.ref.fasting": "натощак",
+  "peoplePage.birthDate": "Дата рождения"
 }

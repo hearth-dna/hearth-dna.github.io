@@ -954,5 +954,21 @@
   "healthTable.downloadSelected": "CSV ڈاؤن لوڈ کریں",
   "healthTable.deleteSelected": "حذف کریں",
   "healthTable.confirmDeleteMany": "{n} اندراجات حذف کریں؟ منسلک دستاویزات بھی حذف ہو جائیں گی۔ اسے واپس نہیں کیا جا سکتا۔",
-  "healthTable.clearSelection": "انتخاب صاف کریں"
+  "healthTable.clearSelection": "انتخاب صاف کریں",
+  "charts.bmi": "BMI (وزن اور قد سے)",
+  "charts.showReference": "حوالہ جاتی اقدار",
+  "charts.referenceFor": "حوالہ برائے",
+  "charts.refGrowth": "سایہ دار: {name} کے لیے WHO نشوونما کے خطوط (P3–P97، گہرا P15–P85)؛ ڈیش: وسطانیہ۔",
+  "charts.refRange": "سایہ دار: {name} کی عمر میں عام حد{label}۔ رہنمائی، تشخیص نہیں۔",
+  "charts.refMissing.birthDate": "WHO نشوونما کے خطوط سے موازنے کے لیے لوگ صفحے پر {name} کی تاریخ پیدائش شامل کریں۔",
+  "charts.refMissing.sex": "WHO نشوونما کے خطوط سے موازنے کے لیے لوگ صفحے پر {name} کی جنس مقرر کریں۔",
+  "charts.percentile": "P{n}",
+  "charts.ref.P50": "وسطانیہ",
+  "charts.ref.underweight": "کم وزن",
+  "charts.ref.overweight": "زیادہ وزن",
+  "charts.ref.obese": "موٹاپا",
+  "charts.ref.high": "زیادہ",
+  "charts.ref.fever": "بخار",
+  "charts.ref.fasting": "نہار منہ",
+  "peoplePage.birthDate": "تاریخ پیدائش"
 }

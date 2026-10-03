@@ -954,5 +954,21 @@
   "healthTable.downloadSelected": "CSV indir",
   "healthTable.deleteSelected": "Sil",
   "healthTable.confirmDeleteMany": "{n} kayıt silinsin mi? Ekli belgeler de silinir. Bu işlem geri alınamaz.",
-  "healthTable.clearSelection": "Seçimi temizle"
+  "healthTable.clearSelection": "Seçimi temizle",
+  "charts.bmi": "VKİ (kilo ve boydan)",
+  "charts.showReference": "Referans değerler",
+  "charts.referenceFor": "Referans:",
+  "charts.refGrowth": "Gölgeli: {name} için DSÖ büyüme eğrileri (P3–P97, koyu P15–P85); kesikli: medyan.",
+  "charts.refRange": "Gölgeli: {name} yaşındaki olağan aralık{label}. Bir rehber, tanı değil.",
+  "charts.refMissing.birthDate": "DSÖ büyüme eğrileriyle karşılaştırmak için Kişiler sayfasında {name} için doğum tarihi ekleyin.",
+  "charts.refMissing.sex": "DSÖ büyüme eğrileriyle karşılaştırmak için Kişiler sayfasında {name} için cinsiyet seçin.",
+  "charts.percentile": "P{n}",
+  "charts.ref.P50": "medyan",
+  "charts.ref.underweight": "zayıf",
+  "charts.ref.overweight": "fazla kilolu",
+  "charts.ref.obese": "obez",
+  "charts.ref.high": "yüksek",
+  "charts.ref.fever": "ateş",
+  "charts.ref.fasting": "açlık",
+  "peoplePage.birthDate": "Doğum tarihi"
 }

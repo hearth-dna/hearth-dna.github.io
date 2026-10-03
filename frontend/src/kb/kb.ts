@@ -23,6 +23,27 @@ export interface KbEntry {
   topic: string
   generated_by: string
 }
+/** One growth indicator for one sex: monthly rows of [age in months, L, M, S] from month 0. */
+export type LmsRows = [number, number, number, number][]
+
+/** WHO growth curves (kb/build_growth.py): weight, length/height, BMI and head circumference for age. */
+export interface KbGrowth {
+  source: string
+  licence: string
+  indicators: Record<'wfa' | 'lhfa' | 'bfa' | 'hcfa', { boys: LmsRows; girls: LmsRows }>
+}
+
+/** A reference range for one chart metric (kb/reviewed/ranges.json); ages in years, max exclusive. */
+export interface KbRange {
+  metric: string
+  age_min?: number
+  age_max?: number
+  normal: [number, number]
+  lines?: { value: number; label: string }[]
+  label?: string
+  source: string
+}
+
 export interface Kb {
   version: string
   entries: KbEntry[]
@@ -31,6 +52,8 @@ export interface Kb {
   analytes: KbAnalyte[]
   panels: KbPanel[]
   units: KbUnit[]
+  growth: KbGrowth
+  ranges: KbRange[]
 }
 
 export async function loadKb(): Promise<Kb> {

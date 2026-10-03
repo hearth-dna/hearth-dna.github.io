@@ -954,5 +954,21 @@
   "healthTable.downloadSelected": "تنزيل CSV",
   "healthTable.deleteSelected": "حذف",
   "healthTable.confirmDeleteMany": "حذف {n} من الإدخالات؟ ستُحذف المستندات المرفقة أيضًا. لا يمكن التراجع عن ذلك.",
-  "healthTable.clearSelection": "مسح التحديد"
+  "healthTable.clearSelection": "مسح التحديد",
+  "charts.bmi": "مؤشر كتلة الجسم (من الوزن والطول)",
+  "charts.showReference": "القيم المرجعية",
+  "charts.referenceFor": "المرجع لـ",
+  "charts.refGrowth": "المظلل: منحنيات النمو لمنظمة الصحة العالمية لـ {name} (P3–P97، والأغمق P15–P85)؛ المتقطع: الوسيط.",
+  "charts.refRange": "المظلل: النطاق المعتاد لعمر {name}{label}. للإرشاد وليس تشخيصًا.",
+  "charts.refMissing.birthDate": "أضف تاريخ ميلاد {name} في صفحة الأشخاص للمقارنة بمنحنيات النمو لمنظمة الصحة العالمية.",
+  "charts.refMissing.sex": "حدد جنس {name} في صفحة الأشخاص للمقارنة بمنحنيات النمو لمنظمة الصحة العالمية.",
+  "charts.percentile": "P{n}",
+  "charts.ref.P50": "الوسيط",
+  "charts.ref.underweight": "نقص الوزن",
+  "charts.ref.overweight": "زيادة الوزن",
+  "charts.ref.obese": "سمنة",
+  "charts.ref.high": "مرتفع",
+  "charts.ref.fever": "حمى",
+  "charts.ref.fasting": "صائم",
+  "peoplePage.birthDate": "تاريخ الميلاد"
 }

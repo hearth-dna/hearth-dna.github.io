@@ -954,5 +954,21 @@
   "healthTable.downloadSelected": "CSV をダウンロード",
   "healthTable.deleteSelected": "削除",
   "healthTable.confirmDeleteMany": "{n} 件を削除しますか？添付文書も削除されます。元に戻せません。",
-  "healthTable.clearSelection": "選択を解除"
+  "healthTable.clearSelection": "選択を解除",
+  "charts.bmi": "BMI（体重と身長から）",
+  "charts.showReference": "基準値",
+  "charts.referenceFor": "基準の対象",
+  "charts.refGrowth": "塗り: {name} の WHO 成長曲線（P3–P97、濃い部分は P15–P85）、破線: 中央値。",
+  "charts.refRange": "塗り: {name} の年齢での一般的な範囲{label}。目安であり診断ではありません。",
+  "charts.refMissing.birthDate": "WHO 成長曲線と比べるには、「人物」ページで {name} の生年月日を入力してください。",
+  "charts.refMissing.sex": "WHO 成長曲線と比べるには、「人物」ページで {name} の性別を設定してください。",
+  "charts.percentile": "P{n}",
+  "charts.ref.P50": "中央値",
+  "charts.ref.underweight": "低体重",
+  "charts.ref.overweight": "過体重",
+  "charts.ref.obese": "肥満",
+  "charts.ref.high": "高い",
+  "charts.ref.fever": "発熱",
+  "charts.ref.fasting": "空腹時",
+  "peoplePage.birthDate": "生年月日"
 }

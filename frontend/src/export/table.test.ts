@@ -19,6 +19,7 @@ const person = (id: string, label: string, displayName = label): Person => ({
   displayName,
   sex: 'unknown',
   birthYear: null,
+  birthDate: '',
   notes: '',
   createdAt: 't',
 })

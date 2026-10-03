@@ -27,7 +27,7 @@ data class RestoreResult(
     val exportedAt: String,
 )
 
-private val PERSON_COLS = listOf("id", "label", "display_name", "sex", "birth_year", "notes", "created_at")
+private val PERSON_COLS = listOf("id", "label", "display_name", "sex", "birth_year", "birth_date", "notes", "created_at")
 private val SOURCE_FILE_COLS = listOf("id", "person_id", "provider", "build", "sha256", "original_name", "row_count", "imported_at")
 private val HEALTH_COLS = listOf(
     "id", "person_id", "date", "time", "kind", "title", "body", "source", "body_part", "side", "severity", "tags",
@@ -59,7 +59,8 @@ fun restore(
     val mark = repo.totalChanges()
     val personsBefore = count(sql, "person")
     val healthBefore = count(sql, "health_log")
-    insertRows(sql, "person", PERSON_COLS, rows(j, "persons"))
+    // birth_date came later: an older dump's people have none, and NOT NULL would skip them.
+    insertRows(sql, "person", PERSON_COLS, rows(j, "persons").map { mapOf("birth_date" to "") + it })
     for (r in rows(j, "relationships"))
         sql.exec("INSERT OR IGNORE INTO relationship(parent_id, child_id) VALUES (?,?)", listOf(r["parentId"], r["childId"]))
     insertRows(sql, "source_file", SOURCE_FILE_COLS, rows(j, "source_files"))

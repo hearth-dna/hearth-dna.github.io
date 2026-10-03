@@ -954,5 +954,21 @@
   "healthTable.downloadSelected": "Завантажити CSV",
   "healthTable.deleteSelected": "Видалити",
   "healthTable.confirmDeleteMany": "Видалити записів: {n}? Прикріплені документи теж буде видалено. Це не можна скасувати.",
-  "healthTable.clearSelection": "Зняти вибір"
+  "healthTable.clearSelection": "Зняти вибір",
+  "charts.bmi": "ІМТ (за вагою і зростом)",
+  "charts.showReference": "Норми",
+  "charts.referenceFor": "Норми для",
+  "charts.refGrowth": "Заливка: криві росту ВООЗ для {name} (P3–P97, темніше P15–P85); пунктир: медіана.",
+  "charts.refRange": "Заливка: звичайний діапазон для віку {name}{label}. Орієнтир, а не діагноз.",
+  "charts.refMissing.birthDate": "Додайте дату народження ({name}) на сторінці «Люди», щоб порівняти з кривими росту ВООЗ.",
+  "charts.refMissing.sex": "Укажіть стать ({name}) на сторінці «Люди», щоб порівняти з кривими росту ВООЗ.",
+  "charts.percentile": "P{n}",
+  "charts.ref.P50": "медіана",
+  "charts.ref.underweight": "дефіцит ваги",
+  "charts.ref.overweight": "надмірна вага",
+  "charts.ref.obese": "ожиріння",
+  "charts.ref.high": "високий",
+  "charts.ref.fever": "температура",
+  "charts.ref.fasting": "натщесерце",
+  "peoplePage.birthDate": "Дата народження"
 }

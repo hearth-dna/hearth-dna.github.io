@@ -21,5 +21,20 @@
   "charts.ariaHint": "Use the arrow keys to step through the readings",
   "charts.high": "high",
   "charts.low": "low",
-  "charts.group.symptom": "Symptoms"
+  "charts.group.symptom": "Symptoms",
+  "charts.bmi": "BMI (from weight and height)",
+  "charts.showReference": "Reference values",
+  "charts.referenceFor": "Reference for",
+  "charts.refGrowth": "Shaded: WHO growth curves for {name} (P3–P97, darker P15–P85); dashed: the median.",
+  "charts.refRange": "Shaded: the usual range at {name}'s age{label}. A guide, not a diagnosis.",
+  "charts.refMissing.birthDate": "Add {name}'s birth date on the People page to compare with the WHO growth curves.",
+  "charts.refMissing.sex": "Set {name}'s sex on the People page to compare with the WHO growth curves.",
+  "charts.percentile": "P{n}",
+  "charts.ref.P50": "median",
+  "charts.ref.underweight": "underweight",
+  "charts.ref.overweight": "overweight",
+  "charts.ref.obese": "obese",
+  "charts.ref.high": "high",
+  "charts.ref.fever": "fever",
+  "charts.ref.fasting": "fasting"
 }

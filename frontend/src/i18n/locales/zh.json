@@ -954,5 +954,21 @@
   "healthTable.downloadSelected": "下载 CSV",
   "healthTable.deleteSelected": "删除",
   "healthTable.confirmDeleteMany": "删除 {n} 条记录？附件也会一并删除。此操作无法撤销。",
-  "healthTable.clearSelection": "取消选择"
+  "healthTable.clearSelection": "取消选择",
+  "charts.bmi": "BMI（由体重和身高计算）",
+  "charts.showReference": "参考值",
+  "charts.referenceFor": "参考对象",
+  "charts.refGrowth": "阴影：{name} 的 WHO 生长曲线（P3–P97，较深为 P15–P85）；虚线：中位数。",
+  "charts.refRange": "阴影：{name} 所在年龄的常见范围{label}。仅供参考，并非诊断。",
+  "charts.refMissing.birthDate": "在“人员”页面添加 {name} 的出生日期，即可与 WHO 生长曲线比较。",
+  "charts.refMissing.sex": "在“人员”页面设置 {name} 的性别，即可与 WHO 生长曲线比较。",
+  "charts.percentile": "P{n}",
+  "charts.ref.P50": "中位数",
+  "charts.ref.underweight": "偏瘦",
+  "charts.ref.overweight": "超重",
+  "charts.ref.obese": "肥胖",
+  "charts.ref.high": "偏高",
+  "charts.ref.fever": "发热",
+  "charts.ref.fasting": "空腹",
+  "peoplePage.birthDate": "出生日期"
 }
