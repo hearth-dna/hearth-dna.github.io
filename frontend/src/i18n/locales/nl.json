@@ -1022,5 +1022,16 @@
   "backupCard.phoneCopy": "Kopie in één bestand voor een telefoon",
   "backupCard.phoneCopyHint": "Schrijft alles, DNA inbegrepen, in één bestand in deze map, zodat een telefoon het met één selectie laadt.",
   "backupCard.phoneCopyDone": "{file} geschreven naar {name}: alles van dit moment, DNA inbegrepen. Kies op de telefoon alleen dit bestand bij ‘Back-up laden’.",
-  "backupCard.oneFileHint": "Een back-upmap bewaart het DNA in een submap, en een telefoon kiest bestanden uit één map tegelijk. Om alles met één selectie te laden, kiest u hearth-phone-copy.hearth (op de computer gemaakt met ‘Kopie in één bestand voor een telefoon’) of een .zip van de hele back-upmap."
+  "backupCard.oneFileHint": "Een back-upmap bewaart het DNA in een submap, en een telefoon kiest bestanden uit één map tegelijk. Om alles met één selectie te laden, kiest u hearth-phone-copy.hearth (op de computer gemaakt met ‘Kopie in één bestand voor een telefoon’) of een .zip van de hele back-upmap.",
+  "repair.title": "De gegevens in deze browser zijn beschadigd",
+  "repair.intro": "Het databasebestand op dit apparaat is beschadigd. Dat gebeurt als de telefoon de app midden in het opslaan sluit, bijvoorbeeld tijdens het laden van een groot genoom. Herstellen houdt alles wat nog leesbaar is (personen, gezondheidslogboek, documenten, instellingen), bouwt het DNA opnieuw op uit de genoombestanden op dit apparaat en begint een schone database. Wat dan nog ontbreekt, komt terug door uw back-up te laden.",
+  "repair.button": "Herstellen",
+  "repair.working": "Bezig met herstellen…",
+  "repair.done": "Hersteld: {people} personen en {entries} logboekitems behouden, het DNA van {genomes} personen opnieuw opgebouwd.",
+  "repair.lost": "Niet leesbaar: {tables}.",
+  "repair.failed": "Herstellen mislukt: {error}",
+  "repair.reload": "Hearth openen",
+  "settingsPage.checkDb": "Database controleren",
+  "settingsPage.checkingDb": "Database wordt gecontroleerd…",
+  "settingsPage.dbIntact": "De database is in orde."
 }

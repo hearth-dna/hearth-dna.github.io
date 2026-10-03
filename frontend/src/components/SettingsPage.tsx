@@ -62,6 +62,8 @@ export function SettingsPage() {
     setMsg(t(r.encrypted ? 'exportDump.encrypted' : 'exportDump.plaintext', { name: r.name, mb: r.mb }))
   }
 
+  /** Settings' database check (quick_check); damage opens the repair screen instead. */
+  const [dbCheck, setDbCheck] = useState<'checking' | 'ok' | null>(null)
   const loader = useFileLoader(() => pass || backups.passphrase())
 
   return (
@@ -262,11 +264,26 @@ export function SettingsPage() {
       <div className="card">
         <h2>{t('settingsPage.eraseEverything')}</h2>
         <p className="muted">{t('settingsPage.eraseIntro')}</p>
+        <button
+          type="button"
+          disabled={dbCheck === 'checking'}
+          onClick={async () => {
+            setDbCheck('checking')
+            setDbCheck((await db.check()) ? 'ok' : null)
+          }}
+        >
+          {t('settingsPage.checkDb')}
+        </button>
         <button type="button" className="danger" onClick={() => setErasing(true)}>
           {t('settingsPage.eraseAllData')}
         </button>
         {erasing && <EraseDialog onClose={() => setErasing(false)} />}
       </div>
+      {dbCheck && (
+        <p className={dbCheck === 'ok' ? 'ok' : 'muted'}>
+          {t(dbCheck === 'ok' ? 'settingsPage.dbIntact' : 'settingsPage.checkingDb')}
+        </p>
+      )}
       {documents && documents.rows > 0 && (
         <p className="muted">
           {t('settingsPage.attachmentStorage', {

@@ -24,6 +24,7 @@ type Req =
       before?: string
       after?: string
     }
+  | { id: number; op: 'repair' }
   | { id: number; op: 'file-put'; name: string; bytes: Uint8Array }
   | { id: number; op: 'file-get'; name: string }
   | { id: number; op: 'file-delete'; name: string }
@@ -48,6 +49,7 @@ const OPFS_RETRY_MS = 300
 
 let sqlite3: Sqlite3Static
 let db: Sqlite3Db
+let pool: Awaited<ReturnType<Sqlite3Static['installOpfsSAHPoolVfs']>> | null = null
 let persistent = false
 let reason = ''
 let filesDir: FileSystemDirectoryHandle | null = null
@@ -83,13 +85,19 @@ async function open(req: { id: number; profile: string; memory?: boolean; wasmUr
   for (let attempt = 0; attempt < OPFS_ATTEMPTS; attempt++) {
     postMessage({ id: req.id, progress: attempt + 1 } satisfies Res)
     try {
-      const pool = await sqlite3.installOpfsSAHPoolVfs({
+      pool = await sqlite3.installOpfsSAHPoolVfs({
         name: `hearth-${profile}`,
         directory: `.hearth-${profile}`,
       })
       db = new pool.OpfsSAHPoolDb('/hearth.sqlite3')
       persistent = true
-      db.exec('PRAGMA cache_size = -65536; PRAGMA temp_store = MEMORY; PRAGMA journal_mode = MEMORY')
+      // A damaged file still opens: the first query says so (SQLITE_CORRUPT) and the app offers
+      // to repair it, rather than falling back to memory as if storage were unavailable.
+      try {
+        db.exec(PRAGMAS)
+      } catch (e) {
+        if (!isCorrupt(e)) throw e
+      }
       const root = await navigator.storage.getDirectory()
       filesDir = await root.getDirectoryHandle(`hearth-${profile}-files`, { create: true })
       return { persistent, reason: '' }
@@ -101,6 +109,61 @@ async function open(req: { id: number; profile: string; memory?: boolean; wasmUr
   // Memory is a last resort the UI must surface: nothing survives a reload. db.ts reports it.
   db = new sqlite3.oo1.DB(':memory:', 'c')
   return { persistent, reason }
+}
+
+/**
+ * The rollback journal is a file (TRUNCATE), never memory: a big transaction (a 700k-row genome)
+ * spills pages into the database before it commits, and with the journal in memory a page closed
+ * mid-write (a phone reclaiming memory does exactly that) left a database it could not roll back,
+ * that is, a corrupt one. With the journal on disk the next open rolls the half-write back. WAL
+ * is not available on the SAH-pool VFS.
+ */
+const PRAGMAS = 'PRAGMA cache_size = -65536; PRAGMA temp_store = MEMORY; PRAGMA journal_mode = TRUNCATE'
+
+const isCorrupt = (e: unknown) =>
+  /malformed|SQLITE_CORRUPT|SQLITE_NOTADB|not a database/i.test(e instanceof Error ? e.message : String(e))
+
+/**
+ * What can still be read from a damaged database, table by table and row by row (a table keeps
+ * the rows read before its first bad page), then a fresh empty database in its place. Genotypes
+ * are left out: rows cut short there would pass for a whole genome, and the original files kept
+ * beside the database (or the backup) rebuild them. The caller recreates the schema.
+ */
+async function repair(): Promise<{ tables: Record<string, Record<string, unknown>[]>; lost: string[] }> {
+  if (!pool) throw new Error('only a database on this device can be repaired')
+  const tables: Record<string, Record<string, unknown>[]> = {}
+  const lost: string[] = []
+  let names: string[] = []
+  try {
+    names = db.selectValues(
+      "SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'",
+    ) as string[]
+  } catch {
+    lost.push('sqlite_master')
+  }
+  for (const name of names) {
+    if (name === 'genotype') continue
+    const rows: Record<string, unknown>[] = []
+    try {
+      db.exec({
+        sql: `SELECT * FROM "${name.replace(/"/g, '""')}"`,
+        rowMode: 'object',
+        callback: (r: Record<string, unknown>) => void rows.push({ ...r }),
+      })
+    } catch {
+      lost.push(name)
+    }
+    tables[name] = rows
+  }
+  try {
+    db.close()
+  } catch {
+    // closing a damaged file can fail too; the wipe below replaces it either way
+  }
+  await pool.wipeFiles()
+  db = new pool.OpfsSAHPoolDb('/hearth.sqlite3')
+  db.exec(PRAGMAS)
+  return { tables, lost }
 }
 
 function dataUrlBytes(url: string): Uint8Array {
@@ -283,6 +346,8 @@ function handle(req: Req): unknown {
       return fileDelete(req.name)
     case 'file-list':
       return fileList()
+    case 'repair':
+      return repair()
     case 'genome-gz':
       return genomeGz(req.personId)
     case 'genotype-table':

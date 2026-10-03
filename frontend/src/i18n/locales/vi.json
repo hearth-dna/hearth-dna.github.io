@@ -1022,5 +1022,16 @@
   "backupCard.phoneCopy": "Bản sao một tệp cho điện thoại",
   "backupCard.phoneCopyHint": "Ghi mọi thứ, gồm cả DNA, vào một tệp trong thư mục này, để điện thoại tải bằng một lần chọn.",
   "backupCard.phoneCopyDone": "Đã ghi {file} vào {name}: mọi thứ tính đến lúc này, gồm cả DNA. Trên điện thoại, chỉ chọn tệp này trong «Tải bản sao lưu».",
-  "backupCard.oneFileHint": "Thư mục sao lưu giữ DNA trong một thư mục con, còn điện thoại chỉ chọn tệp trong một thư mục mỗi lần. Để tải mọi thứ bằng một lần chọn, hãy chọn hearth-phone-copy.hearth (tạo trên máy tính bằng «Bản sao một tệp cho điện thoại») hoặc tệp .zip của cả thư mục sao lưu."
+  "backupCard.oneFileHint": "Thư mục sao lưu giữ DNA trong một thư mục con, còn điện thoại chỉ chọn tệp trong một thư mục mỗi lần. Để tải mọi thứ bằng một lần chọn, hãy chọn hearth-phone-copy.hearth (tạo trên máy tính bằng «Bản sao một tệp cho điện thoại») hoặc tệp .zip của cả thư mục sao lưu.",
+  "repair.title": "Dữ liệu trong trình duyệt này bị hỏng",
+  "repair.intro": "Tệp cơ sở dữ liệu trên thiết bị này bị hỏng. Điều này xảy ra khi điện thoại đóng ứng dụng giữa lúc đang lưu, ví dụ khi tải một bộ gen lớn. Sửa chữa giữ lại mọi thứ còn đọc được (người, nhật ký sức khỏe, tài liệu, cài đặt), dựng lại DNA từ các tệp bộ gen lưu trên thiết bị này và bắt đầu một cơ sở dữ liệu sạch. Những gì còn thiếu sẽ trở lại khi tải bản sao lưu của bạn.",
+  "repair.button": "Sửa",
+  "repair.working": "Đang sửa…",
+  "repair.done": "Đã sửa: giữ {people} người và {entries} mục nhật ký, dựng lại DNA của {genomes} người.",
+  "repair.lost": "Không đọc được: {tables}.",
+  "repair.failed": "Sửa thất bại: {error}",
+  "repair.reload": "Mở Hearth",
+  "settingsPage.checkDb": "Kiểm tra cơ sở dữ liệu",
+  "settingsPage.checkingDb": "Đang kiểm tra cơ sở dữ liệu…",
+  "settingsPage.dbIntact": "Cơ sở dữ liệu nguyên vẹn."
 }

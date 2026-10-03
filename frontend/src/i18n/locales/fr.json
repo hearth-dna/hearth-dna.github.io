@@ -1022,5 +1022,16 @@
   "backupCard.phoneCopy": "Copie en un fichier pour un téléphone",
   "backupCard.phoneCopyHint": "Écrit tout, ADN compris, dans un seul fichier de ce dossier, pour qu'un téléphone le charge en une sélection.",
   "backupCard.phoneCopyDone": "{file} écrit dans {name} : tout à cet instant, ADN compris. Sur le téléphone, choisissez seulement ce fichier dans « Charger une sauvegarde ».",
-  "backupCard.oneFileHint": "Un dossier de sauvegarde garde l'ADN dans un sous-dossier, et un téléphone choisit les fichiers d'un seul dossier à la fois. Pour tout charger en une sélection, choisissez hearth-phone-copy.hearth (créé sur l'ordinateur avec « Copie en un fichier pour un téléphone ») ou un .zip de tout le dossier de sauvegarde."
+  "backupCard.oneFileHint": "Un dossier de sauvegarde garde l'ADN dans un sous-dossier, et un téléphone choisit les fichiers d'un seul dossier à la fois. Pour tout charger en une sélection, choisissez hearth-phone-copy.hearth (créé sur l'ordinateur avec « Copie en un fichier pour un téléphone ») ou un .zip de tout le dossier de sauvegarde.",
+  "repair.title": "Les données de ce navigateur sont endommagées",
+  "repair.intro": "Le fichier de base de données de cet appareil est endommagé. Cela arrive quand le téléphone ferme l'application en plein enregistrement, par exemple pendant le chargement d'un grand génome. La réparation garde tout ce qui se lit encore (personnes, journal de santé, documents, réglages), reconstruit l'ADN à partir des fichiers de génome gardés sur cet appareil et repart d'une base propre. Ce qui manque encore revient en chargeant votre sauvegarde.",
+  "repair.button": "Réparer",
+  "repair.working": "Réparation…",
+  "repair.done": "Réparé : {people} personnes et {entries} entrées du journal gardées, ADN de {genomes} personnes reconstruit.",
+  "repair.lost": "Illisible : {tables}.",
+  "repair.failed": "Échec de la réparation : {error}",
+  "repair.reload": "Ouvrir Hearth",
+  "settingsPage.checkDb": "Vérifier la base de données",
+  "settingsPage.checkingDb": "Vérification de la base de données…",
+  "settingsPage.dbIntact": "La base de données est intacte."
 }

@@ -330,3 +330,42 @@ async function restoreV1(db: Database, dump: DumpV1, onProgress: Progress): Prom
     exportedAt: dump.exported_at,
   }
 }
+
+/**
+ * After a repair (Database.repair) every person is without genotypes, but the genome files kept
+ * beside the database survived it: each person's latest original (`genome-<sha>.gz`, named by its
+ * source_file row) or, for someone imported before originals were kept, the rebuilt copy
+ * (`generic-<person>-<rows>.gz`). Returns how many people got their genotypes back.
+ */
+export async function rebuildGenomesFromCache(
+  db: Database,
+  onProgress: Progress = () => {},
+): Promise<number> {
+  const people = (await db.query(
+    `SELECT p.id FROM person p WHERE NOT EXISTS (SELECT 1 FROM genotype g WHERE g.person_id = p.id)`,
+  )) as { id: string }[]
+  const cached = await db.fileList()
+  let n = 0
+  for (const [i, { id }] of people.entries()) {
+    const sf = await db.one(
+      'SELECT id, provider, build, sha256 FROM source_file WHERE person_id = ? ORDER BY imported_at DESC LIMIT 1',
+      [id],
+    )
+    const original = sf ? await db.fileGet(genomeBlobName(sf.sha256 as string)) : null
+    const rebuilt = original ? null : cached.find((f) => f.startsWith(`generic-${id}-`))
+    const gz = original ?? (rebuilt ? await db.fileGet(rebuilt) : null)
+    if (!gz) continue
+    const entry: GenomeEntry = {
+      path: '',
+      sha256: '',
+      person_id: id,
+      source_file_id: original ? (sf?.id as string) : null,
+      provider: original ? (sf?.provider as GenomeEntry['provider']) : 'generic',
+      build: original ? (sf?.build as string) : '37',
+      kind: original ? 'original' : 'reconstructed',
+    }
+    await restoreGenome(db, entry, gz, onProgress, { n: i + 1, total: people.length })
+    n++
+  }
+  return n
+}

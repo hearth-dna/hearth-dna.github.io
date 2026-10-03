@@ -1022,5 +1022,16 @@
   "backupCard.phoneCopy": "给手机的单文件副本",
   "backupCard.phoneCopyHint": "把包括 DNA 在内的全部内容写入此文件夹中的一个文件，让手机一次选择即可加载。",
   "backupCard.phoneCopyDone": "已将 {file} 写入 {name}：截至现在的全部内容，包括 DNA。在手机上的“加载备份”中只选择这个文件。",
-  "backupCard.oneFileHint": "备份文件夹把 DNA 放在子文件夹中，而手机一次只能从一个文件夹选择文件。要一次选择就加载全部内容，请选择 hearth-phone-copy.hearth（在电脑上用“给手机的单文件副本”生成），或整个备份文件夹的 .zip。"
+  "backupCard.oneFileHint": "备份文件夹把 DNA 放在子文件夹中，而手机一次只能从一个文件夹选择文件。要一次选择就加载全部内容，请选择 hearth-phone-copy.hearth（在电脑上用“给手机的单文件副本”生成），或整个备份文件夹的 .zip。",
+  "repair.title": "此浏览器中的数据已损坏",
+  "repair.intro": "此设备上的数据库文件已损坏。当手机在保存过程中关闭应用时（例如加载大型基因组时）会发生这种情况。修复会保留所有仍可读取的内容（人员、健康记录、文档、设置），用此设备上保存的基因组文件重建 DNA，并启用一个干净的数据库。仍缺少的内容可通过加载备份找回。",
+  "repair.button": "修复",
+  "repair.working": "正在修复…",
+  "repair.done": "已修复：保留了 {people} 人和 {entries} 条健康记录，重建了 {genomes} 人的 DNA。",
+  "repair.lost": "无法读取：{tables}。",
+  "repair.failed": "修复失败：{error}",
+  "repair.reload": "打开 Hearth",
+  "settingsPage.checkDb": "检查数据库",
+  "settingsPage.checkingDb": "正在检查数据库…",
+  "settingsPage.dbIntact": "数据库完好。"
 }

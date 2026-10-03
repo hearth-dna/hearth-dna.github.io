@@ -1,0 +1,10 @@
+{
+  "repair.title": "The data in this browser is damaged",
+  "repair.intro": "The database file on this device is damaged. This can happen when the phone closes the app in the middle of saving, for example while loading a large genome. Repair keeps everything that can still be read (people, health log, documents, settings), rebuilds DNA from the genome files kept on this device, and starts a clean database. Anything still missing comes back by loading your backup.",
+  "repair.button": "Repair",
+  "repair.working": "Repairing…",
+  "repair.done": "Repaired: kept {people} people and {entries} health-log entries, and rebuilt the DNA of {genomes} people.",
+  "repair.lost": "Could not be read: {tables}.",
+  "repair.failed": "Repair failed: {error}",
+  "repair.reload": "Open Hearth"
+}
