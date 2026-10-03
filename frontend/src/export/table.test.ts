@@ -74,6 +74,7 @@ describe('tables', () => {
         conditions: ['c1', 'c2'],
         topic: 't',
         generated_by: '',
+        areas: [],
       },
       genotype: 'AA',
       call: { rsid: 'rs1', chromosome: '1', position: 5, a1: 'A', a2: 'A' },

@@ -5,12 +5,13 @@ import { classifyQuestion, TEMPLATE_FOR } from '../ask/intent'
 import { type AskData, itemLabel, packPeople, resolve } from '../ask/items'
 import { PROMPTS } from '../ask/prompts'
 import { type ItemKey, parseKey, recommend } from '../ask/recommend'
-import { listHealthLog, logSharing, newId, now, personCallsFor } from '../db/repo'
-import { rich, useT } from '../i18n/context'
+import { listHealthLog, personCallsFor } from '../db/repo'
+import { useT } from '../i18n/context'
 import { computeFindings } from '../kb/kb'
 import type { Call } from '../types'
 import { AskSearch } from './AskSearch'
 import { AskSuggestions } from './AskSuggestions'
+import { PackPreview } from './PackPreview'
 
 /**
  * Ask, tiers 0 and 2 (docs/design.md §6.3). The question is classified locally (medication, labs,
@@ -30,8 +31,6 @@ export function AskPage() {
   const [evidence, setEvidence] = useState(true)
   const [templateId, setTemplateId] = useState(PROMPTS[0].id)
   const [templateChosen, setTemplateChosen] = useState(false)
-  const [confirmOpen, setConfirmOpen] = useState(false)
-  const [copied, setCopied] = useState<string | null>(null)
 
   // Load kb findings and the health log once per selected person.
   useEffect(() => {
@@ -110,17 +109,6 @@ export function AskPage() {
   const options = { question, people: packed, realNames, template, compact, evidence }
   const pack = buildContextPack(options)
   const stats = packStats(options, pack)
-
-  const copy = async (destination: string) => {
-    await navigator.clipboard.writeText(pack)
-    await logSharing(db, 'copy-out', destination, pack)
-    await db.exec(
-      'INSERT INTO chat(id,person_ids,question,context_pack,tier,created_at) VALUES (?,?,?,?,?,?)',
-      [newId(), packed.map((p) => p.person.id).join(','), question, pack, 'copy-out', now()],
-    )
-    setConfirmOpen(false)
-    setCopied(destination)
-  }
 
   return (
     <div>
@@ -250,72 +238,13 @@ export function AskPage() {
         )}
       </div>
 
-      <div className="card">
-        <h2>
-          {t('askPage.previewHeading', {
-            chars: stats.chars.toLocaleString(),
-            tokens: stats.tokens.toLocaleString(),
-          })}
-        </h2>
-        <pre className="pack">{pack}</pre>
-        <div className="row">
-          <button
-            type="button"
-            className="primary"
-            disabled={packed.length === 0}
-            onClick={() => setConfirmOpen(true)}
-          >
-            {t('askPage.copyButton')}
-          </button>
-          {copied && <span className="ok">{t('askPage.copied', { destination: copied })}</span>}
-        </div>
-        <p className="muted">
-          {rich(t('askPage.openAssistant'), {
-            chatgpt: (c) => (
-              <a href="https://chatgpt.com" target="_blank" rel="noreferrer">
-                {c}
-              </a>
-            ),
-            claude: (c) => (
-              <a href="https://claude.ai" target="_blank" rel="noreferrer">
-                {c}
-              </a>
-            ),
-            gemini: (c) => (
-              <a href="https://gemini.google.com" target="_blank" rel="noreferrer">
-                {c}
-              </a>
-            ),
-          })}
-        </p>
-      </div>
-
-      {confirmOpen && (
-        <dialog open>
-          <h2 className="mt-0">{t('askPage.confirmTitle')}</h2>
-          <p>{rich(t('askPage.confirmBody'))}</p>
-          <ul>
-            <li>
-              {t('askPage.confirmCounts', {
-                genotypes: stats.genotypes,
-                healthEntries: stats.healthEntries,
-                people: packed.length,
-                peopleWord: packed.length === 1 ? t('askPage.person') : t('askPage.peopleWord'),
-                naming: realNames ? t('askPage.withRealNames') : t('askPage.pseudonymised'),
-              })}
-            </li>
-            <li>{t('askPage.confirmLogged')}</li>
-          </ul>
-          <div className="row">
-            <button type="button" className="primary" onClick={() => copy('clipboard')}>
-              {t('askPage.confirmCopy')}
-            </button>
-            <button type="button" onClick={() => setConfirmOpen(false)}>
-              {t('common.cancel')}
-            </button>
-          </div>
-        </dialog>
-      )}
+      <PackPreview
+        pack={pack}
+        stats={stats}
+        people={packed.map((p) => p.person)}
+        question={question}
+        realNames={realNames}
+      />
     </div>
   )
 }

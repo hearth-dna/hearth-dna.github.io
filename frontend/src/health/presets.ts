@@ -1,4 +1,12 @@
 import type { HealthKind } from '../types'
+import synonyms from './synonyms.json'
+
+/**
+ * Other names for each symptom preset, by id: what a person types or a document says for the
+ * same symptom in English, Russian, Ukrainian, German, Spanish and French. The UI name in every
+ * language comes from the locale files (`preset.<id>`). Lower case; matching ignores case anyway.
+ */
+const SYNONYMS: Record<string, string[]> = synonyms
 
 /**
  * Common situations offered as one-click starting points for a health-log entry. A preset only
@@ -84,6 +92,7 @@ const s = (
   kind: 'symptom',
   bodyPart,
   tags,
+  synonyms: SYNONYMS[id],
   ...(details ? { details } : {}),
 })
 const choice = (id: string, options: string[]): DetailField => ({ id, kind: 'choice', options })
@@ -288,15 +297,30 @@ export const SYMPTOM_PRESETS: HealthPreset[] = [
   s('hot-flushes', 'Hot flushes', 'whole body'),
   s('swelling', 'Swelling', ''),
   s('numbness', 'Numbness or tingling', ''),
+  s('blurred-vision', 'Blurred vision', 'eyes'),
+  s('cold-intolerance', 'Always feeling cold', 'whole body'),
+  s('confusion', 'Confusion', 'head'),
+  s('difficulty-swallowing', 'Difficulty swallowing', 'throat'),
+  s('memory-loss', 'Forgetfulness', 'head'),
+  s('mole-change', 'New or changing mole', 'skin'),
+  s('stiffness', 'Stiffness', 'joints'),
+  s('cramps', 'Muscle cramps', 'muscles'),
+  s('tinnitus', 'Ringing in the ears', 'ears'),
 ]
 
 export const EVENT_PRESETS: HealthPreset[] = [
   { id: 'took-medication', title: 'Took medication', kind: 'medication' },
   { id: 'vaccination', title: 'Vaccination', kind: 'medication', tags: ['vaccine'] },
   { id: 'doctor-visit', title: 'Doctor visit', kind: 'letter' },
-  { id: 'injury', title: 'Injury', kind: 'symptom', tags: ['injury'] },
-  { id: 'allergic-reaction', title: 'Allergic reaction', kind: 'symptom', tags: ['allergy'] },
-  { id: 'fainting', title: 'Fainting', kind: 'symptom', bodyPart: 'head' },
+  { id: 'injury', title: 'Injury', kind: 'symptom', tags: ['injury'], synonyms: SYNONYMS.injury },
+  {
+    id: 'allergic-reaction',
+    title: 'Allergic reaction',
+    kind: 'symptom',
+    tags: ['allergy'],
+    synonyms: SYNONYMS['allergic-reaction'],
+  },
+  { id: 'fainting', title: 'Fainting', kind: 'symptom', bodyPart: 'head', synonyms: SYNONYMS.fainting },
 ]
 
 export const PRESET_GROUPS: { label: string; labelKey: string; presets: HealthPreset[] }[] = [
@@ -320,10 +344,11 @@ const byTitle = (list: HealthPreset[], title: string) =>
 export const measurementPreset = (title: string): HealthPreset | undefined =>
   byTitle(MEASUREMENT_PRESETS, title)
 
-/** The symptom preset a saved entry was made from, by its title (older titles included). */
-export const symptomPreset = (title: string): HealthPreset | undefined =>
-  byTitle(SYMPTOM_PRESETS, title) ??
-  (title.trim().toLowerCase() === 'eye irritation' ? findPreset('eye-irritation') : undefined)
+/** The symptom preset a saved entry was made from, by its title or a synonym (older titles included). */
+export const symptomPreset = (title: string): HealthPreset | undefined => {
+  const p = presetOf({ kind: 'symptom', title })
+  return p && SYMPTOM_PRESETS.includes(p) ? p : undefined
+}
 
 /**
  * Presets of one kind ordered for a quick bar: the ones this person has recorded before come
@@ -347,4 +372,25 @@ export function presetOrder(
 /** Presets that start an entry of this kind, in list order, for the chips above the form. */
 export function presetsFor(kind: HealthKind): HealthPreset[] {
   return PRESET_GROUPS.flatMap((g) => g.presets).filter((p) => p.kind === kind)
+}
+
+const loose = (x: string) =>
+  x.normalize('NFKC').toLowerCase().replace(/[’ʼ]/g, "'").replace(/ё/g, 'е').replace(/\s+/g, ' ').trim()
+
+/**
+ * The preset a saved entry names: one of the same kind whose title or a synonym equals the
+ * entry's title. Entries keep the English title they were saved with ("Headache"), or whatever
+ * name the person typed ("головная боль"); this is how both show up in the UI language.
+ */
+export function presetOf(e: { kind: string; title: string }): HealthPreset | undefined {
+  const n = loose(e.title)
+  return PRESET_GROUPS.flatMap((g) => g.presets).find(
+    (p) => p.kind === e.kind && [p.title, ...(p.synonyms ?? [])].some((x) => loose(x) === n),
+  )
+}
+
+/** An entry's title as the UI shows it: the preset's name in the UI language, else as saved. */
+export function entryTitle(e: { kind: string; title: string }, t: (key: string) => string): string {
+  const p = presetOf(e)
+  return p ? t(`preset.${p.id}`) : e.title
 }

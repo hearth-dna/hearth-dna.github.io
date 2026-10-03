@@ -19,7 +19,7 @@ import {
   when,
 } from '../health/log'
 import { today } from '../health/now'
-import { measurementPreset, symptomPreset } from '../health/presets'
+import { entryTitle, presetOf, symptomPreset } from '../health/presets'
 import { useI18n, useT } from '../i18n/context'
 import { conditionById, conditionName, suggestConditions } from '../kb/conditions'
 import { type Attachment, HEALTH_KIND_LABELS, type HealthEntry, type HealthKind, type Person } from '../types'
@@ -103,6 +103,7 @@ export function HealthTable({
   const [view, setView] = useState<View>(loadView)
   const [panel, setPanel] = useState(false)
   const name = (id: string) => persons.find((p) => p.id === id)?.displayName ?? id
+  const title = (e: HealthEntry) => entryTitle(e, t)
   const { bodyParts, tags, conditions } = useMemo(() => facets(entries), [entries])
   const conditionLabel = (id: string) => {
     const c = conditionById(kb, id)
@@ -118,10 +119,10 @@ export function HealthTable({
     for (const e of byPerson) c[e.kind] = (c[e.kind] ?? 0) + 1
     return { all: byPerson.length, c }
   }, [entries, filter.person])
-  // biome-ignore lint/correctness/useExhaustiveDependencies: name derives from persons
+  // biome-ignore lint/correctness/useExhaustiveDependencies: name derives from persons, title from t
   const shown = useMemo(
-    () => sortHealthLog(filterHealthLog(entries, filter), sort.key, sort.dir, name),
-    [entries, filter, sort, persons],
+    () => sortHealthLog(filterHealthLog(entries, filter, title), sort.key, sort.dir, name, title),
+    [entries, filter, sort, persons, t],
   )
   const set = (patch: Partial<HealthFilter>) => onFilter({ ...filter, ...patch })
   // A deleted or reloaded entry leaves the selection.
@@ -175,7 +176,7 @@ export function HealthTable({
       type="checkbox"
       className={className}
       checked={picked.has(e.id)}
-      aria-label={t('healthTable.selectRow', { title: e.title, date: e.date })}
+      aria-label={t('healthTable.selectRow', { title: title(e), date: e.date })}
       onClick={(ev) => ev.stopPropagation()}
       onChange={() => pick(e.id)}
     />
@@ -297,7 +298,7 @@ export function HealthTable({
           value={e.conditions}
           suggestions={suggestConditions(kb, {
             ...e,
-            preset: e.kind === 'measurement' ? measurementPreset(e.title)?.id : undefined,
+            preset: presetOf(e)?.id,
           })}
           onChange={(ids) => link(e, ids)}
         />
@@ -333,7 +334,7 @@ export function HealthTable({
           {showPerson && <span className="hl-person">{name(e.personId)}</span>}
           <span className="hl-when muted">{grouped ? e.time : when(e)}</span>
         </span>
-        <span className="hl-title">{e.title}</span>
+        <span className="hl-title">{title(e)}</span>
         {e.value !== null && (
           <span className="hl-value">
             {formatValue(e)}
@@ -686,7 +687,7 @@ export function HealthTable({
                       <span className={`badge kind-${e.kind}`}>{t(`kind.${e.kind}`)}</span>
                     </td>
                     <td>
-                      {e.title}
+                      {title(e)}
                       {e.body && <span className="muted"> ¶</span>} {clip(e)}
                     </td>
                     <td className="nowrap">

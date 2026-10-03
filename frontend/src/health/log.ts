@@ -154,7 +154,12 @@ export function panelFilterCount(f: HealthFilter): number {
     .length
 }
 
-export function filterHealthLog(entries: HealthEntry[], f: HealthFilter): HealthEntry[] {
+/** Entries that pass the filter; the text search also looks in `title`, the name the table shows. */
+export function filterHealthLog(
+  entries: HealthEntry[],
+  f: HealthFilter,
+  title: (e: HealthEntry) => string = (e) => e.title,
+): HealthEntry[] {
   const q = f.text.trim().toLowerCase()
   return entries.filter(
     (e) =>
@@ -167,7 +172,7 @@ export function filterHealthLog(entries: HealthEntry[], f: HealthFilter): Health
       (!f.to || e.date <= f.to) &&
       (f.minSeverity === null || (e.severity !== null && e.severity >= f.minSeverity)) &&
       (!q ||
-        [e.title, e.body, e.bodyPart, e.unit, formatDetails(e), ...e.tags].some((s) =>
+        [e.title, title(e), e.body, e.bodyPart, e.unit, formatDetails(e), ...e.tags].some((s) =>
           s.toLowerCase().includes(q),
         )),
   )
@@ -190,13 +195,15 @@ export const HEALTH_SORT_DEFAULT_DIR: Record<HealthSortKey, SortDir> = {
 /**
  * Stable sort for the table. Ties fall back to newest first. Empty values (no measurement,
  * unrated, no body part) always sink to the bottom whatever the direction, so "highest first"
- * and "lowest first" both start with real data. `personName` resolves ids for the Person column.
+ * and "lowest first" both start with real data. `personName` resolves ids for the Person column,
+ * `title` gives the name the Title column shows.
  */
 export function sortHealthLog(
   entries: HealthEntry[],
   key: HealthSortKey,
   dir: SortDir,
   personName: (id: string) => string = (id) => id,
+  title: (e: HealthEntry) => string = (e) => e.title,
 ): HealthEntry[] {
   const sign = dir === 'asc' ? 1 : -1
   // Same day: by time of day (an entry without a time counts as the start of the day), then by
@@ -211,7 +218,7 @@ export function sortHealthLog(
     date: (a, b) => sign * when(a).localeCompare(when(b)) || byDate(a, b),
     person: (a, b) => text(personName(a.personId), personName(b.personId)),
     kind: (a, b) => sign * HEALTH_KIND_LABELS[a.kind].localeCompare(HEALTH_KIND_LABELS[b.kind]),
-    title: (a, b) => text(a.title.toLowerCase(), b.title.toLowerCase()),
+    title: (a, b) => text(title(a).toLowerCase(), title(b).toLowerCase()),
     value: (a, b) => num(a.value, b.value),
     bodyPart: (a, b) => text(a.bodyPart, b.bodyPart),
     severity: (a, b) => num(a.severity, b.severity),

@@ -14,6 +14,7 @@ const entry = (o: Partial<KbEntry>): KbEntry => ({
   sources: [],
   topic: 't',
   generated_by: '',
+  areas: [],
   ...o,
 })
 const finding = (o: Partial<KbEntry>, magnitude: number | null, riskCopies = 0): Finding => ({

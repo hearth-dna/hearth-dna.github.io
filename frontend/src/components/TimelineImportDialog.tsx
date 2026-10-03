@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useApp } from '../app/context'
 import { grantConsent, hasConsent } from '../consent/consent'
 import { addHealthEntries, listHealthLog } from '../db/repo'
-import { MEASUREMENT_PRESETS } from '../health/presets'
+import { entryTitle, MEASUREMENT_PRESETS } from '../health/presets'
 import { useI18n, useT } from '../i18n/context'
 import { sha256Hex } from '../import/unpack'
 import { parseTable } from '../text/table'
@@ -424,7 +424,7 @@ export function TimelineImportDialog({
                 // biome-ignore lint/suspicious/noArrayIndexKey: a fixed preview of the first rows
                 <li key={n}>
                   {e.date}
-                  {e.time ? ` ${e.time}` : ''} · {e.title}: {e.value}
+                  {e.time ? ` ${e.time}` : ''} · {entryTitle(e, t)}: {e.value}
                   {e.value2 != null ? `/${e.value2}` : ''} {e.unit}
                 </li>
               ))}

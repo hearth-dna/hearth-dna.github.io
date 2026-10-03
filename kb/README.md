@@ -4,16 +4,29 @@
 and writes `frontend/public/kb.json`, which the PWA loads from its own origin and caches offline.
 
 Entry shape: `rsid, gene, name, risk_allele, orientation, evidence (A/B/C), summary, genotypes
-{"AG": {label, magnitude}}, sources[], drugs[]?, conditions[]?`. Genotype keys are forward-strand;
+{"AG": {label, magnitude}}, sources[], areas[], drugs[]?, conditions[]?, generated_by?`. Genotype keys are forward-strand;
 the build sorts the two alleles so `GA` and `AG` are the same key. `conditions` holds condition
 ids from the catalogue below, never free text.
+
+`generated_by` defaults to `human`. Entries drafted with an LLM say `llm:draft` and show as
+"draft, not yet reviewed" in the app until someone checks the alleles, strand and effect sizes
+against the sources and removes the field.
+
+## Areas
+
+`reviewed/areas.json` lists the areas of medicine the DNA viewer filters by: heart, diabetes and
+weight, memory, mental health and emotional stability, strength and fitness, medication response,
+cancer, nutrition, eyes and skin. Shape: `id, names {en, …}`, one name per UI language. Every
+entry names one or more areas in `areas`; the build rejects an entry without one or with an
+unknown id. An entry may sit in several areas (CYP2D6 is both medication response and mental
+health, because it guides antidepressant dosing).
 
 ## Conditions
 
 `reviewed/conditions.json` is the condition catalogue: the one id that ties a family's DNA markers
 to the health-log records about the same condition. Shape: `id, names {en, ru, …}, synonyms {lang:
 […]}?, icd10[], category, rsids[], labs [{name, loinc?, synonyms?}], measurements[] (preset ids from
-frontend/src/health/presets.ts), symptoms[], body_parts[] (BODY_PARTS in types.ts), drugs[],
+frontend/src/health/presets.ts), symptoms[] (symptom preset ids, same file), body_parts[] (BODY_PARTS in types.ts), drugs[],
 summary?, sources[]?, reviewed_at`. `names.en` is required; the app falls back to it for other
 languages. Names, synonyms, lab names and drugs are what the app matches free text against, in
 any language listed, so add the words people actually write ("high blood pressure", "давление").

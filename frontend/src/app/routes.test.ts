@@ -9,6 +9,8 @@ describe('routes', () => {
     { name: 'health', person: '' },
     { name: 'health', person: 'p 2' },
     { name: 'charts' },
+    { name: 'dna', person: '' },
+    { name: 'dna', person: 'p 5' },
     { name: 'import', source: '', person: '' },
     { name: 'import', source: 'csv', person: '' },
     { name: 'import', source: 'document', person: 'p 3' },
@@ -23,6 +25,7 @@ describe('routes', () => {
     expect(formatRoute({ name: 'health', person: '' })).toBe('/health-log')
     expect(formatRoute({ name: 'health', person: 'abc' })).toBe('/health-log/abc')
     expect(formatRoute({ name: 'person', id: 'abc' })).toBe('/people/abc')
+    expect(formatRoute({ name: 'dna', person: 'abc' })).toBe('/dna/abc')
     expect(formatRoute({ name: 'import', source: 'csv', person: 'abc' })).toBe('/import/csv/abc')
     expect(parseRoute('/import/nonsense')).toBeNull()
   })

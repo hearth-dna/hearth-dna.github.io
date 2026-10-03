@@ -3,6 +3,7 @@ import { useApp } from '../app/context'
 import { removeAttachment } from '../attachments/store'
 import { deleteHealthEntry, listAttachments, listHealthLog } from '../db/repo'
 import { facets, type HealthFilter, NO_FILTER } from '../health/log'
+import { entryTitle } from '../health/presets'
 import { useT } from '../i18n/context'
 import type { Attachment, HealthEntry, Person } from '../types'
 import { HealthEntryForm } from './HealthEntryForm'
@@ -82,7 +83,7 @@ export function HealthLog({ person }: { person: Person }) {
         onFilter={setFilter}
         onChange={reload}
         onDelete={async (e) => {
-          if (confirm(t('healthLog.confirmDelete', { title: e.title, date: e.date }))) {
+          if (confirm(t('healthLog.confirmDelete', { title: entryTitle(e, t), date: e.date }))) {
             await deleteHealthEntry(db, e.id)
             await reload()
           }

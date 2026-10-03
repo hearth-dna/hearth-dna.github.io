@@ -14,7 +14,6 @@
   "askPage.previewHeading": "Preview — exactly what will be copied ({chars} characters, about {tokens} tokens)",
   "askPage.copyButton": "Copy context pack…",
   "askPage.copied": "Copied for {destination}. Now paste it into the assistant.",
-  "askPage.openAssistant": "Open the assistant yourself: <chatgpt>ChatGPT</chatgpt> · <claude>Claude</claude> · <gemini>Gemini</gemini>. These links carry no data. Consumer chat accounts may use conversations for training unless you turn that off in the provider's settings; consider doing so before pasting health information.",
   "askPage.confirmTitle": "Before you copy",
   "askPage.confirmBody": "The text in the preview will be placed on your clipboard. Once pasted into a third-party service it is governed by <em>their</em> terms and privacy policy, not Hearth's.",
   "askPage.confirmCounts": "{genotypes} genotypes and {healthEntries} health-log entries for {people} {peopleWord}, {naming}",
@@ -74,5 +73,15 @@
   "askPage.reason.notable": "notable marker",
   "askPage.reason.sharedVariant": "carried by several selected people",
   "askPage.reason.matchesQuestion": "mentions “{term}”",
-  "askPage.reason.recent": "recent entry ({kind})"
+  "askPage.reason.recent": "recent entry ({kind})",
+  "askPage.shareButton": "Share…",
+  "askPage.shared": "Handed to the app you chose.",
+  "askPage.confirmShareBody": "The text in the preview will be handed to the app you pick in the share sheet. Once it reaches a third-party service it is governed by <em>their</em> terms and privacy policy, not Hearth's.",
+  "askPage.confirmShare": "I have checked the preview — share",
+  "askPage.openIn": "Open in:",
+  "askPage.tooLong": "At {chars} characters the pack is too long to send in a link; copy it instead, or include fewer records.",
+  "askPage.trainingNotice": "Consumer chat accounts may use conversations for training unless you turn that off in the provider's settings; consider doing so before sending health information.",
+  "askPage.confirmLinkBody": "The text in the preview will be put into the address of a new {assistant} page: it is sent to {assistant} and stays in your browser history. From there it is governed by <em>their</em> terms and privacy policy, not Hearth's.",
+  "askPage.confirmOpen": "I have checked the preview — open {assistant}",
+  "askPage.opened": "Opened in {assistant}."
 }

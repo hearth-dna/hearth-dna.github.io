@@ -1,0 +1,30 @@
+{
+  "topic": "brain_and_body",
+  "category": "lifestyle",
+  "entries": [
+    {"rsid": "rs6265", "gene": "BDNF", "name": "BDNF Val66Met", "risk_allele": "T", "orientation": "forward", "evidence": "C", "generated_by": "llm:draft",
+     "summary": "T (Met66) allele lowers activity-dependent release of BDNF, a growth factor for neurons. Linked to slightly weaker episodic memory and a smaller hippocampus in some studies; links to depression and anxiety are inconsistent. Exercise raises BDNF whatever the genotype.",
+     "genotypes": {"CC": {"label": "Val/Val, typical", "magnitude": 0}, "CT": {"label": "Val/Met, possibly slightly weaker episodic memory", "magnitude": 1}, "TT": {"label": "Met/Met, possibly weaker episodic memory", "magnitude": 1.5}},
+     "sources": ["https://www.ncbi.nlm.nih.gov/snp/rs6265", "https://medlineplus.gov/genetics/gene/bdnf/"], "areas": ["memory", "mental"]},
+    {"rsid": "rs17070145", "gene": "WWC1 (KIBRA)", "name": "KIBRA rs17070145", "risk_allele": "C", "orientation": "forward", "evidence": "C", "generated_by": "llm:draft",
+     "summary": "T allele carriers performed better on episodic memory tests in the original and several replication studies; the effect is small and not found in every cohort.",
+     "genotypes": {"TT": {"label": "possibly better episodic memory", "magnitude": 0}, "CT": {"label": "possibly better episodic memory", "magnitude": 0}, "CC": {"label": "typical episodic memory", "magnitude": 0.5}},
+     "sources": ["https://www.ncbi.nlm.nih.gov/snp/rs17070145"], "areas": ["memory"]},
+    {"rsid": "rs1360780", "gene": "FKBP5", "name": "FKBP5 rs1360780", "risk_allele": "T", "orientation": "forward", "evidence": "C", "generated_by": "llm:draft",
+     "summary": "T allele slows the shut-off of the cortisol stress response. In people with childhood adversity it is linked to higher PTSD and depression risk (a gene-environment interaction); alone it predicts little.",
+     "genotypes": {"CC": {"label": "typical stress-hormone recovery", "magnitude": 0}, "CT": {"label": "slower cortisol recovery; matters mainly after trauma", "magnitude": 1}, "TT": {"label": "slower cortisol recovery; matters mainly after trauma", "magnitude": 1.5}},
+     "sources": ["https://www.ncbi.nlm.nih.gov/snp/rs1360780"], "conditions": ["stress_sensitivity"], "areas": ["mental"]},
+    {"rsid": "rs1006737", "gene": "CACNA1C", "name": "CACNA1C rs1006737", "risk_allele": "A", "orientation": "forward", "evidence": "B", "generated_by": "llm:draft",
+     "summary": "Genome-wide significant risk allele for bipolar disorder and schizophrenia, each A copy raising odds only ~1.1–1.2x. Lifetime risk stays low for almost every carrier; useful for research, not prediction.",
+     "genotypes": {"GG": {"label": "typical", "magnitude": 0}, "AG": {"label": "~1.1x bipolar/schizophrenia odds", "magnitude": 1}, "AA": {"label": "~1.3x bipolar/schizophrenia odds", "magnitude": 1.5}},
+     "sources": ["https://www.ncbi.nlm.nih.gov/snp/rs1006737", "https://www.ebi.ac.uk/gwas/variants/rs1006737"], "areas": ["mental"]},
+    {"rsid": "rs1815739", "gene": "ACTN3", "name": "ACTN3 R577X", "risk_allele": "T", "orientation": "forward", "evidence": "B", "generated_by": "llm:draft",
+     "summary": "T (577X) is a stop codon: XX people make no alpha-actinin-3 in fast-twitch muscle fibres. RR is over-represented among sprint and power athletes, XX slightly among endurance athletes. Training matters far more.",
+     "genotypes": {"CC": {"label": "RR: power/sprint-oriented fibres", "magnitude": 0}, "CT": {"label": "RX: mixed", "magnitude": 0}, "TT": {"label": "XX: no alpha-actinin-3, endurance-leaning", "magnitude": 1}},
+     "sources": ["https://www.ncbi.nlm.nih.gov/snp/rs1815739", "https://medlineplus.gov/genetics/gene/actn3/"], "areas": ["fitness"]},
+    {"rsid": "rs1800012", "gene": "COL1A1", "name": "COL1A1 Sp1 (rs1800012)", "risk_allele": "A", "orientation": "forward", "evidence": "B", "generated_by": "llm:draft",
+     "summary": "A allele (the 's' allele, T on the gene's strand) alters type I collagen production; meta-analyses link it to lower bone density and more osteoporotic fractures, and to some ligament injuries. Weight-bearing exercise, calcium and vitamin D matter more.",
+     "genotypes": {"CC": {"label": "SS, typical bone density", "magnitude": 0}, "AC": {"label": "Ss, slightly lower bone density", "magnitude": 1}, "AA": {"label": "ss, lower bone density, ~1.8x vertebral fracture odds", "magnitude": 2}},
+     "sources": ["https://www.ncbi.nlm.nih.gov/snp/rs1800012"], "areas": ["fitness"]}
+  ]
+}

@@ -28,6 +28,7 @@
   "app.navImport": "Import",
   "app.navMore": "More",
   "app.theme": "Theme: {mode}",
+  "app.navDna": "DNA",
   "app.tabFamily": "Lookup",
   "app.tabSettings": "Settings"
 }
