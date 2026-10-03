@@ -1013,5 +1013,10 @@
   "charts.ref.fasting": "en ayunas",
   "peoplePage.birthDate": "Fecha de nacimiento",
   "settingsPage.about": "Acerca de Hearth",
-  "settingsPage.source": "Código fuente (AGPL-3.0)"
+  "settingsPage.source": "Código fuente (AGPL-3.0)",
+  "restore.genomesElsewhere": "El ADN de {names} no está en este archivo: una carpeta de copias lo guarda en la carpeta genomes, junto al archivo de copia.",
+  "backupCard.pickGenomes": "Toque «Cargar archivos de ADN» y elija todos los archivos de esa carpeta genomes.",
+  "backupCard.loadGenomes": "Cargar archivos de ADN…",
+  "backupCard.genomesLoaded": "Se cargó el ADN de {n} personas.",
+  "backupCard.genomesUnmatched": "{n} de los archivos elegidos no son ADN de esta copia o se cifraron con otra contraseña."
 }

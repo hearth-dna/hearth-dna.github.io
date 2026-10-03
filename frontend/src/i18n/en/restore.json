@@ -6,5 +6,6 @@
   "restore.repairing": "Looking for missing genome files in older backups…",
   "restore.missingGenomes": "The genome files for {names} were not in this backup, so their genotypes were not restored. Import their raw files again from their person pages, or restore an older copy of the backup.",
   "restore.pullingAttachments": "Fetching attached documents…",
-  "restore.fetchingGenome": "Fetching genome {n} of {total}…"
+  "restore.fetchingGenome": "Fetching genome {n} of {total}…",
+  "restore.genomesElsewhere": "The DNA for {names} is not inside this file: a backup folder keeps it in the genomes folder next to the backup file."
 }

@@ -1013,5 +1013,10 @@
   "charts.ref.fasting": "em jejum",
   "peoplePage.birthDate": "Data de nascimento",
   "settingsPage.about": "Sobre o Hearth",
-  "settingsPage.source": "Código-fonte (AGPL-3.0)"
+  "settingsPage.source": "Código-fonte (AGPL-3.0)",
+  "restore.genomesElsewhere": "O DNA de {names} não está neste arquivo: uma pasta de backup o guarda na pasta genomes, ao lado do arquivo de backup.",
+  "backupCard.pickGenomes": "Toque em «Carregar arquivos de DNA» e escolha todos os arquivos dessa pasta genomes.",
+  "backupCard.loadGenomes": "Carregar arquivos de DNA…",
+  "backupCard.genomesLoaded": "DNA de {n} pessoas carregado.",
+  "backupCard.genomesUnmatched": "{n} dos arquivos escolhidos não são DNA deste backup, ou foram criptografados com outra senha."
 }

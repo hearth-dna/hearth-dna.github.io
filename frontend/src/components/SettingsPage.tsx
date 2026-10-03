@@ -4,6 +4,7 @@ import { setTheme, THEMES, useTheme } from '../app/theme'
 import { isArchive } from '../archive/mode'
 import { megabytes } from '../attachments/quota'
 import { persistedState } from '../attachments/store'
+import { backups } from '../backup/scheduler'
 import { listConsents, revokeConsent, revokeDeletesData } from '../consent/consent'
 import { CONSENTS } from '../consent/kinds'
 import {
@@ -69,12 +70,17 @@ export function SettingsPage() {
       const r = await restoreBytes(db, bytes, pass || undefined, (key, params) => setMsg(t(key, params)))
       await refresh()
       await reload()
-      const { people, genomes, version, exportedAt, missing } = r
-      const imported = t('settingsPage.imported', { people, genomes, version, exportedAt })
+      backups.noteRestored(r)
+      const { people, genomes, version, exportedAt, missing, elsewhere } = r
+      const names = (xs: { name: string }[]) => xs.map((x) => x.name).join(', ')
       setMsg(
-        missing.length
-          ? `${imported} ${t('restore.missingGenomes', { names: missing.map((m) => m.name).join(', ') })}`
-          : imported,
+        [
+          t('settingsPage.imported', { people, genomes, version, exportedAt }),
+          missing.length ? t('restore.missingGenomes', { names: names(missing) }) : '',
+          elsewhere.length ? t('restore.genomesElsewhere', { names: names(elsewhere) }) : '',
+        ]
+          .filter(Boolean)
+          .join(' '),
       )
     } catch (e) {
       setMsg(t('settingsPage.importFailed', { error: String(e) }))

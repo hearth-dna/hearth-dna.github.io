@@ -1013,5 +1013,10 @@
   "charts.ref.fasting": "খালি পেটে",
   "peoplePage.birthDate": "জন্মতারিখ",
   "settingsPage.about": "Hearth সম্পর্কে",
-  "settingsPage.source": "সোর্স কোড (AGPL-3.0)"
+  "settingsPage.source": "সোর্স কোড (AGPL-3.0)",
+  "restore.genomesElsewhere": "{names}-এর ডিএনএ এই ফাইলে নেই: ব্যাকআপ ফোল্ডার এটি ব্যাকআপ ফাইলের পাশের genomes ফোল্ডারে রাখে।",
+  "backupCard.pickGenomes": "«ডিএনএ ফাইল লোড করুন» চাপুন এবং সেই genomes ফোল্ডারের সব ফাইল বেছে নিন।",
+  "backupCard.loadGenomes": "ডিএনএ ফাইল লোড করুন…",
+  "backupCard.genomesLoaded": "{n} জনের ডিএনএ লোড হয়েছে।",
+  "backupCard.genomesUnmatched": "বেছে নেওয়া ফাইলের {n}টি এই ব্যাকআপের ডিএনএ নয়, বা অন্য পাসফ্রেজ দিয়ে এনক্রিপ্ট করা।"
 }

@@ -138,6 +138,12 @@ have yet. The manual dump, the portable archive and a single-file backup still e
 a reader without this change refuses a folder snapshot with "missing genomes/…" rather than
 restoring it without its genomes.
 
+A folder snapshot loaded as a single file (a phone browser picking `hearth-backup.hearth` from a
+cloud drive, or Settings' dump import) has nothing beside it to fetch from. The restore names
+those people (`elsewhere`) instead of skipping them silently, and the backup card offers
+**Load DNA files…**: the user picks the files in the `genomes` folder, which are opened with the
+passphrase if sealed and matched to the manifest by content hash, so a renamed copy still counts.
+
 **Newer data wins** (the simple rule, until real conflict resolution exists). Before any write,
 and at start and on returning to the foreground, the app reads the folder snapshot's header (the
 first few hundred bytes are plaintext: format, generation, device, exported_at, even when the

@@ -1013,5 +1013,10 @@
   "charts.ref.fasting": "nuchter",
   "peoplePage.birthDate": "Geboortedatum",
   "settingsPage.about": "Over Hearth",
-  "settingsPage.source": "Broncode (AGPL-3.0)"
+  "settingsPage.source": "Broncode (AGPL-3.0)",
+  "restore.genomesElsewhere": "Het DNA van {names} zit niet in dit bestand: een back-upmap bewaart het in de map genomes naast het back-upbestand.",
+  "backupCard.pickGenomes": "Tik op ‘DNA-bestanden laden’ en kies alle bestanden in die map genomes.",
+  "backupCard.loadGenomes": "DNA-bestanden laden…",
+  "backupCard.genomesLoaded": "DNA van {n} personen geladen.",
+  "backupCard.genomesUnmatched": "{n} van de gekozen bestanden zijn geen DNA uit deze back-up, of zijn versleuteld met een ander wachtwoord."
 }

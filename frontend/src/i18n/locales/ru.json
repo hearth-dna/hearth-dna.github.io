@@ -1013,5 +1013,10 @@
   "charts.ref.fasting": "натощак",
   "peoplePage.birthDate": "Дата рождения",
   "settingsPage.about": "О Hearth",
-  "settingsPage.source": "Исходный код (AGPL-3.0)"
+  "settingsPage.source": "Исходный код (AGPL-3.0)",
+  "restore.genomesElsewhere": "ДНК для {names} нет в этом файле: папка резервных копий хранит её в папке genomes рядом с файлом копии.",
+  "backupCard.pickGenomes": "Нажмите «Загрузить файлы ДНК» и выберите все файлы в этой папке genomes.",
+  "backupCard.loadGenomes": "Загрузить файлы ДНК…",
+  "backupCard.genomesLoaded": "Загружена ДНК людей: {n}.",
+  "backupCard.genomesUnmatched": "Выбранных файлов, которые не являются ДНК из этой копии или зашифрованы другим паролем: {n}."
 }

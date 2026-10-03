@@ -1013,5 +1013,10 @@
   "charts.ref.fasting": "nüchtern",
   "peoplePage.birthDate": "Geburtsdatum",
   "settingsPage.about": "Über Hearth",
-  "settingsPage.source": "Quellcode (AGPL-3.0)"
+  "settingsPage.source": "Quellcode (AGPL-3.0)",
+  "restore.genomesElsewhere": "Die DNA von {names} ist nicht in dieser Datei: Ein Sicherungsordner bewahrt sie im Ordner genomes neben der Sicherungsdatei auf.",
+  "backupCard.pickGenomes": "Tippen Sie auf „DNA-Dateien laden“ und wählen Sie alle Dateien in diesem Ordner genomes.",
+  "backupCard.loadGenomes": "DNA-Dateien laden…",
+  "backupCard.genomesLoaded": "DNA von {n} Personen geladen.",
+  "backupCard.genomesUnmatched": "{n} der gewählten Dateien sind keine DNA aus dieser Sicherung oder wurden mit einem anderen Passwort verschlüsselt."
 }

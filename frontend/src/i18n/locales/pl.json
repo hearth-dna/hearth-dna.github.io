@@ -1013,5 +1013,10 @@
   "charts.ref.fasting": "na czczo",
   "peoplePage.birthDate": "Data urodzenia",
   "settingsPage.about": "O Hearth",
-  "settingsPage.source": "Kod źródłowy (AGPL-3.0)"
+  "settingsPage.source": "Kod źródłowy (AGPL-3.0)",
+  "restore.genomesElsewhere": "DNA osób {names} nie ma w tym pliku: folder kopii zapasowych trzyma je w folderze genomes obok pliku kopii.",
+  "backupCard.pickGenomes": "Stuknij „Wczytaj pliki DNA” i wybierz wszystkie pliki z tego folderu genomes.",
+  "backupCard.loadGenomes": "Wczytaj pliki DNA…",
+  "backupCard.genomesLoaded": "Wczytano DNA osób: {n}.",
+  "backupCard.genomesUnmatched": "Wybrane pliki, które nie są DNA z tej kopii lub zostały zaszyfrowane innym hasłem: {n}."
 }
