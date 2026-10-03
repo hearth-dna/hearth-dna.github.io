@@ -1017,5 +1017,6 @@
   "backupCard.loadGenomes": "Charger les fichiers ADN…",
   "backupCard.genomesLoaded": "ADN chargé pour {n} personnes.",
   "backupCard.dnaFrom": "ADN de {name} depuis {file}.",
-  "backupCard.notUsed": "Non utilisés : {files}. Ce ne sont ni une sauvegarde ni des fichiers ADN de cette sauvegarde."
+  "backupCard.notUsed": "Non utilisés : {files}. Personne dans ce navigateur n'a cet ADN : sélectionnez ces fichiers avec le fichier de sauvegarde dans « Charger une sauvegarde ».",
+  "backupCard.notOpened": "Impossible d'ouvrir {files} avec cette phrase de passe. Saisissez celle du dossier de sauvegarde."
 }

@@ -1017,5 +1017,6 @@
   "backupCard.loadGenomes": "Carica file DNA…",
   "backupCard.genomesLoaded": "Caricato il DNA di {n} persone.",
   "backupCard.dnaFrom": "DNA di {name} da {file}.",
-  "backupCard.notUsed": "Non usati: {files}. Non sono un backup né file DNA di questo backup."
+  "backupCard.notUsed": "Non usati: {files}. Nessuno in questo browser ha questo DNA: seleziona questi file insieme al file di backup in «Carica backup».",
+  "backupCard.notOpened": "Impossibile aprire {files} con questa passphrase. Inserisci quella della cartella di backup."
 }

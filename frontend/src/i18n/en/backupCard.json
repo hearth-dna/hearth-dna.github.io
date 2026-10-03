@@ -67,5 +67,6 @@
   "backupCard.loadGenomes": "Load DNA files…",
   "backupCard.genomesLoaded": "Loaded the DNA of {n} people.",
   "backupCard.dnaFrom": "DNA for {name} from {file}.",
-  "backupCard.notUsed": "Not used: {files}. They are not a backup, nor DNA files this backup lists."
+  "backupCard.notUsed": "Not used: {files}. No one in this browser has this DNA: select these files together with the backup file in Load backup.",
+  "backupCard.notOpened": "Could not open {files} with this passphrase. Enter the passphrase the backup folder was set up with."
 }

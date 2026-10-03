@@ -390,6 +390,7 @@ export function useFileLoader(passphrase?: () => string) {
             : t('backupCard.genomesLoaded', { n: genomes }),
           ...r.dna.map((d) => t('backupCard.dnaFrom', { name: d.name, file: d.file })),
           r.unused.length ? t('backupCard.notUsed', { files: r.unused.join(', ') }) : '',
+          r.unopened.length ? t('backupCard.notOpened', { files: r.unopened.join(', ') }) : '',
         ]
           .filter(Boolean)
           .join(' '),

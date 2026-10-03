@@ -1017,5 +1017,6 @@
   "backupCard.loadGenomes": "DNA-bestanden laden…",
   "backupCard.genomesLoaded": "DNA van {n} personen geladen.",
   "backupCard.dnaFrom": "DNA van {name} uit {file}.",
-  "backupCard.notUsed": "Niet gebruikt: {files}. Dit is geen back-up en geen DNA-bestanden van deze back-up."
+  "backupCard.notUsed": "Niet gebruikt: {files}. Niemand in deze browser heeft dit DNA: kies deze bestanden samen met het back-upbestand bij ‘Back-up laden’.",
+  "backupCard.notOpened": "{files} kon niet worden geopend met dit wachtwoord. Voer het wachtwoord van de back-upmap in."
 }

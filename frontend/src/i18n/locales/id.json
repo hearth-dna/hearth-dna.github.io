@@ -1017,5 +1017,6 @@
   "backupCard.loadGenomes": "Muat file DNA…",
   "backupCard.genomesLoaded": "DNA {n} orang telah dimuat.",
   "backupCard.dnaFrom": "DNA {name} dari {file}.",
-  "backupCard.notUsed": "Tidak dipakai: {files}. Ini bukan cadangan, juga bukan file DNA dari cadangan ini."
+  "backupCard.notUsed": "Tidak dipakai: {files}. Tidak ada orang di browser ini yang memiliki DNA ini: pilih file ini bersama file cadangan di «Muat cadangan».",
+  "backupCard.notOpened": "{files} tidak bisa dibuka dengan frasa sandi ini. Masukkan frasa sandi folder cadangan."
 }

@@ -1017,5 +1017,6 @@
   "backupCard.loadGenomes": "Wczytaj pliki DNA…",
   "backupCard.genomesLoaded": "Wczytano DNA osób: {n}.",
   "backupCard.dnaFrom": "DNA osoby {name} z {file}.",
-  "backupCard.notUsed": "Nieużyte: {files}. To nie kopia ani pliki DNA z tej kopii."
+  "backupCard.notUsed": "Nieużyte: {files}. Nikt w tej przeglądarce nie ma tego DNA: wybierz te pliki razem z plikiem kopii w „Wczytaj kopię”.",
+  "backupCard.notOpened": "Nie udało się otworzyć {files} tym hasłem. Wpisz hasło folderu kopii zapasowych."
 }

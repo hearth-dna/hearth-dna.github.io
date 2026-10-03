@@ -1017,5 +1017,6 @@
   "backupCard.loadGenomes": "DNA dosyalarını yükle…",
   "backupCard.genomesLoaded": "{n} kişinin DNA'sı yüklendi.",
   "backupCard.dnaFrom": "{name} için DNA, {file} dosyasından.",
-  "backupCard.notUsed": "Kullanılmadı: {files}. Bunlar bir yedek ya da bu yedeğin DNA dosyaları değil."
+  "backupCard.notUsed": "Kullanılmadı: {files}. Bu tarayıcıda bu DNA'ya sahip kimse yok: bu dosyaları ‘Yedeği yükle’de yedek dosyasıyla birlikte seçin.",
+  "backupCard.notOpened": "{files} bu parolayla açılamadı. Yedek klasörünün parolasını girin."
 }

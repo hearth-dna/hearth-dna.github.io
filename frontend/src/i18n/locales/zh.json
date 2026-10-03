@@ -1017,5 +1017,6 @@
   "backupCard.loadGenomes": "加载 DNA 文件…",
   "backupCard.genomesLoaded": "已加载 {n} 人的 DNA。",
   "backupCard.dnaFrom": "来自 {file} 的 {name} 的 DNA。",
-  "backupCard.notUsed": "未使用：{files}。它们既不是备份，也不是此备份的 DNA 文件。"
+  "backupCard.notUsed": "未使用：{files}。此浏览器中没有人拥有此 DNA：请在“加载备份”中将这些文件与备份文件一起选择。",
+  "backupCard.notOpened": "无法用此密码打开 {files}。请输入备份文件夹的密码。"
 }
