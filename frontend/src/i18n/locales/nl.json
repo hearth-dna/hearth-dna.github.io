@@ -1018,5 +1018,9 @@
   "backupCard.genomesLoaded": "DNA van {n} personen geladen.",
   "backupCard.dnaFrom": "DNA van {name} uit {file}.",
   "backupCard.notUsed": "Niet gebruikt: {files}. Niemand in deze browser heeft dit DNA: kies deze bestanden samen met het back-upbestand bij ‘Back-up laden’.",
-  "backupCard.notOpened": "{files} kon niet worden geopend met dit wachtwoord. Voer het wachtwoord van de back-upmap in."
+  "backupCard.notOpened": "{files} kon niet worden geopend met dit wachtwoord. Voer het wachtwoord van de back-upmap in.",
+  "backupCard.phoneCopy": "Kopie in één bestand voor een telefoon",
+  "backupCard.phoneCopyHint": "Schrijft alles, DNA inbegrepen, in één bestand in deze map, zodat een telefoon het met één selectie laadt.",
+  "backupCard.phoneCopyDone": "{file} geschreven naar {name}: alles van dit moment, DNA inbegrepen. Kies op de telefoon alleen dit bestand bij ‘Back-up laden’.",
+  "backupCard.oneFileHint": "Een back-upmap bewaart het DNA in een submap, en een telefoon kiest bestanden uit één map tegelijk. Om alles met één selectie te laden, kiest u hearth-phone-copy.hearth (op de computer gemaakt met ‘Kopie in één bestand voor een telefoon’) of een .zip van de hele back-upmap."
 }

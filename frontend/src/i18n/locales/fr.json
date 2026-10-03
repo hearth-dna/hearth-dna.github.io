@@ -1018,5 +1018,9 @@
   "backupCard.genomesLoaded": "ADN chargé pour {n} personnes.",
   "backupCard.dnaFrom": "ADN de {name} depuis {file}.",
   "backupCard.notUsed": "Non utilisés : {files}. Personne dans ce navigateur n'a cet ADN : sélectionnez ces fichiers avec le fichier de sauvegarde dans « Charger une sauvegarde ».",
-  "backupCard.notOpened": "Impossible d'ouvrir {files} avec cette phrase de passe. Saisissez celle du dossier de sauvegarde."
+  "backupCard.notOpened": "Impossible d'ouvrir {files} avec cette phrase de passe. Saisissez celle du dossier de sauvegarde.",
+  "backupCard.phoneCopy": "Copie en un fichier pour un téléphone",
+  "backupCard.phoneCopyHint": "Écrit tout, ADN compris, dans un seul fichier de ce dossier, pour qu'un téléphone le charge en une sélection.",
+  "backupCard.phoneCopyDone": "{file} écrit dans {name} : tout à cet instant, ADN compris. Sur le téléphone, choisissez seulement ce fichier dans « Charger une sauvegarde ».",
+  "backupCard.oneFileHint": "Un dossier de sauvegarde garde l'ADN dans un sous-dossier, et un téléphone choisit les fichiers d'un seul dossier à la fois. Pour tout charger en une sélection, choisissez hearth-phone-copy.hearth (créé sur l'ordinateur avec « Copie en un fichier pour un téléphone ») ou un .zip de tout le dossier de sauvegarde."
 }

@@ -1018,5 +1018,9 @@
   "backupCard.genomesLoaded": "{n} kişinin DNA'sı yüklendi.",
   "backupCard.dnaFrom": "{name} için DNA, {file} dosyasından.",
   "backupCard.notUsed": "Kullanılmadı: {files}. Bu tarayıcıda bu DNA'ya sahip kimse yok: bu dosyaları ‘Yedeği yükle’de yedek dosyasıyla birlikte seçin.",
-  "backupCard.notOpened": "{files} bu parolayla açılamadı. Yedek klasörünün parolasını girin."
+  "backupCard.notOpened": "{files} bu parolayla açılamadı. Yedek klasörünün parolasını girin.",
+  "backupCard.phoneCopy": "Telefon için tek dosyalık kopya",
+  "backupCard.phoneCopyHint": "DNA dahil her şeyi bu klasörde tek bir dosyaya yazar, böylece telefon onu tek seçimle yükler.",
+  "backupCard.phoneCopyDone": "{file}, {name} içine yazıldı: şu ana kadarki her şey, DNA dahil. Telefonda ‘Yedeği yükle’de yalnızca bu dosyayı seçin.",
+  "backupCard.oneFileHint": "Yedek klasörü DNA'yı bir alt klasörde tutar ve telefon dosyaları tek klasörden seçer. Her şeyi tek seçimle yüklemek için hearth-phone-copy.hearth dosyasını (bilgisayarda ‘Telefon için tek dosyalık kopya’ ile oluşturulur) ya da tüm yedek klasörünün .zip'ini seçin."
 }

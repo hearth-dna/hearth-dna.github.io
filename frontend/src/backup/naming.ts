@@ -30,6 +30,14 @@ export const rotatedName = (base: string, n: number) => `${base}.${n}`
 export const attachmentsDirName = (profile: string) =>
   profile === 'default' ? 'attachments' : `attachments-${profile}`
 
+/**
+ * A single-file copy for a phone, written into the folder on request: the folder snapshot keeps
+ * genomes in a subfolder, and a phone's file picker selects within one folder only. Not a name the
+ * snapshot rules (rotation, spares, conflicts) ever match.
+ */
+export const phoneCopyName = (profile: string) =>
+  profile === 'default' ? 'hearth-phone-copy.hearth' : `hearth-phone-copy-${profile}.hearth`
+
 /** Where a folder snapshot's genome files go (`external_genomes`), per profile like attachments. */
 export const genomesDirName = (profile: string) => (profile === 'default' ? 'genomes' : `genomes-${profile}`)
 

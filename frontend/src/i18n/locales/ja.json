@@ -1018,5 +1018,9 @@
   "backupCard.genomesLoaded": "{n} 人の DNA を読み込みました。",
   "backupCard.dnaFrom": "{name} の DNA（{file} から）。",
   "backupCard.notUsed": "使われなかったファイル：{files}。このブラウザーにこの DNA の人はいません。「バックアップを読み込む」でバックアップファイルと一緒に選んでください。",
-  "backupCard.notOpened": "このパスフレーズでは {files} を開けませんでした。バックアップフォルダーのパスフレーズを入力してください。"
+  "backupCard.notOpened": "このパスフレーズでは {files} を開けませんでした。バックアップフォルダーのパスフレーズを入力してください。",
+  "backupCard.phoneCopy": "スマートフォン用の単一ファイルのコピー",
+  "backupCard.phoneCopyHint": "DNA を含むすべてをこのフォルダー内の 1 つのファイルに書き出し、スマートフォンで 1 回の選択で読み込めるようにします。",
+  "backupCard.phoneCopyDone": "{file} を {name} に書き出しました（現時点のすべて、DNA を含む）。スマートフォンでは「バックアップを読み込む」でこのファイルだけを選んでください。",
+  "backupCard.oneFileHint": "バックアップフォルダーは DNA をサブフォルダーに保存しますが、スマートフォンは一度に 1 つのフォルダーからしかファイルを選べません。1 回の選択ですべて読み込むには、hearth-phone-copy.hearth（コンピューターで「スマートフォン用の単一ファイルのコピー」で作成）か、バックアップフォルダー全体の .zip を選んでください。"
 }

@@ -1,11 +1,11 @@
-import { gunzipSync, gzipSync, strFromU8, strToU8 } from 'fflate'
+import { gunzipSync, gzipSync, strFromU8, strToU8, zipSync } from 'fflate'
 import { describe, expect, it } from 'vitest'
 import { isEncrypted, sealer } from '../attachments/crypto'
 import type { Database } from '../db/db'
-import { sha256 } from '../export/container'
+import { type Container, serialiseContainer, sha256 } from '../export/container'
 import { sha256Hex } from '../import/unpack'
 import type { Dir } from './folder'
-import { genomeLoader, mirrorGenomes, pickFor, readPickedGenomes } from './genomes'
+import { expandArchives, genomeLoader, mirrorGenomes, pickFor, readPickedGenomes } from './genomes'
 
 /** A folder in memory, with a count of writes so "written once" can be asserted. */
 function memoryDir(name = 'root'): Dir & { files: Map<string, Uint8Array>; writes: () => number } {
@@ -98,5 +98,47 @@ describe('genome files picked by hand', () => {
     expect(pickFor(await waiting(), await readPickedGenomes([sealed], 'correct horse'))).toBe(0)
     expect(await readPickedGenomes([sealed], 'wrong')).toEqual([null])
     await expect(readPickedGenomes([sealed], null)).rejects.toThrow(/passphrase/)
+  })
+})
+
+describe('a zipped backup folder', () => {
+  it('opens into the current snapshot and its genome files, nothing else', () => {
+    const b = (n: number) => new Uint8Array([n])
+    const zip = zipSync({
+      'Hearth/hearth-backup.hearth': b(1),
+      'Hearth/hearth-backup.hearth.1': b(2),
+      'Hearth/hearth-backup.conflict-2026-10-01.hearth': b(3),
+      'Hearth/README.txt': b(4),
+      'Hearth/genomes/abc.txt.gz': b(5),
+      '__MACOSX/Hearth/._hearth-backup.hearth': b(6),
+    })
+    const out = expandArchives([
+      { name: 'Hearth.zip', bytes: zip },
+      { name: 'x.txt.gz', bytes: b(7) },
+    ])
+    expect(out.map((f) => [f.name, f.bytes[0]])).toEqual([
+      ['hearth-backup.hearth', 1],
+      ['abc.txt.gz', 5],
+      ['x.txt.gz', 7],
+    ])
+  })
+
+  it('leaves a backup alone, though a plaintext one is a zip itself', async () => {
+    const dump = await serialiseContainer({
+      header: {
+        format: 'hearth-dump',
+        version: 2,
+        generation: 1,
+        device: 'd',
+        exported_at: '',
+        encrypted: false,
+      },
+      manifest: { app_version: '0', profile: 'default', genomes: [] },
+      journal: {},
+      genomes: {},
+    } as unknown as Container)
+    expect(expandArchives([{ name: 'hearth-phone-copy.hearth', bytes: dump }])).toEqual([
+      { name: 'hearth-phone-copy.hearth', bytes: dump },
+    ])
   })
 })

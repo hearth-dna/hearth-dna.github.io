@@ -1018,5 +1018,9 @@
   "backupCard.genomesLoaded": "已加载 {n} 人的 DNA。",
   "backupCard.dnaFrom": "来自 {file} 的 {name} 的 DNA。",
   "backupCard.notUsed": "未使用：{files}。此浏览器中没有人拥有此 DNA：请在“加载备份”中将这些文件与备份文件一起选择。",
-  "backupCard.notOpened": "无法用此密码打开 {files}。请输入备份文件夹的密码。"
+  "backupCard.notOpened": "无法用此密码打开 {files}。请输入备份文件夹的密码。",
+  "backupCard.phoneCopy": "给手机的单文件副本",
+  "backupCard.phoneCopyHint": "把包括 DNA 在内的全部内容写入此文件夹中的一个文件，让手机一次选择即可加载。",
+  "backupCard.phoneCopyDone": "已将 {file} 写入 {name}：截至现在的全部内容，包括 DNA。在手机上的“加载备份”中只选择这个文件。",
+  "backupCard.oneFileHint": "备份文件夹把 DNA 放在子文件夹中，而手机一次只能从一个文件夹选择文件。要一次选择就加载全部内容，请选择 hearth-phone-copy.hearth（在电脑上用“给手机的单文件副本”生成），或整个备份文件夹的 .zip。"
 }

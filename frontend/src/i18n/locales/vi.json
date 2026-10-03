@@ -1018,5 +1018,9 @@
   "backupCard.genomesLoaded": "Đã tải DNA của {n} người.",
   "backupCard.dnaFrom": "DNA của {name} từ {file}.",
   "backupCard.notUsed": "Không dùng: {files}. Không ai trong trình duyệt này có DNA này: hãy chọn các tệp này cùng tệp sao lưu trong «Tải bản sao lưu».",
-  "backupCard.notOpened": "Không mở được {files} bằng cụm mật khẩu này. Hãy nhập cụm mật khẩu của thư mục sao lưu."
+  "backupCard.notOpened": "Không mở được {files} bằng cụm mật khẩu này. Hãy nhập cụm mật khẩu của thư mục sao lưu.",
+  "backupCard.phoneCopy": "Bản sao một tệp cho điện thoại",
+  "backupCard.phoneCopyHint": "Ghi mọi thứ, gồm cả DNA, vào một tệp trong thư mục này, để điện thoại tải bằng một lần chọn.",
+  "backupCard.phoneCopyDone": "Đã ghi {file} vào {name}: mọi thứ tính đến lúc này, gồm cả DNA. Trên điện thoại, chỉ chọn tệp này trong «Tải bản sao lưu».",
+  "backupCard.oneFileHint": "Thư mục sao lưu giữ DNA trong một thư mục con, còn điện thoại chỉ chọn tệp trong một thư mục mỗi lần. Để tải mọi thứ bằng một lần chọn, hãy chọn hearth-phone-copy.hearth (tạo trên máy tính bằng «Bản sao một tệp cho điện thoại») hoặc tệp .zip của cả thư mục sao lưu."
 }

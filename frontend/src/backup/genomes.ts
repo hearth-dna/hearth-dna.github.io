@@ -1,7 +1,7 @@
-import { gunzipSync, gzipSync, strFromU8, strToU8 } from 'fflate'
+import { gunzipSync, gzipSync, strFromU8, strToU8, unzipSync } from 'fflate'
 import { isEncrypted, opener, sealer } from '../attachments/crypto'
 import type { Database } from '../db/db'
-import { type GenomeEntry, sha256 } from '../export/container'
+import { type GenomeEntry, readHeader, sha256 } from '../export/container'
 import type { Elsewhere, LoadGenome } from '../export/restore'
 import type { GenomeFile } from '../export/snapshot'
 import { sha256Hex } from '../import/unpack'
@@ -59,6 +59,31 @@ export async function genomeLoader(
     if (!open) throw new Error('the genome files in this folder are encrypted; enter the passphrase')
     return open(raw)
   }
+}
+
+const isZip = (b: Uint8Array) => b[0] === 0x50 && b[1] === 0x4b && b[2] === 3 && b[3] === 4
+
+/**
+ * Picked files with any .zip opened up: a whole backup folder compressed into one file (the Files
+ * app's Compress, a cloud drive's folder download) is one selection on a phone. From a zip only
+ * the current snapshots and the genome files are taken; rotated copies, conflict files, the README
+ * and macOS metadata are left inside.
+ */
+export function expandArchives(
+  files: { name: string; bytes: Uint8Array }[],
+): { name: string; bytes: Uint8Array }[] {
+  return files.flatMap((f) => {
+    // A dump v2 is a zip too (plaintext ones): it is a backup, not a folder of them.
+    if (!isZip(f.bytes) || readHeader(f.bytes)) return [f]
+    const base = (n: string) => n.slice(n.lastIndexOf('/') + 1)
+    const keep = (n: string) =>
+      !n.endsWith('/') &&
+      !n.includes('__MACOSX/') &&
+      !base(n).startsWith('._') &&
+      ((base(n).endsWith('.hearth') && !base(n).includes('.conflict-')) || base(n).endsWith('.gz'))
+    const entries = unzipSync(f.bytes, { filter: (e) => keep(e.name) })
+    return Object.entries(entries).map(([name, bytes]) => ({ name: base(name), bytes }))
+  })
 }
 
 /** A picked file as a possible genome: its gzip bytes and both hashes a manifest may know it by. */
