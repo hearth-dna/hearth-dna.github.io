@@ -1018,5 +1018,9 @@
   "backupCard.genomesLoaded": "Se cargó el ADN de {n} personas.",
   "backupCard.dnaFrom": "ADN de {name} desde {file}.",
   "backupCard.notUsed": "No usados: {files}. Nadie en este navegador tiene este ADN: elija estos archivos junto con el archivo de copia en «Cargar copia».",
-  "backupCard.notOpened": "No se pudo abrir {files} con esta contraseña. Escriba la contraseña de la carpeta de copias."
+  "backupCard.notOpened": "No se pudo abrir {files} con esta contraseña. Escriba la contraseña de la carpeta de copias.",
+  "backupCard.phoneCopy": "Copia en un archivo para el teléfono",
+  "backupCard.phoneCopyHint": "Escribe todo, ADN incluido, en un solo archivo de esta carpeta, para que un teléfono lo cargue en una sola selección.",
+  "backupCard.phoneCopyDone": "{file} escrito en {name}: todo a este momento, ADN incluido. En el teléfono, elija solo este archivo en «Cargar copia».",
+  "backupCard.oneFileHint": "Una carpeta de copias guarda el ADN en una subcarpeta, y un teléfono elige archivos de una sola carpeta a la vez. Para cargarlo todo en una selección, elija hearth-phone-copy.hearth (creado en el ordenador con «Copia en un archivo para el teléfono») o un .zip de toda la carpeta de copias."
 }

@@ -1018,5 +1018,9 @@
   "backupCard.genomesLoaded": "DNA de {n} pessoas carregado.",
   "backupCard.dnaFrom": "DNA de {name} a partir de {file}.",
   "backupCard.notUsed": "Não usados: {files}. Ninguém neste navegador tem este DNA: selecione estes arquivos junto com o arquivo de backup em «Carregar backup».",
-  "backupCard.notOpened": "Não foi possível abrir {files} com esta senha. Digite a senha da pasta de backup."
+  "backupCard.notOpened": "Não foi possível abrir {files} com esta senha. Digite a senha da pasta de backup.",
+  "backupCard.phoneCopy": "Cópia em um arquivo para o celular",
+  "backupCard.phoneCopyHint": "Grava tudo, DNA incluído, em um único arquivo nesta pasta, para que um celular o carregue em uma seleção.",
+  "backupCard.phoneCopyDone": "{file} gravado em {name}: tudo até agora, DNA incluído. No celular, escolha só este arquivo em «Carregar backup».",
+  "backupCard.oneFileHint": "Uma pasta de backup guarda o DNA em uma subpasta, e um celular escolhe arquivos de uma pasta por vez. Para carregar tudo em uma seleção, escolha hearth-phone-copy.hearth (criado no computador com «Cópia em um arquivo para o celular») ou um .zip da pasta de backup inteira."
 }

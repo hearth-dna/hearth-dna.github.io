@@ -1018,5 +1018,9 @@
   "backupCard.genomesLoaded": "DNA von {n} Personen geladen.",
   "backupCard.dnaFrom": "DNA von {name} aus {file}.",
   "backupCard.notUsed": "Nicht verwendet: {files}. Niemand in diesem Browser hat diese DNA: Wählen Sie die Dateien zusammen mit der Sicherungsdatei unter „Sicherung laden“.",
-  "backupCard.notOpened": "{files} ließ sich mit diesem Passwort nicht öffnen. Geben Sie das Passwort des Sicherungsordners ein."
+  "backupCard.notOpened": "{files} ließ sich mit diesem Passwort nicht öffnen. Geben Sie das Passwort des Sicherungsordners ein.",
+  "backupCard.phoneCopy": "Einzeldatei für ein Telefon",
+  "backupCard.phoneCopyHint": "Schreibt alles, auch die DNA, in eine Datei in diesem Ordner, damit ein Telefon sie mit einer Auswahl laden kann.",
+  "backupCard.phoneCopyDone": "{file} in {name} geschrieben: alles mit Stand jetzt, einschließlich DNA. Wählen Sie auf dem Telefon nur diese Datei unter „Sicherung laden“.",
+  "backupCard.oneFileHint": "Ein Sicherungsordner bewahrt die DNA in einem Unterordner auf, und ein Telefon wählt Dateien nur aus einem Ordner. Um alles mit einer Auswahl zu laden, wählen Sie hearth-phone-copy.hearth (am Computer mit „Einzeldatei für ein Telefon“ erstellt) oder eine .zip des ganzen Sicherungsordners."
 }

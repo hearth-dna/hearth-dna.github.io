@@ -144,6 +144,14 @@ those people (`elsewhere`) instead of skipping them silently, and the backup car
 **Load DNA files…**: the user picks the files in the `genomes` folder, which are opened with the
 passphrase if sealed and matched to the manifest by content hash, so a renamed copy still counts.
 
+A phone's file picker selects within one folder, and the genomes sit in a subfolder, so one
+selection cannot reach both. Two ways give it one file: **Single-file copy for a phone** on the
+computer writes `hearth-phone-copy.hearth` into the folder (everything, genomes inside, made on
+request and never by autosave, since it is the whole family each time), and a `.zip` of the whole
+folder is opened on load (only the current snapshot and the genome files are taken from it). A
+picked genome that nothing lists is still matched through its `source_file` row, which carries the
+hash of the original's text.
+
 **Newer data wins** (the simple rule, until real conflict resolution exists). Before any write,
 and at start and on returning to the foreground, the app reads the folder snapshot's header (the
 first few hundred bytes are plaintext: format, generation, device, exported_at, even when the

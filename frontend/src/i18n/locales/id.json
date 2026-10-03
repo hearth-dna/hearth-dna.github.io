@@ -1018,5 +1018,9 @@
   "backupCard.genomesLoaded": "DNA {n} orang telah dimuat.",
   "backupCard.dnaFrom": "DNA {name} dari {file}.",
   "backupCard.notUsed": "Tidak dipakai: {files}. Tidak ada orang di browser ini yang memiliki DNA ini: pilih file ini bersama file cadangan di «Muat cadangan».",
-  "backupCard.notOpened": "{files} tidak bisa dibuka dengan frasa sandi ini. Masukkan frasa sandi folder cadangan."
+  "backupCard.notOpened": "{files} tidak bisa dibuka dengan frasa sandi ini. Masukkan frasa sandi folder cadangan.",
+  "backupCard.phoneCopy": "Salinan satu file untuk ponsel",
+  "backupCard.phoneCopyHint": "Menulis semuanya, termasuk DNA, ke satu file di folder ini, agar ponsel bisa memuatnya dalam satu pilihan.",
+  "backupCard.phoneCopyDone": "{file} ditulis ke {name}: semuanya per saat ini, termasuk DNA. Di ponsel, pilih file ini saja di «Muat cadangan».",
+  "backupCard.oneFileHint": "Folder cadangan menyimpan DNA di subfolder, dan ponsel memilih file dari satu folder saja. Untuk memuat semuanya dalam satu pilihan, pilih hearth-phone-copy.hearth (dibuat di komputer dengan «Salinan satu file untuk ponsel») atau .zip seluruh folder cadangan."
 }

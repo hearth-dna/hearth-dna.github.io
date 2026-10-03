@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import type { Header } from '../export/container'
-import { attachmentsDirName, baseName, hasNewer, rotationPlan, sharedName, spareNames } from './naming'
+import {
+  attachmentsDirName,
+  baseName,
+  hasNewer,
+  phoneCopyName,
+  rotationPlan,
+  sharedName,
+  spareNames,
+} from './naming'
 
 const header = (device: string, generation: number): Header => ({
   format: 'hearth-dump',
@@ -70,5 +78,16 @@ describe('attachmentsDirName', () => {
   it('is shared by default and separate per profile', () => {
     expect(attachmentsDirName('default')).toBe('attachments')
     expect(attachmentsDirName('mum')).toBe('attachments-mum')
+  })
+})
+
+describe('the single-file copy for a phone', () => {
+  it('is never taken for a snapshot, a rotation or a spare', () => {
+    const names = [phoneCopyName('default'), phoneCopyName('family-b'), 'hearth-backup.hearth.1']
+    expect(spareNames(names, baseName('default'))).toEqual(['hearth-backup.hearth.1'])
+    expect(spareNames(names, baseName('family-b'))).toEqual([])
+    expect(rotationPlan(names, baseName('default')).map((x) => x.from)).not.toContain(
+      phoneCopyName('default'),
+    )
   })
 })

@@ -14,12 +14,13 @@ import {
 } from '../export/restore'
 import { folderSnapshot, snapshotBytes } from '../export/snapshot'
 import * as folder from './folder'
-import { genomeLoader, mirrorGenomes, pickFor, readPickedGenomes } from './genomes'
+import { expandArchives, genomeLoader, mirrorGenomes, pickFor, readPickedGenomes } from './genomes'
 import {
   attachmentsDirName,
   baseName,
   genomesDirName,
   hasNewer,
+  phoneCopyName,
   type Seen,
   sharedName,
   spareNames,
@@ -358,6 +359,10 @@ class Backups {
       n = await folder.deleteSnapshots(this.dir, baseName(this.profile))
       files = await folder.removeDir(this.dir, attachmentsDirName(this.profile))
       n += await folder.removeDir(this.dir, genomesDirName(this.profile))
+      if (await this.dir.read(phoneCopyName(this.profile))) {
+        await this.dir.remove(phoneCopyName(this.profile))
+        n++
+      }
     }
     this.saved = null
     await folder.forget(this.profile)
@@ -486,6 +491,27 @@ class Backups {
     }
   }
 
+  /**
+   * Writes a single-file copy of everything, genomes inside, into the folder, for a phone to load
+   * in one selection (`phoneCopyName`). Made on request, never by autosave: it is the whole family
+   * every time, which is exactly what the folder snapshot avoids uploading after each change.
+   */
+  async writePhoneCopy(): Promise<string> {
+    if (!this.saved || this.busy) throw new Error('a backup is in progress')
+    const pass = this.passphrase()
+    if (!this.plain && !pass) throw new Error('enter the passphrase first')
+    const name = phoneCopyName(this.profile)
+    this.busy = true
+    try {
+      const bytes = await snapshotBytes(this.db, this.appVersion, this.plain ? undefined : pass)
+      await this.dir.write(name, bytes)
+      return name
+    } finally {
+      this.busy = false
+      await this.refresh()
+    }
+  }
+
   /** Fetches documents this browser has rows for but not bytes (after restoring on a new PC). */
   async pullNow(): Promise<{ pulled: number; missing: number }> {
     if (!this.saved) return { pulled: 0, missing: 0 }
@@ -589,8 +615,10 @@ class Backups {
     this.busy = true
     this.setStep('loading')
     try {
-      const picked = await Promise.all(
-        files.map(async (f) => ({ name: f.name, bytes: new Uint8Array(await f.arrayBuffer()) })),
+      const picked = expandArchives(
+        await Promise.all(
+          files.map(async (f) => ({ name: f.name, bytes: new Uint8Array(await f.arrayBuffer()) })),
+        ),
       )
       let dumps = picked.filter((f) => isDumpFile(f.bytes))
       let rest = picked.filter((f) => !dumps.includes(f))
