@@ -38,58 +38,42 @@ private func isSealed(_ data: Data) -> Bool {
     Container.isEncrypted(data) || DumpV1.isSealed(data) || Sealer.isSealed(data)
 }
 
-/// "Restore a backup…" and "Load DNA files…": the system picker, several files at once (a folder
-/// backup's snapshot and its genome files, or a zip of the whole folder), a passphrase when one is
-/// sealed, then a merge into the database off the main thread. `passphrase` is tried first when the
-/// caller already has one typed. `progress` gets the step in words, or nil when done; `done` gets
-/// what the load says, whether it worked or not, and is where the caller reads its lists again.
-private struct LoadsFiles: ViewModifier {
-    @Binding var isPresented: Bool
-    let repo: Repo
-    let passphrase: String
-    let progress: (String?) -> Void
-    let done: (String) -> Void
+/// "Restore a backup…" and "Load DNA files…": several files picked at once (a folder backup's
+/// snapshot and its genome files, or a zip of the whole folder), a passphrase asked for when one is
+/// sealed, then a merge into the database off the main thread. The owner keeps one of these, hangs
+/// `.asksLoadPassphrase(loader)` on a view, and feeds it the result of its own file importer, so a
+/// screen keeps the single importer SwiftUI is happy with.
+final class FileLoader: ObservableObject {
+    @Published var asking = false
+    @Published var typed = ""
+    @Published private(set) var message = ""
 
-    @State private var pending: [NamedFile]?
-    @State private var typed = ""
-    @State private var asking = false
-    @State private var message = ""
+    private var pending: [NamedFile]?
+    private var repo: Repo?
+    private var progress: (String?) -> Void = { _ in }
+    private var done: (String) -> Void = { _ in }
 
-    func body(content: Content) -> some View {
-        content
-            // Any file: a .hearth file has no system type, and the header decides what it is.
-            .fileImporter(isPresented: $isPresented, allowedContentTypes: [.data], allowsMultipleSelection: true) { result in
-                switch result {
-                case .success(let urls): read(urls)
-                case .failure(let error): done(loadFailure(error))
-                }
-            }
-            .alert(t("app.passphrase"), isPresented: $asking) {
-                SecureField(t("app.passphrase"), text: $typed)
-                Button(t("common.cancel"), role: .cancel) {
-                    pending = nil
-                    typed = ""
-                }
-                Button(t("app.open")) {
-                    if let files = pending { run(files, typed) }
-                    pending = nil
-                    typed = ""
-                }
-            } message: {
-                Text(message)
-            }
-    }
-
-    /// Reads the picked files (security-scoped URLs outside the app's sandbox) and either loads
-    /// them or asks for a passphrase first.
-    private func read(_ urls: [URL]) {
+    /// `passphrase` is tried first when the caller already has one typed. `progress` gets the step
+    /// in words, or nil when done; `done` gets what the load says, whether it worked or not, and is
+    /// where the caller reads its lists again.
+    func load(
+        _ result: Result<[URL], Error>, repo: Repo, passphrase: String = "",
+        progress: @escaping (String?) -> Void, done: @escaping (String) -> Void
+    ) {
+        self.repo = repo
+        self.progress = progress
+        self.done = done
+        let urls: [URL]
+        switch result {
+        case .success(let picked): urls = picked
+        case .failure(let error): return done(loadFailure(error))
+        }
         var files: [NamedFile] = []
         for url in urls {
             do {
                 files.append(NamedFile(name: url.lastPathComponent, data: try readPickedFile(url)))
             } catch {
-                done(loadFailure(error))
-                return
+                return done(loadFailure(error))
             }
         }
         if !files.contains(where: { isSealed($0.data) }) {
@@ -101,6 +85,19 @@ private struct LoadsFiles: ViewModifier {
         }
     }
 
+    func submitPassphrase() {
+        let files = pending
+        let pass = typed
+        pending = nil
+        typed = ""
+        if let files { run(files, pass) }
+    }
+
+    func cancelPassphrase() {
+        pending = nil
+        typed = ""
+    }
+
     private func ask(_ files: [NamedFile], _ text: String) {
         pending = files
         typed = ""
@@ -109,9 +106,11 @@ private struct LoadsFiles: ViewModifier {
     }
 
     private func run(_ files: [NamedFile], _ pass: String) {
+        guard let repo else { return }
         progress(t("restore.openingDump"))
-        let repo = self.repo
-        DispatchQueue.global(qos: .userInitiated).async {
+        let progress = self.progress
+        let done = self.done
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
             let result = Result { () throws -> (LoadResult, [PersonRef]) in
                 let loaded = try Loader.load(repo, files, passphrase: pass) { key, params in
                     let step = t(key, params)
@@ -128,7 +127,7 @@ private struct LoadsFiles: ViewModifier {
                     let backup = error as? BackupError
                     if backup == .wrongPassphrase || backup == .passphraseRequired {
                         // Ask again rather than send the user back through the file picker.
-                        ask(files, t("app.wrongPassphrase"))
+                        self?.ask(files, t("app.wrongPassphrase"))
                     } else {
                         done(loadFailure(error))
                     }
@@ -138,11 +137,22 @@ private struct LoadsFiles: ViewModifier {
     }
 }
 
+private struct AsksLoadPassphrase: ViewModifier {
+    @ObservedObject var loader: FileLoader
+
+    func body(content: Content) -> some View {
+        content.alert(t("app.passphrase"), isPresented: $loader.asking) {
+            SecureField(t("app.passphrase"), text: $loader.typed)
+            Button(t("common.cancel"), role: .cancel) { loader.cancelPassphrase() }
+            Button(t("app.open")) { loader.submitPassphrase() }
+        } message: {
+            Text(loader.message)
+        }
+    }
+}
+
 extension View {
-    func loadsFiles(
-        isPresented: Binding<Bool>, repo: Repo, passphrase: String = "",
-        progress: @escaping (String?) -> Void, done: @escaping (String) -> Void
-    ) -> some View {
-        modifier(LoadsFiles(isPresented: isPresented, repo: repo, passphrase: passphrase, progress: progress, done: done))
+    func asksLoadPassphrase(_ loader: FileLoader) -> some View {
+        modifier(AsksLoadPassphrase(loader: loader))
     }
 }

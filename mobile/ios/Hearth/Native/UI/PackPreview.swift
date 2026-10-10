@@ -50,47 +50,53 @@ struct PackPreviewSection: View {
                     .padding(8)
             }
             .frame(maxHeight: 480)
-            .alert(notice ?? "", isPresented: Binding(get: { notice != nil }, set: { if !$0 { notice = nil } })) {
-                Button(t("common.close"), role: .cancel) {}
-            }
+            actions
+        } header: {
+            Text(t("askPage.previewHeading", ["chars": grouped(stats.chars), "tokens": grouped(stats.tokens)]))
+        }
+    }
+
+    /// One row holds the buttons and every alert and sheet they raise: a presentation hung on a
+    /// different row would not appear when that row is scrolled out of the list, and the buttons are
+    /// borderless so a tap in the row reaches only the button it hits.
+    private var actions: some View {
+        VStack(alignment: .leading, spacing: 12) {
             Button(t("askPage.copyButton")) { confirming = .clipboard }
                 .disabled(packed.isEmpty)
             Button(t("askPage.shareButton")) { confirming = .share }
                 .disabled(packed.isEmpty)
-            VStack(alignment: .leading, spacing: 8) {
-                Text(t("askPage.openIn")).font(.subheadline.weight(.semibold))
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 8) {
-                        ForEach(Assistants.all) { a in
-                            Button(a.name) { confirming = .assistant(a) }
-                                .buttonStyle(.bordered)
-                                .disabled(packed.isEmpty || Assistants.url(a, pack) == nil)
-                        }
+            Text(t("askPage.openIn")).font(.subheadline.weight(.semibold))
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(Assistants.all) { a in
+                        Button(a.name) { confirming = .assistant(a) }
+                            .buttonStyle(.bordered)
+                            .disabled(packed.isEmpty || Assistants.url(a, pack) == nil)
                     }
                 }
             }
             if !packed.isEmpty && Assistants.all.contains(where: { Assistants.url($0, pack) == nil }) {
                 Text(t("askPage.tooLong", ["chars": grouped(stats.chars)])).font(.footnote).foregroundStyle(.secondary)
             }
-            Text(t("askPage.trainingNotice"))
-                .font(.footnote)
-                .foregroundStyle(.secondary)
-                .alert(t("askPage.confirmTitle"), isPresented: Binding(get: { confirming != nil }, set: { if !$0 { confirming = nil } })) {
-                    if let going = confirming {
-                        Button(confirmLabel(going)) { send(going) }
-                    }
-                    Button(t("common.cancel"), role: .cancel) {}
-                } message: {
-                    Text(confirming.map(confirmMessage) ?? "")
-                }
-                .sheet(isPresented: $sharing) {
-                    ActivityView(text: pack) { completed in
-                        sharing = false
-                        if completed { finish("share", t("askPage.shared")) }
-                    }
-                }
-        } header: {
-            Text(t("askPage.previewHeading", ["chars": grouped(stats.chars), "tokens": grouped(stats.tokens)]))
+            Text(t("askPage.trainingNotice")).font(.footnote).foregroundStyle(.secondary)
+        }
+        .buttonStyle(.borderless)
+        .alert(t("askPage.confirmTitle"), isPresented: Binding(get: { confirming != nil }, set: { if !$0 { confirming = nil } })) {
+            if let going = confirming {
+                Button(confirmLabel(going)) { send(going) }
+            }
+            Button(t("common.cancel"), role: .cancel) {}
+        } message: {
+            Text(confirming.map(confirmMessage) ?? "")
+        }
+        .sheet(isPresented: $sharing) {
+            ActivityView(text: pack) { completed in
+                sharing = false
+                if completed { finish("share", t("askPage.shared")) }
+            }
+        }
+        .alert(notice ?? "", isPresented: Binding(get: { notice != nil }, set: { if !$0 { notice = nil } })) {
+            Button(t("common.close"), role: .cancel) {}
         }
     }
 

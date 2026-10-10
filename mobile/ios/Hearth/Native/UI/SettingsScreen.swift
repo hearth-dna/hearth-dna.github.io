@@ -60,7 +60,7 @@ struct SettingsScreen: View {
     let onErased: () -> Void
 
     private enum Importing {
-        case folder, file
+        case dump, folder, file
     }
 
     private enum Exporting {
@@ -73,9 +73,7 @@ struct SettingsScreen: View {
     @State private var busy: String?
     @State private var dumpPass = ""
     @State private var importing: Importing?
-    /// The "Import dump…" picker, which takes several files; a separate importer from the folder and
-    /// file pickers above, so it hangs off its own button.
-    @State private var loadingFiles = false
+    @StateObject private var loader = FileLoader()
     /// People whose genome files a loaded folder snapshot keeps beside itself and nobody has picked yet.
     @State private var waiting: [PersonRef] = []
     @State private var dbCheck: DbCheck?
@@ -138,8 +136,10 @@ struct SettingsScreen: View {
             }
             .fileImporter(
                 isPresented: Binding(get: { importing != nil }, set: { if !$0 { importing = nil } }),
-                allowedContentTypes: importing == .folder ? [.folder] : [.data]
+                allowedContentTypes: importing == .folder ? [.folder] : [.data],
+                allowsMultipleSelection: importing == .dump
             ) { result in imported(result) }
+            .asksLoadPassphrase(loader)
             .fileExporter(
                 isPresented: Binding(get: { exporting != nil }, set: { if !$0 { exporting = nil } }),
                 document: document, contentType: .data, defaultFilename: exportName
@@ -219,18 +219,9 @@ struct SettingsScreen: View {
             if !waiting.isEmpty {
                 Text(t("restore.genomesElsewhere", ["names": waiting.map(\.name).joined(separator: ", ")]) + " " + t("native.pickGenomes"))
                     .font(.subheadline)
-                Button(t("backupCard.loadGenomes")) { loadingFiles = true }.disabled(busy != nil)
+                Button(t("backupCard.loadGenomes")) { importing = .dump }.disabled(busy != nil)
             }
-            Button(t("settingsPage.importDump")) { loadingFiles = true }
-                .disabled(busy != nil)
-                .loadsFiles(
-                    isPresented: $loadingFiles, repo: repo, passphrase: dumpPass,
-                    progress: { busy = $0 },
-                    done: { message in
-                        reload()
-                        say(message)
-                    }
-                )
+            Button(t("settingsPage.importDump")) { importing = .dump }.disabled(busy != nil)
             if let busy {
                 HStack {
                     Text(busy).foregroundStyle(.secondary)
@@ -260,11 +251,24 @@ struct SettingsScreen: View {
         }
     }
 
-    private func imported(_ result: Result<URL, Error>) {
+    private func imported(_ result: Result<[URL], Error>) {
         let purpose = importing
         importing = nil
-        guard case .success(let url) = result else { return }
+        if purpose == .dump {
+            loader.load(
+                result, repo: repo, passphrase: dumpPass,
+                progress: { busy = $0 },
+                done: { message in
+                    reload()
+                    say(message)
+                }
+            )
+            return
+        }
+        guard case .success(let urls) = result, let url = urls.first else { return }
         switch purpose {
+        case .dump?:
+            break
         case .folder?, .file?:
             do {
                 let scoped = url.startAccessingSecurityScopedResource()

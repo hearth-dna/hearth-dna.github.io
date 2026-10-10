@@ -41,7 +41,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -71,6 +70,19 @@ import java.time.Year
 
 private val EXPLAIN = PROMPTS.firstOrNull { it.id == "explain" }
 
+/** The DNA tab's choices, held above the screen so that opening the family lookup and coming back keeps them. */
+class DnaFilters {
+    var who by mutableStateOf("")
+    var areas by mutableStateOf(listOf<String>())
+    var query by mutableStateOf("")
+    var notable by mutableStateOf(false)
+    var question by mutableStateOf("")
+    var realNames by mutableStateOf(false)
+
+    /** Ticked markers (rsids); when any of them is shown, only those go into the pack. */
+    var picked by mutableStateOf(listOf<String>())
+}
+
 /**
  * The DNA tab (DnaPage.tsx): every marker the knowledge base describes, most clinically useful
  * first, with each person's genotype beside it. Filter by person, area of medicine, text and
@@ -79,21 +91,20 @@ private val EXPLAIN = PROMPTS.firstOrNull { it.id == "explain" }
  */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-fun DnaScreen(repo: Repo, kb: Kb, onLookup: (String) -> Unit) {
+fun DnaScreen(repo: Repo, kb: Kb, f: DnaFilters, onLookup: (String) -> Unit) {
     val t = LocalStrings.current
     val uri = LocalUriHandler.current
     val snackbar = remember { SnackbarHostState() }
     var persons by remember { mutableStateOf(emptyList<Person>()) }
     var counts by remember { mutableStateOf(emptyMap<String, Int>()) }
     var findingsBy by remember { mutableStateOf(emptyMap<String, List<Finding>>()) }
-    var who by rememberSaveable { mutableStateOf("") }
-    var areas by remember { mutableStateOf(listOf<String>()) }
-    var query by rememberSaveable { mutableStateOf("") }
-    var notable by rememberSaveable { mutableStateOf(false) }
-    var question by rememberSaveable { mutableStateOf("") }
-    var realNames by rememberSaveable { mutableStateOf(false) }
-    /** Ticked markers (rsids); when any of them is shown, only those go into the pack. */
-    var picked by remember { mutableStateOf(listOf<String>()) }
+    var who by f::who
+    var areas by f::areas
+    var query by f::query
+    var notable by f::notable
+    var question by f::question
+    var realNames by f::realNames
+    var picked by f::picked
 
     LaunchedEffect(Unit) {
         val (p, c) = withContext(Dispatchers.IO) { repo.listPersons() to repo.genotypeCounts() }

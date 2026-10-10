@@ -2,6 +2,7 @@ package com.hearth.ui
 
 import android.content.Context
 import android.net.Uri
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
@@ -80,6 +81,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
+/** The preference that remembers the database file is damaged until a repair has run. */
+private const val DAMAGED = "database.damaged"
+
 /** The string catalogue, reachable from every screen as `LocalStrings.current("key")`. */
 val LocalStrings = staticCompositionLocalOf<Strings> { error("Strings not provided") }
 
@@ -99,10 +103,18 @@ fun HearthApp(cloud: Cloud? = null) {
     val db = remember { Db.get(context) }
     val repo = remember { Repo(db, Blobs(File(context.filesDir, "blobs"))) }
     // The database file turned out damaged, at start-up or since: the repair screen replaces the app.
-    var damaged by remember { mutableStateOf<String?>(null) }
+    // Remembered across a crash: a screen that queries without a catch can take the process down
+    // before the repair screen composes, and it would crash again on every start.
+    var damaged by remember { mutableStateOf(prefs.getString(DAMAGED, null)) }
     // Bumped after a repair, so the screens are built again over the new file.
     var epoch by remember { mutableStateOf(0) }
-    LaunchedEffect(db) { db.onCorrupt = { damaged = it } }
+    DisposableEffect(db) {
+        db.onCorrupt = { message ->
+            prefs.edit().putString(DAMAGED, message).commit()
+            damaged = message
+        }
+        onDispose { db.onCorrupt = null }
+    }
     val backups = remember { Backups(context.applicationContext, repo, cloud) }
     var consented by remember { mutableStateOf<Boolean?>(null) }
     LaunchedEffect(epoch) {
@@ -126,7 +138,12 @@ fun HearthApp(cloud: Cloud? = null) {
     CompositionLocalProvider(LocalStrings provides strings, LocalLayoutDirection provides if (rtl) LayoutDirection.Rtl else LayoutDirection.Ltr) {
         val broken = damaged
         if (broken != null) {
-            RepairScreen(db, repo, broken) { damaged = null; consented = null; epoch++ }
+            RepairScreen(db, repo, broken) {
+                prefs.edit().remove(DAMAGED).commit()
+                damaged = null
+                consented = null
+                epoch++
+            }
         } else {
             when (consented) {
                 null -> Unit
@@ -165,6 +182,9 @@ private fun Tabs(repo: Repo, backups: Backups, cloud: Cloud?, language: String, 
     var open by remember { mutableStateOf<Person?>(null) }
     var healthScope by rememberSaveable { mutableStateOf("") }
     var lookup by rememberSaveable { mutableStateOf<String?>(null) }
+    val dnaFilters = remember { DnaFilters() }
+    // Back from the lookup returns to the DNA tab rather than leaving the app.
+    BackHandler(enabled = lookup != null) { lookup = null }
     Scaffold(
         bottomBar = {
             NavigationBar {
@@ -191,7 +211,7 @@ private fun Tabs(repo: Repo, backups: Backups, cloud: Cloud?, language: String, 
                 tab == Tab.PEOPLE -> PeopleScreen(repo, backups, onOpen = { open = it })
                 tab == Tab.HEALTH -> HealthScreen(repo, backups, healthScope)
                 tab == Tab.DNA && lookup != null -> FamilyScreen(repo, kb, start = lookup, onBack = { lookup = null })
-                tab == Tab.DNA -> DnaScreen(repo, kb, onLookup = { lookup = it })
+                tab == Tab.DNA -> DnaScreen(repo, kb, dnaFilters, onLookup = { lookup = it })
                 tab == Tab.ASK -> AskScreen(repo, kb)
                 tab == Tab.SETTINGS -> SettingsScreen(repo, kb, backups, cloud, language, onLanguage, onErased)
             }

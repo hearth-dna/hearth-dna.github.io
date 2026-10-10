@@ -104,12 +104,16 @@ class Db private constructor(private val appContext: Context) :
      * Returns the rows each table got back, and the tables that could not be read in full.
      */
     fun repair(): Pair<Map<String, Int>, List<String>> {
-        val kept = salvage(this)
-        // Closing a damaged file can fail too; the delete below replaces it either way.
+        // The helper's connection goes first: it must not hold the file, and opening it through the
+        // helper would run the schema and migrations into the damaged file before anything is read.
         runCatching { close() }
+        val kept = runCatching {
+            // Read-write, not read-only, so a hot journal can still roll back as the file opens.
+            SQLiteDatabase.openDatabase(appContext.getDatabasePath(NAME).path, null, SQLiteDatabase.OPEN_READWRITE, DatabaseErrorHandler { })
+                .use { salvage(RawSql(it)) }
+        }.getOrElse { Salvage(emptyMap(), listOf("sqlite_master")) } // a file that will not even open gives nothing up
         appContext.deleteDatabase(NAME)
-        // The next statement opens a new file: schema, migrations and the meta rows come with it.
-        exec("SELECT 1")
+        // The first statement opens a new file: schema, migrations and the meta rows come with it.
         return restoreSalvage(this, kept) to kept.lost
     }
 
@@ -132,14 +136,6 @@ class Db private constructor(private val appContext: Context) :
         }
     }
 
-    private fun Cursor.value(i: Int): Any? = when (getType(i)) {
-        Cursor.FIELD_TYPE_NULL -> null
-        Cursor.FIELD_TYPE_INTEGER -> getLong(i)
-        Cursor.FIELD_TYPE_FLOAT -> getDouble(i)
-        Cursor.FIELD_TYPE_BLOB -> getBlob(i)
-        else -> getString(i)
-    }
-
     companion object {
         private const val NAME = "user.db"
 
@@ -152,4 +148,34 @@ class Db private constructor(private val appContext: Context) :
         fun get(context: Context): Db =
             instance ?: synchronized(this) { instance ?: Db(context.applicationContext).also { instance = it } }
     }
+}
+
+/** Just the reading side of [Sql] over a bare database, which a repair opens without the helper's schema work. */
+private class RawSql(private val db: SQLiteDatabase) : Sql {
+    override fun exec(sql: String, args: List<Any?>) = db.execSQL(sql, args.toTypedArray())
+
+    override fun query(sql: String, args: List<Any?>): List<Row> = buildList { read(sql, args, this) }
+
+    override fun readInto(sql: String, out: MutableList<Row>) = read(sql, emptyList(), out)
+
+    private fun read(sql: String, args: List<Any?>, out: MutableList<Row>) {
+        db.rawQuery(sql, args.map { it?.toString() }.toTypedArray()).use { c ->
+            while (c.moveToNext()) {
+                out.add((0 until c.columnCount).associate { c.getColumnName(it) to c.value(it) })
+            }
+        }
+    }
+
+    override fun <T> transaction(block: () -> T): T = block()
+
+    override fun insertMany(sql: String, rows: List<List<Any?>>, onProgress: (Int) -> Unit) =
+        throw UnsupportedOperationException("a repair only reads")
+}
+
+private fun Cursor.value(i: Int): Any? = when (getType(i)) {
+    Cursor.FIELD_TYPE_NULL -> null
+    Cursor.FIELD_TYPE_INTEGER -> getLong(i)
+    Cursor.FIELD_TYPE_FLOAT -> getDouble(i)
+    Cursor.FIELD_TYPE_BLOB -> getBlob(i)
+    else -> getString(i)
 }
