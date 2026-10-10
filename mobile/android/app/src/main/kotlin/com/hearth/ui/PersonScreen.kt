@@ -209,7 +209,7 @@ private fun MendelLine(r: MendelRow) {
 
 /** The web's colours for evidence grades and impact (styles.css `.badge.A/B/C`, `.mag.hi/.mid`). */
 @Composable
-private fun evidenceColor(e: String): Color = when (e) {
+fun evidenceColor(e: String): Color = when (e) {
     "A" -> MaterialTheme.colorScheme.primary
     "B" -> MaterialTheme.colorScheme.tertiary
     else -> MaterialTheme.colorScheme.outline

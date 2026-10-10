@@ -1033,5 +1033,8 @@
   "repair.reload": "Hearth 열기",
   "settingsPage.checkDb": "데이터베이스 확인",
   "settingsPage.checkingDb": "데이터베이스 확인 중…",
-  "settingsPage.dbIntact": "데이터베이스에 이상이 없습니다."
+  "settingsPage.dbIntact": "데이터베이스에 이상이 없습니다.",
+  "native.pickGenomes": "genomes 폴더의 모든 파일을 백업 파일과 함께 「백업 복원…」에서 선택하거나, 파일만 따로 「DNA 파일 불러오기…」에서 선택하세요.",
+  "native.notUsed": "사용되지 않음: {files}. 이 휴대폰에는 이 DNA를 가진 사람이 없습니다. 이 파일들을 백업 파일과 함께 「백업 복원…」에서 선택하세요.",
+  "native.repairTitle": "이 휴대폰의 데이터가 손상되었습니다"
 }

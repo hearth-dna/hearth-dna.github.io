@@ -1033,5 +1033,8 @@
   "repair.reload": "Hearth'ü aç",
   "settingsPage.checkDb": "Veritabanını denetle",
   "settingsPage.checkingDb": "Veritabanı denetleniyor…",
-  "settingsPage.dbIntact": "Veritabanı sağlam."
+  "settingsPage.dbIntact": "Veritabanı sağlam.",
+  "native.pickGenomes": "genomes klasöründeki tüm dosyaları yedek dosyasıyla birlikte «Yedeği geri yükle…» içinde seçin ya da tek başına «DNA dosyalarını yükle…» içinde seçin.",
+  "native.notUsed": "Kullanılmadı: {files}. Bu telefonda kimsede bu DNA yok: bu dosyaları yedek dosyasıyla birlikte «Yedeği geri yükle…» içinde seçin.",
+  "native.repairTitle": "Bu telefondaki veriler bozuk"
 }

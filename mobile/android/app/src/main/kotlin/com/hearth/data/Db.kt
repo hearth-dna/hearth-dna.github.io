@@ -2,6 +2,9 @@ package com.hearth.data
 
 import android.content.Context
 import android.database.Cursor
+import android.database.DatabaseErrorHandler
+import android.database.sqlite.SQLiteDatabaseCorruptException
+import android.database.sqlite.SQLiteException
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 
@@ -10,8 +13,20 @@ import android.database.sqlite.SQLiteOpenHelper
  * off for the whole app (allowBackup="false"), so this file never leaves the phone except as a
  * backup the user makes.
  */
-class Db private constructor(context: Context) :
-    SQLiteOpenHelper(context, "user.db", null, SCHEMA_VERSION), Sql {
+class Db private constructor(private val appContext: Context) :
+    // Android's default handler deletes a database file it finds damaged, health data and all. This
+    // one leaves it where it is: the repair screen asks first, and keeps whatever can still be read.
+    SQLiteOpenHelper(appContext, NAME, null, SCHEMA_VERSION, DatabaseErrorHandler { }), Sql {
+
+    /** Called (on whatever thread hit it) when a statement finds the file damaged. */
+    @Volatile var onCorrupt: ((String) -> Unit)? = null
+
+    private inline fun <T> guard(block: () -> T): T = try {
+        block()
+    } catch (e: SQLiteException) {
+        if (isCorrupt(e)) onCorrupt?.invoke(e.message ?: "database disk image is malformed")
+        throw e
+    }
 
     override fun onConfigure(db: SQLiteDatabase) {
         db.setForeignKeyConstraintsEnabled(true)
@@ -44,30 +59,61 @@ class Db private constructor(context: Context) :
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) = Unit
 
-    override fun exec(sql: String, args: List<Any?>) {
+    override fun exec(sql: String, args: List<Any?>) = guard {
         writableDatabase.execSQL(sql, args.toTypedArray())
     }
 
     // rawQuery binds strings only. SQLite applies the column's affinity to a text argument
     // compared with a column, so `version=?` with "1" still matches an INTEGER 1.
-    override fun query(sql: String, args: List<Any?>): List<Row> =
-        readableDatabase.rawQuery(sql, args.map { it?.toString() }.toTypedArray()).use { c ->
-            buildList {
-                while (c.moveToNext()) add((0 until c.columnCount).associate { c.getColumnName(it) to c.value(it) })
-            }
-        }
+    override fun query(sql: String, args: List<Any?>): List<Row> = buildList {
+        readInto(sql, args, this)
+    }
 
-    override fun <T> transaction(block: () -> T): T {
+    // The rows are added as they are read, so a repair keeps those before the first bad page.
+    private fun readInto(sql: String, args: List<Any?>, out: MutableList<Row>) = guard {
+        readableDatabase.rawQuery(sql, args.map { it?.toString() }.toTypedArray()).use { c ->
+            while (c.moveToNext()) out.add((0 until c.columnCount).associate { c.getColumnName(it) to c.value(it) })
+        }
+    }
+
+    override fun readInto(sql: String, out: MutableList<Row>) = readInto(sql, emptyList(), out)
+
+    override fun check(): Boolean {
+        val ok = try {
+            query("PRAGMA quick_check(1)").firstOrNull()?.values?.firstOrNull() == "ok"
+        } catch (_: SQLiteException) {
+            false // a damaged file can fail the check itself; guard has told onCorrupt already
+        }
+        if (!ok) onCorrupt?.invoke("database disk image is malformed")
+        return ok
+    }
+
+    override fun <T> transaction(block: () -> T): T = guard {
         val db = writableDatabase
         db.beginTransaction()
         try {
-            return block().also { db.setTransactionSuccessful() }
+            block().also { db.setTransactionSuccessful() }
         } finally {
             db.endTransaction()
         }
     }
 
-    override fun insertMany(sql: String, rows: List<List<Any?>>, onProgress: (Int) -> Unit) {
+    /**
+     * Replaces a damaged database file with a fresh one holding everything that could still be read
+     * ([salvage]); genotypes come back from the genome files kept beside it (rebuildGenomesFromCache).
+     * Returns the rows each table got back, and the tables that could not be read in full.
+     */
+    fun repair(): Pair<Map<String, Int>, List<String>> {
+        val kept = salvage(this)
+        // Closing a damaged file can fail too; the delete below replaces it either way.
+        runCatching { close() }
+        appContext.deleteDatabase(NAME)
+        // The next statement opens a new file: schema, migrations and the meta rows come with it.
+        exec("SELECT 1")
+        return restoreSalvage(this, kept) to kept.lost
+    }
+
+    override fun insertMany(sql: String, rows: List<List<Any?>>, onProgress: (Int) -> Unit) = guard {
         writableDatabase.compileStatement(sql).use { st ->
             rows.forEachIndexed { n, row ->
                 st.clearBindings()
@@ -95,6 +141,12 @@ class Db private constructor(context: Context) :
     }
 
     companion object {
+        private const val NAME = "user.db"
+
+        /** SQLite's words for a damaged file: SQLITE_CORRUPT, and SQLITE_NOTADB ("file is not a database"). */
+        fun isCorrupt(e: Throwable) =
+            e is SQLiteDatabaseCorruptException || Regex("malformed|SQLITE_CORRUPT|SQLITE_NOTADB|not a database", RegexOption.IGNORE_CASE).containsMatchIn(e.message ?: "")
+
         @Volatile private var instance: Db? = null
 
         fun get(context: Context): Db =

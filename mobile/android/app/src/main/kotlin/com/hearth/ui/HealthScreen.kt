@@ -146,7 +146,7 @@ fun HealthScreen(repo: Repo, backups: Backups, onlyPerson: String = "") {
     var viewing by remember { mutableStateOf<Pair<Attachment, ByteArray>?>(null) }
     var menu by remember { mutableStateOf(false) }
     val snackbar = remember { SnackbarHostState() }
-    val restore = rememberRestore(repo, snackbar) { reload() }
+    val restore = rememberRestore(repo, { m -> scope.launch { snackbar.showSnackbar(m) } }) { reload() }
 
     val name = { id: String -> persons.firstOrNull { it.id == id }?.displayName ?: id }
     val title = { e: HealthEntry -> entryTitle(e) { t(it) } }

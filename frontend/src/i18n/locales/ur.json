@@ -1033,5 +1033,8 @@
   "repair.reload": "Hearth کھولیں",
   "settingsPage.checkDb": "ڈیٹا بیس جانچیں",
   "settingsPage.checkingDb": "ڈیٹا بیس جانچا جا رہا ہے…",
-  "settingsPage.dbIntact": "ڈیٹا بیس ٹھیک ہے۔"
+  "settingsPage.dbIntact": "ڈیٹا بیس ٹھیک ہے۔",
+  "native.pickGenomes": "genomes فولڈر کی ہر فائل کو بیک اپ فائل کے ساتھ «بیک اپ بحال کریں…» میں چنیں، یا اکیلے «ڈی این اے فائلیں لوڈ کریں…» میں چنیں۔",
+  "native.notUsed": "استعمال نہیں ہوئیں: {files}۔ اس فون پر کسی کے پاس یہ ڈی این اے نہیں ہے: ان فائلوں کو بیک اپ فائل کے ساتھ «بیک اپ بحال کریں…» میں چنیں۔",
+  "native.repairTitle": "اس فون کا ڈیٹا خراب ہو گیا ہے"
 }

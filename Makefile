@@ -113,10 +113,13 @@ ASC_KEY_PATH ?= $(shell grep -s '^ASC_KEY_PATH=' .env | cut -d= -f2-)
 # Cloud backup buttons (docs/runbook/cloud-backups.md). Unset means the button is not offered.
 HEARTH_GOOGLE_DRIVE ?= $(shell grep -s '^HEARTH_GOOGLE_DRIVE=' .env | cut -d= -f2-)
 HEARTH_DROPBOX_APP_KEY ?= $(shell grep -s '^HEARTH_DROPBOX_APP_KEY=' .env | cut -d= -f2-)
+# Where the source code is published, shown in Settings (AGPL-3.0). Required to publish.
+HEARTH_SOURCE_URL ?= $(shell grep -s '^HEARTH_SOURCE_URL=' .env | cut -d= -f2-)
 HEARTH_GOOGLE_IOS_CLIENT_ID ?= $(shell grep -s '^HEARTH_GOOGLE_IOS_CLIENT_ID=' .env | cut -d= -f2-)
-CLOUD_ENV = HEARTH_GOOGLE_DRIVE=$(HEARTH_GOOGLE_DRIVE) HEARTH_DROPBOX_APP_KEY=$(HEARTH_DROPBOX_APP_KEY)
+CLOUD_ENV = HEARTH_GOOGLE_DRIVE=$(HEARTH_GOOGLE_DRIVE) HEARTH_DROPBOX_APP_KEY=$(HEARTH_DROPBOX_APP_KEY) HEARTH_SOURCE_URL=$(HEARTH_SOURCE_URL)
 # The same two for xcodebuild, as build settings that Info.plist reads.
-IOS_CLOUD_SETTINGS = HEARTH_GOOGLE_IOS_CLIENT_ID=$(HEARTH_GOOGLE_IOS_CLIENT_ID) HEARTH_DROPBOX_APP_KEY=$(HEARTH_DROPBOX_APP_KEY)
+IOS_CLOUD_SETTINGS = HEARTH_GOOGLE_IOS_CLIENT_ID=$(HEARTH_GOOGLE_IOS_CLIENT_ID) HEARTH_DROPBOX_APP_KEY=$(HEARTH_DROPBOX_APP_KEY) \
+	HEARTH_SOURCE_URL=$(HEARTH_SOURCE_URL)
 
 # Passed through the environment rather than as -P flags: a `-PRELEASE_KEYSTORE_PASSWORD=...` is
 # visible to every process on the machine in `ps`, while /proc/<pid>/environ is readable only by
@@ -240,6 +243,7 @@ android-keystore: ## Create the Play upload keystore (once, outside the repo)
 # costs a message instead of a build.
 _android-release-ready:
 	$(call require_var,HEARTH_APPLICATION_ID,$(HEARTH_APPLICATION_ID))
+	$(call require_var,HEARTH_SOURCE_URL,$(HEARTH_SOURCE_URL))
 	$(call require_var,ANDROID_KEYSTORE_PASSWORD,$(ANDROID_KEYSTORE_PASSWORD))
 	@test -f "$(ANDROID_KEYSTORE_PATH)" || { echo "Error: no keystore at $(ANDROID_KEYSTORE_PATH) — run 'make android-keystore'"; exit 1; }
 
@@ -294,6 +298,7 @@ IOS_AUTH_ARGS = $(if $(ASC_KEY_PATH),-authenticationKeyPath "$(abspath $(ASC_KEY
 _ios-release-ready:
 	$(call require_macos,ios release)
 	$(call require_var,HEARTH_APPLICATION_ID,$(HEARTH_APPLICATION_ID))
+	$(call require_var,HEARTH_SOURCE_URL,$(HEARTH_SOURCE_URL))
 	$(call require_var,APPLE_TEAM_ID,$(APPLE_TEAM_ID))
 	@case "$(HEARTH_APPLICATION_ID)" in example.*) \
 		echo "Error: the placeholder id $(HEARTH_APPLICATION_ID) cannot be published. Set HEARTH_APPLICATION_ID."; exit 1;; esac
@@ -374,6 +379,7 @@ mobile-secrets: ## Show which publishing inputs are set (names and status only, 
 	@printf '  %-28s %s\n' "HEARTH_GOOGLE_DRIVE" "$(if $(filter 1,$(HEARTH_GOOGLE_DRIVE)),on,off - no Google Drive button on Android)"
 	@printf '  %-28s %s\n' "HEARTH_GOOGLE_IOS_CLIENT_ID" "$(if $(HEARTH_GOOGLE_IOS_CLIENT_ID),set,MISSING - no Google Drive button on iOS)"
 	@printf '  %-28s %s\n' "HEARTH_DROPBOX_APP_KEY" "$(if $(HEARTH_DROPBOX_APP_KEY),set,MISSING - no Dropbox button)"
+	@printf '  %-28s %s\n' "HEARTH_SOURCE_URL" "$(if $(HEARTH_SOURCE_URL),set,MISSING - store builds refuse to build)"
 
 # Dev servers
 # ===========

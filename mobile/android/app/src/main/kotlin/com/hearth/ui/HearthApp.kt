@@ -18,7 +18,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -37,6 +36,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -62,7 +62,12 @@ import androidx.compose.ui.unit.dp
 import com.hearth.backup.BackupException
 import com.hearth.backup.isEncrypted
 import com.hearth.backup.isSealedV1
-import com.hearth.backup.restoreBytes
+import com.hearth.backup.LoadResult
+import com.hearth.backup.NamedBytes
+import com.hearth.backup.PersonRef
+import com.hearth.backup.elsewhereNames
+import com.hearth.backup.isSealedSidecar
+import com.hearth.backup.loadFiles
 import com.hearth.data.Blobs
 import com.hearth.data.ConsentKind
 import com.hearth.data.Db
@@ -91,10 +96,24 @@ fun HearthApp(cloud: Cloud? = null) {
     val prefs = remember { context.getSharedPreferences("hearth.native", Context.MODE_PRIVATE) }
     var language by remember { mutableStateOf(prefs.getString("language", null)) }
     val strings = remember(language) { Strings.load(context, language) }
-    val repo = remember { Repo(Db.get(context), Blobs(File(context.filesDir, "blobs"))) }
+    val db = remember { Db.get(context) }
+    val repo = remember { Repo(db, Blobs(File(context.filesDir, "blobs"))) }
+    // The database file turned out damaged, at start-up or since: the repair screen replaces the app.
+    var damaged by remember { mutableStateOf<String?>(null) }
+    // Bumped after a repair, so the screens are built again over the new file.
+    var epoch by remember { mutableStateOf(0) }
+    LaunchedEffect(db) { db.onCorrupt = { damaged = it } }
     val backups = remember { Backups(context.applicationContext, repo, cloud) }
     var consented by remember { mutableStateOf<Boolean?>(null) }
-    LaunchedEffect(Unit) { consented = withContext(Dispatchers.IO) { repo.hasConsent(ConsentKind.FIRST_LAUNCH) } }
+    LaunchedEffect(epoch) {
+        consented = try {
+            withContext(Dispatchers.IO) { repo.hasConsent(ConsentKind.FIRST_LAUNCH) }
+        } catch (e: android.database.sqlite.SQLiteException) {
+            // Db has told onCorrupt already; any other database error is not ours to hide.
+            if (!Db.isCorrupt(e)) throw e
+            null
+        }
+    }
     // Back in the foreground: another device may have written to the backup meanwhile.
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     DisposableEffect(lifecycle) {
@@ -105,22 +124,32 @@ fun HearthApp(cloud: Cloud? = null) {
     val rtl = LANGUAGES.firstOrNull { it.code == strings.language }?.rtl ?: false
 
     CompositionLocalProvider(LocalStrings provides strings, LocalLayoutDirection provides if (rtl) LayoutDirection.Rtl else LayoutDirection.Ltr) {
-        when (consented) {
-            null -> Unit
-            false -> FirstLaunch { withContext(Dispatchers.IO) { repo.grantConsent(ConsentKind.FIRST_LAUNCH) }; consented = true }
-            true -> Tabs(repo, backups, cloud, strings.language, onLanguage = { code ->
-                prefs.edit().putString("language", code).apply()
-                language = code
-            }) { consented = false }
+        val broken = damaged
+        if (broken != null) {
+            RepairScreen(db, repo, broken) { damaged = null; consented = null; epoch++ }
+        } else {
+            when (consented) {
+                null -> Unit
+                false -> FirstLaunch { withContext(Dispatchers.IO) { repo.grantConsent(ConsentKind.FIRST_LAUNCH) }; consented = true }
+                true -> key(epoch) {
+                    Tabs(repo, backups, cloud, strings.language, onLanguage = { code ->
+                        prefs.edit().putString("language", code).apply()
+                        language = code
+                    }) { consented = false }
+                }
+            }
         }
     }
 }
 
-/** The web's five top-level pages, as a bottom navigation bar (TabBar.tsx), in the same order. */
+/**
+ * The web's top-level pages that fit a phone's bottom bar, in the web's order (App.tsx). The family
+ * lookup, a "More" page on the web, opens from a marker on the DNA tab instead of having a tab.
+ */
 private enum class Tab(val labelKey: String) {
     PEOPLE("app.navPeople"),
-    FAMILY("app.tabFamily"),
     HEALTH("app.navHealth"),
+    DNA("app.navDna"),
     ASK("app.navAsk"),
     SETTINGS("app.tabSettings"),
 }
@@ -135,13 +164,14 @@ private fun Tabs(repo: Repo, backups: Backups, cloud: Cloud?, language: String, 
     // opened from it already scoped to that person.
     var open by remember { mutableStateOf<Person?>(null) }
     var healthScope by rememberSaveable { mutableStateOf("") }
+    var lookup by rememberSaveable { mutableStateOf<String?>(null) }
     Scaffold(
         bottomBar = {
             NavigationBar {
                 for (x in Tab.entries) {
                     NavigationBarItem(
                         selected = tab == x,
-                        onClick = { tab = x; open = null; if (x == Tab.HEALTH) healthScope = "" },
+                        onClick = { tab = x; open = null; lookup = null; if (x == Tab.HEALTH) healthScope = "" },
                         icon = { Icon(x.icon, contentDescription = null) },
                         label = { Text(t(x.labelKey)) },
                     )
@@ -159,8 +189,9 @@ private fun Tabs(repo: Repo, backups: Backups, cloud: Cloud?, language: String, 
                     tab = Tab.HEALTH
                 }
                 tab == Tab.PEOPLE -> PeopleScreen(repo, backups, onOpen = { open = it })
-                tab == Tab.FAMILY -> FamilyScreen(repo, kb)
                 tab == Tab.HEALTH -> HealthScreen(repo, backups, healthScope)
+                tab == Tab.DNA && lookup != null -> FamilyScreen(repo, kb, start = lookup, onBack = { lookup = null })
+                tab == Tab.DNA -> DnaScreen(repo, kb, onLookup = { lookup = it })
                 tab == Tab.ASK -> AskScreen(repo, kb)
                 tab == Tab.SETTINGS -> SettingsScreen(repo, kb, backups, cloud, language, onLanguage, onErased)
             }
@@ -171,7 +202,7 @@ private fun Tabs(repo: Repo, backups: Backups, cloud: Cloud?, language: String, 
 private val Tab.icon
     get() = when (this) {
         Tab.PEOPLE -> HearthIcons.Group
-        Tab.FAMILY -> Icons.Filled.Search
+        Tab.DNA -> HearthIcons.Dna
         Tab.ASK -> HearthIcons.Chat
         Tab.SETTINGS -> Icons.Filled.Settings
         Tab.HEALTH -> Icons.Filled.FavoriteBorder
@@ -225,59 +256,83 @@ private fun FirstLaunch(onAgree: suspend () -> Unit) {
     }
 }
 
-/** Whether a backup needs a passphrase before it can be read. */
-fun sealed(bytes: ByteArray) = isEncrypted(bytes) || isSealedV1(bytes)
+/** Whether a picked file needs a passphrase before it can be read: a backup, or a sealed genome file. */
+fun sealed(bytes: ByteArray) = isEncrypted(bytes) || isSealedV1(bytes) || isSealedSidecar(bytes)
 
 /**
- * "Restore a backup…": the system picker, a passphrase when the file is encrypted, then a merge
- * into this app's database. Returns the launcher to call; results land in the snackbar.
+ * What loading picked files says (BackupCard.tsx `useFileLoader`): what came in, whose DNA each
+ * genome file was, what was not used or could not be opened, and who still waits for a genome file.
+ * The web's wording that names a browser is the phone's own under `native.*`.
+ */
+fun loadMessage(t: Strings, r: LoadResult, waiting: List<PersonRef>): String = listOf(
+    if (r.dumps > 0) t("backupCard.loaded", "people" to r.people, "genomes" to r.genomes, "exportedAt" to r.exportedAt, "name" to r.name)
+    else t("backupCard.genomesLoaded", "n" to r.genomes),
+    *r.dna.map { (file, name) -> t("backupCard.dnaFrom", "name" to name, "file" to file) }.toTypedArray(),
+    if (r.missing.isNotEmpty()) t("restore.missingGenomes", "names" to r.missing.joinToString(", ") { it.name }) else "",
+    if (waiting.isNotEmpty()) t("restore.genomesElsewhere", "names" to waiting.joinToString(", ") { it.name }) + " " + t("native.pickGenomes") else "",
+    if (r.unused.isNotEmpty()) t("native.notUsed", "files" to r.unused.joinToString(", ")) else "",
+    if (r.unopened.isNotEmpty()) t("backupCard.notOpened", "files" to r.unopened.joinToString(", ")) else "",
+).filter { it.isNotEmpty() }.joinToString(" ")
+
+/**
+ * "Restore a backup…": the system picker, several files at once (a folder backup's snapshot and
+ * its genome files, or a zip of the whole folder), a passphrase when one is sealed, then a merge
+ * into this app's database. [passphrase] is tried first when the caller already has one typed.
+ * Returns the launcher to call; the outcome goes to [say].
  */
 @Composable
-fun rememberRestore(repo: Repo, snackbar: SnackbarHostState, onRestored: () -> Unit): () -> Unit {
+fun rememberRestore(repo: Repo, say: (String) -> Unit, passphrase: String = "", onRestored: () -> Unit): () -> Unit {
     val context = LocalContext.current
     val t = LocalStrings.current
     val scope = rememberCoroutineScope()
-    var pending by remember { mutableStateOf<ByteArray?>(null) }
+    var pending by remember { mutableStateOf<List<NamedBytes>?>(null) }
     var wrong by remember { mutableStateOf(false) }
 
-    fun run(bytes: ByteArray, passphrase: String?) = scope.launch {
+    fun run(files: List<NamedBytes>, pass: String?) = scope.launch {
         val message = try {
-            val r = withContext(Dispatchers.IO) { restoreBytes(repo, bytes, passphrase) }
+            val (r, waiting) = withContext(Dispatchers.IO) { loadFiles(repo, files, pass) to repo.elsewhereNames() }
             pending = null
             onRestored()
-            t("settingsPage.imported", "people" to r.persons, "genomes" to r.genomes, "version" to 2, "exportedAt" to r.exportedAt)
+            loadMessage(t, r, waiting)
         } catch (e: BackupException) {
-            if (passphrase != null && sealed(bytes)) {
+            if (pass != null && (e.key == "app.wrongPassphrase" || e.key == "native.encryptedTitle")) {
                 wrong = true
+                pending = files
                 return@launch
             }
-            t(e.key)
+            pending = null
+            t("backupCard.loadFailed", "message" to t(e.key))
         } catch (e: Exception) {
             pending = null
-            t("native.error", "error" to (e.message ?: e.javaClass.simpleName))
+            t("backupCard.loadFailed", "message" to (e.message ?: e.javaClass.simpleName))
         }
-        snackbar.showSnackbar(message)
+        say(message)
     }
 
-    val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
-        if (uri == null) return@rememberLauncherForActivityResult
+    val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris: List<Uri> ->
+        if (uris.isEmpty()) return@rememberLauncherForActivityResult
         scope.launch {
-            val bytes = withContext(Dispatchers.IO) { context.contentResolver.openInputStream(uri)?.use { it.readBytes() } }
-                ?: return@launch
+            val files = withContext(Dispatchers.IO) {
+                uris.mapNotNull { uri -> context.contentResolver.openInputStream(uri)?.use { NamedBytes(context.displayName(uri), it.readBytes()) } }
+            }
             wrong = false
-            if (sealed(bytes)) pending = bytes else run(bytes, null)
+            when {
+                files.none { sealed(it.bytes) } -> run(files, null)
+                passphrase.isNotEmpty() -> run(files, passphrase)
+                else -> pending = files
+            }
         }
     }
 
-    pending?.let { bytes ->
-        var passphrase by remember { mutableStateOf("") }
+    pending?.let { files ->
+        var typed by remember { mutableStateOf("") }
         AlertDialog(
             onDismissRequest = { pending = null },
             title = { Text(t("native.encryptedTitle")) },
             text = {
                 OutlinedTextField(
-                    value = passphrase,
-                    onValueChange = { passphrase = it; wrong = false },
+                    value = typed,
+                    onValueChange = { typed = it; wrong = false },
                     label = { Text(t("app.passphrase")) },
                     singleLine = true,
                     isError = wrong,
@@ -286,7 +341,7 @@ fun rememberRestore(repo: Repo, snackbar: SnackbarHostState, onRestored: () -> U
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 )
             },
-            confirmButton = { TextButton(onClick = { run(bytes, passphrase) }, enabled = passphrase.isNotEmpty()) { Text(t("native.open")) } },
+            confirmButton = { TextButton(onClick = { run(files, typed) }, enabled = typed.isNotEmpty()) { Text(t("native.open")) } },
             dismissButton = { TextButton(onClick = { pending = null }) { Text(t("common.cancel")) } },
         )
     }

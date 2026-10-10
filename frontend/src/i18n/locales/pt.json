@@ -1033,5 +1033,8 @@
   "repair.reload": "Abrir o Hearth",
   "settingsPage.checkDb": "Verificar o banco de dados",
   "settingsPage.checkingDb": "Verificando o banco de dados…",
-  "settingsPage.dbIntact": "O banco de dados está íntegro."
+  "settingsPage.dbIntact": "O banco de dados está íntegro.",
+  "native.pickGenomes": "Escolha todos os arquivos dessa pasta genomes junto com o arquivo da cópia em «Restaurar uma cópia de segurança…», ou sozinhos em «Carregar arquivos de DNA…».",
+  "native.notUsed": "Não usados: {files}. Ninguém neste telefone tem este DNA: escolha estes arquivos junto com o arquivo da cópia em «Restaurar uma cópia de segurança…».",
+  "native.repairTitle": "Os dados deste telefone estão danificados"
 }

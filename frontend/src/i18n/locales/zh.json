@@ -1033,5 +1033,8 @@
   "repair.reload": "打开 Hearth",
   "settingsPage.checkDb": "检查数据库",
   "settingsPage.checkingDb": "正在检查数据库…",
-  "settingsPage.dbIntact": "数据库完好。"
+  "settingsPage.dbIntact": "数据库完好。",
+  "native.pickGenomes": "请在“恢复备份…”中同时选择 genomes 文件夹里的所有文件和备份文件，或在“加载 DNA 文件…”中单独选择这些文件。",
+  "native.notUsed": "未使用：{files}。这部手机上没有人拥有这份 DNA：请在“恢复备份…”中同时选择这些文件和备份文件。",
+  "native.repairTitle": "这部手机上的数据已损坏"
 }

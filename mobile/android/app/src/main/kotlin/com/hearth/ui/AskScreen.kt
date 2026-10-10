@@ -1,9 +1,5 @@
 package com.hearth.ui
 
-import android.content.ClipData
-import android.content.ClipDescription
-import android.os.Build
-import android.os.PersistableBundle
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -14,14 +10,11 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -30,7 +23,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButton
@@ -50,14 +42,10 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.ClipEntry
-import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.hearth.ask.AskData
@@ -88,7 +76,6 @@ import com.hearth.kb.computeFindings
 import com.hearth.kb.searchKb
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.Year
 
@@ -98,15 +85,13 @@ private val RSIDS = Regex("rs\\d+")
 /**
  * Ask (AskPage.tsx): the question is classified on the phone, which picks a prompt template and
  * suggests records; the user can search the health log and DNA for anything else. Only records the
- * user includes go into the pack, previewed exactly as copied. The app sends nothing: every copy
- * to the clipboard is confirmed and written to the sharing log.
+ * user includes go into the pack, previewed exactly as sent. The app sends nothing itself: every
+ * copy, share or link (PackPreview) is confirmed and written to the sharing log.
  */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun AskScreen(repo: Repo, kb: Kb) {
     val t = LocalStrings.current
-    val scope = rememberCoroutineScope()
-    val clipboard = LocalClipboardManager.current
     val snackbar = remember { SnackbarHostState() }
 
     var persons by remember { mutableStateOf(emptyList<Person>()) }
@@ -121,7 +106,6 @@ fun AskScreen(repo: Repo, kb: Kb) {
     var evidence by remember { mutableStateOf(true) }
     var templateId by remember { mutableStateOf(PROMPTS[0].id) }
     var templateChosen by remember { mutableStateOf(false) }
-    var confirming by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         persons = withContext(Dispatchers.IO) { repo.listPersons() }
@@ -276,65 +260,9 @@ fun AskScreen(repo: Repo, kb: Kb) {
                 }
             }
             item(key = "preview") {
-                Section(t("askPage.previewHeading", "chars" to stats.chars.grouped(), "tokens" to stats.tokens.grouped())) {
-                    OutlinedCard(Modifier.fillMaxWidth()) {
-                        Text(
-                            pack,
-                            Modifier.padding(12.dp).heightIn(max = 480.dp).horizontalScroll(rememberScrollState()),
-                            fontFamily = FontFamily.Monospace,
-                            style = MaterialTheme.typography.bodySmall,
-                        )
-                    }
-                    Button(enabled = packed.isNotEmpty(), onClick = { confirming = true }, modifier = Modifier.fillMaxWidth()) { Text(t("askPage.copyButton")) }
-                    Text(
-                        rich(
-                            t("askPage.openAssistant"),
-                            links = mapOf("chatgpt" to "https://chatgpt.com", "claude" to "https://claude.ai", "gemini" to "https://gemini.google.com"),
-                        ),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
+                PackPreview(repo, pack, stats, packed, question, realNames, snackbar)
             }
         }
-    }
-
-    if (confirming) {
-        AlertDialog(
-            onDismissRequest = { confirming = false },
-            title = { Text(t("askPage.confirmTitle")) },
-            text = {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(rich(t("askPage.confirmBody")))
-                    Text(
-                        "• " + t(
-                            "askPage.confirmCounts",
-                            "genotypes" to stats.genotypes,
-                            "healthEntries" to stats.healthEntries,
-                            "people" to packed.size,
-                            "peopleWord" to (if (packed.size == 1) t("askPage.person") else t("askPage.peopleWord")),
-                            "naming" to (if (realNames) t("askPage.withRealNames") else t("askPage.pseudonymised")),
-                        ),
-                    )
-                    Text("• " + t("askPage.confirmLogged"))
-                }
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    confirming = false
-                    // Marked sensitive so the keyboard's clipboard preview does not show health data.
-                    val clip = ClipData.newPlainText("Hearth", pack).apply {
-                        if (Build.VERSION.SDK_INT >= 33) description.extras = PersistableBundle().apply { putBoolean(ClipDescription.EXTRA_IS_SENSITIVE, true) }
-                    }
-                    clipboard.setClip(ClipEntry(clip))
-                    scope.launch {
-                        withContext(Dispatchers.IO) { repo.recordCopyOut("clipboard", packed.map { it.person.id }, question, pack) }
-                        snackbar.showSnackbar(t("askPage.copied", "destination" to "clipboard"))
-                    }
-                }) { Text(t("askPage.confirmCopy")) }
-            },
-            dismissButton = { TextButton(onClick = { confirming = false }) { Text(t("common.cancel")) } },
-        )
     }
 }
 

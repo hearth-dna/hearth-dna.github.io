@@ -1033,5 +1033,8 @@
   "repair.reload": "Otwórz Hearth",
   "settingsPage.checkDb": "Sprawdź bazę danych",
   "settingsPage.checkingDb": "Sprawdzanie bazy danych…",
-  "settingsPage.dbIntact": "Baza danych jest w porządku."
+  "settingsPage.dbIntact": "Baza danych jest w porządku.",
+  "native.pickGenomes": "Wybierz wszystkie pliki z folderu genomes razem z plikiem kopii w „Przywróć kopię zapasową…” albo osobno w „Wczytaj pliki DNA…”.",
+  "native.notUsed": "Nieużyte: {files}. Nikt na tym telefonie nie ma tego DNA: wybierz te pliki razem z plikiem kopii w „Przywróć kopię zapasową…”.",
+  "native.repairTitle": "Dane na tym telefonie są uszkodzone"
 }
