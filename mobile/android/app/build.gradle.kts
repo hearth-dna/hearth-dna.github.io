@@ -56,6 +56,9 @@ android {
         // OAuth client for this package and signing certificate, registered by the publisher — so
         // its switch is just "that registration exists". Dropbox's app key is public by design.
         val dropboxKey = buildProp("HEARTH_DROPBOX_APP_KEY") ?: ""
+        // The source code link in Settings (AGPL-3.0); the repository address is not committed, so it
+        // arrives from outside like the store identity. Empty means no link.
+        buildConfigField("String", "SOURCE_URL", "\"${buildProp("HEARTH_SOURCE_URL") ?: ""}\"")
         buildConfigField("boolean", "GOOGLE_DRIVE", (buildProp("HEARTH_GOOGLE_DRIVE") == "1").toString())
         buildConfigField("String", "DROPBOX_APP_KEY", "\"$dropboxKey\"")
         manifestPlaceholders["dropboxScheme"] = "db-${dropboxKey.ifEmpty { "unset" }}"

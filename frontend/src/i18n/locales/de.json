@@ -1033,5 +1033,8 @@
   "repair.reload": "Hearth öffnen",
   "settingsPage.checkDb": "Datenbank prüfen",
   "settingsPage.checkingDb": "Datenbank wird geprüft…",
-  "settingsPage.dbIntact": "Die Datenbank ist intakt."
+  "settingsPage.dbIntact": "Die Datenbank ist intakt.",
+  "native.pickGenomes": "Wähle jede Datei aus dem Ordner genomes zusammen mit der Sicherungsdatei unter „Backup wiederherstellen…“ aus, oder allein unter „DNA-Dateien laden…“.",
+  "native.notUsed": "Nicht verwendet: {files}. Niemand auf diesem Telefon hat diese DNA: Wähle diese Dateien zusammen mit der Sicherungsdatei unter „Backup wiederherstellen…“ aus.",
+  "native.repairTitle": "Die Daten auf diesem Telefon sind beschädigt"
 }

@@ -73,6 +73,10 @@ struct SettingsScreen: View {
     @State private var busy: String?
     @State private var dumpPass = ""
     @State private var importing: Importing?
+    @StateObject private var loader = FileLoader()
+    /// People whose genome files a loaded folder snapshot keeps beside itself and nobody has picked yet.
+    @State private var waiting: [PersonRef] = []
+    @State private var dbCheck: DbCheck?
     @State private var exporting: Exporting?
     @State private var document = DataDocument(data: Data())
     @State private var exportName = ""
@@ -95,6 +99,10 @@ struct SettingsScreen: View {
     @State private var newKey = ""
     @State private var model = Keychain.read(GeminiSecrets.model) ?? Egress.geminiDefaultModel
 
+    private enum DbCheck {
+        case checking, intact
+    }
+
     // Consents, sharing, erase
     @State private var consents: [Repo.ConsentRecord] = []
     @State private var names: [String: String] = [:]
@@ -114,6 +122,13 @@ struct SettingsScreen: View {
                 consentsSection
                 sharingSection
                 eraseSection
+                if let link = sourceLink {
+                    Section {
+                        Link(t("settingsPage.source"), destination: link)
+                    } header: {
+                        Text(t("settingsPage.about"))
+                    }
+                }
             }
             .navigationTitle(t("settingsPage.title"))
             .alert(notice ?? "", isPresented: Binding(get: { notice != nil }, set: { if !$0 { notice = nil } })) {
@@ -121,8 +136,10 @@ struct SettingsScreen: View {
             }
             .fileImporter(
                 isPresented: Binding(get: { importing != nil }, set: { if !$0 { importing = nil } }),
-                allowedContentTypes: importing == .folder ? [.folder] : [.data]
+                allowedContentTypes: importing == .folder ? [.folder] : [.data],
+                allowsMultipleSelection: importing == .dump
             ) { result in imported(result) }
+            .asksLoadPassphrase(loader)
             .fileExporter(
                 isPresented: Binding(get: { exporting != nil }, set: { if !$0 { exporting = nil } }),
                 document: document, contentType: .data, defaultFilename: exportName
@@ -170,6 +187,7 @@ struct SettingsScreen: View {
         consents = (try? repo.listConsents()) ?? []
         names = Dictionary(((try? repo.persons()) ?? []).map { ($0.id, $0.displayName) }, uniquingKeysWith: { a, _ in a })
         sharing = (try? repo.listSharing()) ?? []
+        waiting = Loader.waiting(repo)
         backupPass = backups.passphrase()
         DispatchQueue.global(qos: .utility).async {
             let available = NativeFiles.iCloudRoot() != nil
@@ -198,6 +216,11 @@ struct SettingsScreen: View {
             Text(t("native.fullDumpIntro")).font(.subheadline).foregroundStyle(.secondary)
             SecureField(t("settingsPage.passphrase"), text: $dumpPass)
             Button(t("settingsPage.exportDump")) { exportDump() }.disabled(busy != nil)
+            if !waiting.isEmpty {
+                Text(t("restore.genomesElsewhere", ["names": waiting.map(\.name).joined(separator: ", ")]) + " " + t("native.pickGenomes"))
+                    .font(.subheadline)
+                Button(t("backupCard.loadGenomes")) { importing = .dump }.disabled(busy != nil)
+            }
             Button(t("settingsPage.importDump")) { importing = .dump }.disabled(busy != nil)
             if let busy {
                 HStack {
@@ -228,34 +251,24 @@ struct SettingsScreen: View {
         }
     }
 
-    private func importDump(_ url: URL) {
-        busy = t("settingsPage.readingDump")
-        let pass = dumpPass.isEmpty ? nil : dumpPass
-        let repo = self.repo
-        background({
-            try Restore.bytes(readPickedFile(url), passphrase: pass, into: repo) { key, params in
-                let message = t(key, params)
-                DispatchQueue.main.async { busy = message }
-            }
-        }) { result in
-            busy = nil
-            switch result {
-            case .success(let r):
-                say(t("settingsPage.imported", ["people": r.persons, "genomes": r.genomes, "version": 2, "exportedAt": r.exportedAt]))
-                reload()
-            case .failure(let error):
-                say(t("settingsPage.importFailed", ["error": describe(error)]))
-            }
-        }
-    }
-
-    private func imported(_ result: Result<URL, Error>) {
+    private func imported(_ result: Result<[URL], Error>) {
         let purpose = importing
         importing = nil
-        guard case .success(let url) = result else { return }
+        if purpose == .dump {
+            loader.load(
+                result, repo: repo, passphrase: dumpPass,
+                progress: { busy = $0 },
+                done: { message in
+                    reload()
+                    say(message)
+                }
+            )
+            return
+        }
+        guard case .success(let urls) = result, let url = urls.first else { return }
         switch purpose {
         case .dump?:
-            importDump(url)
+            break
         case .folder?, .file?:
             do {
                 let scoped = url.startAccessingSecurityScopedResource()
@@ -527,7 +540,11 @@ struct SettingsScreen: View {
             busy = nil
             switch result {
             case .success(let r):
-                say(t("backupCard.loaded", ["people": r.persons, "genomes": r.genomes, "name": name, "exportedAt": r.exportedAt]))
+                var message = t("backupCard.loaded", ["people": r.persons, "genomes": r.genomes, "name": name, "exportedAt": r.exportedAt])
+                if !r.missing.isEmpty {
+                    message += " " + t("restore.missingGenomes", ["names": r.missing.map(\.name).joined(separator: ", ")])
+                }
+                say(message)
                 reload()
             case .failure(let error):
                 say(t("backupCard.failed", ["message": describe(error)]))
@@ -571,7 +588,7 @@ struct SettingsScreen: View {
                 let byPerson = try persons.map { p -> (person: Person, findings: [Finding]) in
                     (person: p, findings: KbLogic.computeFindings(kb, try repo.personCallsFor(personId: p.id, rsids: rsids)))
                 }
-                table = OpenFormats.findingsTable(byPerson)
+                table = OpenFormats.findingsTable(kb, byPerson)
             default:
                 let log = try repo.healthLog()
                 let counts = try repo.attachments(entryIds: log.map(\.id)).mapValues(\.count)
@@ -695,9 +712,30 @@ struct SettingsScreen: View {
         }
     }
 
+    private func checkDatabase() {
+        dbCheck = .checking
+        let db = repo.db
+        background({ db.check() }) { ok in
+            if case .success(true) = ok { dbCheck = .intact } else { dbCheck = nil }
+        }
+    }
+
+    /// The source code link (AGPL-3.0): its address comes from the build (HEARTH_SOURCE_URL), none in a local build.
+    private var sourceLink: URL? {
+        (Bundle.main.object(forInfoDictionaryKey: "HearthSourceURL") as? String)
+            .flatMap(URL.init(string:)).flatMap { $0.scheme == "https" ? $0 : nil }
+    }
+
     private var eraseSection: some View {
         Section {
             Text(t("native.eraseIntro")).font(.subheadline).foregroundStyle(.secondary)
+            // quick_check finds damage in pages no query happens to read; damage opens the repair screen.
+            Button(t("settingsPage.checkDb")) { checkDatabase() }.disabled(dbCheck == .checking)
+            if dbCheck == .checking {
+                Text(t("settingsPage.checkingDb")).font(.subheadline).foregroundStyle(.secondary)
+            } else if dbCheck == .intact {
+                Text(t("settingsPage.dbIntact")).font(.subheadline).foregroundStyle(.secondary)
+            }
             Button(t("settingsPage.eraseAllData"), role: .destructive) { erasing = true }
         } header: {
             Text(t("settingsPage.eraseEverything"))

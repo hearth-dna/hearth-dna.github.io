@@ -146,6 +146,12 @@ final class AskTests: XCTestCase {
         XCTAssertEqual(Retrieve.questionTerms("should I worry about this with my family"), [])
     }
 
+    func testMatchesConditionSynonymsInOtherLanguages() {
+        XCTAssertTrue(Retrieve.forQuestion(kb, "есть ли риск диабета у мамы?").contains("rs7903146"))
+        XCTAssertTrue(Retrieve.forQuestion(kb, "anything about heart attack risk").contains("rs10757278"))
+        XCTAssertEqual(Retrieve.forQuestion(kb, "should I worry about this with my family"), [])
+    }
+
     // MARK: - Recommendations and items
 
     private let now = ISO8601DateFormatter().date(from: "2026-09-17T12:00:00Z")!

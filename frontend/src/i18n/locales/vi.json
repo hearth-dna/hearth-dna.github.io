@@ -1033,5 +1033,8 @@
   "repair.reload": "Mở Hearth",
   "settingsPage.checkDb": "Kiểm tra cơ sở dữ liệu",
   "settingsPage.checkingDb": "Đang kiểm tra cơ sở dữ liệu…",
-  "settingsPage.dbIntact": "Cơ sở dữ liệu nguyên vẹn."
+  "settingsPage.dbIntact": "Cơ sở dữ liệu nguyên vẹn.",
+  "native.pickGenomes": "Chọn mọi tệp trong thư mục genomes cùng với tệp sao lưu trong «Khôi phục bản sao lưu…», hoặc chọn riêng trong «Tải tệp DNA…».",
+  "native.notUsed": "Chưa dùng: {files}. Không ai trên điện thoại này có DNA này: hãy chọn các tệp này cùng với tệp sao lưu trong «Khôi phục bản sao lưu…».",
+  "native.repairTitle": "Dữ liệu trên điện thoại này bị hỏng"
 }

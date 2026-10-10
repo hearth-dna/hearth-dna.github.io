@@ -92,7 +92,7 @@ struct HealthFilter: Equatable {
     var to = ""
     /// Only entries rated at least this much; nil for any (including unrated).
     var minSeverity: Int?
-    /// Case-insensitive substring of title, body, body part, unit or tags.
+    /// Case-insensitive substring of title (as saved or as shown), body, body part, unit or tags.
     var text = ""
 
     /// `isFiltering`.
@@ -225,7 +225,8 @@ enum HealthLog {
     }
 
     /// `filterHealthLog`.
-    static func filter(_ entries: [HealthEntry], _ f: HealthFilter) -> [HealthEntry] {
+    /// Entries that pass the filter; the text search also looks in `title`, the name the screen shows.
+    static func filter(_ entries: [HealthEntry], _ f: HealthFilter, title: (HealthEntry) -> String = { $0.title }) -> [HealthEntry] {
         let q = f.text.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
         return entries.filter { e in
             if !f.person.isEmpty && e.personId != f.person { return false }
@@ -238,19 +239,21 @@ enum HealthLog {
                 guard let severity = e.severity, severity >= least else { return false }
             }
             if q.isEmpty { return true }
-            let fields = [e.title, e.body, e.bodyPart, e.unit] + e.tags
+            let fields = [e.title, title(e), e.body, e.bodyPart, e.unit] + e.tags
             return fields.contains { $0.lowercased().contains(q) }
         }
     }
 
     /// `sortHealthLog`: stable; ties fall back to newest first. Empty values (no measurement,
     /// unrated, no body part) sink to the bottom whatever the direction, so "highest first" and
-    /// "lowest first" both start with real data. `personName` resolves ids for the person key.
+    /// "lowest first" both start with real data. `personName` resolves ids for the person key, `title`
+    /// gives the name the title column shows.
     static func sort(
         _ entries: [HealthEntry],
         _ key: HealthSortKey,
         _ dir: SortDir,
-        personName: @escaping (String) -> String = { $0 }
+        personName: @escaping (String) -> String = { $0 },
+        title: @escaping (HealthEntry) -> String = { $0.title }
     ) -> [HealthEntry] {
         let sign = dir == .asc ? 1 : -1
         // Dates and timestamps are ISO strings, so code-point order is date order; the web's
@@ -275,7 +278,7 @@ enum HealthLog {
         case .date: compare = { a, b in sign * ordinal(when(a), when(b)) }
         case .person: compare = { a, b in text(personName(a.personId), personName(b.personId)) }
         case .kind: compare = { a, b in sign * localeCompare(a.kind.label, b.kind.label) }
-        case .title: compare = { a, b in text(a.title.lowercased(), b.title.lowercased()) }
+        case .title: compare = { a, b in text(title(a).lowercased(), title(b).lowercased()) }
         case .value: compare = { a, b in num(a.value, b.value) }
         case .bodyPart: compare = { a, b in text(a.bodyPart, b.bodyPart) }
         case .severity: compare = { a, b in num(a.severity.map { Double($0) }, b.severity.map { Double($0) }) }

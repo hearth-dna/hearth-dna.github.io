@@ -78,6 +78,8 @@ jobs:
       - name: Build the signed bundle
         env:
           HEARTH_APPLICATION_ID: ${{ secrets.HEARTH_APPLICATION_ID }}
+          # Settings links to the source (AGPL-3.0): this repository, whoever's fork it is.
+          HEARTH_SOURCE_URL: ${{ github.server_url }}/${{ github.repository }}
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}

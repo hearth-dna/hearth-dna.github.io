@@ -1033,5 +1033,8 @@
   "repair.reload": "Ouvrir Hearth",
   "settingsPage.checkDb": "Vérifier la base de données",
   "settingsPage.checkingDb": "Vérification de la base de données…",
-  "settingsPage.dbIntact": "La base de données est intacte."
+  "settingsPage.dbIntact": "La base de données est intacte.",
+  "native.pickGenomes": "Choisissez tous les fichiers de ce dossier genomes avec le fichier de sauvegarde dans « Restaurer une sauvegarde… », ou seuls dans « Charger les fichiers ADN… ».",
+  "native.notUsed": "Non utilisés : {files}. Personne sur ce téléphone n’a cet ADN : choisissez ces fichiers avec le fichier de sauvegarde dans « Restaurer une sauvegarde… ».",
+  "native.repairTitle": "Les données de ce téléphone sont endommagées"
 }

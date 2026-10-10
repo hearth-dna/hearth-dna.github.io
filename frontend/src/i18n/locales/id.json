@@ -1033,5 +1033,8 @@
   "repair.reload": "Buka Hearth",
   "settingsPage.checkDb": "Periksa database",
   "settingsPage.checkingDb": "Memeriksa database…",
-  "settingsPage.dbIntact": "Database utuh."
+  "settingsPage.dbIntact": "Database utuh.",
+  "native.pickGenomes": "Pilih setiap file dari folder genomes itu bersama file cadangan di «Pulihkan cadangan…», atau sendiri di «Muat file DNA…».",
+  "native.notUsed": "Tidak dipakai: {files}. Tidak ada yang punya DNA ini di ponsel ini: pilih file ini bersama file cadangan di «Pulihkan cadangan…».",
+  "native.repairTitle": "Data di ponsel ini rusak"
 }

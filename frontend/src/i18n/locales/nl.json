@@ -1033,5 +1033,8 @@
   "repair.reload": "Hearth openen",
   "settingsPage.checkDb": "Database controleren",
   "settingsPage.checkingDb": "Database wordt gecontroleerd…",
-  "settingsPage.dbIntact": "De database is in orde."
+  "settingsPage.dbIntact": "De database is in orde.",
+  "native.pickGenomes": "Kies alle bestanden uit die map genomes samen met het back-upbestand bij ‘Back-up terugzetten…’, of los bij ‘DNA-bestanden laden…’.",
+  "native.notUsed": "Niet gebruikt: {files}. Niemand op deze telefoon heeft dit DNA: kies deze bestanden samen met het back-upbestand bij ‘Back-up terugzetten…’.",
+  "native.repairTitle": "De gegevens op deze telefoon zijn beschadigd"
 }

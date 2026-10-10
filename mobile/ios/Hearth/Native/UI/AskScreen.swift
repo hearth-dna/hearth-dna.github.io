@@ -1,11 +1,9 @@
 import SwiftUI
-import UIKit
-import UniformTypeIdentifiers
 
 /// Ask (AskPage.tsx): the question is classified on the phone, which picks a prompt template and
 /// suggests records; the user can search the health log and DNA for anything else. Only records the
-/// user includes go into the pack, previewed exactly as copied. The app sends nothing: every copy
-/// to the clipboard is confirmed and written to the sharing log.
+/// user includes go into the pack, previewed exactly as sent. The app sends nothing itself: every
+/// copy, share or link (PackPreviewSection) is confirmed and written to the sharing log.
 struct AskScreen: View {
     let repo: Repo
     let kb: Kb
@@ -24,7 +22,6 @@ struct AskScreen: View {
     @State private var evidence = true
     @State private var templateId = Prompts.all[0].id
     @State private var templateChosen = false
-    @State private var confirming = false
     @State private var notice: String?
 
     // MARK: - Derived
@@ -82,15 +79,9 @@ struct AskScreen: View {
                     )
                 }
                 packSection(packed, stats)
-                previewSection(pack, stats, empty: packed.isEmpty)
+                PackPreviewSection(repo: repo, pack: pack, stats: stats, packed: packed, question: question, realNames: realNames)
             }
             .navigationTitle(t("askPage.title"))
-            .alert(t("askPage.confirmTitle"), isPresented: $confirming) {
-                Button(t("askPage.confirmCopy")) { copy(pack, packed) }
-                Button(t("common.cancel"), role: .cancel) {}
-            } message: {
-                Text(confirmMessage(packed, stats))
-            }
             .alert(notice ?? "", isPresented: Binding(get: { notice != nil }, set: { if !$0 { notice = nil } })) {
                 Button(t("common.close"), role: .cancel) {}
             }
@@ -253,44 +244,6 @@ struct AskScreen: View {
         }
     }
 
-    private func previewSection(_ pack: String, _ stats: PackStats, empty: Bool) -> some View {
-        Section {
-            ScrollView([.horizontal, .vertical]) {
-                Text(pack)
-                    .font(.caption.monospaced())
-                    .textSelection(.enabled)
-                    .fixedSize(horizontal: true, vertical: true)
-                    .padding(8)
-            }
-            .frame(maxHeight: 480)
-            Button(t("askPage.copyButton")) { confirming = true }
-                .disabled(empty)
-            Text(rich(t("askPage.openAssistant"), links: [
-                "chatgpt": URL(string: "https://chatgpt.com")!,
-                "claude": URL(string: "https://claude.ai")!,
-                "gemini": URL(string: "https://gemini.google.com")!,
-            ]))
-            .font(.footnote)
-            .foregroundStyle(.secondary)
-        } header: {
-            Text(t("askPage.previewHeading", ["chars": grouped(stats.chars), "tokens": grouped(stats.tokens)]))
-        }
-    }
-
-    /// An alert shows plain text: the body's markup is dropped, the counts and the log note follow
-    /// as the web's list items.
-    private func confirmMessage(_ packed: [PackPerson], _ stats: PackStats) -> String {
-        let body = String(rich(t("askPage.confirmBody")).characters)
-        let counts = t("askPage.confirmCounts", [
-            "genotypes": stats.genotypes,
-            "healthEntries": stats.healthEntries,
-            "people": packed.count,
-            "peopleWord": packed.count == 1 ? t("askPage.person") : t("askPage.peopleWord"),
-            "naming": realNames ? t("askPage.withRealNames") : t("askPage.pseudonymised"),
-        ])
-        return "\(body)\n\n• \(counts)\n• \(t("askPage.confirmLogged"))"
-    }
-
     // MARK: - Actions
 
     private func whoPrefix(_ personId: String) -> String {
@@ -366,27 +319,6 @@ struct AskScreen: View {
                 }
             }
         }
-    }
-
-    /// The pack on the clipboard for this device only and for ten minutes, so health data neither
-    /// syncs to the user's other devices through Universal Clipboard nor lingers there; then the
-    /// copy is recorded in the sharing log and the chat history.
-    private func copy(_ pack: String, _ packed: [PackPerson]) {
-        UIPasteboard.general.setItems(
-            [[UTType.utf8PlainText.identifier: pack]],
-            options: [.localOnly: true, .expirationDate: Date().addingTimeInterval(10 * 60)]
-        )
-        let message: String
-        do {
-            try repo.recordCopyOut(
-                destination: "clipboard", personIds: packed.map(\.person.id), question: question, pack: pack
-            )
-            message = t("askPage.copied", ["destination": "clipboard"])
-        } catch {
-            message = t("native.error", ["error": error.localizedDescription])
-        }
-        // After the confirmation alert has gone: one alert cannot replace another in the same update.
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { notice = message }
     }
 }
 

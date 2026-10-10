@@ -12,6 +12,11 @@ Written by the web app's own code (`frontend/src/export/fixtures.test.ts`):
 - `genomes.hearth` — the same family with two small 23andMe-format genomes inside, for the
   genome restore, findings, Mendelian checks and family lookups.
 
+- `missing-genome.hearth` and `missing-genome.hearth.enc` — copies of the web's
+  `src/export/fixtures/family-missing-genome.hearth` and its `.enc` (passphrase `fixture passphrase`):
+  two invented people with a small genome each, the child's genome entry deleted from the zip, the
+  shape that once failed to open. Every app must restore it around the gap and name the child.
+
 Regenerate with `UPDATE_FIXTURES=1 npx vitest run src/export/fixtures.test.ts` in `frontend/`.
 
 Written by the native apps from `genomes.hearth`, restored and exported again; the web test opens

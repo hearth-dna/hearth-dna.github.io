@@ -25,7 +25,20 @@ data class RestoreResult(
     val genomes: Int,
     val skippedAttachmentFiles: Int,
     val exportedAt: String,
+    /** People whose genome file the backup listed but did not carry, and this phone does not have. */
+    val missing: List<PersonRef> = emptyList(),
+    /** A folder snapshot's genomes that were not beside it: picked on their own, they load later. */
+    val elsewhere: List<Elsewhere> = emptyList(),
 )
+
+data class PersonRef(val id: String, val name: String)
+
+/**
+ * A genome a folder snapshot keeps beside itself. [textSha] is the sha256 of the original's text
+ * (its `source_file` row): a copy that reached this phone decompressed, or compressed again, is
+ * still known by it.
+ */
+data class Elsewhere(val entry: GenomeEntry, val name: String, val textSha: String? = null)
 
 private val PERSON_COLS = listOf("id", "label", "display_name", "sex", "birth_year", "birth_date", "notes", "created_at")
 private val SOURCE_FILE_COLS = listOf("id", "person_id", "provider", "build", "sha256", "original_name", "row_count", "imported_at")
@@ -94,27 +107,66 @@ fun restore(
     repo.touch(since = mark)
     val entries = c.genomeEntries
     var genomes = 0
+    val missing = linkedSetOf<String>()
+    val elsewhere = mutableListOf<GenomeEntry>()
     for (g in entries) {
         if (g.personId in hadGenotypes) continue
-        // A folder backup keeps its genomes beside it; one not there yet loads on the next restore.
-        val gz = c.genomes[g.path] ?: loadGenome(g)?.also {
-            if (sha256Hex(it) != g.sha256) throw BackupException("native.damaged")
-        } ?: continue
-        val text = decode(gunzip(gz))
-        onProgress("restore.parsingGenome", mapOf("n" to genomes + 1, "total" to entries.size))
-        val r = parseRawText(text, if (g.original) Provider.of(g.provider) else Provider.GENERIC)
-        onProgress("restore.storingCalls", mapOf("n" to r.calls.size))
-        repo.storeCalls(g.personId, r.calls)
-        if (g.original) repo.blobs.put(Repo.genomeBlobName(sha256Hex(text)), gz)
+        var gz: ByteArray? = c.genomes[g.path]
+        if (gz == null && c.external) {
+            onProgress("restore.fetchingGenome", mapOf("n" to genomes + 1, "total" to entries.size))
+            // Not in the folder yet (another device is still uploading it): this person keeps no
+            // genotypes for now, and the next load, which skips people who have them, tries again.
+            val fetched = loadGenome(g)
+            if (fetched == null) {
+                elsewhere.add(g)
+                continue
+            }
+            if (sha256Hex(fetched) == g.sha256) gz = fetched
+        }
+        if (gz == null) {
+            missing.add(g.personId)
+            continue
+        }
+        restoreGenome(repo, g, gz, onProgress, genomes + 1, entries.size)
         genomes++
     }
+    val people = rows(j, "persons")
+    fun name(id: String): String {
+        val p = people.firstOrNull { it["id"] == id } ?: return id
+        return (p["display_name"] as? String).orEmpty().ifEmpty { p["label"] as? String ?: id }
+    }
+    val sources = rows(j, "source_files")
     RestoreResult(
         persons = count(sql, "person") - personsBefore,
         healthEntries = count(sql, "health_log") - healthBefore,
         genomes = genomes,
         skippedAttachmentFiles = attachments.size,
         exportedAt = c.header.optString("exported_at"),
+        missing = missing.map { PersonRef(it, name(it)) },
+        elsewhere = elsewhere.map { g ->
+            Elsewhere(g, name(g.personId), sources.firstOrNull { it["id"] == g.sourceFileId }?.get("sha256") as? String)
+        },
     )
+}
+
+/**
+ * One genome file (gzipped raw text, already checked against its manifest entry) into the person's
+ * genotypes. The original is kept so this phone's own backups ship it too.
+ */
+fun restoreGenome(
+    repo: Repo,
+    g: GenomeEntry,
+    gz: ByteArray,
+    onProgress: (String, Map<String, Any>) -> Unit,
+    n: Int,
+    total: Int,
+) {
+    val text = decode(gunzip(gz))
+    onProgress("restore.parsingGenome", mapOf("n" to n, "total" to total))
+    val r = parseRawText(text, if (g.original) Provider.of(g.provider) else Provider.GENERIC)
+    onProgress("restore.storingCalls", mapOf("n" to r.calls.size))
+    repo.storeCalls(g.personId, r.calls)
+    if (g.original) repo.blobs.put(Repo.genomeBlobName(sha256Hex(text)), gz)
 }
 
 private fun insertRows(sql: Sql, table: String, cols: List<String>, rows: List<Map<String, Any?>>) {
@@ -145,3 +197,25 @@ fun restoreBytes(
     loadGenome: (GenomeEntry) -> ByteArray? = { null },
 ): RestoreResult =
     if (isV1(bytes)) restoreV1(repo, openV1(bytes, passphrase)) else restore(repo, openContainer(bytes, passphrase), onProgress, loadGenome)
+
+/**
+ * After a repair (Db.repair) every person is without genotypes, but the genome files kept beside
+ * the database survived it: each person's latest original (`genome-<sha>.gz`, named by its
+ * source_file row) or, for someone imported before originals were kept, the rebuilt copy
+ * (`generic-<person>-<rows>.gz`). Returns how many people got their genotypes back.
+ */
+fun rebuildGenomesFromCache(repo: Repo, onProgress: (String, Map<String, Any>) -> Unit = { _, _ -> }): Int {
+    val people = repo.sql.query("SELECT p.id FROM person p WHERE NOT EXISTS (SELECT 1 FROM genotype g WHERE g.person_id = p.id)").map { it.str("id") }
+    val cached = repo.blobs.list()
+    var n = 0
+    for ((i, id) in people.withIndex()) {
+        val sf = repo.sql.query("SELECT id, provider, build, sha256 FROM source_file WHERE person_id = ? ORDER BY imported_at DESC LIMIT 1", listOf(id)).firstOrNull()
+        val original = sf?.let { repo.blobs.get(Repo.genomeBlobName(it.str("sha256"))) }
+        val rebuilt = if (original == null) cached.firstOrNull { it.startsWith("generic-$id-") } else null
+        val gz = original ?: rebuilt?.let { repo.blobs.get(it) } ?: continue
+        val entry = if (original != null && sf != null) GenomeEntry("", "", id, sf.str("provider"), true, sf.str("id")) else GenomeEntry("", "", id, "generic", false)
+        restoreGenome(repo, entry, gz, onProgress, i + 1, people.size)
+        n++
+    }
+    return n
+}

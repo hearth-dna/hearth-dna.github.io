@@ -23,6 +23,9 @@ class Container(
     val journal: JSONObject,
     val genomes: Map<String, ByteArray> = emptyMap(),
 ) {
+    /** A folder snapshot keeps its genomes beside it; they are fetched one by one on restore. */
+    val external: Boolean get() = manifest.optBoolean("external_genomes")
+
     /** The manifest's genome entries (`GenomeEntry` in container.ts). */
     val genomeEntries: List<GenomeEntry>
         get() {
@@ -35,12 +38,20 @@ class Container(
                     personId = g.getString("person_id"),
                     provider = g.optString("provider", "generic"),
                     original = g.optString("kind") == "original",
+                    sourceFileId = if (g.isNull("source_file_id")) null else g.getString("source_file_id"),
                 )
             }
         }
 }
 
-data class GenomeEntry(val path: String, val sha256: String, val personId: String, val provider: String, val original: Boolean)
+data class GenomeEntry(
+    val path: String,
+    val sha256: String,
+    val personId: String,
+    val provider: String,
+    val original: Boolean,
+    val sourceFileId: String? = null,
+)
 
 /** Why a file would not open, as the i18n key of the message to show. */
 class BackupException(val key: String) : Exception(key)
@@ -62,15 +73,12 @@ fun openContainer(bytes: ByteArray, passphrase: String? = null): Container {
     if (header.optString("format") != "hearth-dump" || header.optInt("version") != 2)
         throw BackupException("native.notBackup")
     val c = Container(header, json("manifest.json"), json("journal.json"))
-    val external = c.manifest.optBoolean("external_genomes")
     val genomes = mutableMapOf<String, ByteArray>()
+    // A genome that is absent or fails its hash is left out rather than failing the whole file, as
+    // on the web: the rest still restores, and the restore names the people whose DNA is missing.
     for (g in c.genomeEntries) {
         val data = entries[g.path]
-        if (data == null && external) continue
-        // A missing or altered genome refuses the whole file, as on the web: half a family is worse
-        // than an error the user can act on.
-        if (data == null || sha256Hex(data) != g.sha256) throw BackupException("native.damaged")
-        genomes[g.path] = data
+        if (data != null && sha256Hex(data) == g.sha256) genomes[g.path] = data
     }
     return Container(c.header, c.manifest, c.journal, genomes)
 }

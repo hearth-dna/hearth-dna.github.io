@@ -5,6 +5,10 @@ import SwiftUI
 struct FamilyScreen: View {
     let repo: Repo
     let kb: Kb
+    /// A marker to show at once, when opened from one (the DNA tab).
+    var start: String?
+    /// Set when shown in a sheet: a button to close it.
+    var onClose: (() -> Void)?
 
     @State private var q = ""
     @State private var looked: String?
@@ -63,6 +67,11 @@ struct FamilyScreen: View {
                 }
             }
             .navigationTitle(t("familyPage.title"))
+            .toolbar {
+                if let onClose {
+                    ToolbarItem(placement: .cancellationAction) { Button(t("common.close"), action: onClose) }
+                }
+            }
             .searchable(text: $q, prompt: Text(t("familyPage.searchPlaceholder")))
             .textInputAutocapitalization(.never)
             .autocorrectionDisabled()
@@ -133,6 +142,7 @@ struct FamilyScreen: View {
         do {
             persons = try repo.persons()
             relationships = try repo.relationships()
+            if looked == nil, let start { q = start; looked = start }
             if let looked { rows = try repo.familyAt(looked) }
         } catch {
             failure = t("native.error", ["error": error.localizedDescription])

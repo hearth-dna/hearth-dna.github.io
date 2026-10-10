@@ -59,7 +59,7 @@ data class HealthFilter(
     val to: String = "",
     /** Only entries rated at least this much; null for any (including unrated). */
     val minSeverity: Int? = null,
-    /** Case-insensitive substring of title, body, body part, unit or tags. */
+    /** Case-insensitive substring of title (as saved or as shown), body, body part, unit or tags. */
     val text: String = "",
 ) {
     val isFiltering: Boolean get() = this != HealthFilter()
@@ -75,7 +75,8 @@ data class HealthFilter(
         ).count { it }
 }
 
-fun filterHealthLog(entries: List<HealthEntry>, f: HealthFilter): List<HealthEntry> {
+/** Entries that pass the filter; the text search also looks in [title], the name the screen shows. */
+fun filterHealthLog(entries: List<HealthEntry>, f: HealthFilter, title: (HealthEntry) -> String = { it.title }): List<HealthEntry> {
     val q = f.text.trim().lowercase()
     return entries.filter { e ->
         (f.person.isEmpty() || e.personId == f.person) &&
@@ -85,7 +86,7 @@ fun filterHealthLog(entries: List<HealthEntry>, f: HealthFilter): List<HealthEnt
             (f.from.isEmpty() || e.date >= f.from) &&
             (f.to.isEmpty() || e.date <= f.to) &&
             (f.minSeverity == null || (e.severity != null && e.severity >= f.minSeverity)) &&
-            (q.isEmpty() || (listOf(e.title, e.body, e.bodyPart, e.unit) + e.tags).any { it.lowercase().contains(q) })
+            (q.isEmpty() || (listOf(e.title, title(e), e.body, e.bodyPart, e.unit) + e.tags).any { it.lowercase().contains(q) })
     }
 }
 
@@ -102,13 +103,15 @@ val SortKey.defaultDir: SortDir
 
 /**
  * Stable sort. Ties fall back to newest first. Empty values (no measurement, unrated, no body
- * part) always sink to the bottom whatever the direction. `personName` resolves ids for PERSON.
+ * part) always sink to the bottom whatever the direction. `personName` resolves ids for PERSON,
+ * `title` gives the name the TITLE column shows.
  */
 fun sortHealthLog(
     entries: List<HealthEntry>,
     key: SortKey,
     dir: SortDir,
     personName: (String) -> String = { it },
+    title: (HealthEntry) -> String = { it.title },
 ): List<HealthEntry> {
     val sign = if (dir == SortDir.ASC) 1 else -1
     val collator = Collator.getInstance()
@@ -134,7 +137,7 @@ fun sortHealthLog(
             SortKey.DATE -> sign * whenOf(a).compareTo(whenOf(b))
             SortKey.PERSON -> text(personName(a.personId), personName(b.personId))
             SortKey.KIND -> sign * collator.compare(a.kind.label, b.kind.label)
-            SortKey.TITLE -> text(a.title.lowercase(), b.title.lowercase())
+            SortKey.TITLE -> text(title(a).lowercase(), title(b).lowercase())
             SortKey.VALUE -> num(a.value, b.value)
             SortKey.BODY_PART -> text(a.bodyPart, b.bodyPart)
             SortKey.SEVERITY -> num(a.severity, b.severity)

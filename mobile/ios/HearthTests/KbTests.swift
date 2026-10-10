@@ -40,8 +40,32 @@ final class KbTests: XCTestCase {
         XCTAssertEqual(f[0].entry.rsid, "rs12248560")
     }
 
+    func testNamesEveryConditionAndAreaInEnglishAndLinksEntriesToKnownOnes() throws {
+        let kb = try loadKb()
+        XCTAssertGreaterThan(kb.conditions.count, 10)
+        for c in kb.conditions { XCTAssertFalse((c.names["en"] ?? "").isEmpty, c.id) }
+        for e in kb.entries {
+            for id in e.conditions { XCTAssertNotNil(kb.condition(id), "\(e.rsid) condition \(id)") }
+        }
+        XCTAssertEqual(kb.conditionLabel("alcohol_flush"), "Alcohol flush reaction")
+        XCTAssertEqual(kb.conditionLabel("not-in-the-kb"), "not-in-the-kb")
+        let ids = Set(kb.areas.map(\.id))
+        for a in kb.areas { XCTAssertFalse((a.names["en"] ?? "").isEmpty, a.id) }
+        for e in kb.entries {
+            XCTAssertFalse(e.areas.isEmpty, e.rsid)
+            for a in e.areas { XCTAssertTrue(ids.contains(a), "\(e.rsid) area \(a)") }
+        }
+    }
+
+    func testMatchesWordsInAnyScriptWithPrefixesOfFiveLetters() {
+        XCTAssertEqual(KbText.tokens("Статин, AB abc!"), ["статин", "abc"])
+        XCTAssertTrue(KbText.tokenMatch("statin", "statins"))
+        XCTAssertFalse(KbText.tokenMatch("stat", "statins"))
+    }
+
     func testSearchesDrugsAndConditions() throws {
         let kb = try loadKb()
+        XCTAssertTrue(KbLogic.search(kb, "heart attack").map(\.rsid).contains("rs10757278"))
         XCTAssertTrue(KbLogic.search(kb, "clopidogrel").map(\.rsid).contains("rs4244285"))
         XCTAssertTrue(KbLogic.search(kb, "diabetes").map(\.gene).contains("TCF7L2"))
         XCTAssertEqual(KbLogic.search(kb, ""), [])

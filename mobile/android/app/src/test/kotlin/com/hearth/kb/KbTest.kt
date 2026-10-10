@@ -28,7 +28,28 @@ class KbTest {
         assertEquals("rs12248560", f[0].entry.rsid)
     }
 
+    @Test fun `names every condition and area in English and links entries to known ones`() {
+        assertTrue(kb.conditions.size > 10)
+        for (c in kb.conditions) assertTrue(c.id, c.names["en"]!!.isNotEmpty())
+        for (e in kb.entries) for (id in e.conditions) assertTrue("${e.rsid} condition $id", kb.condition(id) != null)
+        assertEquals("Alcohol flush reaction", kb.conditionLabel("alcohol_flush"))
+        assertEquals("not-in-the-kb", kb.conditionLabel("not-in-the-kb"))
+        val ids = kb.areas.map { it.id }.toSet()
+        for (a in kb.areas) assertTrue(a.id, a.names["en"]!!.isNotEmpty())
+        for (e in kb.entries) {
+            assertTrue(e.rsid, e.areas.isNotEmpty())
+            for (a in e.areas) assertTrue("${e.rsid} area $a", a in ids)
+        }
+    }
+
+    @Test fun `matches words in any script, with prefixes of five letters`() {
+        assertEquals(listOf("статин", "abc"), tokens("Статин, AB abc!"))
+        assertTrue(tokenMatch("statin", "statins"))
+        assertTrue(!tokenMatch("stat", "statins"))
+    }
+
     @Test fun `searches drugs and conditions`() {
+        assertTrue(searchKb(kb, "heart attack").map { it.rsid }.contains("rs10757278"))
         assertTrue(searchKb(kb, "clopidogrel").map { it.rsid }.contains("rs4244285"))
         assertTrue(searchKb(kb, "diabetes").map { it.gene }.contains("TCF7L2"))
         assertEquals(emptyList<KbEntry>(), searchKb(kb, ""))

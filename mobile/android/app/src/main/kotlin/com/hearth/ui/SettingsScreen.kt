@@ -54,11 +54,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import com.hearth.BuildConfig
 import com.hearth.Cloud
 import com.hearth.Egress
 import com.hearth.Secrets
@@ -69,7 +71,8 @@ import com.hearth.backup.DriveFolders
 import com.hearth.backup.Place
 import com.hearth.backup.Status
 import com.hearth.backup.driveAccount
-import com.hearth.backup.restoreBytes
+import com.hearth.backup.PersonRef
+import com.hearth.backup.elsewhereNames
 import com.hearth.backup.snapshotBytes
 import com.hearth.data.ConsentKind
 import com.hearth.data.Repo
@@ -135,13 +138,14 @@ fun SettingsScreen(repo: Repo, kb: Kb, backups: Backups, cloud: Cloud?, language
                     Muted(t("settingsPage.languageNote"))
                 }
             }
-            item(key = "dump") { DumpCard(repo, say) { reloads++ } }
+            item(key = "dump") { DumpCard(repo, reloads, say) { reloads++ } }
             item(key = "backup") { BackupCard(repo, backups, cloud, say) }
             item(key = "open") { OpenFormatsCard(repo, kb, say) }
             item(key = "gemini") { GeminiCard(say) }
             item(key = "consents") { ConsentsCard(repo, reloads, onErased) { reloads++ } }
             item(key = "sharing") { SharingCard(repo, reloads) }
             item(key = "erase") { EraseCard(repo, onErased) }
+            item(key = "about") { AboutRow() }
         }
     }
 }
@@ -185,7 +189,7 @@ private fun rememberSave(onPicked: (Uri) -> Unit) =
 // ---- full dump -------------------------------------------------------------------------------
 
 @Composable
-private fun DumpCard(repo: Repo, say: (String) -> Unit, onImported: () -> Unit) {
+private fun DumpCard(repo: Repo, reloads: Int, say: (String) -> Unit, onImported: () -> Unit) {
     val t = LocalStrings.current
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -207,33 +211,20 @@ private fun DumpCard(repo: Repo, say: (String) -> Unit, onImported: () -> Unit) 
             say(message)
         }
     }
-    val open = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-        if (uri == null) return@rememberLauncherForActivityResult
-        scope.launch {
-            busy = t("settingsPage.readingDump")
-            val message = try {
-                val r = withContext(Dispatchers.IO) {
-                    restoreBytes(repo, context.contentResolver.openInputStream(uri)!!.use { it.readBytes() }, pass.ifEmpty { null }, onProgress = { key, params ->
-                        busy = t(key, *params.map { (k, v) -> k to v }.toTypedArray())
-                    })
-                }
-                onImported()
-                t("settingsPage.imported", "people" to r.persons, "genomes" to r.genomes, "version" to 2, "exportedAt" to r.exportedAt)
-            } catch (e: BackupException) {
-                t("settingsPage.importFailed", "error" to t(e.key))
-            } catch (e: Exception) {
-                t("settingsPage.importFailed", "error" to (e.message ?: e.javaClass.simpleName))
-            }
-            busy = null
-            say(message)
-        }
-    }
+    val open = rememberRestore(repo, say, pass, onImported)
+    // People whose genome files a loaded folder snapshot keeps beside itself and nobody has picked yet.
+    var waiting by remember { mutableStateOf(emptyList<PersonRef>()) }
+    LaunchedEffect(reloads) { waiting = withContext(Dispatchers.IO) { repo.elsewhereNames() } }
     Card(t("settingsPage.fullDump")) {
         Muted(t("native.fullDumpIntro"))
+        if (waiting.isNotEmpty()) {
+            Notice(t("restore.genomesElsewhere", "names" to waiting.joinToString(", ") { it.name }) + " " + t("native.pickGenomes"))
+            OutlinedButton(onClick = open) { Text(t("backupCard.loadGenomes")) }
+        }
         Passphrase(t("settingsPage.passphrase"), pass) { pass = it }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Button(enabled = busy == null, onClick = { save.launch("hearth-${java.time.LocalDate.now()}.hearth") }) { Text(t("settingsPage.exportDump")) }
-            OutlinedButton(enabled = busy == null, onClick = { open.launch(arrayOf("*/*")) }) { Text(t("settingsPage.importDump")) }
+            OutlinedButton(enabled = busy == null, onClick = open) { Text(t("settingsPage.importDump")) }
         }
         busy?.let { Muted(it); LinearProgressIndicator(Modifier.fillMaxWidth()) }
     }
@@ -421,7 +412,10 @@ private fun BackupCard(repo: Repo, backups: Backups, cloud: Cloud?, say: (String
                         busy = t("backupCard.loading", "name" to s.name)
                         val message = try {
                             val r = backups.loadFromPlace()
-                            t("backupCard.loaded", "people" to r.persons, "genomes" to r.genomes, "name" to s.name, "exportedAt" to r.exportedAt)
+                            listOf(
+                                t("backupCard.loaded", "people" to r.persons, "genomes" to r.genomes, "name" to s.name, "exportedAt" to r.exportedAt),
+                                if (r.missing.isNotEmpty()) t("restore.missingGenomes", "names" to r.missing.joinToString(", ") { it.name }) else "",
+                            ).filter { it.isNotEmpty() }.joinToString(" ")
                         } catch (e: BackupException) {
                             t("backupCard.failed", "message" to t(e.key))
                         } catch (e: Exception) {
@@ -540,7 +534,7 @@ private fun OpenFormatsCard(repo: Repo, kb: Kb, say: (String) -> Unit) {
                     val persons = repo.listPersons()
                     val table = when (what) {
                         "genotypes" -> genotypeTable(repo.sql, personColumns(persons), shared)
-                        "findings" -> findingsTable(persons.map { p -> p to computeFindings(kb, repo.personCallsFor(p.id, kb.entries.map { it.rsid })) })
+                        "findings" -> findingsTable(kb, persons.map { p -> p to computeFindings(kb, repo.personCallsFor(p.id, kb.entries.map { it.rsid })) })
                         else -> {
                             val log = repo.listHealthLog()
                             val counts = repo.attachmentsByEntry().mapValues { it.value.size }
@@ -701,8 +695,19 @@ private fun EraseCard(repo: Repo, onErased: () -> Unit) {
             }
         }
     }
+    var check by remember { mutableStateOf<Boolean?>(null) }
+    var checking by remember { mutableStateOf(false) }
     Card(t("settingsPage.eraseEverything")) {
         Muted(t("native.eraseIntro"))
+        // quick_check finds damage in pages no query happens to read; damage opens the repair screen.
+        OutlinedButton(enabled = !checking, onClick = {
+            scope.launch {
+                checking = true
+                check = withContext(Dispatchers.IO) { runCatching { repo.sql.check() }.getOrDefault(false) }
+                checking = false
+            }
+        }) { Text(t("settingsPage.checkDb")) }
+        if (checking) Muted(t("settingsPage.checkingDb")) else if (check == true) Muted(t("settingsPage.dbIntact"))
         OutlinedButton(onClick = { asking = true }, colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)) { Text(t("settingsPage.eraseAllData")) }
     }
     if (asking) {
@@ -755,4 +760,23 @@ fun SyncAction(backups: Backups) {
         }
     }
     TextButton(onClick = { scope.launch { backups.sync() } }) { Text(label, color = color, style = MaterialTheme.typography.labelLarge) }
+}
+
+/** The source code link (AGPL-3.0): its address comes from the build (HEARTH_SOURCE_URL), none in a local build. */
+@Composable
+private fun AboutRow() {
+    val t = LocalStrings.current
+    val uri = LocalUriHandler.current
+    val url = BuildConfig.SOURCE_URL
+    Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Text(t("settingsPage.about"), style = MaterialTheme.typography.titleMedium)
+        if (url.isNotEmpty()) {
+            Text(
+                t("settingsPage.source"),
+                Modifier.clickable { uri.openUri(url) },
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.primary,
+            )
+        }
+    }
 }

@@ -1033,5 +1033,8 @@
   "repair.reload": "Hearth を開く",
   "settingsPage.checkDb": "データベースを確認",
   "settingsPage.checkingDb": "データベースを確認中…",
-  "settingsPage.dbIntact": "データベースは正常です。"
+  "settingsPage.dbIntact": "データベースは正常です。",
+  "native.pickGenomes": "genomes フォルダーのすべてのファイルを、バックアップファイルと一緒に「バックアップを復元…」で選ぶか、ファイルだけを「DNA ファイルを読み込む…」で選んでください。",
+  "native.notUsed": "使われませんでした: {files}。この電話にはこの DNA を持つ人がいません。これらのファイルをバックアップファイルと一緒に「バックアップを復元…」で選んでください。",
+  "native.repairTitle": "この電話のデータが破損しています"
 }

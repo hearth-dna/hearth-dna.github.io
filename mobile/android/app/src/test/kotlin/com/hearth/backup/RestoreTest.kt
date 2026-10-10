@@ -88,14 +88,28 @@ class RestoreTest {
         assertEquals(1, m.violations)
     }
 
-    @Test fun `refuses a genome whose bytes do not match the manifest`() {
+    @Test fun `refuses a zip with a damaged entry`() {
         val bytes = fixture("genomes.hearth")
-        val c = openContainer(bytes)
-        val path = c.genomeEntries.first().path
-        // Flip a byte inside the stored (uncompressed) zip entry of the first genome.
+        val path = openContainer(bytes).genomeEntries.first().path
+        // Flip a byte inside the stored (uncompressed) zip entry of the first genome: the zip's own
+        // checksum catches it, so the file is refused. A genome that is simply absent is not (below).
         val at = String(bytes, Charsets.ISO_8859_1).indexOf(path) + path.length + 20
         val broken = bytes.copyOf().also { it[at] = (it[at].toInt() xor 1).toByte() }
         assertThrows(BackupException::class.java) { openContainer(broken) }
+    }
+
+    @Test fun `restores a backup that lost a genome file around the gap, plain and sealed`() {
+        for ((name, pass) in listOf("missing-genome.hearth" to null, "missing-genome.hearth.enc" to "fixture passphrase")) {
+            val c = openContainer(fixture(name), pass)
+            assertEquals(2, c.genomeEntries.size)
+            assertEquals(1, c.genomes.size)
+            val repo = newRepo()
+            val r = restoreBytes(repo, fixture(name), pass)
+            assertEquals(1, r.genomes)
+            assertEquals(listOf(PersonRef("fx-child", "Test Child")), r.missing)
+            assertEquals(mapOf("fx-parent" to 5), repo.genotypeCounts())
+        }
+        assertThrows(BackupException::class.java) { openContainer(fixture("missing-genome.hearth.enc")) }
     }
 
     /** JSON as plain Kotlin values, numbers as Double, so two documents compare by content. */

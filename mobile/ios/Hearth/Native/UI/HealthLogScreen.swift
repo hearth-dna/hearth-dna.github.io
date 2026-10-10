@@ -33,7 +33,10 @@ struct HealthLogScreen: View {
         NavigationStack {
             Group {
                 if store.persons.isEmpty {
-                    RestoreBackupView(store: store) { result in notice = restoredMessage(result) }
+                    RestoreBackupView(repo: store.repo) { message in
+                        try? store.reload()
+                        notice = message
+                    }
                 } else {
                     log
                 }
@@ -109,7 +112,8 @@ struct HealthLogScreen: View {
     private var showPerson: Bool { filter.person.isEmpty }
 
     private var shown: [HealthEntry] {
-        HealthLog.sort(HealthLog.filter(store.entries, filter), sortKey, sortDir, personName: store.personName)
+        let title = { (e: HealthEntry) in HealthPresets.entryTitle(e) { t($0) } }
+        return HealthLog.sort(HealthLog.filter(store.entries, filter, title: title), sortKey, sortDir, personName: store.personName, title: title)
     }
 
     /// Counts per kind within the person scope, as on the web: the chips say what each would show.
@@ -409,11 +413,6 @@ struct HealthLogScreen: View {
         // After the form's sheet has gone: an alert cannot show over a sheet that is closing.
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { notice = failures.joined(separator: "\n") }
     }
-
-    /// The web's own message after a restore: who and which genomes came across, from which file.
-    private func restoredMessage(_ r: RestoreResult) -> String {
-        t("settingsPage.imported", ["people": r.persons, "genomes": r.genomes, "version": 2, "exportedAt": r.exportedAt])
-    }
 }
 
 /// One entry as a card: kind, person, time, title with the value large at the trailing edge, then
@@ -442,7 +441,7 @@ struct EntryCard: View {
                     .monospacedDigit()
             }
             HStack(alignment: .firstTextBaseline, spacing: 8) {
-                Text(entry.title)
+                Text(HealthPresets.entryTitle(entry) { t($0) })
                     .frame(maxWidth: .infinity, alignment: .leading)
                 if entry.value != nil {
                     Text(HealthLog.formatValue(entry))
@@ -599,7 +598,7 @@ struct HealthTableView: View {
             KindBadge(kind: entry.kind)
         case "title":
             HStack(spacing: 4) {
-                Text(entry.title)
+                Text(HealthPresets.entryTitle(entry) { t($0) })
                 if !entry.body.isEmpty { Image(systemName: "text.alignleft").foregroundStyle(.secondary) }
                 if let count = attachments[entry.id]?.count, count > 0 {
                     Label(String(count), systemImage: "paperclip")

@@ -102,17 +102,36 @@ final class RestoreTests: XCTestCase {
         XCTAssertEqual(m, Mendelian(compared: 6, violations: 1))
     }
 
-    /// A genome whose bytes do not match the manifest refuses the whole file.
-    func testRefusesATamperedGenome() throws {
+    /// A genome whose bytes do not match the manifest is left out, as on the web: the rest of the
+    /// file still restores, and the person whose DNA is missing is named.
+    func testLeavesOutATamperedGenomeAndNamesWhoIsMissing() throws {
         let data = try fixture("genomes.hearth")
-        let path = try XCTUnwrap(Container.open(data, passphrase: nil).genomes.first?.path)
+        let first = try XCTUnwrap(Container.open(data, passphrase: nil).genomes.first)
         // Flip a byte inside the first genome's stored zip entry, just past its local header's name.
-        let at = try XCTUnwrap(data.range(of: Data(path.utf8))).upperBound + 20
+        let at = try XCTUnwrap(data.range(of: Data(first.path.utf8))).upperBound + 20
         var broken = data
         broken[at] ^= 1
-        XCTAssertThrowsError(try Container.open(broken, passphrase: nil)) { error in
-            XCTAssertEqual(error as? BackupError, .damaged)
+        let dump = try Container.open(broken, passphrase: nil)
+        XCTAssertEqual(dump.genomeFiles.count, dump.genomes.count - 1)
+        let result = try Restore.run(dump, into: makeTestRepo())
+        XCTAssertEqual(result.genomes, 1)
+        XCTAssertEqual(result.missing.map(\.id), [first.personId])
+    }
+
+    /// The web's fixture of the shape that once failed to open: the manifest lists the child's
+    /// genome and the zip has no entry for it. Everything else restores, plain and sealed.
+    func testRestoresABackupThatLostAGenomeFileAroundTheGap() throws {
+        for (name, pass) in [("missing-genome.hearth", nil), ("missing-genome.hearth.enc", "fixture passphrase")] as [(String, String?)] {
+            let dump = try Container.open(fixture(name), passphrase: pass)
+            XCTAssertEqual(dump.genomes.count, 2)
+            XCTAssertEqual(dump.genomeFiles.count, 1)
+            let repo = try makeTestRepo()
+            let result = try Restore.bytes(fixture(name), passphrase: pass, into: repo)
+            XCTAssertEqual(result.genomes, 1)
+            XCTAssertEqual(result.missing, [PersonRef(id: "fx-child", name: "Test Child")])
+            XCTAssertEqual(try repo.genotypeCounts(), ["fx-parent": 5])
         }
+        XCTAssertThrowsError(try Container.open(fixture("missing-genome.hearth.enc"), passphrase: nil))
     }
 
     /// What the screens read back is the same data: tags parsed, the value as a number, an

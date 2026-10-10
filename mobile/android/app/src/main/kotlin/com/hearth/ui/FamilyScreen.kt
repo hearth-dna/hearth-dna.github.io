@@ -17,11 +17,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
@@ -74,11 +76,11 @@ private val RSID = Regex("^rs\\d+$", RegexOption.IGNORE_CASE)
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FamilyScreen(repo: Repo, kb: Kb) {
+fun FamilyScreen(repo: Repo, kb: Kb, start: String? = null, onBack: (() -> Unit)? = null) {
     val t = LocalStrings.current
     val scope = rememberCoroutineScope()
     var q by rememberSaveable { mutableStateOf("") }
-    var looked by rememberSaveable { mutableStateOf<String?>(null) }
+    var looked by rememberSaveable { mutableStateOf<String?>(start) }
     var rows by remember { mutableStateOf<List<FamilyCall>?>(null) }
     var persons by remember { mutableStateOf(emptyList<Person>()) }
     var relationships by remember { mutableStateOf(emptyList<Relationship>()) }
@@ -101,6 +103,9 @@ fun FamilyScreen(repo: Repo, kb: Kb) {
         topBar = {
             LargeTopAppBar(
                 title = { Text(t("familyPage.title")) },
+                navigationIcon = {
+                    if (onBack != null) IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = t("personPage.back")) }
+                },
                 scrollBehavior = topBar,
                 colors = TopAppBarDefaults.largeTopAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background,

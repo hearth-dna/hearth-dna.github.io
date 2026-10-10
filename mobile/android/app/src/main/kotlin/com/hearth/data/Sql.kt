@@ -17,6 +17,21 @@ interface Sql {
      * hundreds of thousands of rows, compiled once. [onProgress] gets the count done every 50 000.
      */
     fun insertMany(sql: String, rows: List<List<Any?>>, onProgress: (Int) -> Unit = {})
+
+    /**
+     * Like [query], but the rows read before an error stay in [out]: a damaged table gives up the
+     * rows before its first bad page (a repair keeps what it can). The default reads all or nothing.
+     */
+    fun readInto(sql: String, out: MutableList<Row>) {
+        out.addAll(query(sql))
+    }
+
+    /**
+     * SQLite's quick_check over the whole file (db.ts `check`): damage in pages no query reads (an
+     * index, a far corner of the genotype table) raises no error until something does; this finds
+     * it. On the phone, damage also puts the repair screen up.
+     */
+    fun check(): Boolean = query("PRAGMA quick_check(1)").firstOrNull()?.values?.firstOrNull() == "ok"
 }
 
 fun Row.str(key: String): String = this[key] as? String ?: ""

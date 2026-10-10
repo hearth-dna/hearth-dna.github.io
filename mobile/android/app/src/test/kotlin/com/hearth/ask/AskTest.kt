@@ -122,6 +122,12 @@ class AskTest {
         assertEquals(emptyList<String>(), questionTerms("should I worry about this with my family"))
     }
 
+    @Test fun `matches condition synonyms in other languages`() {
+        assertTrue(retrieveForQuestion(kb, "есть ли риск диабета у мамы?").contains("rs7903146"))
+        assertTrue(retrieveForQuestion(kb, "anything about heart attack risk").contains("rs10757278"))
+        assertEquals(emptySet<String>(), retrieveForQuestion(kb, "should I worry about this with my family"))
+    }
+
     private val now = Instant.parse("2026-09-17T12:00:00Z")
     private val calls = listOf(Call("rs4244285", "10", 1, "A", "G"), Call("rs7903146", "10", 2, "C", "T"))
     private val findings = computeFindings(kb, calls)
