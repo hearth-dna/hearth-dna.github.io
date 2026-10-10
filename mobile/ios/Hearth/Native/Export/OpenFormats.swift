@@ -120,14 +120,14 @@ enum OpenFormats {
         "conditions", "drugs", "summary", "sources",
     ]
 
-    static func findingsTable(_ byPerson: [(person: Person, findings: [Finding])]) -> Table {
+    static func findingsTable(_ kb: Kb, _ byPerson: [(person: Person, findings: [Finding])]) -> Table {
         Table(header: findingHeader, rows: byPerson.flatMap { item in
             item.findings.map { f -> [Cell] in
                 [
                     .text(item.person.displayName), .text(f.entry.rsid), .text(f.entry.gene), .text(f.entry.name),
                     .text(f.genotype), .text(f.entry.riskAllele), Cell(f.riskCopies), Cell(f.match?.magnitude),
                     .text(f.match?.label ?? ""), .text(f.entry.evidence), .text(f.entry.topic),
-                    .text(f.entry.conditions.joined(separator: "; ")), .text(f.entry.drugs.joined(separator: "; ")),
+                    .text(f.entry.conditions.map(kb.conditionLabel).joined(separator: "; ")), .text(f.entry.drugs.joined(separator: "; ")),
                     .text(f.entry.summary), .text(f.entry.sources.joined(separator: " ")),
                 ]
             }

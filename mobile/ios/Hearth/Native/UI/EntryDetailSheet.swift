@@ -72,7 +72,7 @@ struct EntryDetailSheet: View {
                     Button(t("common.delete"), role: .destructive) { confirmingDelete = true }
                 }
             }
-            .navigationTitle(entry.title)
+            .navigationTitle(HealthPresets.entryTitle(entry) { t($0) })
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
@@ -80,7 +80,7 @@ struct EntryDetailSheet: View {
                 }
             }
             .confirmationDialog(
-                t("healthLog.confirmDelete", ["title": entry.title, "date": entry.date]),
+                t("healthLog.confirmDelete", ["title": HealthPresets.entryTitle(entry) { t($0) }, "date": entry.date]),
                 isPresented: $confirmingDelete,
                 titleVisibility: .visible
             ) {

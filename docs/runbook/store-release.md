@@ -17,6 +17,7 @@ source and none of your secrets can build and run the apps, and can publish noth
 | `PLAY_SERVICE_ACCOUNT_JSON` | Play Developer API credentials | a file outside the repo | in git |
 | `APPLE_TEAM_ID` | your Apple developer team | `.env` / CI secret | in git — `ExportOptions.plist` is generated from the `.example` at export time |
 | `ASC_KEY_ID`, `ASC_ISSUER_ID`, `ASC_KEY_PATH` | App Store Connect API key (`.p8`) | `.env` + a file outside the repo | in git |
+| `HEARTH_SOURCE_URL` | where the source is published; Settings links to it, as the AGPL-3.0 asks of whoever distributes the app | `.env`; CI uses the repository it runs in | in git. Store builds refuse to build without it |
 
 ## Before the first upload
 

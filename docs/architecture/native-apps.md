@@ -22,26 +22,53 @@ page is out of date.
 
 ## Screens
 
-Five tabs, the web's (TabBar.tsx): **People**, **Lookup**, **Health**, **Ask**, **Settings**.
+Five tabs, the web's top-level pages that fit a phone's bar, in the web's order (App.tsx):
+**People**, **Health**, **DNA**, **Ask**, **Settings**. The web's other pages (Lookup, Import, Charts,
+under "More" there) are not tabs here: Lookup opens from a marker on the DNA tab; Import's parts live
+in People (genome files) and Health (documents); Charts are not built yet (see "Not on the phones yet").
 
 - **People** (PeoplePage.tsx): cards, table or pedigree tree; add and edit a person; parent links;
   import a DNA file for one person or several at once, behind the `import_genome` consent (and
   `import_minor` with the guardian statement for someone under 18). A person's **report**
   (PersonPage.tsx) shows their files, the Mendelian check against each parent and the trio, a way
   into their health log, and the knowledge-base findings, sortable.
-- **Lookup** (FamilyPage.tsx): search the kb by gene, drug, condition or rsid; every person's
-  genotype at it, and who inherited which allele (the pedigree with the allele on each line, risk
-  alleles marked, ambiguous lines dashed, impossible ones red).
+- **DNA** (DnaPage.tsx): every marker the knowledge base describes, most clinically useful first
+  (`Viewer.rankEntries`: evidence grade, medical before lifestyle, impact), with each person's
+  genotype under it. Filter by person, area of medicine (`kb.areas`, named in the app's language),
+  text and notability; tick markers to send only those. What is shown becomes a context pack
+  (question optional, pseudonymised unless real names are switched on) previewed exactly as it
+  leaves, with the same copy, share and open-in-an-assistant actions as Ask. Each marker opens the
+  **family lookup**.
+- **Lookup** (FamilyPage.tsx, opened from DNA): search the kb by gene, drug, condition or rsid;
+  every person's genotype at it, and who inherited which allele (the pedigree with the allele on each
+  line, risk alleles marked, ambiguous lines dashed, impossible ones red).
 - **Health**: the log below, plus a quick measurement row, attachments (kept in the app, viewed in
   the app, never handed to another app) and **Read a document** with the user's own Gemini key
   (key in the Keystore / Keychain, the `read_document_byok` consent, a confirmation per send, a
   sharing-log row with metadata only; the reply is a draft for the add form).
 - **Ask** (AskPage.tsx): the question classified on the phone, suggested records with reasons,
-  search for more, the context pack previewed exactly as copied (character for character the
-  web's), copy to the clipboard after a confirmation, logged in the sharing log.
-- **Settings** (SettingsPage.tsx): language; full dump export and import; the backup place;
-  open formats (CSV, JSON Lines); the Gemini key; consents with revoke (revoking deletes what the
-  consent covered); the sharing log; erase everything. A sync status sits in the top bars.
+  search for more, the context pack previewed exactly as sent (character for character the web's),
+  then **copy** it, hand it to the **system share sheet**, or **open it in ChatGPT, Claude, Mistral
+  or Google AI Mode** with the text already typed in (`Assistants`: the text rides in the address, so
+  a pack over 8 000 characters can only be copied). Each is confirmed first, says where the text goes,
+  and is logged in the sharing log and the chat history. The address is handed to the system browser;
+  the app opens no connection of its own, so it does not pass through `Egress`.
+- **Settings** (SettingsPage.tsx): language; full dump export and import (several files at once, see
+  below); the backup place; open formats (CSV, JSON Lines); the Gemini key; consents with revoke
+  (revoking deletes what the consent covered); the sharing log; erase everything; **check the
+  database** (`PRAGMA quick_check`); and the link to the source code (AGPL-3.0), whose address comes
+  from `HEARTH_SOURCE_URL` at build time. A sync status sits in the top bars.
+
+### A damaged database
+
+The web's repair path (`Database.repair`, RepairScreen.tsx), on both phones. A database file that
+turns out damaged (`SQLITE_CORRUPT`, `SQLITE_NOTADB`), at start-up or during use, puts a repair
+screen in place of the app. Android's default handler would delete such a file; `Db.kt` replaces it
+with one that keeps the file. Repair reads every table but genotypes, keeping the rows before a bad
+page (`salvage`), starts a clean database, puts the rows back by column name with foreign keys off
+(`restoreSalvage`), then rebuilds each person's genotypes from the genome files kept beside the
+database (`rebuildGenomesFromCache`: the original named by the latest `source_file`, else the rebuilt
+`generic-<person>-<rows>.gz`). Anything still missing comes back from a backup.
 
 ### Backups
 
@@ -51,6 +78,16 @@ on returning to the foreground, before every backup), genomes and sealed documen
 folder snapshot, rotations where the place does not version files itself. Places: a folder or a
 single file from the system picker, Google Drive or Dropbox (ADR 0009), and iCloud Drive on iOS.
 The passphrase is kept in the Keystore / Keychain under the name the web shell used.
+
+**Restoring picks several files at once** (`loadFiles` / `Loader.load`, scheduler.ts `loadFiles`),
+because a phone's picker selects within one folder and a folder backup keeps its genomes in a
+subfolder: a backup file, its genome files, or a zip of the whole folder, told apart by content. A
+snapshot that arrives without its genomes remembers who still needs one (`meta`
+`genomes-elsewhere`), and Settings offers "Load DNA files…" until they are picked; a genome file is
+recognised by its bytes, or by the text inside (a drive may hand a `.gz` over decompressed). A backup
+whose zip lacks a genome, or whose genome fails its hash, restores around the gap and names the
+person (the web's rule, `missing-genome.hearth` in the fixtures). The web's "single-file copy for a
+phone" is an ordinary dump v2 with the genomes inside, so one pick loads it.
 
 ## Formats the native code must match exactly
 
@@ -120,3 +157,24 @@ The same features on both platforms, each drawn with its own platform's componen
 
 Strings are the web keys. A string the web does not have yet is added to `frontend/src/i18n/en/`
 and all nineteen locales, never hard-coded in native code.
+
+## Not on the phones yet
+
+The web app has grown since the phones were last brought level (the last full sync was 0.2.0,
+2026-09-26). What follows is on the web and not here; the data for all of it is already in the
+database and in backups, so nothing is lost when a backup passes through a phone, but the phone does
+not show or edit it.
+
+- **Charts** (ChartsPage.tsx): time series of measurements, WHO growth curves, adult reference ranges
+  and BMI (`charts/`, `kb.growth`, `kb.ranges`).
+- **Lab results and the Import page** (ImportPage.tsx, LabReviewTable.tsx, TimelineImportDialog.tsx):
+  the blood-test reader (`labs/`), the CSV timeline import with its column picker, and the analyte
+  catalogue (`kb.analytes`, `kb.panels`, `kb.units`). A lab entry restored from a backup shows as a
+  plain entry; its reference range, flag and printed value are kept.
+- **Symptom details and sides**: the structured details of a symptom (stool form, cough type…), the
+  left/right/both side of a body part, the quick symptom bar, and the links from an entry to the kb's
+  conditions (`HealthEntry.side`, `details`, `conditions`). The Ask context pack line for such an
+  entry therefore omits them where the web's includes them (`describeEntry`).
+- **The health-log CSV export** has fewer columns than the web's (`export/table.ts`).
+- **Backup folder repair from older copies** (`backup/repair.ts`): filling a missing genome from a
+  rotated copy or a conflict file when loading from the backup place.

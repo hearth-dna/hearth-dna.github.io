@@ -73,5 +73,8 @@ No account, no server of ours, no push notifications, no background work beyond 
 while the app is open, no analytics, no crash reporter, and no third-party SDK beyond Play services'
 sign-in client (ADR 0009). Android asks for exactly one permission (`INTERNET`, for reading a
 document with the user's own key and for cloud backups) and turns off `allowBackup`; iOS keeps the
-database out of iCloud and device backups. The only copy that leaves the phone is the backup the
-user sets up, encrypted with their passphrase unless they choose otherwise.
+database out of iCloud and device backups. The only copy the app makes of its own accord is the
+backup the user sets up, encrypted with their passphrase unless they choose otherwise. Ask and DNA can
+also hand a context pack to the system share sheet or open it in a chat assistant's page in the
+system browser; each is confirmed first, says where the text goes, and is logged, and the app itself
+opens no connection for it.

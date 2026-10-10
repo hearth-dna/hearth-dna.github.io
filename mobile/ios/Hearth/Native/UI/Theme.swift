@@ -57,6 +57,23 @@ struct KindBadge: View {
     }
 }
 
+/// The web's `.badge.A/B/C`: A in the "ok" green, B in the warning amber, C muted.
+func evidenceColor(_ e: String) -> Color {
+    switch e {
+    case "A": return .green
+    case "B": return severityColor(4)
+    default: return .secondary
+    }
+}
+
+/// The web's `.mag.hi` (3 and up) and `.mag.mid` (2 and up).
+func magnitudeColor(_ m: Double?) -> Color {
+    guard let m else { return .secondary }
+    if m >= 3 { return severityColor(7) }
+    if m >= 2 { return severityColor(4) }
+    return .primary
+}
+
 /// A selectable capsule: scope, kind, period, tag and active-filter chips all use it, so they
 /// read as one family of controls.
 struct Chip: View {

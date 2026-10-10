@@ -9,30 +9,15 @@ enum Retrieve {
             .split(separator: " ").map(String.init)
     )
 
-    /// Lower-cased, split on everything but ASCII letters, digits and `*` (`/[^a-z0-9*]+/`).
-    static func tokens(_ text: String) -> [String] {
-        var out: [String] = []
-        var current = ""
-        for s in text.lowercased().unicodeScalars {
-            if (s >= "a" && s <= "z") || (s >= "0" && s <= "9") || s == "*" {
-                current.unicodeScalars.append(s)
-            } else if !current.isEmpty {
-                out.append(current)
-                current = ""
-            }
-        }
-        if !current.isEmpty { out.append(current) }
-        return out
-    }
-
     /// The question's words worth matching, in order, without repeats.
     static func questionTerms(_ question: String) -> [String] {
         var seen = Set<String>()
-        return tokens(question).filter { $0.count >= 3 && !stop.contains($0) && seen.insert($0).inserted }
+        return KbText.tokens(question).filter { !stop.contains($0) && seen.insert($0).inserted }
     }
 
-    private static func entryTerms(_ e: KbEntry) -> [String] {
-        ([e.rsid, e.gene, e.name] + e.drugs + e.conditions).flatMap(tokens).filter { $0.count >= 3 }
+    /// Marker names, drugs, and the names and synonyms of the conditions the marker is linked to.
+    private static func entryTerms(_ kb: Kb, _ e: KbEntry) -> [String] {
+        ([e.rsid, e.gene, e.name] + e.drugs + kb.conditionNames(e)).flatMap(KbText.tokens)
     }
 
     /// The rsids of the entries the question names, in kb order.
@@ -41,11 +26,8 @@ enum Retrieve {
         if terms.isEmpty { return [] }
         var hits: [String] = []
         for e in kb.entries where !hits.contains(e.rsid) {
-            let et = entryTerms(e)
-            // Whole-token match, or a term that is a prefix of a token of 5+ letters (statin → statins).
-            let match = terms.contains { t in
-                et.contains { w in w == t || (t.count >= 5 && w.hasPrefix(t)) || (w.count >= 5 && t.hasPrefix(w)) }
-            }
+            let et = entryTerms(kb, e)
+            let match = terms.contains { t in et.contains { w in KbText.tokenMatch(t, w) } }
             if match { hits.append(e.rsid) }
         }
         return hits

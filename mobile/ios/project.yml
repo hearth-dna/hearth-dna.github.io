@@ -96,6 +96,9 @@ targets:
         # identifiers, so they never appear in this file.
         HearthGoogleClientID: $(HEARTH_GOOGLE_IOS_CLIENT_ID)
         HearthDropboxAppKey: $(HEARTH_DROPBOX_APP_KEY)
+        # The source code link in Settings (AGPL-3.0). The repository address is not committed; it
+        # arrives from HEARTH_SOURCE_URL like the store identity, and empty means no link.
+        HearthSourceURL: $(HEARTH_SOURCE_URL)
         # Shows the app's iCloud container in iCloud Drive as a "Hearth" folder, so the user can
         # see the backup there and it survives the app being deleted.
         NSUbiquitousContainers:
@@ -118,6 +121,7 @@ targets:
       base:
         HEARTH_GOOGLE_IOS_CLIENT_ID: ""
         HEARTH_DROPBOX_APP_KEY: ""
+        HEARTH_SOURCE_URL: ""
         PRODUCT_BUNDLE_IDENTIFIER: example.hearth.app$(BUNDLE_ID_SUFFIX)
         PRODUCT_NAME: Hearth
         TARGETED_DEVICE_FAMILY: "1,2"

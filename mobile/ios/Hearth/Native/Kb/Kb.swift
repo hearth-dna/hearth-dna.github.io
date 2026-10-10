@@ -20,8 +20,37 @@ struct KbEntry: Identifiable, Equatable {
     let conditions: [String]
     let topic: String
     let generatedBy: String
+    /// Area ids (`Kb.areas`), at least one in the shipped file.
+    var areas: [String] = []
 
     var id: String { rsid }
+}
+
+/// An area of medicine the DNA tab filters by (kb/reviewed/areas.json); `en` is always present.
+struct KbArea: Equatable, Identifiable {
+    let id: String
+    let names: [String: String]
+
+    func name(_ lang: String = "en") -> String { names[lang] ?? names["en"] ?? id }
+}
+
+/// A topic and its category (`clinical` or `lifestyle`), which ranks the DNA tab.
+struct KbTopic: Equatable {
+    let id: String
+    let category: String
+}
+
+/// An entry of the condition catalogue (kb/reviewed/conditions.json): names and synonyms in several
+/// languages. The kb's entries and the health log refer to a condition by `id`; `en` is always present.
+struct KbCondition: Equatable, Identifiable {
+    let id: String
+    let names: [String: String]
+    var synonyms: [String: [String]] = [:]
+
+    func name(_ lang: String = "en") -> String { names[lang] ?? names["en"] ?? id }
+
+    /// Every name and synonym of the condition, in every language.
+    var allNames: [String] { Array(names.values) + synonyms.values.flatMap { $0 } }
 }
 
 /// The bundled knowledge base (frontend/public/kb.json, built by kb/build_kb.py) and the logic over
@@ -30,8 +59,19 @@ struct KbEntry: Identifiable, Equatable {
 struct Kb: Equatable {
     let version: String
     let entries: [KbEntry]
+    var topics: [KbTopic] = []
+    var areas: [KbArea] = []
+    var conditions: [KbCondition] = []
 
     static let empty = Kb(version: "", entries: [])
+
+    func condition(_ id: String) -> KbCondition? { conditions.first { $0.id == id } }
+
+    /// The English name for a condition id, or the id itself when the kb does not know it.
+    func conditionLabel(_ id: String) -> String { condition(id)?.name() ?? id }
+
+    /// Every name and synonym of the conditions an entry is linked to.
+    func conditionNames(_ e: KbEntry) -> [String] { e.conditions.flatMap { condition($0)?.allNames ?? [] } }
 
     /// The copy in the app bundle, read once. A build made without `make mobile-kb` has none, and
     /// gets an empty kb (no findings, no search hits) rather than a crash.
@@ -62,9 +102,13 @@ struct Kb: Equatable {
                     drugs: e.drugs ?? [],
                     conditions: e.conditions ?? [],
                     topic: e.topic ?? "",
-                    generatedBy: e.generated_by ?? ""
+                    generatedBy: e.generated_by ?? "",
+                    areas: e.areas ?? []
                 )
-            }
+            },
+            topics: (file.topics ?? []).map { KbTopic(id: $0.id, category: $0.category ?? "") },
+            areas: (file.areas ?? []).map { KbArea(id: $0.id, names: $0.names) },
+            conditions: (file.conditions ?? []).map { KbCondition(id: $0.id, names: $0.names, synonyms: $0.synonyms ?? [:]) }
         )
     }
 
@@ -88,10 +132,30 @@ struct Kb: Equatable {
             let conditions: [String]?
             let topic: String?
             let generated_by: String?
+            let areas: [String]?
+        }
+
+        struct Topic: Decodable {
+            let id: String
+            let category: String?
+        }
+
+        struct Area: Decodable {
+            let id: String
+            let names: [String: String]
+        }
+
+        struct Condition: Decodable {
+            let id: String
+            let names: [String: String]
+            let synonyms: [String: [String]]?
         }
 
         let version: String?
         let entries: [Entry]
+        let topics: [Topic]?
+        let areas: [Area]?
+        let conditions: [Condition]?
     }
 }
 
@@ -157,12 +221,12 @@ enum KbLogic {
         }
     }
 
-    /// Text search over the kb: rsid, gene, name, summary, drugs, conditions.
+    /// Text search over the kb: rsid, gene, name, summary, drugs, and every name of the linked conditions.
     static func search(_ kb: Kb, _ q: String) -> [KbEntry] {
         let needle = q.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
         if needle.isEmpty { return [] }
         return kb.entries.filter { e in
-            ([e.rsid, e.gene, e.name, e.summary] + e.drugs + e.conditions).contains { $0.lowercased().contains(needle) }
+            ([e.rsid, e.gene, e.name, e.summary] + e.drugs + kb.conditionNames(e)).contains { $0.lowercased().contains(needle) }
         }
     }
 

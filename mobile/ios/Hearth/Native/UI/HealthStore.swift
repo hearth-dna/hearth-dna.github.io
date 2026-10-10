@@ -83,27 +83,6 @@ final class HealthStore: ObservableObject {
     func grantDocumentConsent(_ personId: String) throws {
         try repo.grantConsent(.importDocument, subject: personId)
     }
-
-    /// Opens and merges a backup on a background queue: deriving the key of an encrypted file
-    /// takes a noticeable moment by design, and loading its genomes takes seconds. `Db` serialises
-    /// access, and the screen shows only a progress indicator meanwhile. The completion and the
-    /// reload run back on the main thread.
-    func restore(_ data: Data, passphrase: String?, completion: @escaping (Result<RestoreResult, Error>) -> Void) {
-        let repo = self.repo
-        DispatchQueue.global(qos: .userInitiated).async {
-            let result = Result { () throws -> RestoreResult in
-                try Restore.run(Container.open(data, passphrase: passphrase), into: repo)
-            }
-            DispatchQueue.main.async {
-                completion(result.flatMap { restored in
-                    Result { () throws -> RestoreResult in
-                        try self.reload()
-                        return restored
-                    }
-                })
-            }
-        }
-    }
 }
 
 /// The native app's root (ADR 0010, staging step 1): its own database, which starts empty until a
@@ -116,6 +95,21 @@ struct NativeRootView: View {
     @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
+        Group {
+            if let damaged = database.damaged {
+                // The database file is damaged, at start-up or since: the repair screen replaces the app.
+                RepairView(error: damaged) { database.reopen() }
+            } else {
+                content
+            }
+        }
+        .id(language)
+        .environment(\.layoutDirection, Strings.shared.rightToLeft ? .rightToLeft : .leftToRight)
+        .environment(\.locale, Locale(identifier: language))
+    }
+
+    @ViewBuilder
+    private var content: some View {
         Group {
             switch database.opened {
             case .success(let opened):
@@ -149,25 +143,125 @@ struct NativeRootView: View {
                     .padding(32)
             }
         }
-        .id(language)
-        .environment(\.layoutDirection, Strings.shared.rightToLeft ? .rightToLeft : .leftToRight)
-        .environment(\.locale, Locale(identifier: language))
     }
 }
 
 /// Opens the database once for the life of the scene: a `@StateObject` is created once, where a
 /// view's own properties are rebuilt on every update.
 private final class NativeDatabase: ObservableObject {
-    let opened: Result<(repo: Repo, health: HealthStore, people: PeopleStore, backups: Backups), Error> = Result {
-        let repo = try Repo(db: Db.openDefault(), blobs: Blobs.openDefault())
-        return (repo, try HealthStore(repo: repo), PeopleStore(repo: repo), Backups(repo: repo, cloud: Cloud()))
+    typealias Opened = (repo: Repo, health: HealthStore, people: PeopleStore, backups: Backups)
+
+    @Published private(set) var opened: Result<Opened, Error>
+    /// The database file turned out damaged, at start-up or since; the message is SQLite's own.
+    @Published private(set) var damaged: String?
+
+    init() {
+        opened = .failure(DbError(message: ""))
+        reopen()
+    }
+
+    /// Opens the database again, after a repair. Whatever held the old one is let go first, so
+    /// nothing keeps writing to (or backing up from) a file that is being replaced.
+    func reopen() {
+        damaged = nil
+        opened = .failure(DbError(message: ""))
+        let result = Result { () throws -> Opened in
+            let db = try Db.openDefault()
+            db.onCorrupt = { [weak self] message in DispatchQueue.main.async { self?.markDamaged(message) } }
+            let repo = Repo(db: db, blobs: try Blobs.openDefault())
+            return (repo, try HealthStore(repo: repo), PeopleStore(repo: repo), Backups(repo: repo, cloud: Cloud()))
+        }
+        if case .failure(let error) = result, Db.isCorrupt(error) {
+            damaged = (error as? DbError)?.message ?? error.localizedDescription
+        } else {
+            opened = result
+        }
+    }
+
+    private func markDamaged(_ message: String) {
+        guard damaged == nil else { return }
+        damaged = message
+        opened = .failure(DbError(message: message))
     }
 }
 
-/// The web's top-level pages as a tab bar, in TabBar.tsx's order (People, Lookup, Health, Ask,
-/// Settings), each tab with its own navigation stack. Health is where the app opens, as on
-/// Android. A person's report is pushed on People; its health-log row switches to Health scoped to
-/// that person.
+/// In place of the app when the database file is damaged (RepairScreen.tsx): what happened, and a
+/// repair that keeps whatever can still be read, rebuilds genotypes from the genome files kept on
+/// the phone, and then opens the app again. Anything still missing comes back from a backup.
+private struct RepairView: View {
+    let error: String
+    let onDone: () -> Void
+
+    private enum Step { case ask, working, done, failed }
+
+    @State private var step = Step.ask
+    @State private var progress: String?
+    @State private var message = ""
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section {
+                    Text(t("repair.intro"))
+                    Text(error).font(.footnote).foregroundStyle(.secondary)
+                }
+                Section {
+                    switch step {
+                    case .ask:
+                        Button(t("repair.button"), action: repair)
+                    case .working:
+                        HStack {
+                            Text(progress ?? t("repair.working")).foregroundStyle(.secondary)
+                            Spacer()
+                            ProgressView()
+                        }
+                    case .done, .failed:
+                        Text(message).foregroundStyle(step == .done ? Color.primary : Color.red)
+                        Button(t("repair.reload"), action: onDone)
+                    }
+                }
+            }
+            .navigationTitle(t("native.repairTitle"))
+        }
+    }
+
+    private func repair() {
+        step = .working
+        DispatchQueue.global(qos: .userInitiated).async {
+            let result = Result { () throws -> String in
+                let path = try Db.defaultFile().path
+                let kept = try Db.repair(path: path)
+                let db = try Db(path: path)
+                defer { db.close() }
+                let repo = Repo(db: db, blobs: try Blobs.openDefault())
+                let genomes = try Restore.rebuildGenomesFromCache(repo) { key, params in
+                    let text = t(key, params)
+                    DispatchQueue.main.async { progress = text }
+                }
+                return [
+                    t("repair.done", ["people": kept.rows["person"] ?? 0, "entries": kept.rows["health_log"] ?? 0, "genomes": genomes]),
+                    kept.lost.isEmpty ? "" : t("repair.lost", ["tables": kept.lost.joined(separator: ", ")]),
+                ].filter { !$0.isEmpty }.joined(separator: " ")
+            }
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let text):
+                    message = text
+                    step = .done
+                case .failure(let error):
+                    message = t("repair.failed", ["error": error.localizedDescription])
+                    step = .failed
+                }
+            }
+        }
+    }
+}
+
+/// The web's top-level pages that fit a phone's tab bar, in the web's order (People, Health, DNA,
+/// Ask, Settings; App.tsx), each tab with its own navigation stack. The family lookup, a "More"
+/// page on the web, opens from a marker on the DNA tab instead of having a tab. Health is where
+/// the app opens, as on Android. A person's report is pushed on People; its health-log row
+/// switches to Health scoped to that person.
 private struct NativeTabs: View {
     @ObservedObject var health: HealthStore
     @ObservedObject var people: PeopleStore
@@ -176,7 +270,7 @@ private struct NativeTabs: View {
     let onErased: () -> Void
 
     private enum Tab: Hashable {
-        case people, family, health, ask, settings
+        case people, health, dna, ask, settings
     }
 
     @State private var tab = Tab.health
@@ -190,12 +284,12 @@ private struct NativeTabs: View {
             }
             .tabItem { Label(t("app.navPeople"), systemImage: "person.2") }
             .tag(Tab.people)
-            FamilyScreen(repo: people.repo, kb: Kb.bundled)
-                .tabItem { Label(t("app.tabFamily"), systemImage: "magnifyingglass") }
-                .tag(Tab.family)
             HealthLogScreen(store: health, backups: backups, scopeRequest: $healthScope)
                 .tabItem { Label(t("app.navHealth"), systemImage: "heart.text.square") }
                 .tag(Tab.health)
+            DnaScreen(repo: people.repo, kb: Kb.bundled)
+                .tabItem { Label(t("app.navDna"), systemImage: "circle.hexagongrid") }
+                .tag(Tab.dna)
             AskScreen(repo: people.repo, kb: Kb.bundled)
                 .tabItem { Label(t("app.navAsk"), systemImage: "bubble.left.and.bubble.right") }
                 .tag(Tab.ask)

@@ -12,6 +12,24 @@ struct RestoreResult: Equatable {
     /// travel in the backup folder, which this build does not read yet).
     let skippedAttachmentFiles: Int
     let exportedAt: String
+    /// People whose genome file the backup listed but did not carry, and this phone does not have.
+    var missing: [PersonRef] = []
+    /// A folder snapshot's genomes that were not beside it: picked on their own, they load later.
+    var elsewhere: [Elsewhere] = []
+}
+
+struct PersonRef: Equatable {
+    let id: String
+    let name: String
+}
+
+/// A genome a folder snapshot keeps beside itself. `textSha` is the sha256 of the original's text
+/// (its `source_file` row): a copy that reached this phone decompressed, or compressed again, is
+/// still known by it.
+struct Elsewhere: Equatable {
+    let entry: GenomeEntry
+    let name: String
+    var textSha: String?
 }
 
 /// Merges an opened dump v2 into the database, a port of `restoreContainer` in
@@ -109,36 +127,100 @@ enum Restore {
             let healthEntries = try count(db, "health_log") - entriesBefore
 
             var genomes = 0
+            var missing: [String] = []
+            var elsewhere: [GenomeEntry] = []
             for g in dump.genomes where !hadGenotypes.contains(g.personId) {
-                // A folder backup keeps its genomes beside it; one not there yet loads next time.
-                var loaded = dump.genomeFiles[g.path]
-                if loaded == nil, let fetched = try loadGenome?(g) {
-                    guard sha256Hex(fetched) == g.sha256 else { throw BackupError.damaged }
-                    loaded = fetched
+                var file = dump.genomeFiles[g.path]
+                if file == nil && dump.external {
+                    onProgress?("restore.fetchingGenome", ["n": genomes + 1, "total": dump.genomes.count])
+                    // Not in the folder yet (another device is still uploading it): this person keeps no
+                    // genotypes for now, and the next load, which skips people who have them, tries again.
+                    guard let fetched = try loadGenome?(g) else {
+                        elsewhere.append(g)
+                        continue
+                    }
+                    if sha256Hex(fetched) == g.sha256 { file = fetched }
                 }
-                guard let gz = loaded else { continue }
-                let text: String
-                do {
-                    text = GenomeImport.decode(try Gzip.decompress(gz))
-                } catch {
-                    throw BackupError.damaged
+                guard let gz = file else {
+                    missing.append(g.personId)
+                    continue
                 }
-                onProgress?("restore.parsingGenome", ["n": genomes + 1, "total": dump.genomes.count])
-                let parsed = GenomeParser.parseRawText(text, forced: g.original ? Provider.of(g.provider) : .generic)
-                onProgress?("restore.storingCalls", ["n": parsed.calls.count])
-                try repo.storeCalls(personId: g.personId, calls: parsed.calls)
-                if g.original { try repo.blobs.put(Repo.genomeBlobName(sha256Hex(text)), gz) }
+                try restoreGenome(repo, g, gz, onProgress: onProgress, n: genomes + 1, total: dump.genomes.count)
                 genomes += 1
             }
 
+            let people = try dump.rows("persons")
+            func name(_ id: String) -> String {
+                guard let p = people.first(where: { $0["id"] == JSONValue.string(id) }) else { return id }
+                if case .string(let n)? = p["display_name"], !n.isEmpty { return n }
+                if case .string(let l)? = p["label"] { return l }
+                return id
+            }
+            let sources = try dump.rows("source_files")
             return RestoreResult(
                 persons: persons,
                 healthEntries: healthEntries,
                 genomes: genomes,
                 skippedAttachmentFiles: attachments.count,
-                exportedAt: dump.exportedAt
+                exportedAt: dump.exportedAt,
+                missing: missing.map { PersonRef(id: $0, name: name($0)) },
+                elsewhere: elsewhere.map { g in
+                    var textSha: String?
+                    if let id = g.sourceFileId, case .string(let sha)? = sources.first(where: { $0["id"] == JSONValue.string(id) })?["sha256"] {
+                        textSha = sha
+                    }
+                    return Elsewhere(entry: g, name: name(g.personId), textSha: textSha)
+                }
             )
         }
+    }
+
+    /// One genome file (gzipped raw text, already checked against its manifest entry) into the
+    /// person's genotypes. The original is kept so this phone's own backups ship it too.
+    static func restoreGenome(
+        _ repo: Repo, _ g: GenomeEntry, _ gz: Data,
+        onProgress: ((String, [String: CustomStringConvertible]) -> Void)?, n: Int, total: Int
+    ) throws {
+        let text: String
+        do {
+            text = GenomeImport.decode(try Gzip.decompress(gz))
+        } catch {
+            throw BackupError.damaged
+        }
+        onProgress?("restore.parsingGenome", ["n": n, "total": total])
+        let parsed = GenomeParser.parseRawText(text, forced: g.original ? Provider.of(g.provider) : .generic)
+        onProgress?("restore.storingCalls", ["n": parsed.calls.count])
+        try repo.storeCalls(personId: g.personId, calls: parsed.calls)
+        if g.original { try repo.blobs.put(Repo.genomeBlobName(sha256Hex(text)), gz) }
+    }
+
+    /// After a repair (`Db.repair`) every person is without genotypes, but the genome files kept
+    /// beside the database survived it: each person's latest original (`genome-<sha>.gz`, named by
+    /// its source_file row) or, for someone imported before originals were kept, the rebuilt copy
+    /// (`generic-<person>-<rows>.gz`). Returns how many people got their genotypes back.
+    static func rebuildGenomesFromCache(
+        _ repo: Repo, onProgress: ((String, [String: CustomStringConvertible]) -> Void)? = nil
+    ) throws -> Int {
+        let people = try repo.db.query(
+            "SELECT p.id FROM person p WHERE NOT EXISTS (SELECT 1 FROM genotype g WHERE g.person_id = p.id)"
+        ).map { $0.text("id") }
+        let cached = repo.blobs.list()
+        var n = 0
+        for (i, id) in people.enumerated() {
+            let sf = try repo.db.query(
+                "SELECT id, provider, build, sha256 FROM source_file WHERE person_id = ? ORDER BY imported_at DESC LIMIT 1",
+                [.text(id)]
+            ).first
+            let original = sf.flatMap { repo.blobs.get(Repo.genomeBlobName($0.text("sha256"))) }
+            let rebuilt = original == nil ? cached.first(where: { $0.hasPrefix("generic-\(id)-") }) : nil
+            guard let gz = original ?? rebuilt.flatMap({ repo.blobs.get($0) }) else { continue }
+            let entry = original != nil && sf != nil
+                ? GenomeEntry(path: "", sha256: "", personId: id, provider: sf!.text("provider"), original: true, sourceFileId: sf!.text("id"))
+                : GenomeEntry(path: "", sha256: "", personId: id, provider: "generic", original: false)
+            try restoreGenome(repo, entry, gz, onProgress: onProgress, n: i + 1, total: people.count)
+            n += 1
+        }
+        return n
     }
 
     // MARK: - Private
