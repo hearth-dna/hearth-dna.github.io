@@ -540,7 +540,7 @@ private fun OpenFormatsCard(repo: Repo, kb: Kb, say: (String) -> Unit) {
                     val persons = repo.listPersons()
                     val table = when (what) {
                         "genotypes" -> genotypeTable(repo.sql, personColumns(persons), shared)
-                        "findings" -> findingsTable(persons.map { p -> p to computeFindings(kb, repo.personCallsFor(p.id, kb.entries.map { it.rsid })) })
+                        "findings" -> findingsTable(kb, persons.map { p -> p to computeFindings(kb, repo.personCallsFor(p.id, kb.entries.map { it.rsid })) })
                         else -> {
                             val log = repo.listHealthLog()
                             val counts = repo.attachmentsByEntry().mapValues { it.value.size }

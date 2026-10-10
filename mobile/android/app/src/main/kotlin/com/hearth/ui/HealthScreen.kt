@@ -82,6 +82,7 @@ import com.hearth.health.HealthFilter
 import com.hearth.health.SortDir
 import com.hearth.health.SortKey
 import com.hearth.health.defaultDir
+import com.hearth.health.entryTitle
 import com.hearth.health.filterHealthLog
 import com.hearth.health.groupByDate
 import com.hearth.health.sortHealthLog
@@ -148,7 +149,8 @@ fun HealthScreen(repo: Repo, backups: Backups, onlyPerson: String = "") {
     val restore = rememberRestore(repo, snackbar) { reload() }
 
     val name = { id: String -> persons.firstOrNull { it.id == id }?.displayName ?: id }
-    val shown = remember(entries, filter, sortKey, sortDir, persons) { sortHealthLog(filterHealthLog(entries, filter), sortKey, sortDir, name) }
+    val title = { e: HealthEntry -> entryTitle(e) { t(it) } }
+    val shown = remember(entries, filter, sortKey, sortDir, persons, t) { sortHealthLog(filterHealthLog(entries, filter, title), sortKey, sortDir, name, title) }
     // The web's rule: the family timeline names each entry's person; one person's log does not.
     val showPerson = filter.person.isEmpty()
     val kindCounts = remember(entries, filter.person) {

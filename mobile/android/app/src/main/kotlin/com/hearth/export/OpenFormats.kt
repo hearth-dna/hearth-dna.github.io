@@ -5,6 +5,7 @@ import com.hearth.data.Person
 import com.hearth.data.Sql
 import com.hearth.health.jsNumber
 import com.hearth.kb.Finding
+import com.hearth.kb.Kb
 import java.time.LocalDate
 
 /**
@@ -82,13 +83,13 @@ val FINDING_HEADER = listOf(
     "conditions", "drugs", "summary", "sources",
 )
 
-fun findingsTable(byPerson: List<Pair<Person, List<Finding>>>): Table = Table(
+fun findingsTable(kb: Kb, byPerson: List<Pair<Person, List<Finding>>>): Table = Table(
     FINDING_HEADER,
     byPerson.flatMap { (person, findings) ->
         findings.map { f ->
             listOf(
                 person.displayName, f.entry.rsid, f.entry.gene, f.entry.name, f.genotype, f.entry.riskAllele, f.riskCopies,
-                f.match?.magnitude, f.match?.label ?: "", f.entry.evidence, f.entry.topic, f.entry.conditions.joinToString("; "),
+                f.match?.magnitude, f.match?.label ?: "", f.entry.evidence, f.entry.topic, f.entry.conditions.joinToString("; ") { kb.conditionLabel(it) },
                 f.entry.drugs.joinToString("; "), f.entry.summary, f.entry.sources.joinToString(" "),
             )
         }

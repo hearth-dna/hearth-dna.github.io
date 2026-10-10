@@ -62,6 +62,7 @@ import com.hearth.data.HealthKind
 import com.hearth.health.SortDir
 import com.hearth.health.SortKey
 import com.hearth.health.daysBefore
+import com.hearth.health.entryTitle
 import com.hearth.health.formatValue
 import com.hearth.health.localDate
 import com.hearth.health.whenOf
@@ -141,7 +142,7 @@ fun EntryCard(
                     )
                 }
                 Row(verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Text(entry.title, Modifier.weight(1f), style = MaterialTheme.typography.titleMedium)
+                    Text(entryTitle(entry) { t(it) }, Modifier.weight(1f), style = MaterialTheme.typography.titleMedium)
                     if (value.isNotEmpty()) Text(value, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 }
                 val meta = entry.bodyPart.isNotEmpty() || entry.severity != null || entry.body.isNotEmpty() || attachments > 0
@@ -214,6 +215,7 @@ fun LazyListScope.entryTable(
         }
     }
     items(entries, key = { it.id }) { e ->
+        val t = LocalStrings.current
         Column {
             Row(Modifier.clickable { onOpen(e) }.horizontalScroll(horizontal).padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                 for (k in keys) {
@@ -222,7 +224,7 @@ fun LazyListScope.entryTable(
                             SortKey.DATE -> Text(whenOf(e), style = MaterialTheme.typography.bodyMedium)
                             SortKey.PERSON -> Text(name(e.personId), style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
                             SortKey.KIND -> KindBadge(e.kind)
-                            SortKey.TITLE -> Text(e.title, style = MaterialTheme.typography.bodyMedium, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                            SortKey.TITLE -> Text(entryTitle(e) { t(it) }, style = MaterialTheme.typography.bodyMedium, maxLines = 2, overflow = TextOverflow.Ellipsis)
                             SortKey.VALUE -> Text(formatValue(e), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
                             SortKey.BODY_PART -> Text(e.bodyPart, style = MaterialTheme.typography.bodyMedium)
                             SortKey.SEVERITY -> e.severity?.let { Text("$it/10", fontWeight = FontWeight.Bold, color = severityColor(it)) }
@@ -271,7 +273,7 @@ fun EntrySheet(
                 Spacer(Modifier.weight(1f))
                 Text(whenOf(entry), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
-            Text(entry.title, style = MaterialTheme.typography.headlineSmall)
+            Text(entryTitle(entry) { t(it) }, style = MaterialTheme.typography.headlineSmall)
             formatValue(entry).takeIf { it.isNotEmpty() }?.let {
                 Text(it, style = MaterialTheme.typography.displaySmall, fontWeight = FontWeight.SemiBold)
             }
@@ -359,7 +361,7 @@ fun EntrySheet(
     if (confirm) {
         AlertDialog(
             onDismissRequest = { confirm = false },
-            text = { Text(t("healthLog.confirmDelete", "title" to entry.title, "date" to entry.date)) },
+            text = { Text(t("healthLog.confirmDelete", "title" to entryTitle(entry) { t(it) }, "date" to entry.date)) },
             confirmButton = {
                 TextButton(onClick = { confirm = false; onDelete() }, colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)) {
                     Text(t("common.delete").cap())

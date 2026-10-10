@@ -24,9 +24,44 @@ data class KbEntry(
     val conditions: List<String>,
     val topic: String,
     val generatedBy: String,
+    /** Area ids ([Kb.areas]), at least one in the shipped file. */
+    val areas: List<String> = emptyList(),
 )
 
-data class Kb(val version: String, val entries: List<KbEntry>) {
+/** An area of medicine the DNA tab filters by (kb/reviewed/areas.json); `en` is always present. */
+data class KbArea(val id: String, val names: Map<String, String>) {
+    fun name(lang: String = "en"): String = names[lang] ?: names.getValue("en")
+}
+
+/**
+ * An entry of the condition catalogue (kb/reviewed/conditions.json): names and synonyms in several
+ * languages. The kb's entries and the health log refer to a condition by [id]. `en` is always present.
+ */
+data class KbCondition(val id: String, val names: Map<String, String>, val synonyms: Map<String, List<String>> = emptyMap()) {
+    fun name(lang: String = "en"): String = names[lang] ?: names.getValue("en")
+
+    /** Every name and synonym of the condition, in every language. */
+    fun allNames(): List<String> = names.values + synonyms.values.flatten()
+}
+
+/** A topic and its category (`clinical` or `lifestyle`), which ranks the DNA tab. */
+data class KbTopic(val id: String, val category: String)
+
+data class Kb(
+    val version: String,
+    val entries: List<KbEntry>,
+    val topics: List<KbTopic> = emptyList(),
+    val areas: List<KbArea> = emptyList(),
+    val conditions: List<KbCondition> = emptyList(),
+) {
+    fun condition(id: String): KbCondition? = conditions.firstOrNull { it.id == id }
+
+    /** The English name for a condition id, or the id itself when the kb does not know it. */
+    fun conditionLabel(id: String): String = condition(id)?.name() ?: id
+
+    /** Every name and synonym of the conditions an entry is linked to. */
+    fun conditionNames(e: KbEntry): List<String> = e.conditions.flatMap { id -> condition(id)?.allNames() ?: emptyList() }
+
     companion object {
         fun parse(json: String): Kb {
             val o = JSONObject(json)
@@ -50,9 +85,32 @@ data class Kb(val version: String, val entries: List<KbEntry>) {
                     conditions = strings(e, "conditions"),
                     topic = e.optString("topic"),
                     generatedBy = e.optString("generated_by"),
+                    areas = strings(e, "areas"),
                 )
             }
-            return Kb(o.optString("version"), entries)
+            val topics = o.optJSONArray("topics")?.let { l ->
+                (0 until l.length()).map { l.getJSONObject(it).let { t -> KbTopic(t.getString("id"), t.optString("category")) } }
+            } ?: emptyList()
+            val areas = o.optJSONArray("areas")?.let { l ->
+                (0 until l.length()).map {
+                    val a = l.getJSONObject(it)
+                    val n = a.getJSONObject("names")
+                    KbArea(a.getString("id"), n.keys().asSequence().associateWith { k -> n.getString(k) })
+                }
+            } ?: emptyList()
+            val conditions = o.optJSONArray("conditions")?.let { l ->
+                (0 until l.length()).map {
+                    val c = l.getJSONObject(it)
+                    val n = c.getJSONObject("names")
+                    val syn = c.optJSONObject("synonyms")
+                    KbCondition(
+                        c.getString("id"),
+                        n.keys().asSequence().associateWith { k -> n.getString(k) },
+                        syn?.keys()?.asSequence()?.associateWith { k -> strings(syn, k) } ?: emptyMap(),
+                    )
+                }
+            } ?: emptyList()
+            return Kb(o.optString("version"), entries, topics, areas, conditions)
         }
     }
 }
@@ -82,12 +140,12 @@ fun computeFindings(kb: Kb, calls: Iterable<Call>): List<Finding> {
     }
 }
 
-/** Text search over the kb: rsid, gene, name, summary, drugs, conditions. */
+/** Text search over the kb: rsid, gene, name, summary, drugs, and every name of the linked conditions. */
 fun searchKb(kb: Kb, q: String): List<KbEntry> {
     val needle = q.trim().lowercase()
     if (needle.isEmpty()) return emptyList()
     return kb.entries.filter { e ->
-        (listOf(e.rsid, e.gene, e.name, e.summary) + e.drugs + e.conditions).any { it.lowercase().contains(needle) }
+        (listOf(e.rsid, e.gene, e.name, e.summary) + e.drugs + kb.conditionNames(e)).any { it.lowercase().contains(needle) }
     }
 }
 
