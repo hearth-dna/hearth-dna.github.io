@@ -619,6 +619,7 @@
   "quick.customPlaceholder": "مثلاً قوة القبضة",
   "quick.save": "حفظ",
   "quick.saved": "حُفظ {what}",
+  "quick.note": "ملاحظة (اختياري)",
   "readDocumentDialog.labIntro": "يُقرأ النص وملفات .txt و.csv و.tsv وملفات PDF ذات النص القابل للتحديد على هذا الجهاز ولا تغادره أبدًا. أما الصور وملفات PDF الممسوحة فيقرؤها Google Gemini بمفتاحك.",
   "readDocumentDialog.pasteLabel": "أو الصق نص التقرير",
   "readDocumentDialog.pastePlaceholder": "انسخ جدول النتائج من بوابة المختبر أو من بريد إلكتروني والصقه هنا",

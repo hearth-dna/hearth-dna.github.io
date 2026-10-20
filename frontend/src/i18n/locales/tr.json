@@ -619,6 +619,7 @@
   "quick.customPlaceholder": "örn. Kavrama gücü",
   "quick.save": "Kaydet",
   "quick.saved": "{what} kaydedildi",
+  "quick.note": "Not (isteğe bağlı)",
   "readDocumentDialog.labIntro": "Metin, .txt, .csv ve .tsv dosyaları ve seçilebilir metinli PDF'ler bu cihazda okunur ve cihazdan hiç çıkmaz. Fotoğrafları ve taranmış PDF'leri Google Gemini sizin anahtarınızla okur.",
   "readDocumentDialog.pasteLabel": "Ya da rapor metnini yapıştırın",
   "readDocumentDialog.pastePlaceholder": "Sonuç tablosunu laboratuvar portalından veya bir e-postadan kopyalayıp buraya yapıştırın",

@@ -213,6 +213,8 @@ struct HealthLogScreen: View {
                 scopeChips
                 QuickMeasurement(store: store, initialPerson: defaultPerson)
                     .padding(.horizontal)
+                QuickSymptom(store: store, initialPerson: defaultPerson)
+                    .padding(.horizontal)
                 if store.entries.isEmpty {
                     Text(t("healthTable.empty"))
                         .foregroundStyle(.secondary)

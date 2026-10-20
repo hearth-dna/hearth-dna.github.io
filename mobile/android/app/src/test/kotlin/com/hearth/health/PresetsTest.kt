@@ -51,4 +51,18 @@ class PresetsTest {
         assertEquals(listOf("b", "a"), sortHealthLog(listOf(a, b), SortKey.TITLE, SortDir.ASC, title = shown).map { it.id })
         assertTrue(presetsFor(HealthKind.SYMPTOM).size > 60)
     }
+
+    @Test fun `orders the quick symptom list by what was recorded, under any name, events left out`() {
+        val all = SYMPTOM_PRESETS.map { it.id }
+        assertEquals(all, symptomOrder(emptyList()).map { it.id })
+        // Newest first; a Russian title counts as the preset it names.
+        val order = symptomOrder(listOf(e(HealthKind.SYMPTOM, "кашель"), e(HealthKind.SYMPTOM, "Fever"), e(HealthKind.SYMPTOM, "Cough"))).map { it.id }
+        assertEquals(listOf("cough", "fever"), order.take(2))
+        assertEquals(all.sorted(), order.sorted())
+        // Events, other kinds and unknown titles do not reorder it.
+        val ignored = listOf(e(HealthKind.SYMPTOM, "Injury"), e(HealthKind.SYMPTOM, "Fainting"), e(HealthKind.MEASUREMENT, "Weight"), e(HealthKind.OTHER, "Headache"), e(HealthKind.SYMPTOM, "Knee clicks"))
+        assertEquals(all, symptomOrder(ignored).map { it.id })
+        assertNull(symptomPreset("Injury"))
+        assertEquals("headache", symptomPreset("  ГОЛОВНАЯ боль ")?.id)
+    }
 }

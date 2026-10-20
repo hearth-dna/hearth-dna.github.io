@@ -619,6 +619,7 @@
   "quick.customPlaceholder": "जैसे पकड़ की शक्ति",
   "quick.save": "सहेजें",
   "quick.saved": "{what} सहेजा गया",
+  "quick.note": "नोट (वैकल्पिक)",
   "readDocumentDialog.labIntro": "टेक्स्ट, .txt, .csv और .tsv फ़ाइलें और चुनने योग्य टेक्स्ट वाली PDF इसी डिवाइस पर पढ़ी जाती हैं और कभी बाहर नहीं जातीं। फ़ोटो और स्कैन की गई PDF आपकी कुंजी से Google Gemini पढ़ता है।",
   "readDocumentDialog.pasteLabel": "या रिपोर्ट का टेक्स्ट चिपकाएँ",
   "readDocumentDialog.pastePlaceholder": "लैब पोर्टल या ईमेल से नतीजों की तालिका कॉपी करके यहाँ चिपकाएँ",

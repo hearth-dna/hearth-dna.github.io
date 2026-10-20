@@ -619,6 +619,7 @@
   "quick.customPlaceholder": "例如：握力",
   "quick.save": "保存",
   "quick.saved": "已保存 {what}",
+  "quick.note": "备注（可选）",
   "readDocumentDialog.labIntro": "文本、.txt、.csv 和 .tsv 文件以及可选中文字的 PDF 都在本设备上读取，绝不会离开本设备。照片和扫描的 PDF 由 Google Gemini 使用您的密钥读取。",
   "readDocumentDialog.pasteLabel": "或粘贴报告文字",
   "readDocumentDialog.pastePlaceholder": "从化验机构的网站或邮件中复制结果表并粘贴到这里",

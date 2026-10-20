@@ -619,6 +619,7 @@
   "quick.customPlaceholder": "напр. Сила хвата",
   "quick.save": "Сохранить",
   "quick.saved": "Сохранено: {what}",
+  "quick.note": "Заметка (необязательно)",
   "readDocumentDialog.labIntro": "Текст, файлы .txt, .csv и .tsv и PDF с выделяемым текстом читаются на этом устройстве и не покидают его. Фото и отсканированные PDF читает Google Gemini с вашим ключом.",
   "readDocumentDialog.pasteLabel": "Или вставьте текст анализа",
   "readDocumentDialog.pastePlaceholder": "Скопируйте таблицу результатов с сайта лаборатории или из письма и вставьте сюда",

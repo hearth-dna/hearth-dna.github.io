@@ -62,4 +62,21 @@ final class PresetsTests: XCTestCase {
         XCTAssertEqual(HealthLog.filter([a, b], HealthFilter(text: "headache"), title: shown).map(\.id), ["a"])
         XCTAssertEqual(HealthLog.sort([a, b], .title, .asc, title: shown).map(\.id), ["b", "a"])
     }
+
+    func testOrdersTheQuickSymptomListByWhatWasRecordedUnderAnyNameEventsLeftOut() {
+        let all = HealthPresets.symptoms.map(\.id)
+        XCTAssertEqual(HealthPresets.symptomOrder([]).map(\.id), all)
+        // Newest first; a Russian title counts as the preset it names.
+        let order = HealthPresets.symptomOrder([entry(.symptom, "кашель"), entry(.symptom, "Fever"), entry(.symptom, "Cough")]).map(\.id)
+        XCTAssertEqual(Array(order.prefix(2)), ["cough", "fever"])
+        XCTAssertEqual(order.sorted(), all.sorted())
+        // Events, other kinds and unknown titles do not reorder it.
+        let ignored = [
+            entry(.symptom, "Injury"), entry(.symptom, "Fainting"), entry(.measurement, "Weight"),
+            entry(.other, "Headache"), entry(.symptom, "Knee clicks"),
+        ]
+        XCTAssertEqual(HealthPresets.symptomOrder(ignored).map(\.id), all)
+        XCTAssertNil(HealthPresets.symptomPreset("Injury"))
+        XCTAssertEqual(HealthPresets.symptomPreset("  ГОЛОВНАЯ боль ")?.id, "headache")
+    }
 }

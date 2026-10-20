@@ -14,7 +14,7 @@ const CUSTOM = ''
 /**
  * One line for the numbers people record over and over: weight, height, blood pressure, waist,
  * steps… Pick the parameter, type the number, save — date and time are now, the unit comes from
- * the preset. Anything more (a note, another date, a symptom) belongs in the full add form.
+ * the preset. Anything more (another date, a symptom) belongs in the full add form.
  * Parameters this person already uses come first.
  */
 export function QuickMeasurement({
@@ -37,6 +37,7 @@ export function QuickMeasurement({
   const [unit, setUnit] = useState('')
   const [value, setValue] = useState('')
   const [value2, setValue2] = useState('')
+  const [note, setNote] = useState('')
   const [consented, setConsented] = useState<boolean | null>(null)
   const [asking, setAsking] = useState(false)
   const [saved, setSaved] = useState<string | null>(null)
@@ -63,7 +64,7 @@ export function QuickMeasurement({
       time: nowTime(),
       kind: 'measurement' as const,
       title: finalTitle,
-      body: '',
+      body: note.trim(),
       source: '',
       bodyPart: preset?.bodyPart ?? '',
       severity: null,
@@ -76,6 +77,7 @@ export function QuickMeasurement({
     setSaved(`${finalTitle} ${formatValue({ value: entry.value, value2: entry.value2, unit: finalUnit })}`)
     setValue('')
     setValue2('')
+    setNote('')
     await onSaved()
   }
 
@@ -170,6 +172,13 @@ export function QuickMeasurement({
           style={{ width: '6rem' }}
         />
       )}
+      <input
+        aria-label={t('quick.note')}
+        placeholder={t('quick.note')}
+        value={note}
+        onChange={(e) => setNote(e.target.value)}
+        onKeyDown={(e) => e.key === 'Enter' && save()}
+      />
       <button type="button" className="primary" disabled={!valid || consented === null} onClick={save}>
         {t('quick.save')}
       </button>

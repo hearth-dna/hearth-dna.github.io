@@ -12,8 +12,8 @@ import { DetailFields } from './DetailFields'
 /**
  * One line for how someone feels right now: a runny nose, a cough, red eyes, a stool that was
  * not right. Type or pick the symptom (recently used first; any other text is a custom symptom),
- * optionally rate it and fill the symptom's details, save — date and time are now. Anything more
- * (another date, a note, the side of the body) belongs in the full add form.
+ * optionally rate it, fill the symptom's details and add a note, save — date and time are now. Anything more
+ * (another date, the side of the body) belongs in the full add form.
  */
 export function QuickSymptom({
   persons,
@@ -32,6 +32,7 @@ export function QuickSymptom({
   const [personId, setPersonId] = useState(initialPerson)
   const [text, setText] = useState('')
   const [severity, setSeverity] = useState('')
+  const [note, setNote] = useState('')
   const [details, setDetails] = useState<Record<string, DetailValue>>({})
   const [consented, setConsented] = useState<boolean | null>(null)
   const [asking, setAsking] = useState(false)
@@ -67,7 +68,7 @@ export function QuickSymptom({
       time: nowTime(),
       kind: 'symptom',
       title: preset ? preset.title : name,
-      body: '',
+      body: note.trim(),
       bodyPart: preset?.bodyPart ?? '',
       severity: severity === '' ? null : Number(severity),
       tags: preset?.tags ?? [],
@@ -76,6 +77,7 @@ export function QuickSymptom({
     setSaved(name)
     setText('')
     setSeverity('')
+    setNote('')
     setDetails({})
     await onSaved()
   }
@@ -137,6 +139,13 @@ export function QuickSymptom({
           </option>
         ))}
       </select>
+      <input
+        aria-label={t('quick.note')}
+        placeholder={t('quick.note')}
+        value={note}
+        onChange={(e) => setNote(e.target.value)}
+        onKeyDown={(e) => e.key === 'Enter' && save()}
+      />
       <button type="button" className="primary" disabled={!valid || consented === null} onClick={save}>
         {t('quick.save')}
       </button>

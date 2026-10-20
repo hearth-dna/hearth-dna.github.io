@@ -619,6 +619,7 @@
   "quick.customPlaceholder": "ví dụ Lực bóp tay",
   "quick.save": "Lưu",
   "quick.saved": "Đã lưu {what}",
+  "quick.note": "Ghi chú (không bắt buộc)",
   "readDocumentDialog.labIntro": "Văn bản, tệp .txt, .csv và .tsv cùng PDF có chữ chọn được sẽ được đọc trên thiết bị này và không bao giờ rời khỏi nó. Ảnh và PDF quét do Google Gemini đọc bằng khóa của bạn.",
   "readDocumentDialog.pasteLabel": "Hoặc dán nội dung phiếu kết quả",
   "readDocumentDialog.pastePlaceholder": "Sao chép bảng kết quả từ cổng thông tin phòng xét nghiệm hoặc email rồi dán vào đây",

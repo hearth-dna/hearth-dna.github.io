@@ -2,7 +2,7 @@ import SwiftUI
 
 /// One line for the numbers people record over and over (QuickMeasurement.tsx): pick the parameter,
 /// type the number, save. Date and time are now, the unit comes from the preset, and the parameters
-/// this person already records come first. Anything more belongs in the full form.
+/// this person already records come first. A note is optional; anything more belongs in the full form.
 struct QuickMeasurement: View {
     @ObservedObject var store: HealthStore
     /// The person in scope, or "" to pick one here.
@@ -17,6 +17,7 @@ struct QuickMeasurement: View {
     @State private var unit = ""
     @State private var value = ""
     @State private var value2 = ""
+    @State private var note = ""
     @State private var asking = false
     @State private var ticked = ConsentChecks.unticked(.importDocument)
     @State private var saved: String?
@@ -82,6 +83,7 @@ struct QuickMeasurement: View {
                     .disabled(!valid)
             }
             .textFieldStyle(.roundedBorder)
+            TextField(t("quick.note"), text: $note).textFieldStyle(.roundedBorder)
             if let saved {
                 Text(t("quick.saved", ["what": saved])).font(.caption).foregroundStyle(.tint)
             }
@@ -147,12 +149,13 @@ struct QuickMeasurement: View {
             let entry = try store.add(HealthEntry(
                 id: "", personId: personId, date: HealthLog.localDate(),
                 time: String(format: "%02ld:%02ld", clock.hour ?? 0, clock.minute ?? 0),
-                kind: .measurement, title: finalTitle, body: "", source: "", bodyPart: preset?.bodyPart ?? "",
+                kind: .measurement, title: finalTitle, body: note.trimmingCharacters(in: .whitespacesAndNewlines), source: "", bodyPart: preset?.bodyPart ?? "",
                 severity: nil, tags: preset?.tags ?? [], value: v, value2: v2, unit: finalUnit, createdAt: ""
             ))
             saved = "\(finalTitle) \(HealthLog.formatValue(entry))"
             value = ""
             value2 = ""
+            note = ""
             failure = nil
         } catch {
             failure = t("native.error", ["error": error.localizedDescription])

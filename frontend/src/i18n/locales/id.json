@@ -619,6 +619,7 @@
   "quick.customPlaceholder": "misalnya Kekuatan cengkeraman",
   "quick.save": "Simpan",
   "quick.saved": "{what} tersimpan",
+  "quick.note": "Catatan (opsional)",
   "readDocumentDialog.labIntro": "Teks, file .txt, .csv, dan .tsv, serta PDF dengan teks yang bisa dipilih dibaca di perangkat ini dan tidak pernah keluar. Foto dan PDF hasil pindai dibaca oleh Google Gemini dengan kunci Anda.",
   "readDocumentDialog.pasteLabel": "Atau tempel teks laporan",
   "readDocumentDialog.pastePlaceholder": "Salin tabel hasil dari portal laboratorium atau email lalu tempel di sini",
