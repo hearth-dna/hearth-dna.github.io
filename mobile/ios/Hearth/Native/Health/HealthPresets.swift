@@ -130,6 +130,23 @@ enum HealthPresets {
         return used + measurements.filter { !used.contains($0) }
     }
 
+    /// The symptom presets with the ones this person already recorded first, most recent first, then
+    /// the rest in list order (presets.ts `presetOrder('symptom', …)`); `entries` newest first. An
+    /// entry counts under any name it was saved with: "Cough", "кашель".
+    static func symptomOrder(_ entries: [HealthEntry]) -> [HealthPreset] {
+        var used: [HealthPreset] = []
+        for e in entries where e.kind == .symptom {
+            if let p = symptomPreset(e.title), !used.contains(p) { used.append(p) }
+        }
+        return used + symptoms.filter { !used.contains($0) }
+    }
+
+    /// The symptom preset (not an event like injury or fainting) a saved title names, by its title or
+    /// a synonym (presets.ts `symptomPreset`).
+    static func symptomPreset(_ title: String) -> HealthPreset? {
+        presetOf(kind: .symptom, title: title).flatMap { p in symptoms.contains(p) ? p : nil }
+    }
+
     static func find(_ id: String) -> HealthPreset? {
         all.first { $0.id == id }
     }

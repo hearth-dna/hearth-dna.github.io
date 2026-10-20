@@ -213,6 +213,7 @@ fun HealthScreen(repo: Repo, backups: Backups, onlyPerson: String = "") {
             contentPadding = PaddingValues(top = padding.calculateTopPadding(), bottom = padding.calculateBottomPadding() + 96.dp),
         ) {
             item(key = "quick") { QuickMeasurement(repo, persons, filter.person.ifEmpty { if (persons.size == 1) persons[0].id else "" }, entries) { reload() } }
+            item(key = "quickSymptom") { QuickSymptom(repo, persons, filter.person.ifEmpty { if (persons.size == 1) persons[0].id else "" }, entries) { reload() } }
             item(key = "search") { SearchField(filter.text) { set(filter.copy(text = it)) } }
             if (persons.size > 1) {
                 item(key = "people") {

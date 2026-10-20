@@ -168,3 +168,23 @@ fun presetOf(kind: HealthKind, title: String): HealthPreset? {
 /** An entry's title as the screen shows it: the preset's name in the UI language, else as saved. */
 fun entryTitle(e: com.hearth.data.HealthEntry, t: (String) -> String): String =
     presetOf(e.kind, e.title)?.let { t("preset.${it.id}") } ?: e.title
+
+/**
+ * The symptom preset (not an event like injury or fainting) a saved title names, by its title or a
+ * synonym (presets.ts `symptomPreset`).
+ */
+fun symptomPreset(title: String): HealthPreset? = presetOf(HealthKind.SYMPTOM, title)?.takeIf { it in SYMPTOM_PRESETS }
+
+/**
+ * The symptom presets with the ones this person already recorded first, most recent first, then the
+ * rest in list order (presets.ts `presetOrder('symptom', …)`); [entries] newest first. An entry
+ * counts under any name it was saved with: "Cough", "кашель".
+ */
+fun symptomOrder(entries: List<com.hearth.data.HealthEntry>): List<HealthPreset> {
+    val used = LinkedHashSet<HealthPreset>()
+    for (e in entries) {
+        if (e.kind != HealthKind.SYMPTOM) continue
+        symptomPreset(e.title)?.let { used.add(it) }
+    }
+    return used.toList() + SYMPTOM_PRESETS.filter { it !in used }
+}
