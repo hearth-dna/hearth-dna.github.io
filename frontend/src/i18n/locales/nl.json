@@ -619,6 +619,7 @@
   "quick.customPlaceholder": "bijv. Knijpkracht",
   "quick.save": "Opslaan",
   "quick.saved": "{what} opgeslagen",
+  "quick.note": "Notitie (optioneel)",
   "readDocumentDialog.labIntro": "Tekst, .txt-, .csv- en .tsv-bestanden en pdf's met selecteerbare tekst worden op dit apparaat gelezen en verlaten het nooit. Foto's en gescande pdf's leest Google Gemini met uw sleutel.",
   "readDocumentDialog.pasteLabel": "Of plak de tekst van de uitslag",
   "readDocumentDialog.pastePlaceholder": "Kopieer de uitslagentabel uit het labportaal of een e-mail en plak die hier",

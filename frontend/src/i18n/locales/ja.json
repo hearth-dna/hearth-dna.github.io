@@ -619,6 +619,7 @@
   "quick.customPlaceholder": "例：握力",
   "quick.save": "保存",
   "quick.saved": "{what} を保存しました",
+  "quick.note": "メモ（任意）",
   "readDocumentDialog.labIntro": "テキスト、.txt・.csv・.tsv ファイル、文字を選択できる PDF はこの端末で読み取られ、外に出ることはありません。写真とスキャンした PDF は、あなたのキーで Google Gemini が読み取ります。",
   "readDocumentDialog.pasteLabel": "または検査結果のテキストを貼り付け",
   "readDocumentDialog.pastePlaceholder": "検査機関のポータルやメールから結果の表をコピーしてここに貼り付けてください",

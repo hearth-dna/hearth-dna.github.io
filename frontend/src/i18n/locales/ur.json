@@ -619,6 +619,7 @@
   "quick.customPlaceholder": "مثلاً گرفت کی طاقت",
   "quick.save": "محفوظ کریں",
   "quick.saved": "{what} محفوظ ہو گیا",
+  "quick.note": "نوٹ (اختیاری)",
   "readDocumentDialog.labIntro": "ٹیکسٹ، .txt، .csv اور .tsv فائلیں اور منتخب ہونے والے ٹیکسٹ والی PDF اسی ڈیوائس پر پڑھی جاتی ہیں اور کبھی باہر نہیں جاتیں۔ تصاویر اور اسکین شدہ PDF آپ کی کلید سے Google Gemini پڑھتا ہے۔",
   "readDocumentDialog.pasteLabel": "یا رپورٹ کا ٹیکسٹ چسپاں کریں",
   "readDocumentDialog.pastePlaceholder": "لیب پورٹل یا ای میل سے نتائج کی جدول کاپی کر کے یہاں چسپاں کریں",

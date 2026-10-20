@@ -619,6 +619,7 @@
   "quick.customPlaceholder": "np. Siła uścisku",
   "quick.save": "Zapisz",
   "quick.saved": "Zapisano {what}",
+  "quick.note": "Notatka (opcjonalnie)",
   "readDocumentDialog.labIntro": "Tekst, pliki .txt, .csv i .tsv oraz pliki PDF z zaznaczalnym tekstem są odczytywane na tym urządzeniu i nigdy go nie opuszczają. Zdjęcia i zeskanowane PDF-y odczytuje Google Gemini z Twoim kluczem.",
   "readDocumentDialog.pasteLabel": "Albo wklej tekst wyniku",
   "readDocumentDialog.pastePlaceholder": "Skopiuj tabelę wyników z portalu laboratorium lub e-maila i wklej tutaj",

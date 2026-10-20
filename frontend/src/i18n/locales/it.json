@@ -619,6 +619,7 @@
   "quick.customPlaceholder": "es. Forza della presa",
   "quick.save": "Salva",
   "quick.saved": "{what} salvato",
+  "quick.note": "Nota (facoltativa)",
   "readDocumentDialog.labIntro": "Il testo, i file .txt, .csv e .tsv e i PDF con testo selezionabile vengono letti su questo dispositivo e non lo lasciano mai. Foto e PDF scansionati li legge Google Gemini con la tua chiave.",
   "readDocumentDialog.pasteLabel": "Oppure incolla il testo del referto",
   "readDocumentDialog.pastePlaceholder": "Copia la tabella dei risultati dal portale del laboratorio o da un'e-mail e incollala qui",

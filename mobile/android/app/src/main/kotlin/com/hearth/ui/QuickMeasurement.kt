@@ -47,7 +47,7 @@ private fun number(s: String) = s.trim().replace(',', '.').toDoubleOrNull()?.tak
 /**
  * One line for the numbers people record over and over (QuickMeasurement.tsx): pick the parameter,
  * type the number, save. Date and time are now, the unit comes from the preset, and the parameters
- * this person already records come first. Anything more belongs in the full form.
+ * this person already records come first. A note is optional; anything more belongs in the full form.
  */
 @Composable
 fun QuickMeasurement(repo: Repo, persons: List<Person>, initialPerson: String, entries: List<HealthEntry>, onSaved: () -> Unit) {
@@ -60,6 +60,7 @@ fun QuickMeasurement(repo: Repo, persons: List<Person>, initialPerson: String, e
     var unit by remember { mutableStateOf("") }
     var value by remember { mutableStateOf("") }
     var value2 by remember { mutableStateOf("") }
+    var note by remember { mutableStateOf("") }
     var asking by remember { mutableStateOf(false) }
     var saved by remember { mutableStateOf<String?>(null) }
 
@@ -81,13 +82,14 @@ fun QuickMeasurement(repo: Repo, persons: List<Person>, initialPerson: String, e
             repo.addHealthEntry(
                 NewHealthEntry(
                     personId, localDate(), LocalTime.now().let { "%02d:%02d".format(it.hour, it.minute) }, HealthKind.MEASUREMENT,
-                    finalTitle, "", preset?.bodyPart ?: "", null, preset?.tags ?: emptyList(), v, v2, finalUnit,
+                    finalTitle, note.trim(), preset?.bodyPart ?: "", null, preset?.tags ?: emptyList(), v, v2, finalUnit,
                 ),
             )
         }
         saved = "$finalTitle ${formatValue(v, v2, finalUnit)}"
         value = ""
         value2 = ""
+        note = ""
         onSaved()
     }
 
@@ -127,6 +129,7 @@ fun QuickMeasurement(repo: Repo, persons: List<Person>, initialPerson: String, e
                 if (preset != null) Text(preset.unit, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Button(enabled = valid, onClick = { save() }) { Text(t("quick.save")) }
             }
+            OutlinedTextField(note, { note = it }, placeholder = { Text(t("quick.note")) }, singleLine = true, modifier = Modifier.fillMaxWidth())
             saved?.let { Text(t("quick.saved", "what" to it), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary) }
         }
     }

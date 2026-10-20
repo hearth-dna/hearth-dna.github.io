@@ -619,6 +619,7 @@
   "quick.customPlaceholder": "예: 악력",
   "quick.save": "저장",
   "quick.saved": "{what} 저장됨",
+  "quick.note": "메모 (선택)",
   "readDocumentDialog.labIntro": "텍스트, .txt·.csv·.tsv 파일, 텍스트를 선택할 수 있는 PDF는 이 기기에서 읽으며 기기 밖으로 나가지 않습니다. 사진과 스캔한 PDF는 사용자의 키로 Google Gemini가 읽습니다.",
   "readDocumentDialog.pasteLabel": "또는 검사 결과 텍스트 붙여넣기",
   "readDocumentDialog.pastePlaceholder": "검사 기관 포털이나 이메일에서 결과 표를 복사해 여기에 붙여넣으세요",
