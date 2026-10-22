@@ -3,23 +3,18 @@ import { useApp } from '../app/context'
 import { grantConsent, hasConsent } from '../consent/consent'
 import { addHealthEntry } from '../db/repo'
 import { nowTime, today } from '../health/now'
-import { type DetailValue, findPreset, presetOrder, symptomPreset } from '../health/presets'
+import { type DetailValue, type HealthPreset, presetNamed, presetOrder } from '../health/presets'
 import { useT } from '../i18n/context'
 import type { HealthEntry, Person } from '../types'
 import { ConsentForm } from './ConsentForm'
 import { DetailFields } from './DetailFields'
-
-/** Choice values that are not a preset id: nothing picked yet, and "something else". */
-const NONE = ''
-const CUSTOM = 'custom'
+import { PresetSearch } from './PresetSearch'
 
 /**
  * One line for how someone feels right now: a runny nose, a cough, red eyes, a stool that was
- * not right. Pick the symptom (recently used first) or "something else" and type it — a typed name
- * that is a known symptom or one of its synonyms is saved as that symptom — optionally rate it,
- * fill the symptom's details and add a note, save — date and time are now. A list, not a typed
- * field with suggestions: phone browsers barely show those, and the bar must work the same on both.
- * Anything more (another date, the side of the body) belongs in the full add form.
+ * not right. Search and pick the symptom (recently used first; a name that is a known symptom or one
+ * of its synonyms counts as that symptom, any other text is a custom one), optionally rate it,
+ * fill the symptom's details and add a note, save — date and time are now. Anything more (another date, the side of the body) belongs in the full add form.
  */
 export function QuickSymptom({
   persons,
@@ -36,7 +31,6 @@ export function QuickSymptom({
   const { db } = useApp()
   const t = useT()
   const [personId, setPersonId] = useState(initialPerson)
-  const [choice, setChoice] = useState(NONE)
   const [text, setText] = useState('')
   const [severity, setSeverity] = useState('')
   const [note, setNote] = useState('')
@@ -52,19 +46,14 @@ export function QuickSymptom({
   }, [db, personId])
 
   const order = useMemo(() => presetOrder('symptom', entries), [entries])
-  // Typed text is matched against the translated names, then the English titles and synonyms.
-  const typed = text.trim().toLowerCase()
-  const preset =
-    choice === CUSTOM
-      ? (order.find((p) => t(`preset.${p.id}`).toLowerCase() === typed) ?? symptomPreset(text))
-      : findPreset(choice)
-  const name = preset ? t(`preset.${preset.id}`) : choice === CUSTOM ? text.trim() : ''
+  const shown = (p: HealthPreset) => t(`preset.${p.id}`)
+  const preset = presetNamed(order, text, shown)
+  const name = preset ? shown(preset) : text.trim()
   const valid = !!personId && name !== ''
 
-  const pick = (v: string) => {
-    setChoice(v)
-    setText('')
-    setDetails({})
+  const type = (v: string) => {
+    if (presetNamed(order, v, shown) !== preset) setDetails({})
+    setText(v)
     setSaved(null)
   }
 
@@ -84,7 +73,6 @@ export function QuickSymptom({
       details: preset?.details ? details : {},
     })
     setSaved(name)
-    setChoice(NONE)
     setText('')
     setSeverity('')
     setNote('')
@@ -124,28 +112,15 @@ export function QuickSymptom({
           ))}
         </select>
       )}
-      <select aria-label={t('quickSymptom.symptom')} value={choice} onChange={(e) => pick(e.target.value)}>
-        <option value={NONE}>{t('quickSymptom.symptom')}</option>
-        {order.map((p) => (
-          <option key={p.id} value={p.id}>
-            {t(`preset.${p.id}`)}
-          </option>
-        ))}
-        <option value={CUSTOM}>{t('quick.custom')}</option>
-      </select>
-      {choice === CUSTOM && (
-        <input
-          aria-label={t('quickSymptom.symptom')}
-          placeholder={t('quickSymptom.placeholder')}
-          value={text}
-          onChange={(e) => {
-            setText(e.target.value)
-            setDetails({})
-            setSaved(null)
-          }}
-          onKeyDown={(e) => e.key === 'Enter' && save()}
-        />
-      )}
+      <PresetSearch
+        presets={order}
+        name={shown}
+        value={text}
+        onChange={type}
+        onEnter={save}
+        label={t('quickSymptom.symptom')}
+        placeholder={t('quickSymptom.placeholder')}
+      />
       <select
         aria-label={t('healthLog.severity')}
         value={severity}
