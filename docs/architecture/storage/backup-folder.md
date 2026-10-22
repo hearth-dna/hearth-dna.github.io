@@ -31,6 +31,17 @@ No mobile browser can mount a folder, so there a backup is a file the user hands
   because Drive and Files save a new copy rather than overwrite.
 - **Load backup…** is a file input without `accept` (iOS greys out unknown extensions); the
   system picker browses Drive. Loading is the same union-by-id restore as Import dump.
+- **The round trip with a computer** goes through the computer's backup folder. A phone saves its
+  file there (Files → Google Drive → that folder); the computer, at its next sync, loads every
+  `hearth-backup-<date>-<time>.hearth` it has not loaded yet (`sharedToLoad`, also with the " (1)"
+  or " 2" Drive and Files add), and the backup after that writes them into `hearth-backup.hearth`.
+  Which ones it has loaded is remembered per browser (`Saved.loadedShared`); the files stay. One
+  the passphrase here does not open is named on the card and tried again when the passphrase
+  changes; it never stops the folder's own backups. A phone that loads an unencrypted backup with
+  no passphrase set shares unencrypted from then on, as a computer follows its folder. Back on
+  the phone, *Load backup* on `hearth-phone-copy.hearth` brings in everything, DNA included, in
+  one pick (see below). A phone browser cannot do this by itself: it holds no folder access
+  between visits, so each direction takes a tap.
 - The header button tracks whether anything changed since the last backup file ("Back up" /
   "Backed up 14:02") and makes a new one on click. There is no autosave: sharing needs a tap.
 - Where files cannot be shared the file is downloaded instead, with a hint to upload it from the
@@ -145,11 +156,13 @@ those people (`elsewhere`) instead of skipping them silently, and the backup car
 passphrase if sealed and matched to the manifest by content hash, so a renamed copy still counts.
 
 A phone's file picker selects within one folder, and the genomes sit in a subfolder, so one
-selection cannot reach both. Two ways give it one file: **Single-file copy for a phone** on the
-computer writes `hearth-phone-copy.hearth` into the folder (everything, genomes inside, made on
-request and never by autosave, since it is the whole family each time), and a `.zip` of the whole
-folder is opened on load (only the current snapshot and the genome files are taken from it). A
-picked genome that nothing lists is still matched through its `source_file` row, which carries the
+selection cannot reach both. Two ways give it one file: the computer keeps
+`hearth-phone-copy.hearth` in the folder (everything, genomes inside), and a `.zip` of the whole
+folder is opened on load. The phone copy is the whole family each time, so it follows the snapshot
+at a distance rather than with every autosave: a minute after the last backup, and never more than
+ten minutes behind (`phoneCopyDelay`), only when the database moved past the generation it holds
+(`Saved.phoneCopyGen`), and a failed write is retried, never an error. From a zip only the
+current snapshot and the genome files are taken. A picked genome that nothing lists is still matched through its `source_file` row, which carries the
 hash of the original's text.
 
 **Newer data wins** (the simple rule, until real conflict resolution exists). Before any write,

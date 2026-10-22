@@ -20,9 +20,12 @@ import {
   baseName,
   genomesDirName,
   hasNewer,
+  phoneCopyDelay,
   phoneCopyName,
   type Seen,
+  sharedAction,
   sharedName,
+  sharedToLoad,
   spareNames,
 } from './naming'
 import { openRepaired } from './repair'
@@ -90,6 +93,8 @@ export type Status =
       attachmentsMissing: number
       /** People whose genome file the last loaded snapshot and its spares all lacked. */
       missing: Missing
+      /** Snapshots a phone shared into the folder that the passphrase here does not open. */
+      unopened: string[]
     }
   | { state: 'writing'; name: string; step: 'loading' | 'building' | 'writing' | 'attachments' }
   | { state: 'error'; name: string; message: string }
@@ -121,9 +126,14 @@ class Backups {
   private profile = 'default'
   private saved: folder.Saved | null = null
   private timer: ReturnType<typeof setTimeout> | null = null
+  private phoneTimer: ReturnType<typeof setTimeout> | null = null
+  /** When the phone copy first fell behind the database; caps how long a burst of edits defers it. */
+  private phoneBehindSince: number | null = null
   private busy = false
   private missing: Missing = []
   private elsewhere: Elsewhere[] = []
+  /** Shared snapshots this passphrase did not open; tried again once it changes. */
+  private sharedLater: string[] = []
   /** Set when the browser has no folder picker; see the `manual` status. */
   private shared: folder.Shared | null = null
   private built: { name: string; bytes: Uint8Array; seen: Seen } | null = null
@@ -190,13 +200,21 @@ class Backups {
     this.saved.auto = auto
     await folder.save(this.profile, this.saved)
     if (auto) this.request()
-    else this.cancelPending()
+    else {
+      this.cancelPending()
+      this.cancelPhoneCopy()
+    }
     await this.refresh()
   }
 
   private cancelPending(): void {
     if (this.timer) clearTimeout(this.timer)
     this.timer = null
+  }
+
+  private cancelPhoneCopy(): void {
+    if (this.phoneTimer) clearTimeout(this.phoneTimer)
+    this.phoneTimer = null
   }
 
   passphrase(): string {
@@ -210,6 +228,7 @@ class Backups {
   /** Kept for the tab's session only. */
   setPassphrase(p: string): void {
     this.built = null
+    this.sharedLater = []
     try {
       if (p) sessionStorage.setItem(PASS_KEY(this.profile), p)
       else sessionStorage.removeItem(PASS_KEY(this.profile))
@@ -262,7 +281,10 @@ class Backups {
     const newer = hasNewer(current, device, this.saved.lastSeen)
     if (newer && current?.encrypted && !this.passphrase())
       return this.set({ state: 'needs-passphrase', name })
-    if (newer) {
+    // A phone's snapshot waiting in the folder is read in the same sync; one it cannot open is left
+    // for later and never holds up the folder's own backups.
+    const shared = await withTimeout(this.sharedNames(), FOLDER_TIMEOUT_MS, name).catch(() => [])
+    if (newer || shared.length) {
       // Newer data wins, without asking: pull it in, then write the union back when there is
       // anything of ours to add.
       if (!this.busy) void this.sync()
@@ -283,10 +305,14 @@ class Backups {
       attachmentsPending: Math.max(0, blobs - (this.saved.mirrored ?? 0)),
       attachmentsMissing: (await missingLocally(this.db)).length,
       missing: this.missing,
+      unopened: this.sharedLater,
     })
     // Changes made while the folder was unreachable (or before a reload) go out without waiting
     // for the next edit.
     if (dirty && this.auto && !this.timer && !this.busy) this.request()
+    // The phone copy follows the snapshot once the folder has everything; a timer a closed tab
+    // lost is set again here.
+    else if (!dirty && this.auto) await this.schedulePhoneCopy()
   }
 
   private async refreshShared(): Promise<void> {
@@ -364,6 +390,7 @@ class Backups {
         n++
       }
     }
+    this.cancelPhoneCopy()
     this.saved = null
     await folder.forget(this.profile)
     this.setPassphrase('')
@@ -420,9 +447,12 @@ class Backups {
     try {
       const device = (await getMeta(this.db, 'device')) ?? ''
       const current = await folder.currentHeader(this.dir, baseName(this.profile))
-      if (!hasNewer(current, device, this.saved.lastSeen)) return 'current'
+      const newer = hasNewer(current, device, this.saved.lastSeen)
+      const shared = await this.sharedNames()
+      if (!newer && !shared.length) return 'current'
       this.set({ state: 'writing', name, step: 'loading' })
-      await this.pull(onProgress)
+      if (newer) await this.pull(onProgress)
+      await this.loadShared(shared, onProgress)
       return 'pulled'
     } catch (e) {
       this.set({ state: 'error', name, message: e instanceof Error ? e.message : String(e) })
@@ -491,25 +521,52 @@ class Backups {
     }
   }
 
+  private async schedulePhoneCopy(): Promise<void> {
+    if (!this.saved) return
+    const generation = Number((await getMeta(this.db, 'generation')) ?? 0)
+    const now = Date.now()
+    const delay = phoneCopyDelay(generation, this.saved.phoneCopyGen, this.phoneBehindSince ?? now, now)
+    this.cancelPhoneCopy()
+    if (delay === null) {
+      this.phoneBehindSince = null
+      return
+    }
+    this.phoneBehindSince ??= now
+    this.phoneTimer = setTimeout(() => {
+      this.phoneTimer = null
+      void this.writePhoneCopy()
+    }, delay)
+  }
+
   /**
    * Writes a single-file copy of everything, genomes inside, into the folder, for a phone to load
-   * in one selection (`phoneCopyName`). Made on request, never by autosave: it is the whole family
-   * every time, which is exactly what the folder snapshot avoids uploading after each change.
+   * in one selection (`phoneCopyName`). It is the whole family every time, which the folder
+   * snapshot avoids uploading after each change, so it follows the snapshot at a distance
+   * (`phoneCopyDelay`). Deliberately not fatal, like `mirror`: the snapshot is already written.
    */
-  async writePhoneCopy(): Promise<string> {
-    if (!this.saved || this.busy) throw new Error('a backup is in progress')
+  private async writePhoneCopy(): Promise<void> {
+    if (!this.saved) return
+    // A backup is running; it ends in a refresh, which schedules the copy again.
+    if (this.busy) return
     const pass = this.passphrase()
-    if (!this.plain && !pass) throw new Error('enter the passphrase first')
-    const name = phoneCopyName(this.profile)
+    if (!this.plain && !pass) return
     this.busy = true
     try {
+      const generation = Number((await getMeta(this.db, 'generation')) ?? 0)
       const bytes = await snapshotBytes(this.db, this.appVersion, this.plain ? undefined : pass)
-      await this.dir.write(name, bytes)
-      return name
+      // The whole family in one file: give a cloud mount longer than for the small files.
+      await withTimeout(this.dir.write(phoneCopyName(this.profile), bytes), 6 * FOLDER_TIMEOUT_MS, this.name)
+      this.saved.phoneCopyGen = generation
+      this.phoneBehindSince = null
+      await folder.save(this.profile, this.saved)
+    } catch {
+      // Tried again a quiet period from now, never in a loop.
+      this.phoneBehindSince = Date.now()
     } finally {
       this.busy = false
-      await this.refresh()
     }
+    // An edit made meanwhile found the folder busy; this sends it on.
+    await this.refresh()
   }
 
   /** Fetches documents this browser has rows for but not bytes (after restoring on a new PC). */
@@ -526,6 +583,7 @@ class Backups {
     let r: RestoreResult
     try {
       r = await this.pull(onProgress)
+      await this.loadShared(await this.sharedNames(), onProgress)
     } finally {
       this.busy = false
     }
@@ -560,6 +618,47 @@ class Backups {
     await folder.save(this.profile, this.saved)
     for (const l of this.pulledListeners) l()
     return r
+  }
+
+  /** Snapshots phones shared into the folder that this browser has not loaded yet. */
+  private async sharedNames(): Promise<string[]> {
+    if (!this.saved) return []
+    const done = [...(this.saved.loadedShared ?? []), ...this.sharedLater]
+    return sharedToLoad(await this.dir.names(), this.profile, done)
+  }
+
+  /**
+   * Loads what a phone without folder access saved into the folder through the share sheet (union
+   * by id, like any load). The next backup writes it into the folder's own snapshot, which the
+   * phone loads back: the round trip a phone browser can make.
+   */
+  private async loadShared(names: string[], onProgress: Progress): Promise<void> {
+    if (!this.saved || !names.length) return
+    const dir = this.dir
+    const pass = this.passphrase() || undefined
+    for (const n of names) {
+      const bytes = await dir.read(n)
+      // Unreadable for now (the drive is still fetching it): the next sync tries again.
+      if (!bytes) continue
+      const action = sharedAction(readHeader(bytes), isDumpFile(bytes), !!pass)
+      if (action === 'later') {
+        this.sharedLater.push(n)
+        continue
+      }
+      if (action === 'load') {
+        try {
+          await restoreBytes(this.db, bytes, pass, onProgress)
+        } catch {
+          // Sealed with another passphrase, or damaged: shown on the card, tried again later.
+          this.sharedLater.push(n)
+          continue
+        }
+      }
+      const have = new Set(await dir.names())
+      this.saved.loadedShared = [...(this.saved.loadedShared ?? []).filter((x) => have.has(x)), n]
+      await folder.save(this.profile, this.saved)
+    }
+    for (const l of this.pulledListeners) l()
   }
 
   /**
@@ -647,6 +746,17 @@ class Backups {
         out.exportedAt = r.exportedAt
         missing.push(...r.missing)
         elsewhere = [...elsewhere.filter((x) => !r.elsewhere.some((y) => same(x, y))), ...r.elsewhere]
+      }
+      // Follow the folder, as a computer does: with no passphrase here and an unencrypted backup
+      // loaded, the next one shared stays unencrypted, so the computer can read it back.
+      if (
+        this.shared &&
+        !passphrase &&
+        !this.shared.plain &&
+        dumps.some((d) => readHeader(d.bytes)?.encrypted === false)
+      ) {
+        this.shared.plain = true
+        await folder.saveShared(this.profile, this.shared)
       }
       const genomes = await readPickedGenomes(
         rest.map((f) => f.bytes),

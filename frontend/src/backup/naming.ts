@@ -21,6 +21,32 @@ export function sharedName(profile: string, at: Date): string {
   return baseName(profile).replace(/\.hearth$/, `-${stamp}.hearth`)
 }
 
+/**
+ * Snapshots a phone shared into this folder (`sharedName`) that this browser has not loaded yet,
+ * oldest first. Drive and Files add " (1)" or " 2" when a name is already taken.
+ */
+export function sharedToLoad(existing: string[], profile: string, loaded: string[]): string[] {
+  const stem = baseName(profile)
+    .replace(/\.hearth$/, '')
+    .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const shared = new RegExp(`^${stem}-\\d{4}-\\d{2}-\\d{2}-\\d{4}( ?\\(?\\d+\\)?)?\\.hearth$`)
+  const done = new Set(loaded)
+  return existing.filter((n) => shared.test(n) && !done.has(n)).sort()
+}
+
+/**
+ * What a sync does with a shared snapshot: load it, leave it for when the passphrase is entered, or
+ * pass over it for good (not a Hearth backup). Never a reason to stop the folder's own backups.
+ */
+export function sharedAction(
+  header: Header | null,
+  isBackup: boolean,
+  hasPassphrase: boolean,
+): 'load' | 'later' | 'ignore' {
+  if (!isBackup) return 'ignore'
+  return header?.encrypted && !hasPassphrase ? 'later' : 'load'
+}
+
 export const rotatedName = (base: string, n: number) => `${base}.${n}`
 
 /**
@@ -31,12 +57,30 @@ export const attachmentsDirName = (profile: string) =>
   profile === 'default' ? 'attachments' : `attachments-${profile}`
 
 /**
- * A single-file copy for a phone, written into the folder on request: the folder snapshot keeps
- * genomes in a subfolder, and a phone's file picker selects within one folder only. Not a name the
- * snapshot rules (rotation, spares, conflicts) ever match.
+ * A single-file copy for a phone, kept beside the snapshot: the folder snapshot keeps genomes in a
+ * subfolder, and a phone's file picker selects within one folder only. Not a name the snapshot
+ * rules (rotation, spares, conflicts) ever match.
  */
 export const phoneCopyName = (profile: string) =>
   profile === 'default' ? 'hearth-phone-copy.hearth' : `hearth-phone-copy-${profile}.hearth`
+
+/** Quiet time after a backup before the phone copy follows it, and the most it may lag behind. */
+export const PHONE_COPY_QUIET_MS = 60_000
+export const PHONE_COPY_MAX_MS = 10 * 60_000
+
+/**
+ * How long to wait before rewriting the phone copy, or null when it already holds `generation`.
+ * The copy is the whole family, so a burst of edits writes it once, and never later than the cap.
+ */
+export function phoneCopyDelay(
+  generation: number,
+  written: number | undefined,
+  behindSince: number,
+  now: number,
+): number | null {
+  if (written !== undefined && written >= generation) return null
+  return Math.max(0, Math.min(PHONE_COPY_QUIET_MS, behindSince + PHONE_COPY_MAX_MS - now))
+}
 
 /** Where a folder snapshot's genome files go (`external_genomes`), per profile like attachments. */
 export const genomesDirName = (profile: string) => (profile === 'default' ? 'genomes' : `genomes-${profile}`)

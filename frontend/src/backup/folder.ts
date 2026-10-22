@@ -55,6 +55,10 @@ export interface Saved {
   lastAt?: string
   /** How many attachment sidecars the folder held after the last successful mirror. */
   mirrored?: number
+  /** The generation the phone copy in the folder holds, as this browser last wrote it. */
+  phoneCopyGen?: number
+  /** Snapshots phones shared into the folder that this browser has already loaded. */
+  loadedShared?: string[]
 }
 
 // ---- remembered place (IndexedDB) ----------------------------------------------------------

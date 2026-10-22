@@ -157,6 +157,9 @@ export function BackupCard() {
               })}
             </p>
           )}
+          {status.state === 'ready' && status.unopened.length > 0 && (
+            <p className="notice">{t('backupCard.notOpened', { files: status.unopened.join(', ') })}</p>
+          )}
           {activity && (
             <p className="activity" role="status" aria-live="polite">
               <span className="spinner" aria-hidden="true" /> {activity}
@@ -216,25 +219,6 @@ export function BackupCard() {
             {status.state === 'ready' && (
               <button type="button" disabled={working} onClick={load}>
                 {t('backupCard.loadFromFolder')}
-              </button>
-            )}
-            {status.state === 'ready' && (
-              <button
-                type="button"
-                disabled={working}
-                title={t('backupCard.phoneCopyHint')}
-                onClick={() =>
-                  run(
-                    async () =>
-                      t('backupCard.phoneCopyDone', {
-                        file: await backups.writePhoneCopy(),
-                        name: backups.name,
-                      }),
-                    t('backupCard.building'),
-                  )
-                }
-              >
-                {t('backupCard.phoneCopy')}
               </button>
             )}
             <button type="button" disabled={working} onClick={choose}>
