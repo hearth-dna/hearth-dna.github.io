@@ -221,25 +221,6 @@ export function BackupCard() {
                 {t('backupCard.loadFromFolder')}
               </button>
             )}
-            {status.state === 'ready' && (
-              <button
-                type="button"
-                disabled={working}
-                title={t('backupCard.phoneCopyHint')}
-                onClick={() =>
-                  run(
-                    async () =>
-                      t('backupCard.phoneCopyDone', {
-                        file: await backups.writePhoneCopy(),
-                        name: backups.name,
-                      }),
-                    t('backupCard.building'),
-                  )
-                }
-              >
-                {t('backupCard.phoneCopy')}
-              </button>
-            )}
             <button type="button" disabled={working} onClick={choose}>
               {t('backupCard.changeFolder')}
             </button>

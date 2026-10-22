@@ -69,8 +69,5 @@
   "backupCard.dnaFrom": "DNA for {name} from {file}.",
   "backupCard.notUsed": "Not used: {files}. No one in this browser has this DNA: select these files together with the backup file in Load backup.",
   "backupCard.notOpened": "Could not open {files} with this passphrase. Enter the passphrase the backup folder was set up with.",
-  "backupCard.phoneCopy": "Single-file copy for a phone",
-  "backupCard.phoneCopyHint": "Writes everything, DNA included, into one file in this folder, so a phone can load it in one selection.",
-  "backupCard.phoneCopyDone": "Wrote {file} to {name}: everything as of now, DNA included. On the phone, pick just this file in Load backup.",
-  "backupCard.oneFileHint": "To get the computer's latest changes, pick hearth-backup.hearth in its backup folder. The first time, while this phone has no DNA yet, pick hearth-phone-copy.hearth instead (made on the computer with Single-file copy for a phone) or a .zip of the whole folder: the DNA sits in a subfolder, and a phone picks from one folder at a time."
+  "backupCard.oneFileHint": "To get everything from the computer, DNA included, pick hearth-phone-copy.hearth in its backup folder. The computer keeps that one file up to date, a few minutes behind at most."
 }

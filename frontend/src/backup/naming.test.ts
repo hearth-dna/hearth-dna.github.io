@@ -4,6 +4,9 @@ import {
   attachmentsDirName,
   baseName,
   hasNewer,
+  PHONE_COPY_MAX_MS,
+  PHONE_COPY_QUIET_MS,
+  phoneCopyDelay,
   phoneCopyName,
   rotationPlan,
   sharedAction,
@@ -55,6 +58,14 @@ describe('backup naming', () => {
     expect(sharedAction(plain, true, false)).toBe('load')
     expect(sharedAction(null, true, false)).toBe('load')
     expect(sharedAction(null, false, true)).toBe('ignore')
+  })
+
+  it('rewrites the phone copy a minute after the last backup, at most ten minutes behind', () => {
+    expect(phoneCopyDelay(7, 7, 0, 0)).toBeNull()
+    expect(phoneCopyDelay(7, undefined, 0, 0)).toBe(PHONE_COPY_QUIET_MS)
+    expect(phoneCopyDelay(8, 7, 1000, 5000)).toBe(PHONE_COPY_QUIET_MS)
+    expect(phoneCopyDelay(8, 7, 0, PHONE_COPY_MAX_MS - 10_000)).toBe(10_000)
+    expect(phoneCopyDelay(8, 7, 0, PHONE_COPY_MAX_MS + 5000)).toBe(0)
   })
 
   it('stamps shared snapshots with the local time', () => {

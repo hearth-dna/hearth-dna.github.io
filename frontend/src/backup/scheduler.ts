@@ -20,6 +20,7 @@ import {
   baseName,
   genomesDirName,
   hasNewer,
+  phoneCopyDelay,
   phoneCopyName,
   type Seen,
   sharedAction,
@@ -125,6 +126,9 @@ class Backups {
   private profile = 'default'
   private saved: folder.Saved | null = null
   private timer: ReturnType<typeof setTimeout> | null = null
+  private phoneTimer: ReturnType<typeof setTimeout> | null = null
+  /** When the phone copy first fell behind the database; caps how long a burst of edits defers it. */
+  private phoneBehindSince: number | null = null
   private busy = false
   private missing: Missing = []
   private elsewhere: Elsewhere[] = []
@@ -196,13 +200,21 @@ class Backups {
     this.saved.auto = auto
     await folder.save(this.profile, this.saved)
     if (auto) this.request()
-    else this.cancelPending()
+    else {
+      this.cancelPending()
+      this.cancelPhoneCopy()
+    }
     await this.refresh()
   }
 
   private cancelPending(): void {
     if (this.timer) clearTimeout(this.timer)
     this.timer = null
+  }
+
+  private cancelPhoneCopy(): void {
+    if (this.phoneTimer) clearTimeout(this.phoneTimer)
+    this.phoneTimer = null
   }
 
   passphrase(): string {
@@ -298,6 +310,9 @@ class Backups {
     // Changes made while the folder was unreachable (or before a reload) go out without waiting
     // for the next edit.
     if (dirty && this.auto && !this.timer && !this.busy) this.request()
+    // The phone copy follows the snapshot once the folder has everything; a timer a closed tab
+    // lost is set again here.
+    else if (!dirty && this.auto) await this.schedulePhoneCopy()
   }
 
   private async refreshShared(): Promise<void> {
@@ -375,6 +390,7 @@ class Backups {
         n++
       }
     }
+    this.cancelPhoneCopy()
     this.saved = null
     await folder.forget(this.profile)
     this.setPassphrase('')
@@ -505,25 +521,52 @@ class Backups {
     }
   }
 
+  private async schedulePhoneCopy(): Promise<void> {
+    if (!this.saved) return
+    const generation = Number((await getMeta(this.db, 'generation')) ?? 0)
+    const now = Date.now()
+    const delay = phoneCopyDelay(generation, this.saved.phoneCopyGen, this.phoneBehindSince ?? now, now)
+    this.cancelPhoneCopy()
+    if (delay === null) {
+      this.phoneBehindSince = null
+      return
+    }
+    this.phoneBehindSince ??= now
+    this.phoneTimer = setTimeout(() => {
+      this.phoneTimer = null
+      void this.writePhoneCopy()
+    }, delay)
+  }
+
   /**
    * Writes a single-file copy of everything, genomes inside, into the folder, for a phone to load
-   * in one selection (`phoneCopyName`). Made on request, never by autosave: it is the whole family
-   * every time, which is exactly what the folder snapshot avoids uploading after each change.
+   * in one selection (`phoneCopyName`). It is the whole family every time, which the folder
+   * snapshot avoids uploading after each change, so it follows the snapshot at a distance
+   * (`phoneCopyDelay`). Deliberately not fatal, like `mirror`: the snapshot is already written.
    */
-  async writePhoneCopy(): Promise<string> {
-    if (!this.saved || this.busy) throw new Error('a backup is in progress')
+  private async writePhoneCopy(): Promise<void> {
+    if (!this.saved) return
+    // A backup is running; it ends in a refresh, which schedules the copy again.
+    if (this.busy) return
     const pass = this.passphrase()
-    if (!this.plain && !pass) throw new Error('enter the passphrase first')
-    const name = phoneCopyName(this.profile)
+    if (!this.plain && !pass) return
     this.busy = true
     try {
+      const generation = Number((await getMeta(this.db, 'generation')) ?? 0)
       const bytes = await snapshotBytes(this.db, this.appVersion, this.plain ? undefined : pass)
-      await this.dir.write(name, bytes)
-      return name
+      // The whole family in one file: give a cloud mount longer than for the small files.
+      await withTimeout(this.dir.write(phoneCopyName(this.profile), bytes), 6 * FOLDER_TIMEOUT_MS, this.name)
+      this.saved.phoneCopyGen = generation
+      this.phoneBehindSince = null
+      await folder.save(this.profile, this.saved)
+    } catch {
+      // Tried again a quiet period from now, never in a loop.
+      this.phoneBehindSince = Date.now()
     } finally {
       this.busy = false
-      await this.refresh()
     }
+    // An edit made meanwhile found the folder busy; this sends it on.
+    await this.refresh()
   }
 
   /** Fetches documents this browser has rows for but not bytes (after restoring on a new PC). */

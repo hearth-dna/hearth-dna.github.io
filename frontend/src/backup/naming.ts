@@ -57,12 +57,30 @@ export const attachmentsDirName = (profile: string) =>
   profile === 'default' ? 'attachments' : `attachments-${profile}`
 
 /**
- * A single-file copy for a phone, written into the folder on request: the folder snapshot keeps
- * genomes in a subfolder, and a phone's file picker selects within one folder only. Not a name the
- * snapshot rules (rotation, spares, conflicts) ever match.
+ * A single-file copy for a phone, kept beside the snapshot: the folder snapshot keeps genomes in a
+ * subfolder, and a phone's file picker selects within one folder only. Not a name the snapshot
+ * rules (rotation, spares, conflicts) ever match.
  */
 export const phoneCopyName = (profile: string) =>
   profile === 'default' ? 'hearth-phone-copy.hearth' : `hearth-phone-copy-${profile}.hearth`
+
+/** Quiet time after a backup before the phone copy follows it, and the most it may lag behind. */
+export const PHONE_COPY_QUIET_MS = 60_000
+export const PHONE_COPY_MAX_MS = 10 * 60_000
+
+/**
+ * How long to wait before rewriting the phone copy, or null when it already holds `generation`.
+ * The copy is the whole family, so a burst of edits writes it once, and never later than the cap.
+ */
+export function phoneCopyDelay(
+  generation: number,
+  written: number | undefined,
+  behindSince: number,
+  now: number,
+): number | null {
+  if (written !== undefined && written >= generation) return null
+  return Math.max(0, Math.min(PHONE_COPY_QUIET_MS, behindSince + PHONE_COPY_MAX_MS - now))
+}
 
 /** Where a folder snapshot's genome files go (`external_genomes`), per profile like attachments. */
 export const genomesDirName = (profile: string) => (profile === 'default' ? 'genomes' : `genomes-${profile}`)
