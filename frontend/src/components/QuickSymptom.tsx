@@ -9,12 +9,14 @@ import type { HealthEntry, Person } from '../types'
 import { ConsentForm } from './ConsentForm'
 import { DetailFields } from './DetailFields'
 import { PresetSearch } from './PresetSearch'
+import { WhenInputs } from './WhenInputs'
 
 /**
  * One line for how someone feels right now: a runny nose, a cough, red eyes, a stool that was
  * not right. Search and pick the symptom (recently used first; a name that is a known symptom or one
  * of its synonyms counts as that symptom, any other text is a custom one), optionally rate it,
- * fill the symptom's details and add a note, save — date and time are now. Anything more (another date, the side of the body) belongs in the full add form.
+ * fill the symptom's details and add a note, save — date and time are now unless changed.
+ * Anything more (the side of the body) belongs in the full add form.
  */
 export function QuickSymptom({
   persons,
@@ -34,6 +36,8 @@ export function QuickSymptom({
   const [text, setText] = useState('')
   const [severity, setSeverity] = useState('')
   const [note, setNote] = useState('')
+  // Empty: now, taken when saving.
+  const [when, setWhen] = useState({ date: '', time: '' })
   const [details, setDetails] = useState<Record<string, DetailValue>>({})
   const [consented, setConsented] = useState<boolean | null>(null)
   const [asking, setAsking] = useState(false)
@@ -62,8 +66,8 @@ export function QuickSymptom({
     if (consented === false) return setAsking(true)
     await addHealthEntry(db, {
       personId,
-      date: today(),
-      time: nowTime(),
+      date: when.date || today(),
+      time: when.date || when.time ? when.time : nowTime(),
       kind: 'symptom',
       title: preset ? preset.title : name,
       body: note.trim(),
@@ -76,6 +80,7 @@ export function QuickSymptom({
     setText('')
     setSeverity('')
     setNote('')
+    setWhen({ date: '', time: '' })
     setDetails({})
     await onSaved()
   }
@@ -140,6 +145,7 @@ export function QuickSymptom({
         onChange={(e) => setNote(e.target.value)}
         onKeyDown={(e) => e.key === 'Enter' && save()}
       />
+      <WhenInputs date={when.date || today()} time={when.time || nowTime()} onChange={setWhen} />
       <button type="button" className="primary" disabled={!valid || consented === null} onClick={save}>
         {t('quick.save')}
       </button>
