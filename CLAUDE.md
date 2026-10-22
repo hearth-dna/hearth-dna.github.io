@@ -44,6 +44,9 @@ under `.dev/`; `make dev-stop` stops it; `make test` runs the suite.
 
 ## Conventions
 
+Phone browsers get the desktop experience and the same code: one component for both, chosen so
+it works on a phone (a `<select>` over a `<datalist>`); a phone-only path only where the browser
+lacks the feature (the folder picker), behind feature detection.
 TypeScript: Biome (single quotes, no semicolons, 2-space). UI: tokens and components in
 `frontend/src/styles.css` (`docs/architecture/ui/design-system.md`); no inline spacing styles. Tests: Vitest, pure-logic suites in
 `node` env, DOM suites opt in per file. Commits: imperative, lower-case.
