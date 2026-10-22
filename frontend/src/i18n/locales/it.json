@@ -868,7 +868,7 @@
   "quickSymptom.severity": "intensità",
   "charts.group.symptom": "Sintomi",
   "backupCard.titleManual": "Backup",
-  "backupCard.introManual": "Questo browser non può mantenere sincronizzata una cartella, quindi i backup sono file. <b>Esegui backup</b> crea uno snapshot cifrato e apre il menu di condivisione: salvalo con File o Google Drive nella cartella di backup usata dal tuo computer, e il computer lo aggiungerà alla prossima sincronizzazione. <b>Carica backup</b> apre un file salvato e ne aggiunge il contenuto. Hearth di per sé non invia nulla.",
+  "backupCard.introManual": "Questo browser non può mantenere sincronizzata una cartella, quindi i backup sono file. <b>Esegui backup</b> crea uno snapshot cifrato e apre il menu di condivisione: salvalo con File o Google Drive nella cartella di backup usata dal tuo computer. Tutti i dispositivi leggono e scrivono lo stesso file, e il computer aggiunge le modifiche del telefono alla prossima sincronizzazione. <b>Carica backup</b> apre un file salvato e ne aggiunge il contenuto. Hearth di per sé non invia nulla.",
   "backupCard.downloadOnly": "Questo browser può solo scaricare il file. Caricalo su Google Drive dall'app Drive o conservalo in un posto sicuro.",
   "backupCard.lastShared": "Ultimo backup: {time}.",
   "backupCard.neverShared": "Nessun backup da questo dispositivo finora.",
@@ -1020,7 +1020,7 @@
   "backupCard.dnaFrom": "DNA di {name} da {file}.",
   "backupCard.notUsed": "Non usati: {files}. Nessuno in questo browser ha questo DNA: seleziona questi file insieme al file di backup in «Carica backup».",
   "backupCard.notOpened": "Impossibile aprire {files} con questa passphrase. Inserisci quella della cartella di backup.",
-  "backupCard.oneFileHint": "Per avere tutto dal computer, DNA compreso, scegli hearth-phone-copy.hearth nella sua cartella di backup. Il computer tiene aggiornato quell’unico file, al massimo con qualche minuto di ritardo.",
+  "backupCard.oneFileHint": "Per avere le ultime modifiche del computer, scegli {file} nella sua cartella di backup. La prima volta, finché questo telefono non ha ancora il DNA, seleziona anche {copy}: il computer vi tiene il DNA, al massimo con qualche minuto di ritardo.",
   "repair.title": "I dati in questo browser sono danneggiati",
   "repair.intro": "Il file del database su questo dispositivo è danneggiato. Succede quando il telefono chiude l'app a metà di un salvataggio, per esempio mentre carica un genoma grande. La riparazione tiene tutto ciò che si legge ancora (persone, diario della salute, documenti, impostazioni), ricostruisce il DNA dai file di genoma tenuti su questo dispositivo e riparte da un database pulito. Ciò che manca ancora torna caricando il tuo backup.",
   "repair.button": "Ripara",
@@ -1034,5 +1034,7 @@
   "settingsPage.dbIntact": "Il database è integro.",
   "native.pickGenomes": "Scegli tutti i file di quella cartella genomes insieme al file del backup in «Ripristina un backup…», oppure da soli in «Carica file DNA…».",
   "native.notUsed": "Non usati: {files}. Nessuno su questo telefono ha questo DNA: scegli questi file insieme al file del backup in «Ripristina un backup…».",
-  "native.repairTitle": "I dati su questo telefono sono danneggiati"
+  "native.repairTitle": "I dati su questo telefono sono danneggiati",
+  "backupCard.fileName": "Nome del file di backup",
+  "backupCard.fileNameHint": "Lo stesso su ogni dispositivo che condivide questa cartella: tutti leggono e scrivono questo unico file."
 }

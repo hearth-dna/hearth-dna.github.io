@@ -868,7 +868,7 @@
   "quickSymptom.severity": "keparahan",
   "charts.group.symptom": "Gejala",
   "backupCard.titleManual": "Cadangan",
-  "backupCard.introManual": "Browser ini tidak dapat menjaga folder tetap tersinkron, jadi cadangan berupa file. <b>Cadangkan</b> membuat snapshot terenkripsi dan membuka menu bagikan: simpan dengan File atau Google Drive ke folder cadangan yang dipakai komputer Anda, dan komputer akan menambahkannya pada sinkronisasi berikutnya. <b>Muat cadangan</b> membuka file tersimpan dan menambahkan isinya. Hearth sendiri tidak mengirim apa pun.",
+  "backupCard.introManual": "Browser ini tidak dapat menjaga folder tetap tersinkron, jadi cadangan berupa file. <b>Cadangkan</b> membuat snapshot terenkripsi dan membuka menu bagikan: simpan dengan File atau Google Drive ke folder cadangan yang dipakai komputer Anda. Semua perangkat membaca dan menulis file yang sama, dan komputer menambahkan perubahan dari ponsel pada sinkronisasi berikutnya. <b>Muat cadangan</b> membuka file tersimpan dan menambahkan isinya. Hearth sendiri tidak mengirim apa pun.",
   "backupCard.downloadOnly": "Browser ini hanya bisa mengunduh file. Unggah ke Google Drive dari aplikasi Drive, atau simpan di tempat yang aman.",
   "backupCard.lastShared": "Cadangan terakhir: {time}.",
   "backupCard.neverShared": "Belum ada cadangan dari perangkat ini.",
@@ -1020,7 +1020,7 @@
   "backupCard.dnaFrom": "DNA {name} dari {file}.",
   "backupCard.notUsed": "Tidak dipakai: {files}. Tidak ada orang di browser ini yang memiliki DNA ini: pilih file ini bersama file cadangan di «Muat cadangan».",
   "backupCard.notOpened": "{files} tidak bisa dibuka dengan frasa sandi ini. Masukkan frasa sandi folder cadangan.",
-  "backupCard.oneFileHint": "Untuk mendapatkan semuanya dari komputer, termasuk DNA, pilih hearth-phone-copy.hearth di folder cadangannya. Komputer selalu memperbarui satu file itu, paling lambat beberapa menit tertinggal.",
+  "backupCard.oneFileHint": "Untuk mendapatkan perubahan terbaru dari komputer, pilih {file} di folder cadangannya. Pertama kali, selama ponsel ini belum punya DNA, pilih juga {copy}: komputer menyimpan DNA di sana, paling lambat beberapa menit tertinggal.",
   "repair.title": "Data di browser ini rusak",
   "repair.intro": "File database di perangkat ini rusak. Ini terjadi saat ponsel menutup aplikasi di tengah penyimpanan, misalnya saat memuat genom besar. Perbaikan menyimpan semua yang masih bisa dibaca (orang, catatan kesehatan, dokumen, pengaturan), membangun ulang DNA dari file genom yang disimpan di perangkat ini, dan memulai database yang bersih. Yang masih hilang kembali dengan memuat cadangan Anda.",
   "repair.button": "Perbaiki",
@@ -1034,5 +1034,7 @@
   "settingsPage.dbIntact": "Database utuh.",
   "native.pickGenomes": "Pilih setiap file dari folder genomes itu bersama file cadangan di «Pulihkan cadangan…», atau sendiri di «Muat file DNA…».",
   "native.notUsed": "Tidak dipakai: {files}. Tidak ada yang punya DNA ini di ponsel ini: pilih file ini bersama file cadangan di «Pulihkan cadangan…».",
-  "native.repairTitle": "Data di ponsel ini rusak"
+  "native.repairTitle": "Data di ponsel ini rusak",
+  "backupCard.fileName": "Nama file cadangan",
+  "backupCard.fileNameHint": "Sama di setiap perangkat yang berbagi folder ini: semuanya membaca dan menulis satu file ini."
 }

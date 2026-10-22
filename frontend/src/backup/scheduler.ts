@@ -17,7 +17,7 @@ import * as folder from './folder'
 import { expandArchives, genomeLoader, mirrorGenomes, pickFor, readPickedGenomes } from './genomes'
 import {
   attachmentsDirName,
-  baseName,
+  fileName,
   genomesDirName,
   hasNewer,
   phoneCopyDelay,
@@ -26,7 +26,6 @@ import {
   sharedAction,
   sharedFiles,
   sharedKey,
-  sharedName,
   spareNames,
 } from './naming'
 import { openRepaired } from './repair'
@@ -188,6 +187,34 @@ class Backups {
     return folder.open(this.saved.place)
   }
 
+  /** The single-file copy, DNA inside, that a phone loads beside the backup the first time. */
+  get phoneCopy(): string {
+    return phoneCopyName(this.profile)
+  }
+
+  /** The backup file every device reads and writes; the same name on all of them. */
+  get file(): string {
+    return fileName(this.profile, (this.saved ?? this.shared)?.fileName)
+  }
+
+  /**
+   * Renames the backup file (empty: the default). The folder's file under the new name is another
+   * backup, so nothing counts as seen from it yet; the old file stays where it is.
+   */
+  async setFileName(name: string): Promise<void> {
+    const chosen = name.trim() || undefined
+    if (this.shared) {
+      this.shared.fileName = chosen
+      this.built = null
+      await folder.saveShared(this.profile, this.shared)
+    } else if (this.saved) {
+      this.saved.fileName = chosen
+      this.saved.lastSeen = null
+      await folder.save(this.profile, this.saved)
+    }
+    await this.refresh()
+  }
+
   get plain(): boolean {
     return (this.shared ?? this.saved)?.plain ?? false
   }
@@ -264,11 +291,7 @@ class Backups {
     const device = (await getMeta(this.db, 'device')) ?? ''
     let current: Awaited<ReturnType<typeof folder.currentHeader>>
     try {
-      current = await withTimeout(
-        folder.currentHeader(this.dir, baseName(this.profile)),
-        FOLDER_TIMEOUT_MS,
-        name,
-      )
+      current = await withTimeout(folder.currentHeader(this.dir, this.file), FOLDER_TIMEOUT_MS, name)
     } catch (e) {
       return this.set({ state: 'error', name, message: e instanceof Error ? e.message : String(e) })
     }
@@ -383,7 +406,7 @@ class Backups {
     let n = 0
     let files = 0
     if (this.saved && deleteFiles) {
-      n = await folder.deleteSnapshots(this.dir, baseName(this.profile))
+      n = await folder.deleteSnapshots(this.dir, this.file)
       files = await folder.removeDir(this.dir, attachmentsDirName(this.profile))
       n += await folder.removeDir(this.dir, genomesDirName(this.profile))
       if (await this.dir.read(phoneCopyName(this.profile))) {
@@ -447,7 +470,7 @@ class Backups {
     this.busy = true
     try {
       const device = (await getMeta(this.db, 'device')) ?? ''
-      const current = await folder.currentHeader(this.dir, baseName(this.profile))
+      const current = await folder.currentHeader(this.dir, this.file)
       const newer = hasNewer(current, device, this.saved.lastSeen)
       const shared = await this.sharedNames()
       if (!newer && !shared.length) return 'current'
@@ -479,7 +502,7 @@ class Backups {
     this.busy = true
     this.set({ state: 'writing', name, step: 'building' })
     try {
-      const base = baseName(this.profile)
+      const base = this.file
       const dir = this.dir
       const key = this.plain ? undefined : pass
       // Genomes beside the snapshot, written once; after an edit this writes the journal alone.
@@ -595,7 +618,7 @@ class Backups {
   /** The load itself: the snapshot, then its documents; remembers what was seen. */
   private async pull(onProgress: Progress): Promise<RestoreResult> {
     if (!this.saved) throw new Error('no folder chosen')
-    const base = baseName(this.profile)
+    const base = this.file
     const dir = this.dir
     const bytes = await dir.read(base)
     if (!bytes) throw new Error(`no ${base} in ${this.name}`)
@@ -627,7 +650,7 @@ class Backups {
     const dir = this.dir
     const done = new Set([...(this.saved.loadedShared ?? []), ...this.sharedLater])
     const out: string[] = []
-    for (const n of sharedFiles(await dir.names(), this.profile))
+    for (const n of sharedFiles(await dir.names(), this.file, this.profile))
       if (!done.has(sharedKey(n, await folder.currentHeader(dir, n)))) out.push(n)
     return out
   }
@@ -687,7 +710,7 @@ class Backups {
         const bytes = await snapshotBytes(this.db, this.appVersion, this.plain ? undefined : pass)
         const device = (await getMeta(this.db, 'device')) ?? ''
         const generation = Number((await getMeta(this.db, 'generation')) ?? 0)
-        this.built = { name: sharedName(this.profile), bytes, seen: { device, generation } }
+        this.built = { name: this.file, bytes, seen: { device, generation } }
       } finally {
         this.busy = false
         this.setStep(null)

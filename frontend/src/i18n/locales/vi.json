@@ -868,7 +868,7 @@
   "quickSymptom.severity": "mức độ",
   "charts.group.symptom": "Triệu chứng",
   "backupCard.titleManual": "Sao lưu",
-  "backupCard.introManual": "Trình duyệt này không thể giữ một thư mục đồng bộ, nên bản sao lưu là tệp. <b>Sao lưu</b> tạo một bản chụp được mã hóa và mở menu chia sẻ: lưu nó bằng Tệp hoặc Google Drive vào thư mục sao lưu mà máy tính của bạn dùng, và máy tính sẽ thêm nó ở lần đồng bộ tiếp theo. <b>Tải bản sao lưu</b> mở một tệp đã lưu và thêm nội dung trong đó. Bản thân Hearth không gửi gì cả.",
+  "backupCard.introManual": "Trình duyệt này không thể giữ một thư mục đồng bộ, nên bản sao lưu là tệp. <b>Sao lưu</b> tạo một bản chụp được mã hóa và mở menu chia sẻ: lưu nó bằng Tệp hoặc Google Drive vào thư mục sao lưu mà máy tính của bạn dùng. Mọi thiết bị đọc và ghi cùng một tệp, và máy tính thêm các thay đổi từ điện thoại ở lần đồng bộ tiếp theo. <b>Tải bản sao lưu</b> mở một tệp đã lưu và thêm nội dung trong đó. Bản thân Hearth không gửi gì cả.",
   "backupCard.downloadOnly": "Trình duyệt này chỉ có thể tải tệp xuống. Hãy tải nó lên Google Drive từ ứng dụng Drive, hoặc cất ở nơi an toàn.",
   "backupCard.lastShared": "Bản sao lưu gần nhất: {time}.",
   "backupCard.neverShared": "Chưa có bản sao lưu nào từ thiết bị này.",
@@ -1020,7 +1020,7 @@
   "backupCard.dnaFrom": "DNA của {name} từ {file}.",
   "backupCard.notUsed": "Không dùng: {files}. Không ai trong trình duyệt này có DNA này: hãy chọn các tệp này cùng tệp sao lưu trong «Tải bản sao lưu».",
   "backupCard.notOpened": "Không mở được {files} bằng cụm mật khẩu này. Hãy nhập cụm mật khẩu của thư mục sao lưu.",
-  "backupCard.oneFileHint": "Để nhận mọi thứ từ máy tính, kể cả DNA, hãy chọn hearth-phone-copy.hearth trong thư mục sao lưu của nó. Máy tính luôn cập nhật tệp duy nhất này, chậm nhất vài phút.",
+  "backupCard.oneFileHint": "Để nhận các thay đổi mới nhất từ máy tính, hãy chọn {file} trong thư mục sao lưu của nó. Lần đầu, khi điện thoại này chưa có DNA, hãy chọn thêm {copy}: máy tính giữ DNA ở đó, chậm nhất vài phút.",
   "repair.title": "Dữ liệu trong trình duyệt này bị hỏng",
   "repair.intro": "Tệp cơ sở dữ liệu trên thiết bị này bị hỏng. Điều này xảy ra khi điện thoại đóng ứng dụng giữa lúc đang lưu, ví dụ khi tải một bộ gen lớn. Sửa chữa giữ lại mọi thứ còn đọc được (người, nhật ký sức khỏe, tài liệu, cài đặt), dựng lại DNA từ các tệp bộ gen lưu trên thiết bị này và bắt đầu một cơ sở dữ liệu sạch. Những gì còn thiếu sẽ trở lại khi tải bản sao lưu của bạn.",
   "repair.button": "Sửa",
@@ -1034,5 +1034,7 @@
   "settingsPage.dbIntact": "Cơ sở dữ liệu nguyên vẹn.",
   "native.pickGenomes": "Chọn mọi tệp trong thư mục genomes cùng với tệp sao lưu trong «Khôi phục bản sao lưu…», hoặc chọn riêng trong «Tải tệp DNA…».",
   "native.notUsed": "Chưa dùng: {files}. Không ai trên điện thoại này có DNA này: hãy chọn các tệp này cùng với tệp sao lưu trong «Khôi phục bản sao lưu…».",
-  "native.repairTitle": "Dữ liệu trên điện thoại này bị hỏng"
+  "native.repairTitle": "Dữ liệu trên điện thoại này bị hỏng",
+  "backupCard.fileName": "Tên tệp sao lưu",
+  "backupCard.fileNameHint": "Giống nhau trên mọi thiết bị dùng chung thư mục này: tất cả đều đọc và ghi đúng một tệp này."
 }

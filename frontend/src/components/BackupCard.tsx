@@ -31,6 +31,8 @@ export function BackupCard() {
   const working = writing || busy !== null
   // Only these states can actually write; elsewhere the notice above the buttons says what to do.
   const canBackUp = !working && (status.state === 'ready' || status.state === 'error')
+  // Unencrypted here, but the folder holds a file another device sealed: its passphrase opens it.
+  const plainHere = backups.plain && status.state !== 'needs-passphrase'
 
   // A finished autosave should be visible too, not only one started from the button.
   const [wasWriting, setWasWriting] = useState(false)
@@ -167,11 +169,11 @@ export function BackupCard() {
           )}
           <div className="row">
             <label className="field">
-              {t(backups.plain ? 'backupCard.passphraseNotUsed' : 'backupCard.passphraseRequired')}
+              {t(plainHere ? 'backupCard.passphraseNotUsed' : 'backupCard.passphraseRequired')}
               <input
                 type="password"
                 value={pass}
-                disabled={backups.plain}
+                disabled={plainHere}
                 onChange={(e) => setPass(e.target.value)}
                 // Applied when typing is done, never per keystroke: each change re-reads the folder
                 // and could encrypt a backup with half a passphrase.
@@ -179,6 +181,7 @@ export function BackupCard() {
                 onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
               />
             </label>
+            <FileNameField disabled={working} />
             <label className="check">
               <input
                 type="checkbox"
@@ -317,6 +320,7 @@ function ManualBackup({ status }: { status: Extract<Status, { state: 'manual' }>
           />
           <span>{t('backupCard.storeUnencrypted')}</span>
         </label>
+        <FileNameField disabled={working} />
       </div>
       {needsPass && <p className="notice">{t('backupCard.needsPassphraseManual')}</p>}
       {status.missing.length > 0 && (
@@ -338,9 +342,35 @@ function ManualBackup({ status }: { status: Extract<Status, { state: 'manual' }>
         </button>
         <PickFiles label={t('backupCard.loadFile')} disabled={working} onFiles={load} />
       </div>
-      <p className="muted">{t('backupCard.oneFileHint')}</p>
+      <p className="muted">{t('backupCard.oneFileHint', { file: backups.file, copy: backups.phoneCopy })}</p>
       {msg && <p>{msg}</p>}
     </div>
+  )
+}
+
+/**
+ * The backup file's name, the same on every device: they all read and write this one file. Applied
+ * when typing is done, like the passphrase, never per keystroke.
+ */
+function FileNameField({ disabled }: { disabled: boolean }) {
+  const t = useT()
+  const [name, setName] = useState(backups.file)
+  return (
+    <label className="field" title={t('backupCard.fileNameHint')}>
+      {t('backupCard.fileName')}
+      <input
+        value={name}
+        disabled={disabled}
+        autoCapitalize="none"
+        autoComplete="off"
+        onChange={(e) => setName(e.target.value)}
+        onBlur={() => {
+          if (name.trim() === backups.file) return
+          void backups.setFileName(name).then(() => setName(backups.file))
+        }}
+        onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
+      />
+    </label>
   )
 }
 

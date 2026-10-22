@@ -868,7 +868,7 @@
   "quickSymptom.severity": "nasilenie",
   "charts.group.symptom": "Objawy",
   "backupCard.titleManual": "Kopia zapasowa",
-  "backupCard.introManual": "Ta przeglądarka nie może synchronizować folderu, więc kopie zapasowe są plikami. <b>Utwórz kopię</b> tworzy zaszyfrowaną migawkę i otwiera menu udostępniania: zapisz ją przez Pliki lub Dysk Google w folderze kopii, którego używa komputer, a komputer doda ją przy następnej synchronizacji. <b>Wczytaj kopię</b> otwiera zapisany plik i dodaje jego zawartość. Sam Hearth niczego nie wysyła.",
+  "backupCard.introManual": "Ta przeglądarka nie może synchronizować folderu, więc kopie zapasowe są plikami. <b>Utwórz kopię</b> tworzy zaszyfrowaną migawkę i otwiera menu udostępniania: zapisz ją przez Pliki lub Dysk Google w folderze kopii, którego używa komputer. Wszystkie urządzenia czytają i zapisują ten sam plik, a komputer dodaje zmiany z telefonu przy następnej synchronizacji. <b>Wczytaj kopię</b> otwiera zapisany plik i dodaje jego zawartość. Sam Hearth niczego nie wysyła.",
   "backupCard.downloadOnly": "Ta przeglądarka może tylko pobrać plik. Prześlij go na Dysk Google z aplikacji Dysk albo przechowuj w bezpiecznym miejscu.",
   "backupCard.lastShared": "Ostatnia kopia: {time}.",
   "backupCard.neverShared": "Z tego urządzenia nie ma jeszcze kopii.",
@@ -1020,7 +1020,7 @@
   "backupCard.dnaFrom": "DNA osoby {name} z {file}.",
   "backupCard.notUsed": "Nieużyte: {files}. Nikt w tej przeglądarce nie ma tego DNA: wybierz te pliki razem z plikiem kopii w „Wczytaj kopię”.",
   "backupCard.notOpened": "Nie udało się otworzyć {files} tym hasłem. Wpisz hasło folderu kopii zapasowych.",
-  "backupCard.oneFileHint": "Aby dostać wszystko z komputera, razem z DNA, wybierz hearth-phone-copy.hearth w jego folderze kopii. Komputer na bieżąco aktualizuje ten jeden plik, najwyżej z kilkuminutowym opóźnieniem.",
+  "backupCard.oneFileHint": "Aby pobrać najnowsze zmiany z komputera, wybierz {file} w jego folderze kopii. Za pierwszym razem, dopóki ten telefon nie ma jeszcze DNA, zaznacz razem z nim {copy}: tam komputer trzyma DNA, najwyżej z kilkuminutowym opóźnieniem.",
   "repair.title": "Dane w tej przeglądarce są uszkodzone",
   "repair.intro": "Plik bazy danych na tym urządzeniu jest uszkodzony. Dzieje się tak, gdy telefon zamyka aplikację w trakcie zapisu, na przykład przy wczytywaniu dużego genomu. Naprawa zachowa wszystko, co da się jeszcze odczytać (osoby, dziennik zdrowia, dokumenty, ustawienia), odtworzy DNA z plików genomów zapisanych na tym urządzeniu i zacznie czystą bazę. To, czego nadal brakuje, wróci po wczytaniu kopii zapasowej.",
   "repair.button": "Napraw",
@@ -1034,5 +1034,7 @@
   "settingsPage.dbIntact": "Baza danych jest w porządku.",
   "native.pickGenomes": "Wybierz wszystkie pliki z folderu genomes razem z plikiem kopii w „Przywróć kopię zapasową…” albo osobno w „Wczytaj pliki DNA…”.",
   "native.notUsed": "Nieużyte: {files}. Nikt na tym telefonie nie ma tego DNA: wybierz te pliki razem z plikiem kopii w „Przywróć kopię zapasową…”.",
-  "native.repairTitle": "Dane na tym telefonie są uszkodzone"
+  "native.repairTitle": "Dane na tym telefonie są uszkodzone",
+  "backupCard.fileName": "Nazwa pliku kopii",
+  "backupCard.fileNameHint": "Taka sama na każdym urządzeniu, które korzysta z tego folderu: wszystkie czytają i zapisują ten jeden plik."
 }

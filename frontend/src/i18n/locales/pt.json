@@ -868,7 +868,7 @@
   "quickSymptom.severity": "intensidade",
   "charts.group.symptom": "Sintomas",
   "backupCard.titleManual": "Backup",
-  "backupCard.introManual": "Este navegador não consegue manter uma pasta sincronizada, então os backups são arquivos. <b>Fazer backup</b> cria um snapshot criptografado e abre o menu de compartilhamento: salve-o com Arquivos ou Google Drive na pasta de backup que seu computador usa, e o computador o adicionará na próxima sincronização. <b>Carregar backup</b> abre um arquivo salvo e adiciona o conteúdo. O Hearth não envia nada por conta própria.",
+  "backupCard.introManual": "Este navegador não consegue manter uma pasta sincronizada, então os backups são arquivos. <b>Fazer backup</b> cria um snapshot criptografado e abre o menu de compartilhamento: salve-o com Arquivos ou Google Drive na pasta de backup que seu computador usa. Todos os dispositivos leem e gravam o mesmo arquivo, e o computador adiciona as alterações do celular na próxima sincronização. <b>Carregar backup</b> abre um arquivo salvo e adiciona o conteúdo. O Hearth não envia nada por conta própria.",
   "backupCard.downloadOnly": "Este navegador só consegue baixar o arquivo. Envie-o ao Google Drive pelo app do Drive ou guarde-o em um lugar seguro.",
   "backupCard.lastShared": "Último backup: {time}.",
   "backupCard.neverShared": "Ainda não há backup deste dispositivo.",
@@ -1020,7 +1020,7 @@
   "backupCard.dnaFrom": "DNA de {name} a partir de {file}.",
   "backupCard.notUsed": "Não usados: {files}. Ninguém neste navegador tem este DNA: selecione estes arquivos junto com o arquivo de backup em «Carregar backup».",
   "backupCard.notOpened": "Não foi possível abrir {files} com esta senha. Digite a senha da pasta de backup.",
-  "backupCard.oneFileHint": "Para receber tudo do computador, DNA incluído, escolha hearth-phone-copy.hearth na pasta de backup dele. O computador mantém esse único arquivo atualizado, no máximo alguns minutos atrás.",
+  "backupCard.oneFileHint": "Para receber as alterações mais recentes do computador, escolha {file} na pasta de backup dele. Na primeira vez, enquanto este celular ainda não tem DNA, selecione também {copy}: o computador mantém o DNA ali, no máximo alguns minutos atrás.",
   "repair.title": "Os dados deste navegador estão danificados",
   "repair.intro": "O arquivo de banco de dados deste aparelho está danificado. Isso acontece quando o celular fecha o app no meio de um salvamento, por exemplo ao carregar um genoma grande. O reparo mantém tudo o que ainda pode ser lido (pessoas, diário de saúde, documentos, configurações), reconstrói o DNA a partir dos arquivos de genoma guardados neste aparelho e começa um banco limpo. O que ainda faltar volta ao carregar seu backup.",
   "repair.button": "Reparar",
@@ -1034,5 +1034,7 @@
   "settingsPage.dbIntact": "O banco de dados está íntegro.",
   "native.pickGenomes": "Escolha todos os arquivos dessa pasta genomes junto com o arquivo da cópia em «Restaurar uma cópia de segurança…», ou sozinhos em «Carregar arquivos de DNA…».",
   "native.notUsed": "Não usados: {files}. Ninguém neste telefone tem este DNA: escolha estes arquivos junto com o arquivo da cópia em «Restaurar uma cópia de segurança…».",
-  "native.repairTitle": "Os dados deste telefone estão danificados"
+  "native.repairTitle": "Os dados deste telefone estão danificados",
+  "backupCard.fileName": "Nome do arquivo de backup",
+  "backupCard.fileNameHint": "O mesmo em todos os dispositivos que compartilham esta pasta: todos leem e gravam este único arquivo."
 }
