@@ -7,6 +7,7 @@ import {
   phoneCopyName,
   rotationPlan,
   sharedName,
+  sharedToLoad,
   spareNames,
 } from './naming'
 
@@ -23,6 +24,27 @@ describe('backup naming', () => {
   it('names the file per profile', () => {
     expect(baseName('default')).toBe('hearth-backup.hearth')
     expect(baseName('kids')).toBe('hearth-backup-kids.hearth')
+  })
+
+  it('finds the snapshots a phone shared into the folder, oldest first, once', () => {
+    const names = [
+      'hearth-backup.hearth',
+      'hearth-backup.hearth.1',
+      'hearth-backup-2026-10-02-0915.hearth',
+      'hearth-backup-2026-09-29-1402.hearth',
+      'hearth-backup-2026-09-29-1402 (1).hearth',
+      'hearth-backup-2026-09-29-1402 2.hearth',
+      'hearth-backup-kids-2026-09-30-0800.hearth',
+      'hearth-phone-copy.hearth',
+      'genomes',
+      'README.txt',
+    ]
+    expect(sharedToLoad(names, 'default', ['hearth-backup-2026-10-02-0915.hearth'])).toEqual([
+      'hearth-backup-2026-09-29-1402 (1).hearth',
+      'hearth-backup-2026-09-29-1402 2.hearth',
+      'hearth-backup-2026-09-29-1402.hearth',
+    ])
+    expect(sharedToLoad(names, 'kids', [])).toEqual(['hearth-backup-kids-2026-09-30-0800.hearth'])
   })
 
   it('stamps shared snapshots with the local time', () => {

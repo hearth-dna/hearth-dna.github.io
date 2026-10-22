@@ -55,6 +55,8 @@ export interface Saved {
   lastAt?: string
   /** How many attachment sidecars the folder held after the last successful mirror. */
   mirrored?: number
+  /** Snapshots phones shared into the folder that this browser has already loaded. */
+  loadedShared?: string[]
 }
 
 // ---- remembered place (IndexedDB) ----------------------------------------------------------

@@ -21,6 +21,19 @@ export function sharedName(profile: string, at: Date): string {
   return baseName(profile).replace(/\.hearth$/, `-${stamp}.hearth`)
 }
 
+/**
+ * Snapshots a phone shared into this folder (`sharedName`) that this browser has not loaded yet,
+ * oldest first. Drive and Files add " (1)" or " 2" when a name is already taken.
+ */
+export function sharedToLoad(existing: string[], profile: string, loaded: string[]): string[] {
+  const stem = baseName(profile)
+    .replace(/\.hearth$/, '')
+    .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const shared = new RegExp(`^${stem}-\\d{4}-\\d{2}-\\d{2}-\\d{4}( ?\\(?\\d+\\)?)?\\.hearth$`)
+  const done = new Set(loaded)
+  return existing.filter((n) => shared.test(n) && !done.has(n)).sort()
+}
+
 export const rotatedName = (base: string, n: number) => `${base}.${n}`
 
 /**

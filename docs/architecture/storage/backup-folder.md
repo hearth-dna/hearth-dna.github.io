@@ -31,6 +31,16 @@ No mobile browser can mount a folder, so there a backup is a file the user hands
   because Drive and Files save a new copy rather than overwrite.
 - **Load backup…** is a file input without `accept` (iOS greys out unknown extensions); the
   system picker browses Drive. Loading is the same union-by-id restore as Import dump.
+- **The round trip with a computer** goes through the computer's backup folder. A phone saves its
+  file there (Files → Google Drive → that folder); the computer, at its next sync, loads every
+  `hearth-backup-<date>-<time>.hearth` it has not loaded yet (`sharedToLoad`, also with the " (1)"
+  or " 2" Drive and Files add), and the backup after that writes them into `hearth-backup.hearth`.
+  Which ones it has loaded is remembered per browser (`Saved.loadedShared`); the files stay. Back on
+  the phone, *Load backup* on `hearth-backup.hearth` brings in the computer's changes. Its genomes
+  sit in `genomes/`, out of reach of a picker that selects in one folder, so the first load on a
+  phone without DNA takes `hearth-phone-copy.hearth` or a .zip of the folder instead; after that
+  people who have DNA skip it. A phone browser cannot do this by itself: it holds no folder access
+  between visits, so each direction takes a tap.
 - The header button tracks whether anything changed since the last backup file ("Back up" /
   "Backed up 14:02") and makes a new one on click. There is no autosave: sharing needs a tap.
 - Where files cannot be shared the file is downloaded instead, with a hint to upload it from the

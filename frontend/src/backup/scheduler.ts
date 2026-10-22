@@ -23,6 +23,7 @@ import {
   phoneCopyName,
   type Seen,
   sharedName,
+  sharedToLoad,
   spareNames,
 } from './naming'
 import { openRepaired } from './repair'
@@ -243,9 +244,10 @@ class Backups {
       return this.set({ state: 'reconnect', name })
     const device = (await getMeta(this.db, 'device')) ?? ''
     let current: Awaited<ReturnType<typeof folder.currentHeader>>
+    let shared: Awaited<ReturnType<typeof folder.currentHeader>>[]
     try {
-      current = await withTimeout(
-        folder.currentHeader(this.dir, baseName(this.profile)),
+      ;[current, shared] = await withTimeout(
+        Promise.all([folder.currentHeader(this.dir, baseName(this.profile)), this.sharedHeaders()]),
         FOLDER_TIMEOUT_MS,
         name,
       )
@@ -259,8 +261,8 @@ class Backups {
       this.saved.plain = true
       await folder.save(this.profile, this.saved)
     }
-    const newer = hasNewer(current, device, this.saved.lastSeen)
-    if (newer && current?.encrypted && !this.passphrase())
+    const newer = hasNewer(current, device, this.saved.lastSeen) || shared.length > 0
+    if (newer && [current, ...shared].some((h) => h?.encrypted) && !this.passphrase())
       return this.set({ state: 'needs-passphrase', name })
     if (newer) {
       // Newer data wins, without asking: pull it in, then write the union back when there is
@@ -420,9 +422,12 @@ class Backups {
     try {
       const device = (await getMeta(this.db, 'device')) ?? ''
       const current = await folder.currentHeader(this.dir, baseName(this.profile))
-      if (!hasNewer(current, device, this.saved.lastSeen)) return 'current'
+      const newer = hasNewer(current, device, this.saved.lastSeen)
+      const shared = await this.sharedNames()
+      if (!newer && !shared.length) return 'current'
       this.set({ state: 'writing', name, step: 'loading' })
-      await this.pull(onProgress)
+      if (newer) await this.pull(onProgress)
+      await this.loadShared(shared, onProgress)
       return 'pulled'
     } catch (e) {
       this.set({ state: 'error', name, message: e instanceof Error ? e.message : String(e) })
@@ -526,6 +531,7 @@ class Backups {
     let r: RestoreResult
     try {
       r = await this.pull(onProgress)
+      await this.loadShared(await this.sharedNames(), onProgress)
     } finally {
       this.busy = false
     }
@@ -560,6 +566,45 @@ class Backups {
     await folder.save(this.profile, this.saved)
     for (const l of this.pulledListeners) l()
     return r
+  }
+
+  /** Snapshots phones shared into the folder that this browser has not loaded yet. */
+  private async sharedNames(): Promise<string[]> {
+    if (!this.saved) return []
+    return sharedToLoad(await this.dir.names(), this.profile, this.saved.loadedShared ?? [])
+  }
+
+  private async sharedHeaders() {
+    const dir = this.dir
+    return Promise.all((await this.sharedNames()).map((n) => folder.currentHeader(dir, n)))
+  }
+
+  /**
+   * Loads what a phone without folder access saved into the folder through the share sheet (union
+   * by id, like any load). The next backup writes it into the folder's own snapshot, which the
+   * phone loads back: the round trip a phone browser can make.
+   */
+  private async loadShared(names: string[], onProgress: Progress): Promise<void> {
+    if (!this.saved || !names.length) return
+    const dir = this.dir
+    const pass = this.passphrase() || undefined
+    for (const n of names) {
+      const bytes = await dir.read(n)
+      // Unreadable for now (the drive is still fetching it): the next sync tries again.
+      if (!bytes) continue
+      // Not a Hearth file after all: nothing to load, and nothing to look at again.
+      if (isDumpFile(bytes)) {
+        try {
+          await restoreBytes(this.db, bytes, pass, onProgress)
+        } catch (e) {
+          throw new Error(`${n}: ${e instanceof Error ? e.message : String(e)}`)
+        }
+      }
+      const have = new Set(await dir.names())
+      this.saved.loadedShared = [...(this.saved.loadedShared ?? []).filter((x) => have.has(x)), n]
+      await folder.save(this.profile, this.saved)
+    }
+    for (const l of this.pulledListeners) l()
   }
 
   /**
