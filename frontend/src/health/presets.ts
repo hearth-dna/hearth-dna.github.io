@@ -377,6 +377,44 @@ export function presetsFor(kind: HealthKind): HealthPreset[] {
 const loose = (x: string) =>
   x.normalize('NFKC').toLowerCase().replace(/[’ʼ]/g, "'").replace(/ё/g, 'е').replace(/\s+/g, ' ').trim()
 
+const names = (p: HealthPreset, label: (p: HealthPreset) => string) =>
+  [label(p), p.title, ...(p.synonyms ?? [])].map(loose)
+
+/**
+ * Presets whose shown name, English title or a synonym match what is being typed, for the quick
+ * bars' search: names that start with it first, then names with a word that does, then names that
+ * contain it, each group in `order`. Empty text matches everything.
+ */
+export function searchPresets(
+  order: HealthPreset[],
+  text: string,
+  label: (p: HealthPreset) => string,
+): HealthPreset[] {
+  const q = loose(text)
+  if (!q) return order
+  const rank = (p: HealthPreset) => {
+    const ns = names(p, label)
+    if (ns.some((n) => n.startsWith(q))) return 0
+    if (ns.some((n) => n.split(/[\s(/-]+/).some((w) => w.startsWith(q)))) return 1
+    return ns.some((n) => n.includes(q)) ? 2 : 3
+  }
+  return order
+    .map((p) => ({ p, r: rank(p) }))
+    .filter((x) => x.r < 3)
+    .sort((a, b) => a.r - b.r)
+    .map((x) => x.p)
+}
+
+/** The preset that typed text names exactly: its shown name, English title or a synonym. */
+export function presetNamed(
+  order: HealthPreset[],
+  text: string,
+  label: (p: HealthPreset) => string,
+): HealthPreset | undefined {
+  const q = loose(text)
+  return q ? order.find((p) => names(p, label).includes(q)) : undefined
+}
+
 /**
  * The preset a saved entry names: one of the same kind whose title or a synonym equals the
  * entry's title. Entries keep the English title they were saved with ("Headache"), or whatever

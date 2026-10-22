@@ -4,18 +4,17 @@ import { grantConsent, hasConsent } from '../consent/consent'
 import { addHealthEntry } from '../db/repo'
 import { formatValue } from '../health/log'
 import { nowTime, today } from '../health/now'
-import { findPreset, type HealthPreset, presetOrder } from '../health/presets'
+import { type HealthPreset, presetNamed, presetOrder } from '../health/presets'
 import { useT } from '../i18n/context'
 import type { HealthEntry, Person } from '../types'
 import { ConsentForm } from './ConsentForm'
-
-const CUSTOM = ''
+import { PresetSearch } from './PresetSearch'
 
 /**
  * One line for the numbers people record over and over: weight, height, blood pressure, waist,
- * steps… Pick the parameter, type the number, save — date and time are now, the unit comes from
- * the preset. Anything more (another date, a symptom) belongs in the full add form.
- * Parameters this person already uses come first.
+ * steps… Search and pick the parameter (any other name is a custom one, with its own unit), type
+ * the number, save — date and time are now, the unit comes from the preset. Anything more (another
+ * date, a symptom) belongs in the full add form. Parameters this person already uses come first.
  */
 export function QuickMeasurement({
   persons,
@@ -32,8 +31,9 @@ export function QuickMeasurement({
   const { db } = useApp()
   const t = useT()
   const [personId, setPersonId] = useState(initialPerson)
-  const [presetId, setPresetId] = useState(presetOrder('measurement', entries)[0]?.id ?? '')
-  const [title, setTitle] = useState('')
+  const order = presetOrder('measurement', entries)
+  const shown = (p: HealthPreset) => t(`preset.${p.id}`)
+  const [title, setTitle] = useState(() => (order[0] ? shown(order[0]) : ''))
   const [unit, setUnit] = useState('')
   const [value, setValue] = useState('')
   const [value2, setValue2] = useState('')
@@ -48,7 +48,7 @@ export function QuickMeasurement({
     if (personId) hasConsent(db, 'import_document', personId).then(setConsented)
   }, [db, personId])
 
-  const preset: HealthPreset | undefined = findPreset(presetId)
+  const preset = presetNamed(order, title, shown)
   const pair = preset?.pair
   const numeric = (s: string) => s.trim() !== '' && Number.isFinite(Number(s))
   const finalTitle = preset ? preset.title : title.trim()
@@ -113,30 +113,21 @@ export function QuickMeasurement({
           ))}
         </select>
       )}
-      <select
-        aria-label={t('quick.parameter')}
-        value={presetId}
-        onChange={(e) => {
-          setPresetId(e.target.value)
-          setValue('')
-          setValue2('')
+      <PresetSearch
+        presets={order}
+        name={shown}
+        value={title}
+        onChange={(v) => {
+          if (presetNamed(order, v, shown) !== preset) {
+            setValue('')
+            setValue2('')
+          }
+          setTitle(v)
         }}
-      >
-        {presetOrder('measurement', entries).map((p) => (
-          <option key={p.id} value={p.id}>
-            {t(`preset.${p.id}`)}
-          </option>
-        ))}
-        <option value={CUSTOM}>{t('quick.custom')}</option>
-      </select>
-      {!preset && (
-        <input
-          aria-label={t('healthLog.titleField')}
-          placeholder={t('quick.customPlaceholder')}
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
-      )}
+        onEnter={save}
+        label={t('quick.parameter')}
+        placeholder={t('quick.customPlaceholder')}
+      />
       <input
         aria-label={
           pair ? t('healthLog.valueOf', { label: t(`preset.pair.${pair[0]}`) }) : t('healthLog.value')

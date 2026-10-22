@@ -253,6 +253,11 @@ table td input, table td select { min-height: var(--control-h-sm); }
 .kindpicker button span { font-size: var(--text-xs); }
 .row.quickmeasure { margin: var(--space-3) 0; padding: var(--space-2) var(--space-3); background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--radius-md); }
 .row.quickmeasure input[type='number'] { width: 6.5rem; }
+/* A search box with its matches listed under it (PresetSearch); the same on phones. */
+.suggest { position: relative; }
+.suggest-list { position: absolute; z-index: 20; top: calc(100% + var(--space-1)); left: 0; min-width: 100%; width: max-content; max-width: min(22rem, 90vw); max-height: 16rem; overflow-y: auto; padding: var(--space-1); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-md); box-shadow: var(--shadow-2); }
+.suggest-list [role='option'] { display: flex; align-items: center; min-height: var(--control-h); padding: 0 var(--control-px); border-radius: var(--radius-sm); cursor: pointer; }
+.suggest-list [role='option']:hover, .suggest-list [aria-selected='true'] { background: var(--accent-soft); }
 
 /* ---- Start-up screen ---------------------------------------------------------------------- */
 .startup { max-width: 640px; margin: 2rem auto; }

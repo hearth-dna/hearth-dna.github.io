@@ -43,6 +43,9 @@ mode. `--card` and `--radius` are aliases kept for older page rules.
 - **Chips and badges.** `button.tag` is a filter or preset chip; `active` means selected;
   `condition` has a dashed outline until linked. `.badge` is a label (`A`/`B`/`C` for evidence).
   `.row.tabs` holds pill tabs, and `.segmented` is a view switch.
+- **Search with suggestions.** `PresetSearch` (`.suggest`, `.suggest-list`) is a text box with its
+  matches listed under it; tap or Enter picks. Use it instead of `<datalist>`, which phone
+  browsers barely show.
 - **Tables.** Wrap them in `.tablewrap` for scrolling and a sticky header. Numbers use tabular
   figures.
 
