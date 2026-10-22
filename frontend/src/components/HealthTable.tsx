@@ -1,6 +1,6 @@
 import { Fragment, type ReactNode, useEffect, useMemo, useState } from 'react'
 import { useApp } from '../app/context'
-import { deleteHealthEntries, setHealthConditions } from '../db/repo'
+import { deleteHealthEntries, setHealthConditions, setHealthWhen } from '../db/repo'
 import { exportHealthEntries } from '../export/openFormats'
 import {
   daysBefore,
@@ -26,6 +26,7 @@ import { type Attachment, HEALTH_KIND_LABELS, type HealthEntry, type HealthKind,
 import { AttachmentList } from './AttachmentList'
 import { ConditionPicker } from './ConditionPicker'
 import { useDetailsText } from './DetailFields'
+import { EditWhen } from './WhenInputs'
 
 const KINDS = Object.keys(HEALTH_KIND_LABELS) as HealthKind[]
 
@@ -111,6 +112,10 @@ export function HealthTable({
   }
   const link = async (e: HealthEntry, ids: string[]) => {
     await setHealthConditions(db, e.id, ids)
+    onChange?.()
+  }
+  const move = async (e: HealthEntry, date: string, time: string) => {
+    await setHealthWhen(db, e.id, date, time)
     onChange?.()
   }
   const counts = useMemo(() => {
@@ -290,6 +295,9 @@ export function HealthTable({
   const detail = (e: HealthEntry) => (
     <div className="hl-detail">
       {e.body ? <pre className="pack">{e.body}</pre> : <p className="muted">{t('healthTable.noText')}</p>}
+      {onChange && (
+        <EditWhen key={`${e.id} ${e.date} ${e.time}`} entry={e} onSave={(d, tm) => move(e, d, tm)} />
+      )}
       {onDeleteAttachment && (
         <AttachmentList items={attachments?.[e.id] ?? []} onDelete={onDeleteAttachment} />
       )}

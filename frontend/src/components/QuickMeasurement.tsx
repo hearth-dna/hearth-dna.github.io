@@ -9,12 +9,13 @@ import { useT } from '../i18n/context'
 import type { HealthEntry, Person } from '../types'
 import { ConsentForm } from './ConsentForm'
 import { PresetSearch } from './PresetSearch'
+import { WhenInputs } from './WhenInputs'
 
 /**
  * One line for the numbers people record over and over: weight, height, blood pressure, waist,
  * steps… Search and pick the parameter (any other name is a custom one, with its own unit), type
- * the number, save — date and time are now, the unit comes from the preset. Anything more (another
- * date, a symptom) belongs in the full add form. Parameters this person already uses come first.
+ * the number, save — date and time are now unless changed, the unit comes from the preset.
+ * Anything more (a symptom) belongs in the full add form. Parameters already used come first.
  */
 export function QuickMeasurement({
   persons,
@@ -38,6 +39,8 @@ export function QuickMeasurement({
   const [value, setValue] = useState('')
   const [value2, setValue2] = useState('')
   const [note, setNote] = useState('')
+  // Empty: now, taken when saving.
+  const [when, setWhen] = useState({ date: '', time: '' })
   const [consented, setConsented] = useState<boolean | null>(null)
   const [asking, setAsking] = useState(false)
   const [saved, setSaved] = useState<string | null>(null)
@@ -60,8 +63,8 @@ export function QuickMeasurement({
     if (consented === false) return setAsking(true)
     const entry = {
       personId,
-      date: today(),
-      time: nowTime(),
+      date: when.date || today(),
+      time: when.date || when.time ? when.time : nowTime(),
       kind: 'measurement' as const,
       title: finalTitle,
       body: note.trim(),
@@ -78,6 +81,7 @@ export function QuickMeasurement({
     setValue('')
     setValue2('')
     setNote('')
+    setWhen({ date: '', time: '' })
     await onSaved()
   }
 
@@ -170,6 +174,7 @@ export function QuickMeasurement({
         onChange={(e) => setNote(e.target.value)}
         onKeyDown={(e) => e.key === 'Enter' && save()}
       />
+      <WhenInputs date={when.date || today()} time={when.time || nowTime()} onChange={setWhen} />
       <button type="button" className="primary" disabled={!valid || consented === null} onClick={save}>
         {t('quick.save')}
       </button>

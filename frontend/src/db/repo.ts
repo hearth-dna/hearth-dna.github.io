@@ -472,9 +472,14 @@ export async function addHealthEntries(db: Database, es: HealthEntryInput[]): Pr
   return es.length
 }
 
-/** Replace the conditions an entry is linked to; the only field of an entry that is edited in place. */
+/** Replace the conditions an entry is linked to; with the date, the fields edited in place. */
 export async function setHealthConditions(db: Database, id: string, ids: string[]): Promise<void> {
   await db.exec('UPDATE health_log SET conditions=? WHERE id=?', [formatTags(parseTags(formatTags(ids))), id])
+}
+
+/** Moves an entry to another date and time (an empty time: none recorded). */
+export async function setHealthWhen(db: Database, id: string, date: string, time: string): Promise<void> {
+  await db.exec('UPDATE health_log SET date=?, time=? WHERE id=?', [date, time, id])
 }
 
 export async function deleteHealthEntry(db: Database, id: string): Promise<void> {

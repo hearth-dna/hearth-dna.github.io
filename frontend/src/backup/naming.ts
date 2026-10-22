@@ -12,27 +12,35 @@ export function baseName(profile: string): string {
 }
 
 /**
- * A snapshot handed to the share sheet: `hearth-backup-2026-09-29-1402.hearth` in local time.
- * Timestamped, because Drive and Files save a copy rather than overwrite one.
+ * A snapshot handed to the share sheet: `hearth-phone.hearth`, the same name every time, so saving
+ * it over the last one in the folder replaces it. Never the folder snapshot's own name, which a
+ * phone's copy must not overwrite.
  */
-export function sharedName(profile: string, at: Date): string {
-  const p = (n: number) => String(n).padStart(2, '0')
-  const stamp = `${at.getFullYear()}-${p(at.getMonth() + 1)}-${p(at.getDate())}-${p(at.getHours())}${p(at.getMinutes())}`
-  return baseName(profile).replace(/\.hearth$/, `-${stamp}.hearth`)
+export const sharedName = (profile: string) =>
+  profile === 'default' ? 'hearth-phone.hearth' : `hearth-phone-${profile}.hearth`
+
+const literal = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+/**
+ * Snapshots a phone shared into this folder: `sharedName`, the timestamped names earlier versions
+ * gave them (`hearth-backup-2026-09-29-1402.hearth`), and the " (1)" or " 2" Drive and Files add
+ * when "keep both" is chosen. Sorted by name.
+ */
+export function sharedFiles(existing: string[], profile: string): string[] {
+  const copy = '( ?\\(?\\d+\\)?)?\\.hearth$'
+  const phone = new RegExp(`^${literal(sharedName(profile).replace(/\.hearth$/, ''))}${copy}`)
+  const stamped = new RegExp(
+    `^${literal(baseName(profile).replace(/\.hearth$/, ''))}-\\d{4}-\\d{2}-\\d{2}-\\d{4}${copy}`,
+  )
+  return existing.filter((n) => phone.test(n) || stamped.test(n)).sort()
 }
 
 /**
- * Snapshots a phone shared into this folder (`sharedName`) that this browser has not loaded yet,
- * oldest first. Drive and Files add " (1)" or " 2" when a name is already taken.
+ * What a computer remembers of a shared snapshot it has loaded: the name and the header's device
+ * and generation, so a newer one saved under the same name is loaded again.
  */
-export function sharedToLoad(existing: string[], profile: string, loaded: string[]): string[] {
-  const stem = baseName(profile)
-    .replace(/\.hearth$/, '')
-    .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-  const shared = new RegExp(`^${stem}-\\d{4}-\\d{2}-\\d{2}-\\d{4}( ?\\(?\\d+\\)?)?\\.hearth$`)
-  const done = new Set(loaded)
-  return existing.filter((n) => shared.test(n) && !done.has(n)).sort()
-}
+export const sharedKey = (name: string, header: Header | null) =>
+  header ? `${name}|${header.device}|${header.generation}` : name
 
 /**
  * What a sync does with a shared snapshot: load it, leave it for when the passphrase is entered, or

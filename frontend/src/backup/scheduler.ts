@@ -24,8 +24,9 @@ import {
   phoneCopyName,
   type Seen,
   sharedAction,
+  sharedFiles,
+  sharedKey,
   sharedName,
-  sharedToLoad,
   spareNames,
 } from './naming'
 import { openRepaired } from './repair'
@@ -305,7 +306,7 @@ class Backups {
       attachmentsPending: Math.max(0, blobs - (this.saved.mirrored ?? 0)),
       attachmentsMissing: (await missingLocally(this.db)).length,
       missing: this.missing,
-      unopened: this.sharedLater,
+      unopened: this.sharedLater.map((k) => k.split('|')[0]),
     })
     // Changes made while the folder was unreachable (or before a reload) go out without waiting
     // for the next edit.
@@ -623,8 +624,12 @@ class Backups {
   /** Snapshots phones shared into the folder that this browser has not loaded yet. */
   private async sharedNames(): Promise<string[]> {
     if (!this.saved) return []
-    const done = [...(this.saved.loadedShared ?? []), ...this.sharedLater]
-    return sharedToLoad(await this.dir.names(), this.profile, done)
+    const dir = this.dir
+    const done = new Set([...(this.saved.loadedShared ?? []), ...this.sharedLater])
+    const out: string[] = []
+    for (const n of sharedFiles(await dir.names(), this.profile))
+      if (!done.has(sharedKey(n, await folder.currentHeader(dir, n)))) out.push(n)
+    return out
   }
 
   /**
@@ -640,9 +645,11 @@ class Backups {
       const bytes = await dir.read(n)
       // Unreadable for now (the drive is still fetching it): the next sync tries again.
       if (!bytes) continue
-      const action = sharedAction(readHeader(bytes), isDumpFile(bytes), !!pass)
+      const header = readHeader(bytes)
+      const key = sharedKey(n, header)
+      const action = sharedAction(header, isDumpFile(bytes), !!pass)
       if (action === 'later') {
-        this.sharedLater.push(n)
+        this.sharedLater.push(key)
         continue
       }
       if (action === 'load') {
@@ -650,12 +657,15 @@ class Backups {
           await restoreBytes(this.db, bytes, pass, onProgress)
         } catch {
           // Sealed with another passphrase, or damaged: shown on the card, tried again later.
-          this.sharedLater.push(n)
+          this.sharedLater.push(key)
           continue
         }
       }
       const have = new Set(await dir.names())
-      this.saved.loadedShared = [...(this.saved.loadedShared ?? []).filter((x) => have.has(x)), n]
+      const kept = (this.saved.loadedShared ?? []).filter(
+        (x) => x.split('|')[0] !== n && have.has(x.split('|')[0]),
+      )
+      this.saved.loadedShared = [...kept, key]
       await folder.save(this.profile, this.saved)
     }
     for (const l of this.pulledListeners) l()
@@ -677,7 +687,7 @@ class Backups {
         const bytes = await snapshotBytes(this.db, this.appVersion, this.plain ? undefined : pass)
         const device = (await getMeta(this.db, 'device')) ?? ''
         const generation = Number((await getMeta(this.db, 'generation')) ?? 0)
-        this.built = { name: sharedName(this.profile, new Date()), bytes, seen: { device, generation } }
+        this.built = { name: sharedName(this.profile), bytes, seen: { device, generation } }
       } finally {
         this.busy = false
         this.setStep(null)

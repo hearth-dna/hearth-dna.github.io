@@ -10,8 +10,9 @@ import {
   phoneCopyName,
   rotationPlan,
   sharedAction,
+  sharedFiles,
+  sharedKey,
   sharedName,
-  sharedToLoad,
   spareNames,
 } from './naming'
 
@@ -30,25 +31,38 @@ describe('backup naming', () => {
     expect(baseName('kids')).toBe('hearth-backup-kids.hearth')
   })
 
-  it('finds the snapshots a phone shared into the folder, oldest first, once', () => {
+  it('finds the snapshots a phone shared into the folder, older names and kept copies too', () => {
     const names = [
       'hearth-backup.hearth',
       'hearth-backup.hearth.1',
-      'hearth-backup-2026-10-02-0915.hearth',
+      'hearth-phone.hearth',
+      'hearth-phone 2.hearth',
+      'hearth-phone (1).hearth',
+      'hearth-phone-kids.hearth',
       'hearth-backup-2026-09-29-1402.hearth',
-      'hearth-backup-2026-09-29-1402 (1).hearth',
-      'hearth-backup-2026-09-29-1402 2.hearth',
       'hearth-backup-kids-2026-09-30-0800.hearth',
       'hearth-phone-copy.hearth',
       'genomes',
       'README.txt',
     ]
-    expect(sharedToLoad(names, 'default', ['hearth-backup-2026-10-02-0915.hearth'])).toEqual([
-      'hearth-backup-2026-09-29-1402 (1).hearth',
-      'hearth-backup-2026-09-29-1402 2.hearth',
+    expect(sharedFiles(names, 'default')).toEqual([
       'hearth-backup-2026-09-29-1402.hearth',
+      'hearth-phone (1).hearth',
+      'hearth-phone 2.hearth',
+      'hearth-phone.hearth',
     ])
-    expect(sharedToLoad(names, 'kids', [])).toEqual(['hearth-backup-kids-2026-09-30-0800.hearth'])
+    expect(sharedFiles(names, 'kids')).toEqual([
+      'hearth-backup-kids-2026-09-30-0800.hearth',
+      'hearth-phone-kids.hearth',
+    ])
+  })
+
+  it('knows a shared snapshot by name and header, so one saved over it counts as new', () => {
+    expect(sharedKey('hearth-phone.hearth', header('phone', 4))).toBe('hearth-phone.hearth|phone|4')
+    expect(sharedKey('hearth-phone.hearth', header('phone', 5))).not.toBe(
+      sharedKey('hearth-phone.hearth', header('phone', 4)),
+    )
+    expect(sharedKey('notes.hearth', null)).toBe('notes.hearth')
   })
 
   it('leaves a shared snapshot it cannot open for later, and passes over what is not a backup', () => {
@@ -68,10 +82,9 @@ describe('backup naming', () => {
     expect(phoneCopyDelay(8, 7, 0, PHONE_COPY_MAX_MS + 5000)).toBe(0)
   })
 
-  it('stamps shared snapshots with the local time', () => {
-    const at = new Date(2026, 8, 29, 14, 2)
-    expect(sharedName('default', at)).toBe('hearth-backup-2026-09-29-1402.hearth')
-    expect(sharedName('kids', at)).toBe('hearth-backup-kids-2026-09-29-1402.hearth')
+  it('names shared snapshots the same every time, per profile', () => {
+    expect(sharedName('default')).toBe('hearth-phone.hearth')
+    expect(sharedName('kids')).toBe('hearth-phone-kids.hearth')
   })
 
   it('plans rotation oldest first and never beyond the keep count', () => {

@@ -57,7 +57,7 @@ export interface Saved {
   mirrored?: number
   /** The generation the phone copy in the folder holds, as this browser last wrote it. */
   phoneCopyGen?: number
-  /** Snapshots phones shared into the folder that this browser has already loaded. */
+  /** Snapshots phones shared into the folder that this browser has already loaded (`sharedKey`). */
   loadedShared?: string[]
 }
 
