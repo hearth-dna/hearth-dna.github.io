@@ -34,6 +34,19 @@ export function sharedToLoad(existing: string[], profile: string, loaded: string
   return existing.filter((n) => shared.test(n) && !done.has(n)).sort()
 }
 
+/**
+ * What a sync does with a shared snapshot: load it, leave it for when the passphrase is entered, or
+ * pass over it for good (not a Hearth backup). Never a reason to stop the folder's own backups.
+ */
+export function sharedAction(
+  header: Header | null,
+  isBackup: boolean,
+  hasPassphrase: boolean,
+): 'load' | 'later' | 'ignore' {
+  if (!isBackup) return 'ignore'
+  return header?.encrypted && !hasPassphrase ? 'later' : 'load'
+}
+
 export const rotatedName = (base: string, n: number) => `${base}.${n}`
 
 /**

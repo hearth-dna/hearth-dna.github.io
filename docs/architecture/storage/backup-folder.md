@@ -35,7 +35,10 @@ No mobile browser can mount a folder, so there a backup is a file the user hands
   file there (Files → Google Drive → that folder); the computer, at its next sync, loads every
   `hearth-backup-<date>-<time>.hearth` it has not loaded yet (`sharedToLoad`, also with the " (1)"
   or " 2" Drive and Files add), and the backup after that writes them into `hearth-backup.hearth`.
-  Which ones it has loaded is remembered per browser (`Saved.loadedShared`); the files stay. Back on
+  Which ones it has loaded is remembered per browser (`Saved.loadedShared`); the files stay. One
+  the passphrase here does not open is named on the card and tried again when the passphrase
+  changes; it never stops the folder's own backups. A phone that loads an unencrypted backup with
+  no passphrase set shares unencrypted from then on, as a computer follows its folder. Back on
   the phone, *Load backup* on `hearth-backup.hearth` brings in the computer's changes. Its genomes
   sit in `genomes/`, out of reach of a picker that selects in one folder, so the first load on a
   phone without DNA takes `hearth-phone-copy.hearth` or a .zip of the folder instead; after that

@@ -6,6 +6,7 @@ import {
   hasNewer,
   phoneCopyName,
   rotationPlan,
+  sharedAction,
   sharedName,
   sharedToLoad,
   spareNames,
@@ -45,6 +46,15 @@ describe('backup naming', () => {
       'hearth-backup-2026-09-29-1402.hearth',
     ])
     expect(sharedToLoad(names, 'kids', [])).toEqual(['hearth-backup-kids-2026-09-30-0800.hearth'])
+  })
+
+  it('leaves a shared snapshot it cannot open for later, and passes over what is not a backup', () => {
+    const plain = { ...header('phone', 3), encrypted: false }
+    expect(sharedAction(header('phone', 3), true, false)).toBe('later')
+    expect(sharedAction(header('phone', 3), true, true)).toBe('load')
+    expect(sharedAction(plain, true, false)).toBe('load')
+    expect(sharedAction(null, true, false)).toBe('load')
+    expect(sharedAction(null, false, true)).toBe('ignore')
   })
 
   it('stamps shared snapshots with the local time', () => {

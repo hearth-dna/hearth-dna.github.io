@@ -157,6 +157,9 @@ export function BackupCard() {
               })}
             </p>
           )}
+          {status.state === 'ready' && status.unopened.length > 0 && (
+            <p className="notice">{t('backupCard.notOpened', { files: status.unopened.join(', ') })}</p>
+          )}
           {activity && (
             <p className="activity" role="status" aria-live="polite">
               <span className="spinner" aria-hidden="true" /> {activity}

@@ -22,6 +22,7 @@ import {
   hasNewer,
   phoneCopyName,
   type Seen,
+  sharedAction,
   sharedName,
   sharedToLoad,
   spareNames,
@@ -91,6 +92,8 @@ export type Status =
       attachmentsMissing: number
       /** People whose genome file the last loaded snapshot and its spares all lacked. */
       missing: Missing
+      /** Snapshots a phone shared into the folder that the passphrase here does not open. */
+      unopened: string[]
     }
   | { state: 'writing'; name: string; step: 'loading' | 'building' | 'writing' | 'attachments' }
   | { state: 'error'; name: string; message: string }
@@ -125,6 +128,8 @@ class Backups {
   private busy = false
   private missing: Missing = []
   private elsewhere: Elsewhere[] = []
+  /** Shared snapshots this passphrase did not open; tried again once it changes. */
+  private sharedLater: string[] = []
   /** Set when the browser has no folder picker; see the `manual` status. */
   private shared: folder.Shared | null = null
   private built: { name: string; bytes: Uint8Array; seen: Seen } | null = null
@@ -211,6 +216,7 @@ class Backups {
   /** Kept for the tab's session only. */
   setPassphrase(p: string): void {
     this.built = null
+    this.sharedLater = []
     try {
       if (p) sessionStorage.setItem(PASS_KEY(this.profile), p)
       else sessionStorage.removeItem(PASS_KEY(this.profile))
@@ -244,10 +250,9 @@ class Backups {
       return this.set({ state: 'reconnect', name })
     const device = (await getMeta(this.db, 'device')) ?? ''
     let current: Awaited<ReturnType<typeof folder.currentHeader>>
-    let shared: Awaited<ReturnType<typeof folder.currentHeader>>[]
     try {
-      ;[current, shared] = await withTimeout(
-        Promise.all([folder.currentHeader(this.dir, baseName(this.profile)), this.sharedHeaders()]),
+      current = await withTimeout(
+        folder.currentHeader(this.dir, baseName(this.profile)),
         FOLDER_TIMEOUT_MS,
         name,
       )
@@ -261,10 +266,13 @@ class Backups {
       this.saved.plain = true
       await folder.save(this.profile, this.saved)
     }
-    const newer = hasNewer(current, device, this.saved.lastSeen) || shared.length > 0
-    if (newer && [current, ...shared].some((h) => h?.encrypted) && !this.passphrase())
+    const newer = hasNewer(current, device, this.saved.lastSeen)
+    if (newer && current?.encrypted && !this.passphrase())
       return this.set({ state: 'needs-passphrase', name })
-    if (newer) {
+    // A phone's snapshot waiting in the folder is read in the same sync; one it cannot open is left
+    // for later and never holds up the folder's own backups.
+    const shared = await withTimeout(this.sharedNames(), FOLDER_TIMEOUT_MS, name).catch(() => [])
+    if (newer || shared.length) {
       // Newer data wins, without asking: pull it in, then write the union back when there is
       // anything of ours to add.
       if (!this.busy) void this.sync()
@@ -285,6 +293,7 @@ class Backups {
       attachmentsPending: Math.max(0, blobs - (this.saved.mirrored ?? 0)),
       attachmentsMissing: (await missingLocally(this.db)).length,
       missing: this.missing,
+      unopened: this.sharedLater,
     })
     // Changes made while the folder was unreachable (or before a reload) go out without waiting
     // for the next edit.
@@ -571,12 +580,8 @@ class Backups {
   /** Snapshots phones shared into the folder that this browser has not loaded yet. */
   private async sharedNames(): Promise<string[]> {
     if (!this.saved) return []
-    return sharedToLoad(await this.dir.names(), this.profile, this.saved.loadedShared ?? [])
-  }
-
-  private async sharedHeaders() {
-    const dir = this.dir
-    return Promise.all((await this.sharedNames()).map((n) => folder.currentHeader(dir, n)))
+    const done = [...(this.saved.loadedShared ?? []), ...this.sharedLater]
+    return sharedToLoad(await this.dir.names(), this.profile, done)
   }
 
   /**
@@ -592,12 +597,18 @@ class Backups {
       const bytes = await dir.read(n)
       // Unreadable for now (the drive is still fetching it): the next sync tries again.
       if (!bytes) continue
-      // Not a Hearth file after all: nothing to load, and nothing to look at again.
-      if (isDumpFile(bytes)) {
+      const action = sharedAction(readHeader(bytes), isDumpFile(bytes), !!pass)
+      if (action === 'later') {
+        this.sharedLater.push(n)
+        continue
+      }
+      if (action === 'load') {
         try {
           await restoreBytes(this.db, bytes, pass, onProgress)
-        } catch (e) {
-          throw new Error(`${n}: ${e instanceof Error ? e.message : String(e)}`)
+        } catch {
+          // Sealed with another passphrase, or damaged: shown on the card, tried again later.
+          this.sharedLater.push(n)
+          continue
         }
       }
       const have = new Set(await dir.names())
@@ -692,6 +703,17 @@ class Backups {
         out.exportedAt = r.exportedAt
         missing.push(...r.missing)
         elsewhere = [...elsewhere.filter((x) => !r.elsewhere.some((y) => same(x, y))), ...r.elsewhere]
+      }
+      // Follow the folder, as a computer does: with no passphrase here and an unencrypted backup
+      // loaded, the next one shared stays unencrypted, so the computer can read it back.
+      if (
+        this.shared &&
+        !passphrase &&
+        !this.shared.plain &&
+        dumps.some((d) => readHeader(d.bytes)?.encrypted === false)
+      ) {
+        this.shared.plain = true
+        await folder.saveShared(this.profile, this.shared)
       }
       const genomes = await readPickedGenomes(
         rest.map((f) => f.bytes),
