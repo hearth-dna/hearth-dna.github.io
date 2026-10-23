@@ -1,0 +1,33 @@
+.github/workflows/android-release.yml
+  s_b5b7f997588654::t_a66c1c51adb237 102,104
+.github/workflows/ios-release.yml
+  s_b5b7f997588654::t_af8a0c4f57b5fb 118
+Makefile
+  s_b5b7f997588654::t_37313e6c90cf6d 6-11,18,160-162,181-201,208-218,220-243,247-249,313-318,321-335,337-350,421-422,426-429,434,437-451
+docs/runbook/store-release.md
+  s_b5b7f997588654::t_27f16a5b0bcb27 37,39-42,45-47,75,79-82,131-143
+mobile/README.md
+  s_b5b7f997588654::t_e47df3f751648f 31-33,47,49-57,60-61
+mobile/fastlane/Fastfile
+  s_b5b7f997588654::t_2a09341f0ddc54 49-108
+mobile/scripts/ios-simulator.sh
+  s_b5b7f997588654::t_0521ad2b5c11ad 1-91
+mobile/scripts/version.sh
+  s_b5b7f997588654::t_59ba8ee3c5b121 1-82
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "99adf844088c0a7c86311141e7c9820fa67a87c6",
+  "prompts": {},
+  "sessions": {
+    "s_b5b7f997588654": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "07010a7a-d45b-44fb-a387-c471ca07ccfc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Vladimir Bloshchitcyn <vladimir.bloshchitcyn@deliveryhero.com>"
+    }
+  }
+}
