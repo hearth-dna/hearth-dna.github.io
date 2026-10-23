@@ -868,7 +868,7 @@
   "quickSymptom.severity": "严重程度",
   "charts.group.symptom": "症状",
   "backupCard.titleManual": "备份",
-  "backupCard.introManual": "此浏览器无法保持文件夹同步，因此备份是文件。<b>备份</b>会生成加密快照并打开共享菜单：用“文件”或 Google 云端硬盘把它保存到电脑使用的备份文件夹，电脑会在下次同步时把它加进去。<b>载入备份</b>会打开已保存的文件并添加其中的内容。Hearth 本身不会发送任何内容。",
+  "backupCard.introManual": "此浏览器无法保持文件夹同步，因此备份是文件。<b>备份</b>会生成加密快照并打开共享菜单：用“文件”或 Google 云端硬盘把它保存到电脑使用的备份文件夹。所有设备读写同一个文件，电脑会在下次同步时加入手机上的更改。<b>载入备份</b>会打开已保存的文件并添加其中的内容。Hearth 本身不会发送任何内容。",
   "backupCard.downloadOnly": "此浏览器只能下载该文件。请通过云端硬盘应用将其上传到 Google 云端硬盘，或存放在安全的地方。",
   "backupCard.lastShared": "上次备份：{time}。",
   "backupCard.neverShared": "此设备尚无备份。",
@@ -1020,7 +1020,7 @@
   "backupCard.dnaFrom": "来自 {file} 的 {name} 的 DNA。",
   "backupCard.notUsed": "未使用：{files}。此浏览器中没有人拥有此 DNA：请在“加载备份”中将这些文件与备份文件一起选择。",
   "backupCard.notOpened": "无法用此密码打开 {files}。请输入备份文件夹的密码。",
-  "backupCard.oneFileHint": "要从电脑获取全部内容（包括 DNA），请在其备份文件夹中选择 hearth-phone-copy.hearth。电脑会持续更新这一个文件，最多落后几分钟。",
+  "backupCard.oneFileHint": "要获取电脑上的最新更改，请在其备份文件夹中选择 {file}。第一次、这部手机还没有 DNA 时，请同时选上 {copy}：电脑把 DNA 放在那里，最多落后几分钟。",
   "repair.title": "此浏览器中的数据已损坏",
   "repair.intro": "此设备上的数据库文件已损坏。当手机在保存过程中关闭应用时（例如加载大型基因组时）会发生这种情况。修复会保留所有仍可读取的内容（人员、健康记录、文档、设置），用此设备上保存的基因组文件重建 DNA，并启用一个干净的数据库。仍缺少的内容可通过加载备份找回。",
   "repair.button": "修复",
@@ -1034,5 +1034,7 @@
   "settingsPage.dbIntact": "数据库完好。",
   "native.pickGenomes": "请在“恢复备份…”中同时选择 genomes 文件夹里的所有文件和备份文件，或在“加载 DNA 文件…”中单独选择这些文件。",
   "native.notUsed": "未使用：{files}。这部手机上没有人拥有这份 DNA：请在“恢复备份…”中同时选择这些文件和备份文件。",
-  "native.repairTitle": "这部手机上的数据已损坏"
+  "native.repairTitle": "这部手机上的数据已损坏",
+  "backupCard.fileName": "备份文件名",
+  "backupCard.fileNameHint": "共享此文件夹的每台设备上都相同：它们都读写这一个文件。"
 }

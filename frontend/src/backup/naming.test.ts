@@ -3,6 +3,7 @@ import type { Header } from '../export/container'
 import {
   attachmentsDirName,
   baseName,
+  fileName,
   hasNewer,
   PHONE_COPY_MAX_MS,
   PHONE_COPY_QUIET_MS,
@@ -12,7 +13,6 @@ import {
   sharedAction,
   sharedFiles,
   sharedKey,
-  sharedName,
   spareNames,
 } from './naming'
 
@@ -31,29 +31,45 @@ describe('backup naming', () => {
     expect(baseName('kids')).toBe('hearth-backup-kids.hearth')
   })
 
-  it('finds the snapshots a phone shared into the folder, older names and kept copies too', () => {
+  it('names the backup file per profile unless the user chose a name', () => {
+    expect(fileName('default')).toBe('hearth-backup.hearth')
+    expect(fileName('kids', '  ')).toBe('hearth-backup-kids.hearth')
+    expect(fileName('default', 'family')).toBe('family.hearth')
+    expect(fileName('default', 'family.hearth')).toBe('family.hearth')
+    expect(fileName('default', 'a/b')).toBe('hearth-backup.hearth')
+  })
+
+  it('finds the copies other devices saved beside the backup, and older phone names', () => {
     const names = [
       'hearth-backup.hearth',
       'hearth-backup.hearth.1',
+      'hearth-backup (1).hearth',
+      'hearth-backup 2.hearth',
       'hearth-phone.hearth',
       'hearth-phone 2.hearth',
-      'hearth-phone (1).hearth',
       'hearth-phone-kids.hearth',
       'hearth-backup-2026-09-29-1402.hearth',
+      'hearth-backup-kids.hearth',
+      'hearth-backup-kids (1).hearth',
       'hearth-backup-kids-2026-09-30-0800.hearth',
       'hearth-phone-copy.hearth',
       'genomes',
       'README.txt',
     ]
-    expect(sharedFiles(names, 'default')).toEqual([
+    expect(sharedFiles(names, 'hearth-backup.hearth', 'default')).toEqual([
+      'hearth-backup (1).hearth',
+      'hearth-backup 2.hearth',
       'hearth-backup-2026-09-29-1402.hearth',
-      'hearth-phone (1).hearth',
       'hearth-phone 2.hearth',
       'hearth-phone.hearth',
     ])
-    expect(sharedFiles(names, 'kids')).toEqual([
+    expect(sharedFiles(names, 'hearth-backup-kids.hearth', 'kids')).toEqual([
+      'hearth-backup-kids (1).hearth',
       'hearth-backup-kids-2026-09-30-0800.hearth',
       'hearth-phone-kids.hearth',
+    ])
+    expect(sharedFiles(['family.hearth', 'family (1).hearth'], 'family.hearth', 'default')).toEqual([
+      'family (1).hearth',
     ])
   })
 
@@ -80,11 +96,6 @@ describe('backup naming', () => {
     expect(phoneCopyDelay(8, 7, 1000, 5000)).toBe(PHONE_COPY_QUIET_MS)
     expect(phoneCopyDelay(8, 7, 0, PHONE_COPY_MAX_MS - 10_000)).toBe(10_000)
     expect(phoneCopyDelay(8, 7, 0, PHONE_COPY_MAX_MS + 5000)).toBe(0)
-  })
-
-  it('names shared snapshots the same every time, per profile', () => {
-    expect(sharedName('default')).toBe('hearth-phone.hearth')
-    expect(sharedName('kids')).toBe('hearth-phone-kids.hearth')
   })
 
   it('plans rotation oldest first and never beyond the keep count', () => {

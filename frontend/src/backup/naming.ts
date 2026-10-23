@@ -12,27 +12,32 @@ export function baseName(profile: string): string {
 }
 
 /**
- * A snapshot handed to the share sheet: `hearth-phone.hearth`, the same name every time, so saving
- * it over the last one in the folder replaces it. Never the folder snapshot's own name, which a
- * phone's copy must not overwrite.
+ * The backup file every device of a family reads and writes, phones included: `baseName` unless
+ * the user named it (Settings). A name without `.hearth` gets it; a path is not a name.
  */
-export const sharedName = (profile: string) =>
-  profile === 'default' ? 'hearth-phone.hearth' : `hearth-phone-${profile}.hearth`
+export function fileName(profile: string, chosen?: string): string {
+  const n = chosen?.trim() ?? ''
+  if (!n || /[/\\]/.test(n)) return baseName(profile)
+  return n.endsWith('.hearth') ? n : `${n}.hearth`
+}
 
 const literal = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
 /**
- * Snapshots a phone shared into this folder: `sharedName`, the timestamped names earlier versions
- * gave them (`hearth-backup-2026-09-29-1402.hearth`), and the " (1)" or " 2" Drive and Files add
- * when "keep both" is chosen. Sorted by name.
+ * Backups beside `base` that another device saved instead of replacing it: the " (1)" or " 2" a
+ * drive or Files adds when the name is taken, and the names earlier versions gave a phone's copy
+ * (`hearth-phone.hearth`, `hearth-backup-2026-09-29-1402.hearth`). Never `base` itself, its
+ * rotations, or the phone copy. Sorted by name.
  */
-export function sharedFiles(existing: string[], profile: string): string[] {
-  const copy = '( ?\\(?\\d+\\)?)?\\.hearth$'
-  const phone = new RegExp(`^${literal(sharedName(profile).replace(/\.hearth$/, ''))}${copy}`)
-  const stamped = new RegExp(
-    `^${literal(baseName(profile).replace(/\.hearth$/, ''))}-\\d{4}-\\d{2}-\\d{2}-\\d{4}${copy}`,
+export function sharedFiles(existing: string[], base: string, profile: string): string[] {
+  const stem = (n: string) => literal(n.replace(/\.hearth$/, ''))
+  const copy = new RegExp(`^${stem(base)}( \\(\\d+\\)| ?\\d+)\\.hearth$`)
+  const legacy = '( ?\\(?\\d+\\)?)?\\.hearth$'
+  const phone = new RegExp(
+    `^${profile === 'default' ? 'hearth-phone' : stem(`hearth-phone-${profile}.hearth`)}${legacy}`,
   )
-  return existing.filter((n) => phone.test(n) || stamped.test(n)).sort()
+  const stamped = new RegExp(`^${stem(baseName(profile))}-\\d{4}-\\d{2}-\\d{2}-\\d{4}${legacy}`)
+  return existing.filter((n) => n !== base && [copy, phone, stamped].some((r) => r.test(n))).sort()
 }
 
 /**
@@ -142,7 +147,9 @@ export const README = (url: string) =>
     'This folder is written by Hearth, a local-first family genome browser.',
     '',
     'hearth-backup*.hearth files are snapshots of everything in the app (people, genome files, health',
-    'log, notes). The newest is hearth-backup.hearth; .1, .2, ... are older copies. A file starting',
+    'log, notes). The newest is hearth-backup.hearth (or the name set in Settings, the same on every',
+    'device); .1, .2, ... are older copies. hearth-phone-copy.hearth has the DNA inside, for a phone.',
+    'Phones save their backup over the same file, or beside it as a copy. A file starting',
     'with "HRTH2" is encrypted with the passphrase set in Hearth; a file starting with "PK" is a',
     'plain zip and readable by anyone who has it.',
     '',

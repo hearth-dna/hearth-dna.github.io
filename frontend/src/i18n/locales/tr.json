@@ -868,7 +868,7 @@
   "quickSymptom.severity": "şiddet",
   "charts.group.symptom": "Belirtiler",
   "backupCard.titleManual": "Yedek",
-  "backupCard.introManual": "Bu tarayıcı bir klasörü eşitlenmiş tutamaz, bu yüzden yedekler dosyadır. <b>Yedekle</b> şifreli bir anlık görüntü oluşturur ve paylaşım menüsünü açar: Dosyalar veya Google Drive ile bilgisayarınızın kullandığı yedek klasörüne kaydedin; bilgisayar bir sonraki eşitlemede onu ekler. <b>Yedeği yükle</b> kayıtlı bir dosyayı açar ve içeriğini ekler. Hearth kendisi hiçbir şey göndermez.",
+  "backupCard.introManual": "Bu tarayıcı bir klasörü eşitlenmiş tutamaz, bu yüzden yedekler dosyadır. <b>Yedekle</b> şifreli bir anlık görüntü oluşturur ve paylaşım menüsünü açar: Dosyalar veya Google Drive ile bilgisayarınızın kullandığı yedek klasörüne kaydedin. Tüm cihazlar aynı dosyayı okuyup yazar; bilgisayar telefondaki değişiklikleri bir sonraki eşitlemede ekler. <b>Yedeği yükle</b> kayıtlı bir dosyayı açar ve içeriğini ekler. Hearth kendisi hiçbir şey göndermez.",
   "backupCard.downloadOnly": "Bu tarayıcı dosyayı yalnızca indirebilir. Drive uygulamasından Google Drive'a yükleyin veya güvenli bir yerde saklayın.",
   "backupCard.lastShared": "Son yedek: {time}.",
   "backupCard.neverShared": "Bu cihazdan henüz yedek yok.",
@@ -1020,7 +1020,7 @@
   "backupCard.dnaFrom": "{name} için DNA, {file} dosyasından.",
   "backupCard.notUsed": "Kullanılmadı: {files}. Bu tarayıcıda bu DNA'ya sahip kimse yok: bu dosyaları ‘Yedeği yükle’de yedek dosyasıyla birlikte seçin.",
   "backupCard.notOpened": "{files} bu parolayla açılamadı. Yedek klasörünün parolasını girin.",
-  "backupCard.oneFileHint": "DNA dahil bilgisayardaki her şeyi almak için yedek klasöründeki hearth-phone-copy.hearth dosyasını seçin. Bilgisayar bu tek dosyayı güncel tutar; en fazla birkaç dakika geriden gelir.",
+  "backupCard.oneFileHint": "Bilgisayarın en son değişikliklerini almak için yedek klasöründeki {file} dosyasını seçin. İlk seferde, bu telefonda henüz DNA yokken, onunla birlikte {copy} dosyasını da seçin: bilgisayar DNA'yı orada tutar, en fazla birkaç dakika geriden.",
   "repair.title": "Bu tarayıcıdaki veriler bozuk",
   "repair.intro": "Bu cihazdaki veritabanı dosyası bozuk. Bu, telefon uygulamayı kaydetmenin ortasında kapattığında olur; örneğin büyük bir genom yüklenirken. Onarım hâlâ okunabilen her şeyi (kişiler, sağlık günlüğü, belgeler, ayarlar) korur, DNA'yı bu cihazda tutulan genom dosyalarından yeniden oluşturur ve temiz bir veritabanı başlatır. Hâlâ eksik olan, yedeğinizi yükleyerek geri gelir.",
   "repair.button": "Onar",
@@ -1034,5 +1034,7 @@
   "settingsPage.dbIntact": "Veritabanı sağlam.",
   "native.pickGenomes": "genomes klasöründeki tüm dosyaları yedek dosyasıyla birlikte «Yedeği geri yükle…» içinde seçin ya da tek başına «DNA dosyalarını yükle…» içinde seçin.",
   "native.notUsed": "Kullanılmadı: {files}. Bu telefonda kimsede bu DNA yok: bu dosyaları yedek dosyasıyla birlikte «Yedeği geri yükle…» içinde seçin.",
-  "native.repairTitle": "Bu telefondaki veriler bozuk"
+  "native.repairTitle": "Bu telefondaki veriler bozuk",
+  "backupCard.fileName": "Yedek dosyasının adı",
+  "backupCard.fileNameHint": "Bu klasörü paylaşan her cihazda aynı: hepsi bu tek dosyayı okuyup yazar."
 }

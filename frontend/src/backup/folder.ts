@@ -57,6 +57,8 @@ export interface Saved {
   mirrored?: number
   /** The generation the phone copy in the folder holds, as this browser last wrote it. */
   phoneCopyGen?: number
+  /** The backup file's name when the user chose one (`fileName`). */
+  fileName?: string
   /** Snapshots phones shared into the folder that this browser has already loaded (`sharedKey`). */
   loadedShared?: string[]
 }
@@ -123,6 +125,8 @@ export interface Shared {
   lastSeen: Seen | null
   plain: boolean
   lastAt?: string
+  /** The backup file's name when the user chose one (`fileName`). */
+  fileName?: string
 }
 
 const sharedKey = (profile: string) => `${profile}:shared`

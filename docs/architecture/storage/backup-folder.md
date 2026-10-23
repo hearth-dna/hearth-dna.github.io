@@ -27,23 +27,29 @@ No mobile browser can mount a folder, so there a backup is a file the user hands
 
 - **Back up…** builds the same snapshot (same passphrase rule, same envelope) and opens the system
   share sheet with it (`navigator.share({ files })`), where the user picks Google Drive, Files →
-  Google Drive, or any other app. The name is always `hearth-phone.hearth` (`sharedName`), so
-  saving it into the same folder replaces the last one (Files asks Replace or Keep Both).
+  Google Drive, or any other app. The name is the folder's own, `hearth-backup.hearth` (`fileName`;
+  the card lets the user rename it, and every device must then use the same name), so every
+  device reads and writes one file.
 - **Load backup…** is a file input without `accept` (iOS greys out unknown extensions); the
   system picker browses Drive. Loading is the same union-by-id restore as Import dump.
-- **The round trip with a computer** goes through the computer's backup folder. A phone saves its
-  file there (Files → Google Drive → that folder); the computer, at its next sync, loads every
-  phone snapshot it has not loaded yet (`sharedFiles`: `hearth-phone.hearth`, the copies "Keep
-  Both" makes, and the timestamped names earlier versions used), and the backup after that writes
-  them into `hearth-backup.hearth`. What it has loaded is remembered per browser by name, device
-  and generation (`sharedKey` in `Saved.loadedShared`), so a newer file under the same name is
-  loaded again; the files stay. One
-  the passphrase here does not open is named on the card and tried again when the passphrase
-  changes; it never stops the folder's own backups. A phone that loads an unencrypted backup with
-  no passphrase set shares unencrypted from then on, as a computer follows its folder. Back on
-  the phone, *Load backup* on `hearth-phone-copy.hearth` brings in everything, DNA included, in
-  one pick (see below). A phone browser cannot do this by itself: it holds no folder access
-  between visits, so each direction takes a tap.
+- **The round trip with a computer** goes through that one file. A phone saves its snapshot over
+  it (Files → Google Drive → the computer's folder); the computer, at its next sync, sees a header
+  from another device and loads it like any newer snapshot, and its next backup writes the union
+  back. Replacing the file loses nothing that still lives on a device that syncs again, because
+  every load is a union by id and every device writes back after loading; Drive's version history
+  covers the rest. Where the drive keeps both instead (Google Drive allows two files of one name,
+  shown as `hearth-backup (1).hearth`), the computer also loads the copies beside it
+  (`sharedFiles`, with the `hearth-phone.hearth` and timestamped names earlier versions wrote),
+  remembering by name, device and generation which it has loaded (`sharedKey` in
+  `Saved.loadedShared`); the files stay. One the passphrase here does not open is named on the
+  card and tried again when the passphrase changes; it never stops the folder's own backups. A
+  phone file sealed with a passphrase in an unencrypted folder asks for it on the computer, whose
+  passphrase box stays open for that. A phone that loads an unencrypted backup with no passphrase
+  set shares unencrypted from then on, as a computer follows its folder (and a computer follows a
+  plaintext file a phone saved). Back on the phone, *Load backup* on `hearth-backup.hearth`
+  brings in the computer's changes; the first time, while the phone has no DNA, it selects
+  `hearth-phone-copy.hearth` with it (see below). A phone browser cannot do this by itself: it
+  holds no folder access between visits, so each direction takes a tap.
 - The header button tracks whether anything changed since the last backup file ("Back up" /
   "Backed up 14:02") and makes a new one on click. There is no autosave: sharing needs a tap.
 - Where files cannot be shared the file is downloaded instead, with a hint to upload it from the
