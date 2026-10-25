@@ -1,0 +1,145 @@
+.gitignore
+  s_b5b7f997588654::t_b6590008c118b8 84-86
+CLAUDE.md
+  s_b5b7f997588654::t_7b82b47593d7ff 38-41
+Makefile
+  s_b5b7f997588654::t_355528363eed14 10,251-258
+docs/architecture/storage/cloud-drives.md
+  s_b5b7f997588654::t_03920548f093df 15-16
+docs/decisions/0006-native-shells-around-the-pwa.md
+  s_b5b7f997588654::t_55bc2b83986046 37
+docs/decisions/0007-native-screens-over-the-web-engine.md
+  s_b5b7f997588654::t_facecb0656dbe0 1-62
+docs/decisions/0008-ios-backup-folder-through-the-files-app.md
+  s_b5b7f997588654::t_0f613fb4364338 1-43
+frontend/index.html
+  s_b5b7f997588654::t_911b83aad9d749 5
+frontend/src/App.tsx
+  s_b5b7f997588654::t_e2a3a90d9d60ae 24,44-47
+frontend/src/backup/folder.test.ts
+  s_b5b7f997588654::t_2b1320f7db13ca 1-124
+frontend/src/backup/folder.ts
+  s_b5b7f997588654::t_6907497e8fbe13 5-10,25-36,38,41-44,97-109,116-119,121-149,151-152,154-162,166-170,172-216,220-221,223-224,233,240,245,247-248,250-251,254,257,259,265
+frontend/src/backup/look.ts
+  s_b5b7f997588654::t_4cea17a5826887 1-67
+frontend/src/backup/scheduler.ts
+  s_b5b7f997588654::t_1ba25c303d1dd5 86,138,145,182-188,190,196-197,252,263,266,269,285,293
+frontend/src/components/HealthEntryForm.tsx
+  s_b5b7f997588654::t_65ac43fa4cb8db 7
+frontend/src/components/InheritanceTree.tsx
+  s_b5b7f997588654::t_2b3d96bac4b335 3,6,20-35
+frontend/src/components/SettingsPage.tsx
+  s_b5b7f997588654::t_c1d3421d3515e3 3,98-99
+frontend/src/components/SyncButton.tsx
+  s_b5b7f997588654::t_e134a8a0e3d0b6 2,20
+frontend/src/family/inheritance.ts
+  s_b5b7f997588654::t_c9e9c404fc8fcc 87-125
+frontend/src/health/presets.ts
+  s_b5b7f997588654::t_e928f443182297 110-124
+frontend/src/i18n/en/app.json
+  s_b5b7f997588654::t_db56d1bf88542a 13-15
+frontend/src/i18n/en/common.json
+  s_b5b7f997588654::t_e33a1417490b72 9-11
+frontend/src/i18n/en/personPage.json
+  s_b5b7f997588654::t_3d803dbd9c2971 13,23-27
+frontend/src/i18n/locales/de.json
+  s_b5b7f997588654::t_9c902e33921fe7 13-15,109-110,349,360-363
+frontend/src/i18n/locales/es.json
+  s_b5b7f997588654::t_536f130282f0dc 13-15,109-110,349,360-363
+frontend/src/i18n/locales/fr.json
+  s_b5b7f997588654::t_01ba426916d80f 13-15,109-110,349,360-363
+frontend/src/i18n/locales/it.json
+  s_b5b7f997588654::t_390b4f380770fe 13-15,109-110,349,360-363
+frontend/src/i18n/locales/ja.json
+  s_b5b7f997588654::t_f730e76fd2df7c 13-15,109-110,349,360-363
+frontend/src/i18n/locales/ko.json
+  s_b5b7f997588654::t_1019b3dd71928b 13-15,109-110,349,360-363
+frontend/src/i18n/locales/nl.json
+  s_b5b7f997588654::t_e7ded3857d90e1 13-15,109-110,349,360-363
+frontend/src/i18n/locales/pl.json
+  s_b5b7f997588654::t_396d24afc80546 13-15,109-110,349,360-363
+frontend/src/i18n/locales/pt.json
+  s_b5b7f997588654::t_d5a977549c4e16 13-15,109-110,349,360-363
+frontend/src/i18n/locales/ru.json
+  s_b5b7f997588654::t_b383dd62598273 13-15,109-110,349,360-363
+frontend/src/i18n/locales/tr.json
+  s_b5b7f997588654::t_826d107e65cb3e 13-15,109-110,349,360-363
+frontend/src/i18n/locales/uk.json
+  s_b5b7f997588654::t_6060749c61b10e 13-15,109-110,349,360-363
+frontend/src/i18n/locales/zh.json
+  s_b5b7f997588654::t_937498d1ec7898 13-15,109-110,349,360-363
+frontend/src/native/bridge.test.ts
+  s_b5b7f997588654::t_9397e3545b06f6 1-182
+frontend/src/native/bridge.ts
+  s_b5b7f997588654::t_5af295bc087328 1-602
+frontend/src/native/useNativeBridge.ts
+  s_b5b7f997588654::t_a7f828c2e2e227 1-46
+frontend/src/styles.css
+  s_b5b7f997588654::t_334b9de625dc2b 10-13,15-21,28-33,118-129
+mobile/README.md
+  s_b5b7f997588654::t_3bb93df317a189 3-14,25,27,29-30,42-44
+mobile/ios/Hearth/Bridge.swift
+  s_b5b7f997588654::t_8d536ad4a62059 1-259
+mobile/ios/Hearth/CloudFolder.swift
+  s_b5b7f997588654::t_8802351ba2793d 1-189
+mobile/ios/Hearth/Engine.swift
+  s_b5b7f997588654::t_8f6bf2c0a43b81 1-182
+mobile/ios/Hearth/FindingsView.swift
+  s_b5b7f997588654::t_cd03c55913b4ea 1-242
+mobile/ios/Hearth/HealthView.swift
+  s_b5b7f997588654::t_d8c12a447cd1d1 1-396
+mobile/ios/Hearth/HearthApp.swift
+  s_b5b7f997588654::t_e17ac5a0082b6c 12,15-16,38-39
+mobile/ios/Hearth/ImportSheet.swift
+  s_b5b7f997588654::t_fc16f84a249c2a 1-178
+mobile/ios/Hearth/Keychain.swift
+  s_b5b7f997588654::t_1fc76d5d481f91 1-31
+mobile/ios/Hearth/Listing.swift
+  s_b5b7f997588654::t_7c88b1de1611f7 1-165
+mobile/ios/Hearth/LocalWebServer.swift
+  s_b5b7f997588654::t_23b77a584465dc 35-36
+mobile/ios/Hearth/Pedigree.swift
+  s_b5b7f997588654::t_86cb19747ec0e0 1-86
+mobile/ios/Hearth/PeopleView.swift
+  s_b5b7f997588654::t_5b26444622f62b 1-371
+mobile/ios/Hearth/PersonView.swift
+  s_b5b7f997588654::t_e19f73a22eece9 1-283
+mobile/ios/Hearth/Resources/Assets.xcassets/AccentColor.colorset/Contents.json
+  s_b5b7f997588654::t_95a954aae58560 1-38
+mobile/ios/Hearth/WebNavigator.swift
+  s_b5b7f997588654::t_d4facbca995e1a 4-9,11-13,15,17-18,21-25,27-36,38-43,45-46,48-54,56-62,64-80,82-85,87-92,94-96,98,100-110
+mobile/ios/HearthTests/BridgeTests.swift
+  s_b5b7f997588654::t_0b312459876f30 1-87
+mobile/ios/HearthTests/CloudFolderTests.swift
+  s_b5b7f997588654::t_24905ef75e8b0e 1-17
+mobile/ios/project.yml
+  s_b5b7f997588654::t_cf77b01b966914 90,101-118
+mobile/ios/Hearth/FamilyView.swift
+  s_b5b7f997588654::t_7267c4786d9005 1-251
+mobile/ios/Hearth/HealthEntryForm.swift
+  s_b5b7f997588654::t_dd208d28d20e0e 1-238
+mobile/ios/Hearth/RootView.swift
+  s_b5b7f997588654::t_2cbf8c794e1d84 1-86
+mobile/ios/Hearth/SettingsView.swift
+  s_b5b7f997588654::t_95f671fca2a34b 1-223
+mobile/ios/Hearth/WebSlotView.swift
+  s_b5b7f997588654::t_cf59b87267c534 1-33
+mobile/ios/HearthUITests/PeopleFlowTests.swift
+  s_b5b7f997588654::t_80b153ffb10fae 1-352
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "d4e54da3dc5630208a4670e7cb335832648a3d78",
+  "prompts": {},
+  "sessions": {
+    "s_b5b7f997588654": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "07010a7a-d45b-44fb-a387-c471ca07ccfc",
+        "model": "unknown"
+      },
+      "human_author": "Vladimir Bloshchitcyn <vladimir.bloshchitcyn@deliveryhero.com>"
+    }
+  }
+}
