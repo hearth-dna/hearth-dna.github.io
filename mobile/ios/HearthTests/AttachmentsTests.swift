@@ -74,7 +74,7 @@ final class AttachmentsTests: XCTestCase {
                 source: "", bodyPart: "", severity: nil, tags: [], value: 1, value2: nil, unit: "", createdAt: ""
             )
         }
-        let order = HealthPresets.measurementOrder([m("Weight"), m(" blood pressure "), m("Weight"), m("Grip")])
+        let order = HealthPresets.presetOrder([.measurement], [m("Weight"), m(" blood pressure "), m("Weight"), m("Grip")])
         XCTAssertEqual(order.prefix(2).map(\.id), ["weight", "blood-pressure"])
         XCTAssertEqual(order.count, HealthPresets.measurements.count)
     }

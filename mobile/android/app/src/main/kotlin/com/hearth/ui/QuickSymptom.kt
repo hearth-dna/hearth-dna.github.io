@@ -1,14 +1,12 @@
 package com.hearth.ui
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -29,8 +27,8 @@ import com.hearth.data.Person
 import com.hearth.data.Repo
 import com.hearth.health.findPreset
 import com.hearth.health.localDate
-import com.hearth.health.symptomOrder
-import com.hearth.health.symptomPreset
+import com.hearth.health.presetOf
+import com.hearth.health.presetOrder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -41,26 +39,33 @@ private const val NONE = ""
 private const val CUSTOM = "*"
 
 /**
- * One line for how someone feels right now (QuickSymptom.tsx): a runny nose, a cough, red eyes.
- * Pick the symptom (the ones this person already records come first) or type another, optionally
- * rate it and add a note, save. Date and time are now. The symptom's structured details and
- * anything else (another date, the side of the body) belong in the full form.
+ * One line for how someone feels right now (QuickSymptom.tsx) — a runny nose, a cough, red eyes —
+ * or for a treatment or checkup they had: teeth cleaning, an eye exam. Pick from both lists (the
+ * ones this person already records come first; the pick decides symptom or procedure) or type
+ * another and say which it is, optionally rate a symptom and add a note, save. Date and time are
+ * now. The symptom's structured details and anything else (another date, the side of the body)
+ * belong in the full form.
  */
 @Composable
 fun QuickSymptom(repo: Repo, persons: List<Person>, initialPerson: String, entries: List<HealthEntry>, onSaved: () -> Unit) {
     val t = LocalStrings.current
     val scope = rememberCoroutineScope()
     var personId by remember(initialPerson) { mutableStateOf(initialPerson) }
-    val order = remember(entries, personId) { symptomOrder(entries.filter { personId.isEmpty() || it.personId == personId }) }
+    val order = remember(entries, personId) {
+        presetOrder(listOf(HealthKind.SYMPTOM, HealthKind.PROCEDURE), entries.filter { personId.isEmpty() || it.personId == personId })
+    }
     var choice by remember { mutableStateOf(NONE) }
     var typed by remember { mutableStateOf("") }
+    // What typed text is saved as; a preset brings its own kind.
+    var custom by remember { mutableStateOf(HealthKind.SYMPTOM) }
     var severity by remember { mutableStateOf("") }
     var note by remember { mutableStateOf("") }
     var asking by remember { mutableStateOf(false) }
     var saved by remember { mutableStateOf<String?>(null) }
 
-    // A typed name that is a known symptom, or one of its synonyms, is saved as that preset.
-    val preset = if (choice == CUSTOM) symptomPreset(typed.trim()) else findPreset(choice)
+    // A typed name that is a known one, or one of its synonyms, is saved as that preset.
+    val preset = if (choice == CUSTOM) order.firstOrNull { presetOf(it.kind, typed) == it } else findPreset(choice)
+    val kind = preset?.kind ?: custom
     val finalTitle = preset?.title ?: if (choice == CUSTOM) typed.trim() else ""
     val shownName = preset?.let { t("preset.${it.id}") } ?: finalTitle
     val valid = personId.isNotEmpty() && finalTitle.isNotEmpty()
@@ -74,8 +79,8 @@ fun QuickSymptom(repo: Repo, persons: List<Person>, initialPerson: String, entri
         withContext(Dispatchers.IO) {
             repo.addHealthEntry(
                 NewHealthEntry(
-                    personId, localDate(), LocalTime.now().let { "%02d:%02d".format(it.hour, it.minute) }, HealthKind.SYMPTOM,
-                    finalTitle, note.trim(), preset?.bodyPart ?: "", severity.toIntOrNull(), preset?.tags ?: emptyList(), null, null, "",
+                    personId, localDate(), LocalTime.now().let { "%02d:%02d".format(it.hour, it.minute) }, kind,
+                    finalTitle, note.trim(), preset?.bodyPart ?: "", severity.toIntOrNull()?.takeIf { kind == HealthKind.SYMPTOM }, preset?.tags ?: emptyList(), null, null, "",
                 ),
             )
         }
@@ -87,28 +92,33 @@ fun QuickSymptom(repo: Repo, persons: List<Person>, initialPerson: String, entri
         onSaved()
     }
 
-    OutlinedCard(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
-        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(t("quickSymptom.label"), style = MaterialTheme.typography.titleSmall)
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                if (persons.size > 1) {
-                    Picker(t("healthPage.colPerson"), personId, listOf("" to t("healthForm.pickPerson")) + persons.map { it.id to it.displayName }, modifier = Modifier.weight(1f)) { personId = it }
-                }
-                Picker(t("quickSymptom.symptom"), choice, listOf(NONE to "—") + order.map { it.id to t("preset.${it.id}") } + (CUSTOM to t("quick.custom")), modifier = Modifier.weight(1f)) {
-                    choice = it
-                    typed = ""
-                }
+    QuickBar(t("quickSymptom.label")) {
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            if (persons.size > 1) {
+                Picker(t("healthPage.colPerson"), personId, listOf("" to t("healthForm.pickPerson")) + persons.map { it.id to it.displayName }, modifier = Modifier.weight(1f)) { personId = it }
             }
-            if (choice == CUSTOM) {
-                OutlinedTextField(typed, { typed = it }, placeholder = { Text(t("quickSymptom.placeholder")) }, singleLine = true, modifier = Modifier.fillMaxWidth())
+            Picker(t("quickSymptom.symptom"), choice, listOf(NONE to "—") + order.map { it.id to t("preset.${it.id}") } + (CUSTOM to t("quick.custom")), modifier = Modifier.weight(1f)) {
+                choice = it
+                typed = ""
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                Picker(t("healthLog.severity"), severity, listOf("" to "—") + (1..10).map { it.toString() to t("healthLog.outOfTen", "n" to it) }, modifier = Modifier.weight(1f)) { severity = it }
-                Button(enabled = valid, onClick = { save() }) { Text(t("quick.save")) }
-            }
-            OutlinedTextField(note, { note = it }, placeholder = { Text(t("quick.note")) }, singleLine = true, modifier = Modifier.fillMaxWidth())
-            saved?.let { Text(t("quick.saved", "what" to it), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary) }
         }
+        if (choice == CUSTOM) {
+            OutlinedTextField(typed, { typed = it }, placeholder = { Text(t("quickSymptom.placeholder")) }, singleLine = true, modifier = Modifier.fillMaxWidth())
+            if (preset == null) {
+                val kinds = listOf(HealthKind.SYMPTOM, HealthKind.PROCEDURE)
+                Picker(t("healthLog.kind"), custom.id, kinds.map { it.id to t("kind.${it.id}") }, modifier = Modifier.fillMaxWidth()) { id -> custom = kinds.first { it.id == id } }
+            }
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+            if (kind == HealthKind.SYMPTOM) {
+                Picker(t("healthLog.severity"), severity, listOf("" to "—") + (1..10).map { it.toString() to t("healthLog.outOfTen", "n" to it) }, modifier = Modifier.weight(1f)) { severity = it }
+            } else {
+                Spacer(Modifier.weight(1f))
+            }
+            Button(enabled = valid, onClick = { save() }) { Text(t("quick.save")) }
+        }
+        OutlinedTextField(note, { note = it }, placeholder = { Text(t("quick.note")) }, singleLine = true, modifier = Modifier.fillMaxWidth())
+        saved?.let { Text(t("quick.saved", "what" to it), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary) }
     }
 
     if (asking) {

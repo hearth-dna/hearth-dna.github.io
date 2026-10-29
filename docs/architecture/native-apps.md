@@ -42,8 +42,9 @@ in People (genome files) and Health (documents); Charts are not built yet (see "
 - **Lookup** (FamilyPage.tsx, opened from DNA): search the kb by gene, drug, condition or rsid;
   every person's genotype at it, and who inherited which allele (the pedigree with the allele on each
   line, risk alleles marked, ambiguous lines dashed, impossible ones red).
-- **Health**: the log below, plus a quick measurement row and a quick symptom row (the symptom,
-  an optional 1–10 rating and an optional note; no structured details, see below), attachments (kept in the app, viewed in
+- **Health**: the log below, plus a quick measurement row and a quick symptom row (a symptom or
+  a procedure such as teeth cleaning, an optional 1–10 rating for a symptom and an optional note; no structured details, see below),
+  both folded to their label until tapped, attachments (kept in the app, viewed in
   the app, never handed to another app) and **Read a document** with the user's own Gemini key
   (key in the Keystore / Keychain, the `read_document_byok` consent, a confirmation per send, a
   sharing-log row with metadata only; the reply is a draft for the add form).

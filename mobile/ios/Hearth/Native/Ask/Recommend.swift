@@ -55,7 +55,7 @@ enum Recommend {
         .labs: [(.lab, 10, 730), (.medication, 5, 365)],
         .symptoms: [(.symptom, 10, 90), (.measurement, 15, 30), (.medication, 5, 90), (.diagnosis, 3, 3650)],
         .family: [(.diagnosis, 5, 3650)],
-        .doctor: [(.symptom, 8, 60), (.diagnosis, 5, 3650), (.medication, 8, 365), (.lab, 5, 365)],
+        .doctor: [(.symptom, 8, 60), (.diagnosis, 5, 3650), (.medication, 8, 365), (.lab, 5, 365), (.procedure, 5, 730)],
         .report: [(.letter, 3, 365), (.imaging, 3, 365), (.diagnosis, 3, 3650)],
         .genetics: [],
     ]

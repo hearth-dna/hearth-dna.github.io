@@ -87,6 +87,9 @@ export type Status =
       /** This browser has changes the folder does not have yet. */
       dirty: boolean
       lastAt: string | null
+      /** The backup file in the folder, and when any device last wrote it (ISO; null: none yet). */
+      file: string
+      updatedAt: string | null
       /** Attached documents this browser has not copied to the folder yet. */
       attachmentsPending: number
       /** Attached documents this browser has a row for but not the bytes. */
@@ -326,6 +329,8 @@ class Backups {
       pending: this.timer !== null,
       dirty,
       lastAt: this.saved.lastAt ?? null,
+      file: this.file,
+      updatedAt: current?.exported_at ?? null,
       attachmentsPending: Math.max(0, blobs - (this.saved.mirrored ?? 0)),
       attachmentsMissing: (await missingLocally(this.db)).length,
       missing: this.missing,

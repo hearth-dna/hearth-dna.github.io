@@ -55,7 +55,11 @@ sealed interface Status {
     data object None : Status
     data class Reconnect(val name: String) : Status
     data class NeedsPassphrase(val name: String) : Status
-    data class Ready(val name: String, val pending: Boolean, val dirty: Boolean, val lastAt: String?, val attachmentsPending: Int, val attachmentsMissing: Int) : Status
+    /** [file] is the backup file in the place, [updatedAt] when any device last wrote it (null: none yet). */
+    data class Ready(
+        val name: String, val pending: Boolean, val dirty: Boolean, val lastAt: String?, val attachmentsPending: Int, val attachmentsMissing: Int,
+        val file: String, val updatedAt: String?,
+    ) : Status
     data class Writing(val name: String, val step: String) : Status
     data class Error(val name: String, val message: String) : Status
 }
@@ -209,7 +213,10 @@ class Backups(private val context: Context, private val repo: Repo, private val 
         val blobs = repo.sql.query("SELECT COUNT(DISTINCT sha256) AS n FROM attachment").first()["n"].let { (it as Number).toInt() }
         val have = repo.blobs.list().toSet()
         val missing = repo.sql.query("SELECT DISTINCT sha256 FROM attachment").count { Repo.attachmentBlobName(it["sha256"] as String) !in have }
-        _status.value = Status.Ready(name, timer != null, isDirty, saved?.lastAt, if (single) 0 else maxOf(0, blobs - (saved?.mirrored ?: 0)), missing)
+        _status.value = Status.Ready(
+            name, timer != null, isDirty, saved?.lastAt, if (single) 0 else maxOf(0, blobs - (saved?.mirrored ?: 0)), missing,
+            if (single) name else SNAPSHOT, current?.optString("exported_at")?.takeIf { it.isNotEmpty() },
+        )
         // Changes made while the place was unreachable go out without waiting for the next edit.
         if (isDirty && auto && timer == null && !lock.isLocked) request()
     }

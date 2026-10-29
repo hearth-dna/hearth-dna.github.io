@@ -116,6 +116,26 @@ val SYMPTOM_PRESETS = listOf(
     HealthPreset("tinnitus", "Ringing in the ears", HealthKind.SYMPTOM, bodyPart = "ears", synonyms = listOf("tinnitus", "buzzing in the ears", "шум в ушах", "звон в ушах", "шум у вухах", "дзвін у вухах", "ohrensausen", "ohrgeräusche", "zumbido de oídos", "acúfenos", "bourdonnements d'oreille", "acouphènes")),
 )
 
+/** Treatments and checkups done to the person: what happened, not how they felt. */
+val PROCEDURE_PRESETS = listOf(
+    HealthPreset("teeth-cleaning", "Teeth cleaning", HealthKind.PROCEDURE, bodyPart = "mouth", tags = listOf("dental"), synonyms = listOf("tooth cleaning", "dental cleaning", "scale and polish", "dental hygiene", "чистка зубов", "профессиональная чистка зубов", "чистка зубів", "професійна чистка зубів", "zahnreinigung", "professionelle zahnreinigung", "limpieza dental", "limpieza bucal", "détartrage", "nettoyage dentaire")),
+    HealthPreset("dental-checkup", "Dental checkup", HealthKind.PROCEDURE, bodyPart = "mouth", tags = listOf("dental"), synonyms = listOf("dentist visit", "dental exam", "осмотр у стоматолога", "визит к стоматологу", "огляд у стоматолога", "zahnkontrolle", "kontrolle beim zahnarzt", "revisión dental", "chequeo dental", "contrôle dentaire", "visite chez le dentiste")),
+    HealthPreset("dental-filling", "Dental filling", HealthKind.PROCEDURE, bodyPart = "mouth", tags = listOf("dental"), synonyms = listOf("filling", "tooth filling", "пломба", "пломбирование зуба", "пломбування зуба", "zahnfüllung", "füllung", "empaste", "obturación", "plombage", "obturation dentaire")),
+    HealthPreset("checkup", "General checkup", HealthKind.PROCEDURE, synonyms = listOf("check-up", "physical", "physical exam", "annual checkup", "medical checkup", "диспансеризация", "медосмотр", "профосмотр", "медогляд", "профілактичний огляд", "vorsorgeuntersuchung", "gesundheitscheck", "chequeo médico", "revisión médica", "bilan de santé", "examen médical")),
+    HealthPreset("eye-exam", "Eye exam", HealthKind.PROCEDURE, bodyPart = "eyes", synonyms = listOf("eye test", "vision test", "eye checkup", "проверка зрения", "осмотр у окулиста", "перевірка зору", "огляд в окуліста", "sehtest", "augenuntersuchung", "examen de la vista", "revisión ocular", "examen de la vue", "contrôle de la vue")),
+    HealthPreset("hearing-test", "Hearing test", HealthKind.PROCEDURE, bodyPart = "ears", synonyms = listOf("audiometry", "проверка слуха", "аудиометрия", "перевірка слуху", "аудіометрія", "hörtest", "prueba de audición", "audiometría", "test auditif", "audiométrie")),
+    HealthPreset("ear-cleaning", "Ear wax removal", HealthKind.PROCEDURE, bodyPart = "ears", synonyms = listOf("ear cleaning", "ear syringing", "earwax removal", "чистка ушей", "удаление серной пробки", "чистка вух", "видалення сірчаної пробки", "ohrenreinigung", "ohrenschmalzentfernung", "limpieza de oídos", "extracción de cerumen", "nettoyage des oreilles", "retrait du bouchon de cérumen")),
+    HealthPreset("skin-check", "Skin check", HealthKind.PROCEDURE, bodyPart = "skin", synonyms = listOf("mole check", "skin exam", "осмотр родинок", "осмотр у дерматолога", "огляд родимок", "огляд у дерматолога", "hautkrebsvorsorge", "hautcheck", "revisión de lunares", "revisión dermatológica", "contrôle des grains de beauté", "examen de la peau")),
+    HealthPreset("blood-test", "Blood test", HealthKind.PROCEDURE, synonyms = listOf("blood draw", "blood sample", "анализ крови", "забор крови", "аналіз крові", "забір крові", "blutabnahme", "blutentnahme", "análisis de sangre", "extracción de sangre", "prise de sang", "analyse de sang")),
+    HealthPreset("ecg", "ECG", HealthKind.PROCEDURE, bodyPart = "heart", synonyms = listOf("ekg", "electrocardiogram", "экг", "электрокардиограмма", "екг", "електрокардіограма", "elektrokardiogramm", "electrocardiograma", "électrocardiogramme")),
+    HealthPreset("mammogram", "Mammogram", HealthKind.PROCEDURE, bodyPart = "chest", tags = listOf("screening"), synonyms = listOf("mammography", "breast screening", "маммография", "мамографія", "mammographie", "mamografía")),
+    HealthPreset("pap-smear", "Cervical screening (Pap smear)", HealthKind.PROCEDURE, tags = listOf("screening"), synonyms = listOf("pap smear", "pap test", "smear test", "cervical smear", "мазок на цитологию", "пап-тест", "мазок на цитологію", "pap-abstrich", "krebsabstrich", "citología", "papanicolau", "frottis", "frottis cervical")),
+    HealthPreset("colonoscopy", "Colonoscopy", HealthKind.PROCEDURE, bodyPart = "abdomen", tags = listOf("screening"), synonyms = listOf("колоноскопия", "колоноскопія", "darmspiegelung", "koloskopie", "colonoscopia", "coloscopie")),
+    HealthPreset("physiotherapy", "Physiotherapy session", HealthKind.PROCEDURE, synonyms = listOf("physio", "physiotherapy", "physical therapy", "физиотерапия", "лфк", "фізіотерапія", "physiotherapie", "krankengymnastik", "fisioterapia", "kinésithérapie", "kiné")),
+    HealthPreset("massage", "Massage", HealthKind.PROCEDURE, bodyPart = "muscles", synonyms = listOf("massage therapy", "массаж", "масаж", "masaje")),
+    HealthPreset("blood-donation", "Blood donation", HealthKind.PROCEDURE, synonyms = listOf("donated blood", "донорство крови", "сдача крови", "донорство крові", "здача крові", "blutspende", "donación de sangre", "don du sang")),
+)
+
 val EVENT_PRESETS = listOf(
     HealthPreset("took-medication", "Took medication", HealthKind.MEDICATION),
     HealthPreset("vaccination", "Vaccination", HealthKind.MEDICATION, tags = listOf("vaccine")),
@@ -125,21 +145,27 @@ val EVENT_PRESETS = listOf(
     HealthPreset("fainting", "Fainting", HealthKind.SYMPTOM, bodyPart = "head", synonyms = listOf("fainted", "passed out", "syncope", "обморок", "потерял сознание", "потеряла сознание", "непритомність", "знепритомнів", "ohnmacht", "desmayo", "síncope", "évanouissement")),
 )
 
-private val ALL_PRESETS = MEASUREMENT_PRESETS + SYMPTOM_PRESETS + EVENT_PRESETS
+private val ALL_PRESETS = MEASUREMENT_PRESETS + SYMPTOM_PRESETS + PROCEDURE_PRESETS + EVENT_PRESETS
 
 fun findPreset(id: String): HealthPreset? = ALL_PRESETS.firstOrNull { it.id == id }
 
+/** The lists a quick bar offers, by the kind of entry it saves. */
+private val QUICK = mapOf(
+    HealthKind.MEASUREMENT to MEASUREMENT_PRESETS,
+    HealthKind.SYMPTOM to SYMPTOM_PRESETS,
+    HealthKind.PROCEDURE to PROCEDURE_PRESETS,
+)
+
 /**
- * The measurement presets with the ones this person already records first, in the order they
- * last used them (presets.ts `measurementOrder`); [entries] newest first.
+ * Presets of these kinds ordered for a quick bar (presets.ts `presetOrder`): the ones this person
+ * has recorded before first, most recently used first, then the rest in list order; [entries]
+ * newest first. An entry counts under any name it was saved with: "Cough", "кашель".
  */
-fun measurementOrder(entries: List<com.hearth.data.HealthEntry>): List<HealthPreset> {
+fun presetOrder(kinds: List<HealthKind>, entries: List<com.hearth.data.HealthEntry>): List<HealthPreset> {
+    val list = kinds.flatMap { QUICK.getValue(it) }
     val used = LinkedHashSet<HealthPreset>()
-    for (e in entries) {
-        if (e.kind != HealthKind.MEASUREMENT) continue
-        MEASUREMENT_PRESETS.firstOrNull { it.title.lowercase() == e.title.trim().lowercase() }?.let { used.add(it) }
-    }
-    return used.toList() + MEASUREMENT_PRESETS.filter { it !in used }
+    for (e in entries) presetOf(e.kind, e.title)?.takeIf { it in list }?.let { used.add(it) }
+    return used.toList() + list.filter { it !in used }
 }
 
 /** Presets that start an entry of this kind, in list order, for the chips above the form. */
@@ -168,23 +194,3 @@ fun presetOf(kind: HealthKind, title: String): HealthPreset? {
 /** An entry's title as the screen shows it: the preset's name in the UI language, else as saved. */
 fun entryTitle(e: com.hearth.data.HealthEntry, t: (String) -> String): String =
     presetOf(e.kind, e.title)?.let { t("preset.${it.id}") } ?: e.title
-
-/**
- * The symptom preset (not an event like injury or fainting) a saved title names, by its title or a
- * synonym (presets.ts `symptomPreset`).
- */
-fun symptomPreset(title: String): HealthPreset? = presetOf(HealthKind.SYMPTOM, title)?.takeIf { it in SYMPTOM_PRESETS }
-
-/**
- * The symptom presets with the ones this person already recorded first, most recent first, then the
- * rest in list order (presets.ts `presetOrder('symptom', …)`); [entries] newest first. An entry
- * counts under any name it was saved with: "Cough", "кашель".
- */
-fun symptomOrder(entries: List<com.hearth.data.HealthEntry>): List<HealthPreset> {
-    val used = LinkedHashSet<HealthPreset>()
-    for (e in entries) {
-        if (e.kind != HealthKind.SYMPTOM) continue
-        symptomPreset(e.title)?.let { used.add(it) }
-    }
-    return used.toList() + SYMPTOM_PRESETS.filter { it !in used }
-}

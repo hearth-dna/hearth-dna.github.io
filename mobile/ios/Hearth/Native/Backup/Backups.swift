@@ -44,7 +44,8 @@ enum BackupStatus: Equatable {
     case none
     case reconnect(String)
     case needsPassphrase(String)
-    case ready(name: String, pending: Bool, dirty: Bool, lastAt: String?, attachmentsPending: Int, attachmentsMissing: Int)
+    /// `file` is the backup file in the place, `updatedAt` when any device last wrote it (nil: none yet).
+    case ready(name: String, pending: Bool, dirty: Bool, lastAt: String?, attachmentsPending: Int, attachmentsMissing: Int, file: String, updatedAt: String?)
     case writing(name: String, step: String)
     case error(name: String, message: String)
 }
@@ -227,8 +228,11 @@ final class Backups: ObservableObject {
     }
 
     private func markReady(dirty: Bool, pending: Bool?) {
-        if case .ready(let name, let p, _, let lastAt, let a, let m) = status {
-            status = .ready(name: name, pending: pending ?? p, dirty: dirty, lastAt: lastAt, attachmentsPending: a, attachmentsMissing: m)
+        if case .ready(let name, let p, _, let lastAt, let a, let m, let file, let updatedAt) = status {
+            status = .ready(
+                name: name, pending: pending ?? p, dirty: dirty, lastAt: lastAt, attachmentsPending: a, attachmentsMissing: m,
+                file: file, updatedAt: updatedAt
+            )
         }
     }
 
@@ -354,7 +358,8 @@ final class Backups: ObservableObject {
         let pending = locked { timerPending }
         publish(.ready(
             name: name, pending: pending, dirty: dirty, lastAt: saved?.lastAt,
-            attachmentsPending: single ? 0 : max(0, documents.count - (saved?.mirrored ?? 0)), attachmentsMissing: missing
+            attachmentsPending: single ? 0 : max(0, documents.count - (saved?.mirrored ?? 0)), attachmentsMissing: missing,
+            file: single ? name : Backup.snapshot, updatedAt: current?.exportedAt
         ))
         // Changes made while the place was unreachable go out without waiting for the next edit.
         if dirty && auto && !pending { DispatchQueue.main.async { self.request() } }

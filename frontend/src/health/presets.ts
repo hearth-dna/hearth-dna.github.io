@@ -95,6 +95,14 @@ const s = (
   synonyms: SYNONYMS[id],
   ...(details ? { details } : {}),
 })
+const proc = (id: string, title: string, bodyPart = '', tags: string[] = []): HealthPreset => ({
+  id,
+  title,
+  kind: 'procedure',
+  bodyPart,
+  tags,
+  synonyms: SYNONYMS[id],
+})
 const choice = (id: string, options: string[]): DetailField => ({ id, kind: 'choice', options })
 const flag = (id: string): DetailField => ({ id, kind: 'flag' })
 const TIMES: DetailField = { id: 'times', kind: 'count' }
@@ -308,6 +316,26 @@ export const SYMPTOM_PRESETS: HealthPreset[] = [
   s('tinnitus', 'Ringing in the ears', 'ears'),
 ]
 
+/** Treatments and checkups done to the person: what happened, not how they felt. */
+export const PROCEDURE_PRESETS: HealthPreset[] = [
+  proc('teeth-cleaning', 'Teeth cleaning', 'mouth', ['dental']),
+  proc('dental-checkup', 'Dental checkup', 'mouth', ['dental']),
+  proc('dental-filling', 'Dental filling', 'mouth', ['dental']),
+  proc('checkup', 'General checkup'),
+  proc('eye-exam', 'Eye exam', 'eyes'),
+  proc('hearing-test', 'Hearing test', 'ears'),
+  proc('ear-cleaning', 'Ear wax removal', 'ears'),
+  proc('skin-check', 'Skin check', 'skin'),
+  proc('blood-test', 'Blood test'),
+  proc('ecg', 'ECG', 'heart'),
+  proc('mammogram', 'Mammogram', 'chest', ['screening']),
+  proc('pap-smear', 'Cervical screening (Pap smear)', '', ['screening']),
+  proc('colonoscopy', 'Colonoscopy', 'abdomen', ['screening']),
+  proc('physiotherapy', 'Physiotherapy session'),
+  proc('massage', 'Massage', 'muscles'),
+  proc('blood-donation', 'Blood donation'),
+]
+
 export const EVENT_PRESETS: HealthPreset[] = [
   { id: 'took-medication', title: 'Took medication', kind: 'medication' },
   { id: 'vaccination', title: 'Vaccination', kind: 'medication', tags: ['vaccine'] },
@@ -326,6 +354,7 @@ export const EVENT_PRESETS: HealthPreset[] = [
 export const PRESET_GROUPS: { label: string; labelKey: string; presets: HealthPreset[] }[] = [
   { label: 'Measurements', labelKey: 'preset.group.measurements', presets: MEASUREMENT_PRESETS },
   { label: 'Symptoms', labelKey: 'preset.group.symptoms', presets: SYMPTOM_PRESETS },
+  { label: 'Procedures', labelKey: 'preset.group.procedures', presets: PROCEDURE_PRESETS },
   { label: 'Events', labelKey: 'preset.group.events', presets: EVENT_PRESETS },
 ]
 
@@ -337,34 +366,32 @@ export function findPreset(id: string): HealthPreset | undefined {
   return undefined
 }
 
-const byTitle = (list: HealthPreset[], title: string) =>
-  list.find((x) => x.title.toLowerCase() === title.trim().toLowerCase())
-
-/** The measurement preset a saved entry was made from, by its title. */
-export const measurementPreset = (title: string): HealthPreset | undefined =>
-  byTitle(MEASUREMENT_PRESETS, title)
-
 /** The symptom preset a saved entry was made from, by its title or a synonym (older titles included). */
 export const symptomPreset = (title: string): HealthPreset | undefined => {
   const p = presetOf({ kind: 'symptom', title })
   return p && SYMPTOM_PRESETS.includes(p) ? p : undefined
 }
 
+/** The lists a quick bar offers, by the kind of entry it saves. */
+const QUICK: Record<'measurement' | 'symptom' | 'procedure', HealthPreset[]> = {
+  measurement: MEASUREMENT_PRESETS,
+  symptom: SYMPTOM_PRESETS,
+  procedure: PROCEDURE_PRESETS,
+}
+
 /**
- * Presets of one kind ordered for a quick bar: the ones this person has recorded before come
+ * Presets of these kinds ordered for a quick bar: the ones this person has recorded before come
  * first, most recently used first, then the rest in list order. `entries` must be newest first.
  */
 export function presetOrder(
-  kind: 'measurement' | 'symptom',
+  kinds: (keyof typeof QUICK)[],
   entries: { kind: string; title: string }[],
 ): HealthPreset[] {
-  const [list, find] =
-    kind === 'measurement' ? [MEASUREMENT_PRESETS, measurementPreset] : [SYMPTOM_PRESETS, symptomPreset]
+  const list = kinds.flatMap((k) => QUICK[k])
   const used: HealthPreset[] = []
   for (const e of entries) {
-    if (e.kind !== kind) continue
-    const p = find(e.title)
-    if (p && !used.includes(p)) used.push(p)
+    const p = presetOf(e)
+    if (p && list.includes(p) && !used.includes(p)) used.push(p)
   }
   return [...used, ...list.filter((p) => !used.includes(p))]
 }

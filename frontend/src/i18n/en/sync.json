@@ -13,7 +13,7 @@
   "sync.unsynced": "Not synced",
   "sync.unsyncedHint": "There are changes {name} does not have yet; click to sync now",
   "sync.synced": "Synced",
-  "sync.syncedAt": "Synced {time}",
+  "sync.fileUpdated": "{file} · updated {time}",
   "sync.syncedHint": "{name} has everything; click to sync again",
   "sync.backingUp": "Backing up…",
   "sync.shareReady": "Share backup",

@@ -62,7 +62,7 @@ private val HEALTH_PLAN: Map<QuestionType, List<Triple<HealthKind, Int, Long>>> 
     QuestionType.FAMILY to listOf(Triple(HealthKind.DIAGNOSIS, 5, 3650)),
     QuestionType.DOCTOR to listOf(
         Triple(HealthKind.SYMPTOM, 8, 60), Triple(HealthKind.DIAGNOSIS, 5, 3650),
-        Triple(HealthKind.MEDICATION, 8, 365), Triple(HealthKind.LAB, 5, 365),
+        Triple(HealthKind.MEDICATION, 8, 365), Triple(HealthKind.LAB, 5, 365), Triple(HealthKind.PROCEDURE, 5, 730),
     ),
     QuestionType.REPORT to listOf(Triple(HealthKind.LETTER, 3, 365), Triple(HealthKind.IMAGING, 3, 365), Triple(HealthKind.DIAGNOSIS, 3, 3650)),
     QuestionType.GENETICS to emptyList(),

@@ -15,13 +15,14 @@ class PresetsTest {
 
     private fun webIds(call: String) = Regex("""\b$call\(\s*'([a-z0-9-]+)'""").findAll(web).map { it.groupValues[1] }.toList()
 
-    @Test fun `has the web's measurement and symptom presets in the web's order`() {
+    @Test fun `has the web's measurement, symptom and procedure presets in the web's order`() {
         assertEquals(webIds("m"), MEASUREMENT_PRESETS.map { it.id })
         assertEquals(webIds("s"), SYMPTOM_PRESETS.map { it.id })
+        assertEquals(webIds("proc"), PROCEDURE_PRESETS.map { it.id })
     }
 
-    @Test fun `has the web's symptom synonyms`() {
-        for (p in SYMPTOM_PRESETS + EVENT_PRESETS.filter { it.kind == HealthKind.SYMPTOM }) {
+    @Test fun `has the web's symptom and procedure synonyms`() {
+        for (p in SYMPTOM_PRESETS + PROCEDURE_PRESETS + EVENT_PRESETS.filter { it.kind == HealthKind.SYMPTOM }) {
             val want = synonyms.optJSONArray(p.id)?.let { a -> (0 until a.length()).map { a.getString(it) } } ?: emptyList()
             assertEquals(p.id, want, p.synonyms)
         }
@@ -53,16 +54,16 @@ class PresetsTest {
     }
 
     @Test fun `orders the quick symptom list by what was recorded, under any name, events left out`() {
-        val all = SYMPTOM_PRESETS.map { it.id }
-        assertEquals(all, symptomOrder(emptyList()).map { it.id })
+        val kinds = listOf(HealthKind.SYMPTOM, HealthKind.PROCEDURE)
+        val all = (SYMPTOM_PRESETS + PROCEDURE_PRESETS).map { it.id }
+        assertEquals(all, presetOrder(kinds, emptyList()).map { it.id })
         // Newest first; a Russian title counts as the preset it names.
-        val order = symptomOrder(listOf(e(HealthKind.SYMPTOM, "кашель"), e(HealthKind.SYMPTOM, "Fever"), e(HealthKind.SYMPTOM, "Cough"))).map { it.id }
-        assertEquals(listOf("cough", "fever"), order.take(2))
+        val order = presetOrder(kinds, listOf(e(HealthKind.PROCEDURE, "чистка зубов"), e(HealthKind.SYMPTOM, "кашель"), e(HealthKind.SYMPTOM, "Fever"), e(HealthKind.SYMPTOM, "Cough"))).map { it.id }
+        assertEquals(listOf("teeth-cleaning", "cough", "fever"), order.take(3))
         assertEquals(all.sorted(), order.sorted())
         // Events, other kinds and unknown titles do not reorder it.
         val ignored = listOf(e(HealthKind.SYMPTOM, "Injury"), e(HealthKind.SYMPTOM, "Fainting"), e(HealthKind.MEASUREMENT, "Weight"), e(HealthKind.OTHER, "Headache"), e(HealthKind.SYMPTOM, "Knee clicks"))
-        assertEquals(all, symptomOrder(ignored).map { it.id })
-        assertNull(symptomPreset("Injury"))
-        assertEquals("headache", symptomPreset("  ГОЛОВНАЯ боль ")?.id)
+        assertEquals(all, presetOrder(kinds, ignored).map { it.id })
+        assertEquals("weight", presetOrder(listOf(HealthKind.MEASUREMENT), ignored).first().id)
     }
 }

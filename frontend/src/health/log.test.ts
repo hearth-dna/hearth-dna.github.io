@@ -119,16 +119,19 @@ describe('formatValue', () => {
 describe('presetOrder', () => {
   it('puts what the person records most recently first, then the rest', () => {
     const e = (kind: string, title: string) => ({ kind, title })
-    const order = presetOrder('measurement', [
-      e('measurement', 'Weight'),
-      e('symptom', 'Headache'),
-      e('measurement', ' height '),
-      e('measurement', 'Weight'),
-    ])
+    const order = presetOrder(
+      ['measurement'],
+      [
+        e('measurement', 'Weight'),
+        e('symptom', 'Headache'),
+        e('measurement', ' height '),
+        e('measurement', 'Weight'),
+      ],
+    )
     expect(order.slice(0, 2).map((p) => p.id)).toEqual(['weight', 'height'])
     expect(order.length).toBe(MEASUREMENT_PRESETS.length)
     expect(new Set(order.map((p) => p.id)).size).toBe(order.length)
-    expect(presetOrder('measurement', []).map((p) => p.id)).toEqual(MEASUREMENT_PRESETS.map((p) => p.id))
+    expect(presetOrder(['measurement'], []).map((p) => p.id)).toEqual(MEASUREMENT_PRESETS.map((p) => p.id))
   })
 })
 
@@ -326,7 +329,7 @@ describe('symptom details', () => {
       }
     }
     expect(symptomPreset('Eye irritation')?.id).toBe('eye-irritation')
-    expect(presetOrder('symptom', [{ kind: 'symptom', title: 'Cough' }])[0].id).toBe('cough')
+    expect(presetOrder(['symptom'], [{ kind: 'symptom', title: 'Cough' }])[0].id).toBe('cough')
   })
 })
 

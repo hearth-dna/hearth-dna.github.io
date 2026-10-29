@@ -1,16 +1,13 @@
 package com.hearth.ui
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -34,7 +31,7 @@ import com.hearth.data.Repo
 import com.hearth.health.findPreset
 import com.hearth.health.formatValue
 import com.hearth.health.localDate
-import com.hearth.health.measurementOrder
+import com.hearth.health.presetOrder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -54,7 +51,7 @@ fun QuickMeasurement(repo: Repo, persons: List<Person>, initialPerson: String, e
     val t = LocalStrings.current
     val scope = rememberCoroutineScope()
     var personId by remember(initialPerson) { mutableStateOf(initialPerson) }
-    val order = remember(entries, personId) { measurementOrder(entries.filter { personId.isEmpty() || it.personId == personId }) }
+    val order = remember(entries, personId) { presetOrder(listOf(HealthKind.MEASUREMENT), entries.filter { personId.isEmpty() || it.personId == personId }) }
     var presetId by remember { mutableStateOf(order.firstOrNull()?.id ?: CUSTOM) }
     var title by remember { mutableStateOf("") }
     var unit by remember { mutableStateOf("") }
@@ -93,45 +90,42 @@ fun QuickMeasurement(repo: Repo, persons: List<Person>, initialPerson: String, e
         onSaved()
     }
 
-    OutlinedCard(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
-        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(t("quick.label"), style = MaterialTheme.typography.titleSmall)
+    QuickBar(t("quick.label")) {
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            if (persons.size > 1) {
+                Picker(t("healthPage.colPerson"), personId, listOf("" to t("healthForm.pickPerson")) + persons.map { it.id to it.displayName }, modifier = Modifier.weight(1f)) { personId = it }
+            }
+            Picker(t("quick.parameter"), presetId, order.map { it.id to t("preset.${it.id}") } + (CUSTOM to t("quick.custom")), modifier = Modifier.weight(1f)) {
+                presetId = it
+                value = ""
+                value2 = ""
+            }
+        }
+        if (preset == null) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                if (persons.size > 1) {
-                    Picker(t("healthPage.colPerson"), personId, listOf("" to t("healthForm.pickPerson")) + persons.map { it.id to it.displayName }, modifier = Modifier.weight(1f)) { personId = it }
-                }
-                Picker(t("quick.parameter"), presetId, order.map { it.id to t("preset.${it.id}") } + (CUSTOM to t("quick.custom")), modifier = Modifier.weight(1f)) {
-                    presetId = it
-                    value = ""
-                    value2 = ""
-                }
+                OutlinedTextField(title, { title = it }, placeholder = { Text(t("quick.customPlaceholder")) }, singleLine = true, modifier = Modifier.weight(1f))
+                OutlinedTextField(unit, { unit = it }, placeholder = { Text(t("healthLog.unitPlaceholder")) }, singleLine = true, modifier = Modifier.weight(0.6f))
             }
-            if (preset == null) {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedTextField(title, { title = it }, placeholder = { Text(t("quick.customPlaceholder")) }, singleLine = true, modifier = Modifier.weight(1f))
-                    OutlinedTextField(unit, { unit = it }, placeholder = { Text(t("healthLog.unitPlaceholder")) }, singleLine = true, modifier = Modifier.weight(0.6f))
-                }
-            }
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                val keyboard = KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Done)
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+            val keyboard = KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Done)
+            OutlinedTextField(
+                value, { value = it },
+                placeholder = { Text(if (pair != null) t("preset.pair.${pair.first}") else t("healthLog.value")) },
+                singleLine = true, keyboardOptions = keyboard, keyboardActions = KeyboardActions(onDone = { save() }), modifier = Modifier.weight(1f),
+            )
+            if (pair != null) {
                 OutlinedTextField(
-                    value, { value = it },
-                    placeholder = { Text(if (pair != null) t("preset.pair.${pair.first}") else t("healthLog.value")) },
+                    value2, { value2 = it },
+                    placeholder = { Text(t("preset.pair.${pair.second}")) },
                     singleLine = true, keyboardOptions = keyboard, keyboardActions = KeyboardActions(onDone = { save() }), modifier = Modifier.weight(1f),
                 )
-                if (pair != null) {
-                    OutlinedTextField(
-                        value2, { value2 = it },
-                        placeholder = { Text(t("preset.pair.${pair.second}")) },
-                        singleLine = true, keyboardOptions = keyboard, keyboardActions = KeyboardActions(onDone = { save() }), modifier = Modifier.weight(1f),
-                    )
-                }
-                if (preset != null) Text(preset.unit, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Button(enabled = valid, onClick = { save() }) { Text(t("quick.save")) }
             }
-            OutlinedTextField(note, { note = it }, placeholder = { Text(t("quick.note")) }, singleLine = true, modifier = Modifier.fillMaxWidth())
-            saved?.let { Text(t("quick.saved", "what" to it), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary) }
+            if (preset != null) Text(preset.unit, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Button(enabled = valid, onClick = { save() }) { Text(t("quick.save")) }
         }
+        OutlinedTextField(note, { note = it }, placeholder = { Text(t("quick.note")) }, singleLine = true, modifier = Modifier.fillMaxWidth())
+        saved?.let { Text(t("quick.saved", "what" to it), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary) }
     }
 
     if (asking) {

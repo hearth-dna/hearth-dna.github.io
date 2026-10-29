@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { type HealthPreset, presetNamed, presetOrder, searchPresets } from './presets'
 
-const symptoms = presetOrder('symptom', [])
-const measurements = presetOrder('measurement', [])
+const symptoms = presetOrder(['symptom'], [])
+const measurements = presetOrder(['measurement'], [])
 // A translated name stands in for the UI language.
 const shown = (p: HealthPreset) => (p.id === 'cough' ? 'Кашель' : p.title)
 const ids = (ps: HealthPreset[]) => ps.map((p) => p.id)
@@ -29,5 +29,33 @@ describe('preset search', () => {
     expect(presetNamed(symptoms, 'tummy ache', shown)?.id).toBe('stomach-ache')
     expect(presetNamed(symptoms, 'runny', shown)).toBeUndefined()
     expect(presetNamed(symptoms, '', shown)).toBeUndefined()
+  })
+})
+
+describe('the quick symptom bar', () => {
+  const both = presetOrder(['symptom', 'procedure'], [])
+
+  it('offers treatments and checkups beside the symptoms, each saved as its own kind', () => {
+    expect(presetNamed(both, 'teeth cleaning', shown)?.kind).toBe('procedure')
+    expect(presetNamed(both, 'Чистка зубов', shown)?.id).toBe('teeth-cleaning')
+    expect(presetNamed(both, 'Cough', shown)?.kind).toBe('symptom')
+    expect(ids(searchPresets(both, 'dental', shown))).toEqual(
+      expect.arrayContaining(['teeth-cleaning', 'dental-checkup', 'dental-filling']),
+    )
+  })
+
+  it('puts the last procedure recorded first, and no name stands for two presets', () => {
+    const order = presetOrder(
+      ['symptom', 'procedure'],
+      [
+        { kind: 'procedure', title: 'Eye exam' },
+        { kind: 'symptom', title: 'Cough' },
+      ],
+    )
+    expect(ids(order.slice(0, 2))).toEqual(['eye-exam', 'cough'])
+    const names = both.flatMap((p) => [
+      ...new Set([p.title, ...(p.synonyms ?? [])].map((n) => n.toLowerCase())),
+    ])
+    expect(new Set(names).size).toBe(names.length)
   })
 })

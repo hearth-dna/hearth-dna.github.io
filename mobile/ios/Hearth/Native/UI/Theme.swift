@@ -12,6 +12,7 @@ extension HealthKind {
         case .imaging: return adaptive(light: 0x1f7f7a, dark: 0x6fc9c2)
         case .diagnosis: return adaptive(light: 0xa86a00, dark: 0xe0b35a)
         case .medication: return adaptive(light: 0x2f7d3a, dark: 0x85c98f)
+        case .procedure: return adaptive(light: 0x9c3f7c, dark: 0xe092c4)
         case .letter: return adaptive(light: 0x7a6446, dark: 0xc9b08c)
         case .other: return adaptive(light: 0x6b6a66, dark: 0xa09d95)
         }
