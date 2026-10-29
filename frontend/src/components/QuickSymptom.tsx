@@ -9,6 +9,7 @@ import type { HealthEntry, Person } from '../types'
 import { ConsentForm } from './ConsentForm'
 import { DetailFields } from './DetailFields'
 import { PresetSearch } from './PresetSearch'
+import { QuickBar } from './QuickBar'
 import { WhenInputs } from './WhenInputs'
 
 /**
@@ -92,85 +93,88 @@ export function QuickSymptom({
 
   if (asking)
     return (
-      <div className="card inset">
-        <ConsentForm
-          kind="import_document"
-          onCancel={() => setAsking(false)}
-          onConfirm={async () => {
-            await grantConsent(db, 'import_document', personId)
-            setConsented(true)
-            setAsking(false)
-          }}
-        />
-      </div>
+      <QuickBar label={t('quickSymptom.label')}>
+        <div className="card inset">
+          <ConsentForm
+            kind="import_document"
+            onCancel={() => setAsking(false)}
+            onConfirm={async () => {
+              await grantConsent(db, 'import_document', personId)
+              setConsented(true)
+              setAsking(false)
+            }}
+          />
+        </div>
+      </QuickBar>
     )
 
   return (
-    <div className="row quickmeasure">
-      <span className="muted">{t('quickSymptom.label')}</span>
-      {persons.length > 1 && (
+    <QuickBar label={t('quickSymptom.label')}>
+      <div className="row quickmeasure">
+        {persons.length > 1 && (
+          <select
+            aria-label={t('healthPage.colPerson')}
+            value={personId}
+            onChange={(e) => setPersonId(e.target.value)}
+          >
+            <option value="">{t('healthForm.pickPerson')}</option>
+            {persons.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.displayName}
+              </option>
+            ))}
+          </select>
+        )}
         <select
-          aria-label={t('healthPage.colPerson')}
-          value={personId}
-          onChange={(e) => setPersonId(e.target.value)}
+          aria-label={t('healthLog.kind')}
+          value={kind}
+          disabled={!!preset}
+          onChange={(e) => setCustom(e.target.value as 'symptom' | 'procedure')}
         >
-          <option value="">{t('healthForm.pickPerson')}</option>
-          {persons.map((p) => (
-            <option key={p.id} value={p.id}>
-              {p.displayName}
-            </option>
-          ))}
+          <option value="symptom">{t('kind.symptom')}</option>
+          <option value="procedure">{t('kind.procedure')}</option>
         </select>
-      )}
-      <select
-        aria-label={t('healthLog.kind')}
-        value={kind}
-        disabled={!!preset}
-        onChange={(e) => setCustom(e.target.value as 'symptom' | 'procedure')}
-      >
-        <option value="symptom">{t('kind.symptom')}</option>
-        <option value="procedure">{t('kind.procedure')}</option>
-      </select>
-      <PresetSearch
-        presets={order}
-        name={shown}
-        value={text}
-        onChange={type}
-        onEnter={save}
-        label={t('quickSymptom.symptom')}
-        placeholder={t('quickSymptom.placeholder')}
-      />
-      {kind === 'symptom' && (
-        <select
-          aria-label={t('healthLog.severity')}
-          value={severity}
-          onChange={(e) => setSeverity(e.target.value)}
-        >
-          <option value="">{t('quickSymptom.severity')}</option>
-          {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
-            <option key={n} value={n}>
-              {t('healthLog.outOfTen', { n })}
-            </option>
-          ))}
-        </select>
-      )}
-      <input
-        aria-label={t('quick.note')}
-        placeholder={t('quick.note')}
-        value={note}
-        onChange={(e) => setNote(e.target.value)}
-        onKeyDown={(e) => e.key === 'Enter' && save()}
-      />
-      <WhenInputs date={when.date || today()} time={when.time || nowTime()} onChange={setWhen} />
-      <button type="button" className="primary" disabled={!valid || consented === null} onClick={save}>
-        {t('quick.save')}
-      </button>
-      {saved && <span className="ok">{t('quick.saved', { what: saved })}</span>}
-      {preset?.details && (
-        <div className="row details">
-          <DetailFields fields={preset.details} value={details} onChange={setDetails} />
-        </div>
-      )}
-    </div>
+        <PresetSearch
+          presets={order}
+          name={shown}
+          value={text}
+          onChange={type}
+          onEnter={save}
+          label={t('quickSymptom.symptom')}
+          placeholder={t('quickSymptom.placeholder')}
+        />
+        {kind === 'symptom' && (
+          <select
+            aria-label={t('healthLog.severity')}
+            value={severity}
+            onChange={(e) => setSeverity(e.target.value)}
+          >
+            <option value="">{t('quickSymptom.severity')}</option>
+            {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
+              <option key={n} value={n}>
+                {t('healthLog.outOfTen', { n })}
+              </option>
+            ))}
+          </select>
+        )}
+        <input
+          aria-label={t('quick.note')}
+          placeholder={t('quick.note')}
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && save()}
+        />
+        <WhenInputs date={when.date || today()} time={when.time || nowTime()} onChange={setWhen} />
+        <button type="button" className="primary" disabled={!valid || consented === null} onClick={save}>
+          {t('quick.save')}
+        </button>
+        {saved && <span className="ok">{t('quick.saved', { what: saved })}</span>}
+        {preset?.details && (
+          <div className="row details">
+            <DetailFields fields={preset.details} value={details} onChange={setDetails} />
+          </div>
+        )}
+      </div>
+    </QuickBar>
   )
 }

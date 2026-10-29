@@ -48,8 +48,7 @@ struct QuickSymptom: View {
     private var valid: Bool { !personId.isEmpty && !finalTitle.isEmpty }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(t("quickSymptom.label")).font(.subheadline.weight(.semibold))
+        QuickBar(label: t("quickSymptom.label")) {
             HStack {
                 if store.persons.count > 1 {
                     Picker(t("healthPage.colPerson"), selection: $personId) {
@@ -102,11 +101,6 @@ struct QuickSymptom: View {
                 Text(failure).font(.caption).foregroundStyle(.red)
             }
         }
-        .padding(12)
-        .background(
-            Color(uiColor: .secondarySystemGroupedBackground),
-            in: RoundedRectangle(cornerRadius: 12, style: .continuous)
-        )
         .onAppear { if personId.isEmpty { personId = initialPerson } }
         .onChange(of: initialPerson) { _, id in personId = id }
         .sheet(isPresented: $asking) { consentSheet }

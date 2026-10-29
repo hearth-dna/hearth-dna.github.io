@@ -1,15 +1,12 @@
 package com.hearth.ui
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -95,36 +92,33 @@ fun QuickSymptom(repo: Repo, persons: List<Person>, initialPerson: String, entri
         onSaved()
     }
 
-    OutlinedCard(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
-        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(t("quickSymptom.label"), style = MaterialTheme.typography.titleSmall)
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                if (persons.size > 1) {
-                    Picker(t("healthPage.colPerson"), personId, listOf("" to t("healthForm.pickPerson")) + persons.map { it.id to it.displayName }, modifier = Modifier.weight(1f)) { personId = it }
-                }
-                Picker(t("quickSymptom.symptom"), choice, listOf(NONE to "—") + order.map { it.id to t("preset.${it.id}") } + (CUSTOM to t("quick.custom")), modifier = Modifier.weight(1f)) {
-                    choice = it
-                    typed = ""
-                }
+    QuickBar(t("quickSymptom.label")) {
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            if (persons.size > 1) {
+                Picker(t("healthPage.colPerson"), personId, listOf("" to t("healthForm.pickPerson")) + persons.map { it.id to it.displayName }, modifier = Modifier.weight(1f)) { personId = it }
             }
-            if (choice == CUSTOM) {
-                OutlinedTextField(typed, { typed = it }, placeholder = { Text(t("quickSymptom.placeholder")) }, singleLine = true, modifier = Modifier.fillMaxWidth())
-                if (preset == null) {
-                    val kinds = listOf(HealthKind.SYMPTOM, HealthKind.PROCEDURE)
-                    Picker(t("healthLog.kind"), custom.id, kinds.map { it.id to t("kind.${it.id}") }, modifier = Modifier.fillMaxWidth()) { id -> custom = kinds.first { it.id == id } }
-                }
+            Picker(t("quickSymptom.symptom"), choice, listOf(NONE to "—") + order.map { it.id to t("preset.${it.id}") } + (CUSTOM to t("quick.custom")), modifier = Modifier.weight(1f)) {
+                choice = it
+                typed = ""
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                if (kind == HealthKind.SYMPTOM) {
-                    Picker(t("healthLog.severity"), severity, listOf("" to "—") + (1..10).map { it.toString() to t("healthLog.outOfTen", "n" to it) }, modifier = Modifier.weight(1f)) { severity = it }
-                } else {
-                    Spacer(Modifier.weight(1f))
-                }
-                Button(enabled = valid, onClick = { save() }) { Text(t("quick.save")) }
-            }
-            OutlinedTextField(note, { note = it }, placeholder = { Text(t("quick.note")) }, singleLine = true, modifier = Modifier.fillMaxWidth())
-            saved?.let { Text(t("quick.saved", "what" to it), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary) }
         }
+        if (choice == CUSTOM) {
+            OutlinedTextField(typed, { typed = it }, placeholder = { Text(t("quickSymptom.placeholder")) }, singleLine = true, modifier = Modifier.fillMaxWidth())
+            if (preset == null) {
+                val kinds = listOf(HealthKind.SYMPTOM, HealthKind.PROCEDURE)
+                Picker(t("healthLog.kind"), custom.id, kinds.map { it.id to t("kind.${it.id}") }, modifier = Modifier.fillMaxWidth()) { id -> custom = kinds.first { it.id == id } }
+            }
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+            if (kind == HealthKind.SYMPTOM) {
+                Picker(t("healthLog.severity"), severity, listOf("" to "—") + (1..10).map { it.toString() to t("healthLog.outOfTen", "n" to it) }, modifier = Modifier.weight(1f)) { severity = it }
+            } else {
+                Spacer(Modifier.weight(1f))
+            }
+            Button(enabled = valid, onClick = { save() }) { Text(t("quick.save")) }
+        }
+        OutlinedTextField(note, { note = it }, placeholder = { Text(t("quick.note")) }, singleLine = true, modifier = Modifier.fillMaxWidth())
+        saved?.let { Text(t("quick.saved", "what" to it), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary) }
     }
 
     if (asking) {

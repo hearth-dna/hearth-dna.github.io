@@ -9,6 +9,7 @@ import { useT } from '../i18n/context'
 import type { HealthEntry, Person } from '../types'
 import { ConsentForm } from './ConsentForm'
 import { PresetSearch } from './PresetSearch'
+import { QuickBar } from './QuickBar'
 import { WhenInputs } from './WhenInputs'
 
 /**
@@ -87,98 +88,101 @@ export function QuickMeasurement({
 
   if (asking)
     return (
-      <div className="card inset">
-        <ConsentForm
-          kind="import_document"
-          onCancel={() => setAsking(false)}
-          onConfirm={async () => {
-            await grantConsent(db, 'import_document', personId)
-            setConsented(true)
-            setAsking(false)
-          }}
-        />
-      </div>
+      <QuickBar label={t('quick.label')}>
+        <div className="card inset">
+          <ConsentForm
+            kind="import_document"
+            onCancel={() => setAsking(false)}
+            onConfirm={async () => {
+              await grantConsent(db, 'import_document', personId)
+              setConsented(true)
+              setAsking(false)
+            }}
+          />
+        </div>
+      </QuickBar>
     )
 
   return (
-    <div className="row quickmeasure">
-      <span className="muted">{t('quick.label')}</span>
-      {persons.length > 1 && (
-        <select
-          aria-label={t('healthPage.colPerson')}
-          value={personId}
-          onChange={(e) => setPersonId(e.target.value)}
-        >
-          <option value="">{t('healthForm.pickPerson')}</option>
-          {persons.map((p) => (
-            <option key={p.id} value={p.id}>
-              {p.displayName}
-            </option>
-          ))}
-        </select>
-      )}
-      <PresetSearch
-        presets={order}
-        name={shown}
-        value={title}
-        onChange={(v) => {
-          if (presetNamed(order, v, shown) !== preset) {
-            setValue('')
-            setValue2('')
-          }
-          setTitle(v)
-        }}
-        onEnter={save}
-        label={t('quick.parameter')}
-        placeholder={t('quick.customPlaceholder')}
-      />
-      <input
-        aria-label={
-          pair ? t('healthLog.valueOf', { label: t(`preset.pair.${pair[0]}`) }) : t('healthLog.value')
-        }
-        type="number"
-        inputMode="decimal"
-        step={preset?.step ?? 'any'}
-        placeholder={pair ? t(`preset.pair.${pair[0]}`) : t('healthLog.value')}
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        onKeyDown={(e) => e.key === 'Enter' && save()}
-      />
-      {pair && (
+    <QuickBar label={t('quick.label')}>
+      <div className="row quickmeasure">
+        {persons.length > 1 && (
+          <select
+            aria-label={t('healthPage.colPerson')}
+            value={personId}
+            onChange={(e) => setPersonId(e.target.value)}
+          >
+            <option value="">{t('healthForm.pickPerson')}</option>
+            {persons.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.displayName}
+              </option>
+            ))}
+          </select>
+        )}
+        <PresetSearch
+          presets={order}
+          name={shown}
+          value={title}
+          onChange={(v) => {
+            if (presetNamed(order, v, shown) !== preset) {
+              setValue('')
+              setValue2('')
+            }
+            setTitle(v)
+          }}
+          onEnter={save}
+          label={t('quick.parameter')}
+          placeholder={t('quick.customPlaceholder')}
+        />
         <input
-          aria-label={t('healthLog.valueOf', { label: t(`preset.pair.${pair[1]}`) })}
+          aria-label={
+            pair ? t('healthLog.valueOf', { label: t(`preset.pair.${pair[0]}`) }) : t('healthLog.value')
+          }
           type="number"
           inputMode="decimal"
           step={preset?.step ?? 'any'}
-          placeholder={t(`preset.pair.${pair[1]}`)}
-          value={value2}
-          onChange={(e) => setValue2(e.target.value)}
+          placeholder={pair ? t(`preset.pair.${pair[0]}`) : t('healthLog.value')}
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && save()}
         />
-      )}
-      {preset ? (
-        <span className="muted">{preset.unit}</span>
-      ) : (
+        {pair && (
+          <input
+            aria-label={t('healthLog.valueOf', { label: t(`preset.pair.${pair[1]}`) })}
+            type="number"
+            inputMode="decimal"
+            step={preset?.step ?? 'any'}
+            placeholder={t(`preset.pair.${pair[1]}`)}
+            value={value2}
+            onChange={(e) => setValue2(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && save()}
+          />
+        )}
+        {preset ? (
+          <span className="muted">{preset.unit}</span>
+        ) : (
+          <input
+            aria-label={t('healthLog.unit')}
+            placeholder={t('healthLog.unitPlaceholder')}
+            value={unit}
+            onChange={(e) => setUnit(e.target.value)}
+            style={{ width: '6rem' }}
+          />
+        )}
         <input
-          aria-label={t('healthLog.unit')}
-          placeholder={t('healthLog.unitPlaceholder')}
-          value={unit}
-          onChange={(e) => setUnit(e.target.value)}
-          style={{ width: '6rem' }}
+          aria-label={t('quick.note')}
+          placeholder={t('quick.note')}
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && save()}
         />
-      )}
-      <input
-        aria-label={t('quick.note')}
-        placeholder={t('quick.note')}
-        value={note}
-        onChange={(e) => setNote(e.target.value)}
-        onKeyDown={(e) => e.key === 'Enter' && save()}
-      />
-      <WhenInputs date={when.date || today()} time={when.time || nowTime()} onChange={setWhen} />
-      <button type="button" className="primary" disabled={!valid || consented === null} onClick={save}>
-        {t('quick.save')}
-      </button>
-      {saved && <span className="ok">{t('quick.saved', { what: saved })}</span>}
-    </div>
+        <WhenInputs date={when.date || today()} time={when.time || nowTime()} onChange={setWhen} />
+        <button type="button" className="primary" disabled={!valid || consented === null} onClick={save}>
+          {t('quick.save')}
+        </button>
+        {saved && <span className="ok">{t('quick.saved', { what: saved })}</span>}
+      </div>
+    </QuickBar>
   )
 }
