@@ -24,7 +24,7 @@ struct QuickMeasurement: View {
     @State private var failure: String?
 
     private var order: [HealthPreset] {
-        HealthPresets.measurementOrder(store.entries.filter { personId.isEmpty || $0.personId == personId })
+        HealthPresets.presetOrder([.measurement], store.entries.filter { personId.isEmpty || $0.personId == personId })
     }
 
     private var selectedId: String { presetId ?? order.first?.id ?? QuickMeasurement.custom }

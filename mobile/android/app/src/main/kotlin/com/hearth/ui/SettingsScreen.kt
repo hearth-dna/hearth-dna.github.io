@@ -92,6 +92,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.time.Instant
+import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -99,6 +100,13 @@ import kotlin.coroutines.resume
 
 private fun clock(iso: String): String = runCatching {
     DateTimeFormatter.ofPattern("HH:mm").withZone(ZoneId.systemDefault()).format(Instant.parse(iso))
+}.getOrDefault(iso)
+
+/** The time today, date and time otherwise: when another device last wrote the backup file. */
+private fun stamp(iso: String): String = runCatching {
+    val at = Instant.parse(iso).atZone(ZoneId.systemDefault())
+    val today = at.toLocalDate() == LocalDate.now()
+    DateTimeFormatter.ofPattern(if (today) "HH:mm" else "d MMM HH:mm").format(at)
 }.getOrDefault(iso)
 
 private fun mb(bytes: Long) = String.format(Locale.ROOT, "%.1f", bytes / 1024.0 / 1024.0)
@@ -755,11 +763,17 @@ fun SyncAction(backups: Backups) {
         is Status.Ready -> when {
             x.pending -> t("sync.pending") to MaterialTheme.colorScheme.onSurfaceVariant
             x.dirty -> t("sync.unsynced") to severityColor(4)
-            x.lastAt != null -> t("sync.syncedAt", "time" to clock(x.lastAt)) to MaterialTheme.colorScheme.primary
             else -> t("sync.synced") to MaterialTheme.colorScheme.primary
         }
     }
-    TextButton(onClick = { scope.launch { backups.sync() } }) { Text(label, color = color, style = MaterialTheme.typography.labelLarge) }
+    // The second line: the backup file, and when any device last wrote it.
+    val detail = (s as? Status.Ready)?.let { r -> r.updatedAt?.let { t("sync.fileUpdated", "file" to r.file, "time" to stamp(it)) } ?: r.file }
+    TextButton(onClick = { scope.launch { backups.sync() } }) {
+        Column(horizontalAlignment = Alignment.End) {
+            Text(label, color = color, style = MaterialTheme.typography.labelLarge)
+            detail?.let { Text(it, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall) }
+        }
+    }
 }
 
 /** The source code link (AGPL-3.0): its address comes from the build (HEARTH_SOURCE_URL), none in a local build. */

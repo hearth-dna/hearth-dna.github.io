@@ -64,5 +64,21 @@
   "bruising": ["bruise", "bruises", "синяки", "синяк", "кровоподтёк", "синці", "blaue flecken", "bluterguss", "moratones", "hematomas", "bleus", "ecchymoses"],
   "cold-sore": ["fever blister", "herpes labialis", "герпес на губах", "простуда на губе", "герпес на губі", "lippenherpes", "fieberbläschen", "herpes labial", "calentura", "bouton de fièvre", "herpès labial"],
   "watery-eyes": ["teary eyes", "tearing", "слезотечение", "слезятся глаза", "сльозотеча", "сльозяться очі", "tränende augen", "ojos llorosos", "lagrimeo", "yeux larmoyants", "larmoiement"],
-  "blocked-ears": ["ear fullness", "plugged ears", "заложенность ушей", "заложило уши", "закладеність вух", "verstopfte ohren", "druck auf den ohren", "oídos tapados", "taponamiento de oídos", "oreilles bouchées"]
+  "blocked-ears": ["ear fullness", "plugged ears", "заложенность ушей", "заложило уши", "закладеність вух", "verstopfte ohren", "druck auf den ohren", "oídos tapados", "taponamiento de oídos", "oreilles bouchées"],
+  "teeth-cleaning": ["tooth cleaning", "dental cleaning", "scale and polish", "dental hygiene", "чистка зубов", "профессиональная чистка зубов", "чистка зубів", "професійна чистка зубів", "zahnreinigung", "professionelle zahnreinigung", "limpieza dental", "limpieza bucal", "détartrage", "nettoyage dentaire"],
+  "dental-checkup": ["dentist visit", "dental exam", "осмотр у стоматолога", "визит к стоматологу", "огляд у стоматолога", "zahnkontrolle", "kontrolle beim zahnarzt", "revisión dental", "chequeo dental", "contrôle dentaire", "visite chez le dentiste"],
+  "dental-filling": ["filling", "tooth filling", "пломба", "пломбирование зуба", "пломбування зуба", "zahnfüllung", "füllung", "empaste", "obturación", "plombage", "obturation dentaire"],
+  "checkup": ["check-up", "physical", "physical exam", "annual checkup", "medical checkup", "диспансеризация", "медосмотр", "профосмотр", "медогляд", "профілактичний огляд", "vorsorgeuntersuchung", "gesundheitscheck", "chequeo médico", "revisión médica", "bilan de santé", "examen médical"],
+  "eye-exam": ["eye test", "vision test", "eye checkup", "проверка зрения", "осмотр у окулиста", "перевірка зору", "огляд в окуліста", "sehtest", "augenuntersuchung", "examen de la vista", "revisión ocular", "examen de la vue", "contrôle de la vue"],
+  "hearing-test": ["audiometry", "проверка слуха", "аудиометрия", "перевірка слуху", "аудіометрія", "hörtest", "prueba de audición", "audiometría", "test auditif", "audiométrie"],
+  "ear-cleaning": ["ear cleaning", "ear syringing", "earwax removal", "чистка ушей", "удаление серной пробки", "чистка вух", "видалення сірчаної пробки", "ohrenreinigung", "ohrenschmalzentfernung", "limpieza de oídos", "extracción de cerumen", "nettoyage des oreilles", "retrait du bouchon de cérumen"],
+  "skin-check": ["mole check", "skin exam", "осмотр родинок", "осмотр у дерматолога", "огляд родимок", "огляд у дерматолога", "hautkrebsvorsorge", "hautcheck", "revisión de lunares", "revisión dermatológica", "contrôle des grains de beauté", "examen de la peau"],
+  "blood-test": ["blood draw", "blood sample", "анализ крови", "забор крови", "аналіз крові", "забір крові", "blutabnahme", "blutentnahme", "análisis de sangre", "extracción de sangre", "prise de sang", "analyse de sang"],
+  "ecg": ["ekg", "electrocardiogram", "экг", "электрокардиограмма", "екг", "електрокардіограма", "elektrokardiogramm", "electrocardiograma", "électrocardiogramme"],
+  "mammogram": ["mammography", "breast screening", "маммография", "мамографія", "mammographie", "mamografía"],
+  "pap-smear": ["pap smear", "pap test", "smear test", "cervical smear", "мазок на цитологию", "пап-тест", "мазок на цитологію", "pap-abstrich", "krebsabstrich", "citología", "papanicolau", "frottis", "frottis cervical"],
+  "colonoscopy": ["колоноскопия", "колоноскопія", "darmspiegelung", "koloskopie", "colonoscopia", "coloscopie"],
+  "physiotherapy": ["physio", "physiotherapy", "physical therapy", "физиотерапия", "лфк", "фізіотерапія", "physiotherapie", "krankengymnastik", "fisioterapia", "kinésithérapie", "kiné"],
+  "massage": ["massage therapy", "массаж", "масаж", "masaje"],
+  "blood-donation": ["donated blood", "донорство крови", "сдача крови", "донорство крові", "здача крові", "blutspende", "donación de sangre", "don du sang"]
 }

@@ -6,8 +6,8 @@
   "quick.save": "Save",
   "quick.saved": "Saved {what}",
   "quick.note": "Note (optional)",
-  "quickSymptom.label": "Quick symptom:",
-  "quickSymptom.symptom": "Symptom",
-  "quickSymptom.placeholder": "e.g. Runny nose",
+  "quickSymptom.label": "Quick symptom or procedure:",
+  "quickSymptom.symptom": "Symptom or procedure",
+  "quickSymptom.placeholder": "e.g. Runny nose, Teeth cleaning",
   "quickSymptom.severity": "severity"
 }

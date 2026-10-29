@@ -11,6 +11,12 @@ const when = (iso: string) =>
     ? clock(iso)
     : new Date(iso).toLocaleDateString([], { month: 'short', day: 'numeric' })
 
+/** The time today, date and time otherwise: when another device last wrote the file. */
+const stamp = (iso: string) =>
+  new Date(iso).toDateString() === new Date().toDateString()
+    ? clock(iso)
+    : new Date(iso).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+
 type Look = {
   icon: string
   label: string
@@ -32,6 +38,18 @@ export function SyncButton({ onOpenSettings }: { onOpenSettings: () => void }) {
   useEffect(() => backups.subscribe(() => setStatus({ ...backups.status })), [])
 
   const needsPass = !backups.plain && !backups.passphrase()
+
+  // The second line: the backup file, and when any device last wrote it once that is known.
+  const detail = ((): string | null => {
+    if (status.state === 'ready')
+      return status.updatedAt
+        ? t('sync.fileUpdated', { file: status.file, time: stamp(status.updatedAt) })
+        : status.file
+    // The label already says when this browser last backed up.
+    if (status.state === 'manual' || status.state === 'writing' || status.state === 'error')
+      return backups.file
+    return null
+  })()
 
   const look = ((): Look => {
     switch (status.state) {
@@ -80,7 +98,8 @@ export function SyncButton({ onOpenSettings }: { onOpenSettings: () => void }) {
           }
         return {
           icon: '✓',
-          label: status.lastAt ? t('sync.syncedAt', { time: clock(status.lastAt) }) : t('sync.synced'),
+          // When is on the second line: the file's time, newer than ours when another device wrote last.
+          label: t('sync.synced'),
           title: t('sync.syncedHint', { name: status.name }),
           tone: 'ok',
         }
@@ -108,7 +127,7 @@ export function SyncButton({ onOpenSettings }: { onOpenSettings: () => void }) {
     <button
       type="button"
       className={`sync small ${look.tone}`}
-      title={look.title}
+      title={detail ? `${detail}\n${look.title}` : look.title}
       aria-live="polite"
       disabled={look.busy}
       onClick={click}
@@ -118,7 +137,10 @@ export function SyncButton({ onOpenSettings }: { onOpenSettings: () => void }) {
       ) : (
         <span aria-hidden="true">{look.icon}</span>
       )}
-      <span className="sync-label">{look.label}</span>
+      <span className="sync-label">
+        {look.label}
+        {detail && <small className="sync-file">{detail}</small>}
+      </span>
     </button>
   )
 }

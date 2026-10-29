@@ -53,7 +53,7 @@ struct AddEntrySheet: View {
     }
 
     /// Kinds usually recorded as they happen; the others mostly come from paper with no time on it.
-    private static let timed: Set<HealthKind> = [.symptom, .measurement, .medication]
+    private static let timed: Set<HealthKind> = [.symptom, .measurement, .medication, .procedure]
 
     /// Which optional fields each type shows (the web's FIELDS); title, date, tags and text always.
     private struct Fields {
@@ -66,7 +66,7 @@ struct AddEntrySheet: View {
         switch kind {
         case .symptom, .other: return Fields(bodyPart: true, severity: true)
         case .measurement: return Fields(value: true, bodyPart: true)
-        case .imaging, .diagnosis: return Fields(bodyPart: true)
+        case .imaging, .diagnosis, .procedure: return Fields(bodyPart: true)
         case .lab, .medication, .letter: return Fields()
         }
     }

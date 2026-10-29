@@ -34,7 +34,7 @@ import com.hearth.data.Repo
 import com.hearth.health.findPreset
 import com.hearth.health.formatValue
 import com.hearth.health.localDate
-import com.hearth.health.measurementOrder
+import com.hearth.health.presetOrder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -54,7 +54,7 @@ fun QuickMeasurement(repo: Repo, persons: List<Person>, initialPerson: String, e
     val t = LocalStrings.current
     val scope = rememberCoroutineScope()
     var personId by remember(initialPerson) { mutableStateOf(initialPerson) }
-    val order = remember(entries, personId) { measurementOrder(entries.filter { personId.isEmpty() || it.personId == personId }) }
+    val order = remember(entries, personId) { presetOrder(listOf(HealthKind.MEASUREMENT), entries.filter { personId.isEmpty() || it.personId == personId }) }
     var presetId by remember { mutableStateOf(order.firstOrNull()?.id ?: CUSTOM) }
     var title by remember { mutableStateOf("") }
     var unit by remember { mutableStateOf("") }

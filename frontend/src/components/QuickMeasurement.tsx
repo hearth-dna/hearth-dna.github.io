@@ -32,7 +32,7 @@ export function QuickMeasurement({
   const { db } = useApp()
   const t = useT()
   const [personId, setPersonId] = useState(initialPerson)
-  const order = presetOrder('measurement', entries)
+  const order = presetOrder(['measurement'], entries)
   const shown = (p: HealthPreset) => t(`preset.${p.id}`)
   const [title, setTitle] = useState(() => (order[0] ? shown(order[0]) : ''))
   const [unit, setUnit] = useState('')

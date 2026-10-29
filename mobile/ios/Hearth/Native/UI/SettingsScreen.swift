@@ -31,6 +31,16 @@ func clockTime(_ iso: String) -> String {
     return date.formatted(date: .omitted, time: .shortened)
 }
 
+/// The time today, date and time otherwise: when another device last wrote the backup file.
+func stampTime(_ iso: String) -> String {
+    let parser = ISO8601DateFormatter()
+    parser.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+    guard let date = parser.date(from: iso) else { return iso }
+    return Calendar.current.isDateInToday(date)
+        ? date.formatted(date: .omitted, time: .shortened)
+        : date.formatted(.dateTime.month(.abbreviated).day().hour().minute())
+}
+
 /// Runs `work` on a background queue and hands its result back on the main one.
 private func background<T>(_ work: @escaping () throws -> T, done: @escaping (Result<T, Error>) -> Void) {
     DispatchQueue.global(qos: .userInitiated).async {
@@ -456,7 +466,7 @@ struct SettingsScreen: View {
         let status = backups.status
         let name = backups.saved?.place.name ?? ""
         Text(rich(t(backups.single ? "backupCard.file" : "backupCard.folder", ["name": name])))
-        if case .ready(_, let pending, _, let lastAt, let attachmentsPending, let missing) = status {
+        if case .ready(_, let pending, _, let lastAt, let attachmentsPending, let missing, _, _) = status {
             let bits = [
                 lastAt.map { t("backupCard.lastBackup", ["time": clockTime($0)]) } ?? "",
                 pending ? t("backupCard.pending") : "",
@@ -528,7 +538,7 @@ struct SettingsScreen: View {
     private func backUpNow() {
         if backupPass != backups.passphrase() { backups.setPassphrase(backupPass) }
         backups.backupNow {
-            if case .ready(let name, _, _, let lastAt, _, _) = backups.status {
+            if case .ready(let name, _, _, let lastAt, _, _, _, _) = backups.status {
                 say(t("backupCard.done", ["name": name, "time": lastAt.map(clockTime) ?? ""]))
             }
         }
@@ -910,9 +920,18 @@ struct SyncButton: View {
     var body: some View {
         if let s = state {
             Button { backups.sync() } label: {
-                Text(s.label).font(.subheadline.weight(.semibold)).foregroundStyle(s.color)
+                VStack(alignment: .trailing, spacing: 0) {
+                    Text(s.label).font(.subheadline.weight(.semibold)).foregroundStyle(s.color)
+                    if let detail { Text(detail).font(.caption2).foregroundStyle(.secondary) }
+                }
             }
         }
+    }
+
+    /// The second line: the backup file, and when any device last wrote it.
+    private var detail: String? {
+        guard case .ready(_, _, _, _, _, _, let file, let updatedAt) = backups.status else { return nil }
+        return updatedAt.map { t("sync.fileUpdated", ["file": file, "time": stampTime($0)]) } ?? file
     }
 
     private var state: (label: String, color: Color)? {
@@ -922,10 +941,9 @@ struct SyncButton: View {
         case .needsPassphrase: return (t("sync.passphrase"), .red)
         case .writing: return (t("sync.syncing"), .secondary)
         case .error: return (t("sync.error"), .red)
-        case .ready(_, let pending, let dirty, let lastAt, _, _):
+        case .ready(_, let pending, let dirty, _, _, _, _, _):
             if pending { return (t("sync.pending"), .secondary) }
             if dirty { return (t("sync.unsynced"), severityColor(4)) }
-            if let lastAt { return (t("sync.syncedAt", ["time": clockTime(lastAt)]), .accentColor) }
             return (t("sync.synced"), .accentColor)
         }
     }

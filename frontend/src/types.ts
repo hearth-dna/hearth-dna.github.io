@@ -42,8 +42,9 @@ export interface Person {
 
 /**
  * One dated entry in a person's health log: a lab report, diagnosis, medication or letter as text,
- * a symptom the person noticed themselves ("pain in both hands since morning"), or a measurement
- * they took at home (temperature 37.8 °C, blood pressure 120/80 mmHg).
+ * a symptom the person noticed themselves ("pain in both hands since morning"), a measurement
+ * they took at home (temperature 37.8 °C, blood pressure 120/80 mmHg), or a treatment or checkup
+ * they had done (teeth cleaning, an eye exam).
  */
 export type HealthKind =
   | 'symptom'
@@ -52,6 +53,7 @@ export type HealthKind =
   | 'imaging'
   | 'diagnosis'
   | 'medication'
+  | 'procedure'
   | 'letter'
   | 'other'
 
@@ -62,6 +64,7 @@ export const HEALTH_KIND_LABELS: Record<HealthKind, string> = {
   imaging: 'Imaging report',
   diagnosis: 'Diagnosis',
   medication: 'Medication',
+  procedure: 'Procedure or checkup',
   letter: 'Doctor letter',
   other: 'Other',
 }

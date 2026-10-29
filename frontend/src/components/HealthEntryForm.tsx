@@ -23,7 +23,7 @@ import { ConsentForm } from './ConsentForm'
 import { DetailFields } from './DetailFields'
 
 /** Kinds usually recorded as they happen; the others mostly come from paper with no time on it. */
-const TIMED: ReadonlySet<HealthKind> = new Set(['symptom', 'measurement', 'medication'])
+const TIMED: ReadonlySet<HealthKind> = new Set(['symptom', 'measurement', 'medication', 'procedure'])
 const KINDS = Object.keys(HEALTH_KIND_LABELS) as HealthKind[]
 
 /** Which optional fields each type of entry shows; title, date, tags and text are always there. */
@@ -34,6 +34,7 @@ const FIELDS: Record<HealthKind, { value?: true; bodyPart?: true; severity?: tru
   imaging: { bodyPart: true },
   diagnosis: { bodyPart: true },
   medication: {},
+  procedure: { bodyPart: true },
   letter: {},
   other: { bodyPart: true, severity: true },
 }

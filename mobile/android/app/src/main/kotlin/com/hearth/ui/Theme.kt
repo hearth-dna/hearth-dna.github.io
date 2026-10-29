@@ -75,6 +75,7 @@ fun kindColor(kind: HealthKind): Color {
         HealthKind.IMAGING -> if (dark) Color(0xFF6FC9C2) else Color(0xFF1F7F7A)
         HealthKind.DIAGNOSIS -> if (dark) Color(0xFFE0B35A) else Color(0xFFA86A00)
         HealthKind.MEDICATION -> if (dark) Color(0xFF85C98F) else Color(0xFF2F7D3A)
+        HealthKind.PROCEDURE -> if (dark) Color(0xFFE092C4) else Color(0xFF9C3F7C)
         HealthKind.LETTER -> if (dark) Color(0xFFC9B08C) else Color(0xFF7A6446)
         HealthKind.OTHER -> MaterialTheme.colorScheme.onSurfaceVariant
     }

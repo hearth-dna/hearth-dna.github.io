@@ -18,15 +18,16 @@ final class PresetsTests: XCTestCase {
         return re.matches(in: web, range: range).map { String(web[Range($0.range(at: 1), in: web)!]) }
     }
 
-    func testHasTheWebsMeasurementAndSymptomPresetsInTheWebsOrder() throws {
+    func testHasTheWebsMeasurementSymptomAndProcedurePresetsInTheWebsOrder() throws {
         XCTAssertEqual(HealthPresets.measurements.map(\.id), try webIds("m"))
         XCTAssertEqual(HealthPresets.symptoms.map(\.id), try webIds("s"))
+        XCTAssertEqual(HealthPresets.procedures.map(\.id), try webIds("proc"))
     }
 
-    func testHasTheWebsSymptomSynonyms() throws {
+    func testHasTheWebsSymptomAndProcedureSynonyms() throws {
         let data = try Data(contentsOf: PresetsTests.healthDir.appendingPathComponent("synonyms.json"))
         let web = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: [String]])
-        for p in HealthPresets.symptoms + HealthPresets.events.filter({ $0.kind == .symptom }) {
+        for p in HealthPresets.symptoms + HealthPresets.procedures + HealthPresets.events.filter({ $0.kind == .symptom }) {
             XCTAssertEqual(p.synonyms, web[p.id] ?? [], p.id)
         }
     }
@@ -64,19 +65,20 @@ final class PresetsTests: XCTestCase {
     }
 
     func testOrdersTheQuickSymptomListByWhatWasRecordedUnderAnyNameEventsLeftOut() {
-        let all = HealthPresets.symptoms.map(\.id)
-        XCTAssertEqual(HealthPresets.symptomOrder([]).map(\.id), all)
+        let kinds: [HealthKind] = [.symptom, .procedure]
+        let all = (HealthPresets.symptoms + HealthPresets.procedures).map(\.id)
+        XCTAssertEqual(HealthPresets.presetOrder(kinds, []).map(\.id), all)
         // Newest first; a Russian title counts as the preset it names.
-        let order = HealthPresets.symptomOrder([entry(.symptom, "кашель"), entry(.symptom, "Fever"), entry(.symptom, "Cough")]).map(\.id)
-        XCTAssertEqual(Array(order.prefix(2)), ["cough", "fever"])
+        let order = HealthPresets.presetOrder(kinds, [
+            entry(.procedure, "чистка зубов"), entry(.symptom, "кашель"), entry(.symptom, "Fever"), entry(.symptom, "Cough"),
+        ]).map(\.id)
+        XCTAssertEqual(Array(order.prefix(3)), ["teeth-cleaning", "cough", "fever"])
         XCTAssertEqual(order.sorted(), all.sorted())
         // Events, other kinds and unknown titles do not reorder it.
         let ignored = [
             entry(.symptom, "Injury"), entry(.symptom, "Fainting"), entry(.measurement, "Weight"),
             entry(.other, "Headache"), entry(.symptom, "Knee clicks"),
         ]
-        XCTAssertEqual(HealthPresets.symptomOrder(ignored).map(\.id), all)
-        XCTAssertNil(HealthPresets.symptomPreset("Injury"))
-        XCTAssertEqual(HealthPresets.symptomPreset("  ГОЛОВНАЯ боль ")?.id, "headache")
+        XCTAssertEqual(HealthPresets.presetOrder(kinds, ignored).map(\.id), all)
     }
 }

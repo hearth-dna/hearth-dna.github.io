@@ -108,6 +108,26 @@ enum HealthPresets {
         symptom("tinnitus", "Ringing in the ears", "ears", synonyms: ["tinnitus", "buzzing in the ears", "шум в ушах", "звон в ушах", "шум у вухах", "дзвін у вухах", "ohrensausen", "ohrgeräusche", "zumbido de oídos", "acúfenos", "bourdonnements d'oreille", "acouphènes"]),
     ]
 
+    /// Treatments and checkups done to the person: what happened, not how they felt.
+    static let procedures: [HealthPreset] = [
+        procedure("teeth-cleaning", "Teeth cleaning", bodyPart: "mouth", tags: ["dental"], synonyms: ["tooth cleaning", "dental cleaning", "scale and polish", "dental hygiene", "чистка зубов", "профессиональная чистка зубов", "чистка зубів", "професійна чистка зубів", "zahnreinigung", "professionelle zahnreinigung", "limpieza dental", "limpieza bucal", "détartrage", "nettoyage dentaire"]),
+        procedure("dental-checkup", "Dental checkup", bodyPart: "mouth", tags: ["dental"], synonyms: ["dentist visit", "dental exam", "осмотр у стоматолога", "визит к стоматологу", "огляд у стоматолога", "zahnkontrolle", "kontrolle beim zahnarzt", "revisión dental", "chequeo dental", "contrôle dentaire", "visite chez le dentiste"]),
+        procedure("dental-filling", "Dental filling", bodyPart: "mouth", tags: ["dental"], synonyms: ["filling", "tooth filling", "пломба", "пломбирование зуба", "пломбування зуба", "zahnfüllung", "füllung", "empaste", "obturación", "plombage", "obturation dentaire"]),
+        procedure("checkup", "General checkup", synonyms: ["check-up", "physical", "physical exam", "annual checkup", "medical checkup", "диспансеризация", "медосмотр", "профосмотр", "медогляд", "профілактичний огляд", "vorsorgeuntersuchung", "gesundheitscheck", "chequeo médico", "revisión médica", "bilan de santé", "examen médical"]),
+        procedure("eye-exam", "Eye exam", bodyPart: "eyes", synonyms: ["eye test", "vision test", "eye checkup", "проверка зрения", "осмотр у окулиста", "перевірка зору", "огляд в окуліста", "sehtest", "augenuntersuchung", "examen de la vista", "revisión ocular", "examen de la vue", "contrôle de la vue"]),
+        procedure("hearing-test", "Hearing test", bodyPart: "ears", synonyms: ["audiometry", "проверка слуха", "аудиометрия", "перевірка слуху", "аудіометрія", "hörtest", "prueba de audición", "audiometría", "test auditif", "audiométrie"]),
+        procedure("ear-cleaning", "Ear wax removal", bodyPart: "ears", synonyms: ["ear cleaning", "ear syringing", "earwax removal", "чистка ушей", "удаление серной пробки", "чистка вух", "видалення сірчаної пробки", "ohrenreinigung", "ohrenschmalzentfernung", "limpieza de oídos", "extracción de cerumen", "nettoyage des oreilles", "retrait du bouchon de cérumen"]),
+        procedure("skin-check", "Skin check", bodyPart: "skin", synonyms: ["mole check", "skin exam", "осмотр родинок", "осмотр у дерматолога", "огляд родимок", "огляд у дерматолога", "hautkrebsvorsorge", "hautcheck", "revisión de lunares", "revisión dermatológica", "contrôle des grains de beauté", "examen de la peau"]),
+        procedure("blood-test", "Blood test", synonyms: ["blood draw", "blood sample", "анализ крови", "забор крови", "аналіз крові", "забір крові", "blutabnahme", "blutentnahme", "análisis de sangre", "extracción de sangre", "prise de sang", "analyse de sang"]),
+        procedure("ecg", "ECG", bodyPart: "heart", synonyms: ["ekg", "electrocardiogram", "экг", "электрокардиограмма", "екг", "електрокардіограма", "elektrokardiogramm", "electrocardiograma", "électrocardiogramme"]),
+        procedure("mammogram", "Mammogram", bodyPart: "chest", tags: ["screening"], synonyms: ["mammography", "breast screening", "маммография", "мамографія", "mammographie", "mamografía"]),
+        procedure("pap-smear", "Cervical screening (Pap smear)", tags: ["screening"], synonyms: ["pap smear", "pap test", "smear test", "cervical smear", "мазок на цитологию", "пап-тест", "мазок на цитологію", "pap-abstrich", "krebsabstrich", "citología", "papanicolau", "frottis", "frottis cervical"]),
+        procedure("colonoscopy", "Colonoscopy", bodyPart: "abdomen", tags: ["screening"], synonyms: ["колоноскопия", "колоноскопія", "darmspiegelung", "koloskopie", "colonoscopia", "coloscopie"]),
+        procedure("physiotherapy", "Physiotherapy session", synonyms: ["physio", "physiotherapy", "physical therapy", "физиотерапия", "лфк", "фізіотерапія", "physiotherapie", "krankengymnastik", "fisioterapia", "kinésithérapie", "kiné"]),
+        procedure("massage", "Massage", bodyPart: "muscles", synonyms: ["massage therapy", "массаж", "масаж", "masaje"]),
+        procedure("blood-donation", "Blood donation", synonyms: ["donated blood", "донорство крови", "сдача крови", "донорство крові", "здача крові", "blutspende", "donación de sangre", "don du sang"]),
+    ]
+
     static let events: [HealthPreset] = [
         HealthPreset(id: "took-medication", title: "Took medication", kind: .medication),
         HealthPreset(id: "vaccination", title: "Vaccination", kind: .medication, tags: ["vaccine"]),
@@ -117,34 +137,23 @@ enum HealthPresets {
         HealthPreset(id: "fainting", title: "Fainting", kind: .symptom, bodyPart: "head", synonyms: ["fainted", "passed out", "syncope", "обморок", "потерял сознание", "потеряла сознание", "непритомність", "знепритомнів", "ohnmacht", "desmayo", "síncope", "évanouissement"]),
     ]
 
-    static let all = measurements + symptoms + events
+    static let all = measurements + symptoms + procedures + events
 
-    /// The measurement presets with the ones this person already records first, in the order they
-    /// last used them (presets.ts `measurementOrder`); `entries` newest first.
-    static func measurementOrder(_ entries: [HealthEntry]) -> [HealthPreset] {
+    /// The lists a quick bar offers, by the kind of entry it saves.
+    private static let quick: [HealthKind: [HealthPreset]] = [
+        .measurement: measurements, .symptom: symptoms, .procedure: procedures,
+    ]
+
+    /// Presets of these kinds ordered for a quick bar (presets.ts `presetOrder`): the ones this
+    /// person has recorded before first, most recently used first, then the rest in list order;
+    /// `entries` newest first. An entry counts under any name it was saved with: "Cough", "кашель".
+    static func presetOrder(_ kinds: [HealthKind], _ entries: [HealthEntry]) -> [HealthPreset] {
+        let list = kinds.flatMap { quick[$0] ?? [] }
         var used: [HealthPreset] = []
-        for e in entries where e.kind == .measurement {
-            let title = e.title.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-            if let p = measurements.first(where: { $0.title.lowercased() == title }), !used.contains(p) { used.append(p) }
+        for e in entries {
+            if let p = presetOf(kind: e.kind, title: e.title), list.contains(p), !used.contains(p) { used.append(p) }
         }
-        return used + measurements.filter { !used.contains($0) }
-    }
-
-    /// The symptom presets with the ones this person already recorded first, most recent first, then
-    /// the rest in list order (presets.ts `presetOrder('symptom', …)`); `entries` newest first. An
-    /// entry counts under any name it was saved with: "Cough", "кашель".
-    static func symptomOrder(_ entries: [HealthEntry]) -> [HealthPreset] {
-        var used: [HealthPreset] = []
-        for e in entries where e.kind == .symptom {
-            if let p = symptomPreset(e.title), !used.contains(p) { used.append(p) }
-        }
-        return used + symptoms.filter { !used.contains($0) }
-    }
-
-    /// The symptom preset (not an event like injury or fainting) a saved title names, by its title or
-    /// a synonym (presets.ts `symptomPreset`).
-    static func symptomPreset(_ title: String) -> HealthPreset? {
-        presetOf(kind: .symptom, title: title).flatMap { p in symptoms.contains(p) ? p : nil }
+        return used + list.filter { !used.contains($0) }
     }
 
     static func find(_ id: String) -> HealthPreset? {
@@ -164,6 +173,12 @@ enum HealthPresets {
             id: id, title: title, kind: .measurement, bodyPart: bodyPart, unit: unit,
             pair: pair.map { [$0.0, $0.1] }, synonyms: synonyms
         )
+    }
+
+    private static func procedure(
+        _ id: String, _ title: String, bodyPart: String? = nil, tags: [String] = [], synonyms: [String] = []
+    ) -> HealthPreset {
+        HealthPreset(id: id, title: title, kind: .procedure, bodyPart: bodyPart, tags: tags, synonyms: synonyms)
     }
 
     private static func symptom(

@@ -6,7 +6,7 @@ import Foundation
 
 /// What an entry is. The raw values are what the `kind` column stores.
 enum HealthKind: String, CaseIterable, Identifiable {
-    case symptom, measurement, lab, imaging, diagnosis, medication, letter, other
+    case symptom, measurement, lab, imaging, diagnosis, medication, procedure, letter, other
 
     var id: String { rawValue }
 
@@ -20,6 +20,7 @@ enum HealthKind: String, CaseIterable, Identifiable {
         case .imaging: return "Imaging report"
         case .diagnosis: return "Diagnosis"
         case .medication: return "Medication"
+        case .procedure: return "Procedure or checkup"
         case .letter: return "Doctor letter"
         case .other: return "Other"
         }

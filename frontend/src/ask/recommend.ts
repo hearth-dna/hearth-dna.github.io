@@ -76,6 +76,7 @@ const HEALTH_PLAN: Record<Intent['type'], [HealthKind, number, number][]> = {
     ['diagnosis', 5, 3650],
     ['medication', 8, 365],
     ['lab', 5, 365],
+    ['procedure', 5, 730],
   ],
   report: [
     ['letter', 3, 365],

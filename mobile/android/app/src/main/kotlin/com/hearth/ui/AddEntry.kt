@@ -84,11 +84,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 /** Kinds whose entries usually happen at a time of day; the others start without one. */
-private val TIMED = setOf(HealthKind.SYMPTOM, HealthKind.MEASUREMENT, HealthKind.MEDICATION)
+private val TIMED = setOf(HealthKind.SYMPTOM, HealthKind.MEASUREMENT, HealthKind.MEDICATION, HealthKind.PROCEDURE)
 
 /** Which optional fields each kind shows, as HealthEntryForm's FIELDS. */
 private fun HealthKind.hasValue() = this == HealthKind.MEASUREMENT
-private fun HealthKind.hasBodyPart() = this in setOf(HealthKind.SYMPTOM, HealthKind.MEASUREMENT, HealthKind.IMAGING, HealthKind.DIAGNOSIS, HealthKind.OTHER)
+private fun HealthKind.hasBodyPart() = this in setOf(HealthKind.SYMPTOM, HealthKind.MEASUREMENT, HealthKind.IMAGING, HealthKind.DIAGNOSIS, HealthKind.PROCEDURE, HealthKind.OTHER)
 private fun HealthKind.hasSeverity() = this == HealthKind.SYMPTOM || this == HealthKind.OTHER
 
 private fun nowTime() = LocalTime.now().let { "%02d:%02d".format(it.hour, it.minute) }

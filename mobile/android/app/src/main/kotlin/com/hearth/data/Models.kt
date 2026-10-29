@@ -20,6 +20,7 @@ enum class HealthKind(val id: String, val label: String) {
     IMAGING("imaging", "Imaging report"),
     DIAGNOSIS("diagnosis", "Diagnosis"),
     MEDICATION("medication", "Medication"),
+    PROCEDURE("procedure", "Procedure or checkup"),
     LETTER("letter", "Doctor letter"),
     OTHER("other", "Other");
 

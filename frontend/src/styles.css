@@ -225,6 +225,8 @@ button.sync.ok > span:first-child { color: var(--ok); }
 button.sync.warn { border-color: var(--warn); }
 button.sync.warn > span:first-child { color: var(--warn); }
 button.sync.danger { border-color: var(--danger); color: var(--danger); }
+button.sync .sync-label { display: inline-flex; flex-direction: column; align-items: flex-start; line-height: 1.15; }
+button.sync .sync-file { font-size: var(--text-xs); color: var(--muted); font-weight: 400; }
 @media (max-width: 640px) { button.sync .sync-label { display: none; } }
 
 /* ---- Right-to-left ------------------------------------------------------------------------- */
@@ -312,13 +314,13 @@ fieldset.field > legend { padding: 0; margin-bottom: var(--space-1); }
 
 /* ---- Health log: a colour per kind, toolbar, filter panel, cards ------------------------------ */
 .kind-symptom { --k: #b4432f; } .kind-measurement { --k: #2f6fa8; } .kind-lab { --k: #7a4fb0; } .kind-imaging { --k: #1f7f7a; }
-.kind-diagnosis { --k: #a86a00; } .kind-medication { --k: #2f7d3a; } .kind-letter { --k: #7a6446; } .kind-other { --k: var(--muted); }
+.kind-diagnosis { --k: #a86a00; } .kind-medication { --k: #2f7d3a; } .kind-letter { --k: #7a6446; } .kind-procedure { --k: #9c3f7c; } .kind-other { --k: var(--muted); }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) .kind-symptom { --k: #e58a78; } :root:not([data-theme='light']) .kind-measurement { --k: #7fb2e5; } :root:not([data-theme='light']) .kind-lab { --k: #b99be0; } :root:not([data-theme='light']) .kind-imaging { --k: #6fc9c2; }
-  :root:not([data-theme='light']) .kind-diagnosis { --k: #e0b35a; } :root:not([data-theme='light']) .kind-medication { --k: #85c98f; } :root:not([data-theme='light']) .kind-letter { --k: #c9b08c; }
+  :root:not([data-theme='light']) .kind-diagnosis { --k: #e0b35a; } :root:not([data-theme='light']) .kind-medication { --k: #85c98f; } :root:not([data-theme='light']) .kind-letter { --k: #c9b08c; } :root:not([data-theme='light']) .kind-procedure { --k: #e092c4; }
 }
 :root[data-theme='dark'] .kind-symptom { --k: #e58a78; } :root[data-theme='dark'] .kind-measurement { --k: #7fb2e5; } :root[data-theme='dark'] .kind-lab { --k: #b99be0; } :root[data-theme='dark'] .kind-imaging { --k: #6fc9c2; }
-:root[data-theme='dark'] .kind-diagnosis { --k: #e0b35a; } :root[data-theme='dark'] .kind-medication { --k: #85c98f; } :root[data-theme='dark'] .kind-letter { --k: #c9b08c; }
+:root[data-theme='dark'] .kind-diagnosis { --k: #e0b35a; } :root[data-theme='dark'] .kind-medication { --k: #85c98f; } :root[data-theme='dark'] .kind-letter { --k: #c9b08c; } :root[data-theme='dark'] .kind-procedure { --k: #e092c4; }
 .badge[class*='kind-'] { color: var(--k); border-color: color-mix(in srgb, var(--k) 45%, transparent); background: color-mix(in srgb, var(--k) 10%, transparent); font-weight: 600; }
 .row.tabs.kinds button[class*='kind-']::before { content: ''; display: inline-block; width: 0.55em; height: 0.55em; border-radius: 50%; background: var(--k); margin-inline-end: 0.4em; vertical-align: 0.05em; }
 .hl-toolbar { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem; }

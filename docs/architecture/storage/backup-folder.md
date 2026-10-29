@@ -139,7 +139,9 @@ from `meta.generation` against the generation last written or loaded; when it is
 sync is on, the next start or reconnect syncs without waiting for another edit.
 
 **Header Sync button.** `components/SyncButton.tsx` shows the state in a word and a colour:
-synced (with the time), syncing soon, not synced, syncing, passphrase needed, reconnect, failed.
+synced, syncing soon, not synced, syncing, passphrase needed, reconnect, failed. A second line
+names the backup file and, once read, when any device last wrote it (the snapshot header's
+`exported_at`), so a newer write from another device shows there.
 A click syncs: a newer copy is loaded first (a union by id, so nothing here is lost), then this
 browser's state is written. States that need a
 decision open Settings. Folder reads time out after 10 s, so a stuck cloud mount shows "Sync
