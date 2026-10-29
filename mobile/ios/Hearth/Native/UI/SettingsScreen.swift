@@ -914,21 +914,20 @@ private struct EraseSheet: View {
 }
 
 /// The header's sync state (SyncButton.tsx): tap to sync now; it says why it cannot when it cannot.
+/// A long press shows the backup file and when any device last wrote it.
 struct SyncButton: View {
     @ObservedObject var backups: Backups
 
     var body: some View {
         if let s = state {
             Button { backups.sync() } label: {
-                VStack(alignment: .trailing, spacing: 0) {
-                    Text(s.label).font(.subheadline.weight(.semibold)).foregroundStyle(s.color)
-                    if let detail { Text(detail).font(.caption2).foregroundStyle(.secondary) }
-                }
+                Text(s.label).font(.subheadline.weight(.semibold)).foregroundStyle(s.color)
             }
+            .contextMenu { if let detail { Text(detail) } }
         }
     }
 
-    /// The second line: the backup file, and when any device last wrote it.
+    /// The hint: the backup file, and when any device last wrote it.
     private var detail: String? {
         guard case .ready(_, _, _, _, _, _, let file, let updatedAt) = backups.status else { return nil }
         return updatedAt.map { t("sync.fileUpdated", ["file": file, "time": stampTime($0)]) } ?? file

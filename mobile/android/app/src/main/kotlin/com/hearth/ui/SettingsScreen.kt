@@ -31,6 +31,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
@@ -41,7 +42,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -748,7 +752,11 @@ private fun EraseCard(repo: Repo, onErased: () -> Unit) {
 
 // ---- the sync button ------------------------------------------------------------------------
 
-/** The header's sync state (SyncButton.tsx): tap to sync now; it says why it cannot when it cannot. */
+/**
+ * The header's sync state (SyncButton.tsx): tap to sync now; it says why it cannot when it cannot.
+ * A long press shows the backup file and when any device last wrote it.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SyncAction(backups: Backups) {
     val t = LocalStrings.current
@@ -766,13 +774,13 @@ fun SyncAction(backups: Backups) {
             else -> t("sync.synced") to MaterialTheme.colorScheme.primary
         }
     }
-    // The second line: the backup file, and when any device last wrote it.
     val detail = (s as? Status.Ready)?.let { r -> r.updatedAt?.let { t("sync.fileUpdated", "file" to r.file, "time" to stamp(it)) } ?: r.file }
-    TextButton(onClick = { scope.launch { backups.sync() } }) {
-        Column(horizontalAlignment = Alignment.End) {
-            Text(label, color = color, style = MaterialTheme.typography.labelLarge)
-            detail?.let { Text(it, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall) }
-        }
+    TooltipBox(
+        positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+        tooltip = { detail?.let { PlainTooltip { Text(it) } } },
+        state = rememberTooltipState(),
+    ) {
+        TextButton(onClick = { scope.launch { backups.sync() } }) { Text(label, color = color, style = MaterialTheme.typography.labelLarge) }
     }
 }
 
