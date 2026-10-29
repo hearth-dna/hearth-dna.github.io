@@ -886,7 +886,7 @@
   "quickSymptom.severity": "nasilenie",
   "charts.group.symptom": "Objawy",
   "backupCard.titleManual": "Kopia zapasowa",
-  "backupCard.introManual": "Ta przeglądarka nie może synchronizować folderu, więc kopie zapasowe są plikami. <b>Utwórz kopię</b> tworzy zaszyfrowaną migawkę i otwiera menu udostępniania: zapisz ją przez Pliki lub Dysk Google w folderze kopii, którego używa komputer. Wszystkie urządzenia czytają i zapisują ten sam plik, a komputer dodaje zmiany z telefonu przy następnej synchronizacji. <b>Wczytaj kopię</b> otwiera zapisany plik i dodaje jego zawartość. Sam Hearth niczego nie wysyła.",
+  "backupCard.introManual": "Ta przeglądarka nie może synchronizować folderu, więc kopie zapasowe są plikami. <b>Utwórz kopię</b> tworzy zaszyfrowaną migawkę i otwiera menu udostępniania: zapisz ją przez Pliki lub Dysk Google w folderze kopii, którego używa komputer. Każda kopia dostaje nową nazwę z datą, a komputer dodaje zmiany z telefonu przy następnej synchronizacji. <b>Wczytaj kopię</b> otwiera zapisany plik i dodaje jego zawartość. Sam Hearth niczego nie wysyła.",
   "backupCard.downloadOnly": "Ta przeglądarka może tylko pobrać plik. Prześlij go na Dysk Google z aplikacji Dysk albo przechowuj w bezpiecznym miejscu.",
   "backupCard.lastShared": "Ostatnia kopia: {time}.",
   "backupCard.neverShared": "Z tego urządzenia nie ma jeszcze kopii.",

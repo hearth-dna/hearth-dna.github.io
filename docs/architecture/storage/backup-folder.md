@@ -27,19 +27,19 @@ No mobile browser can mount a folder, so there a backup is a file the user hands
 
 - **Back up…** builds the same snapshot (same passphrase rule, same envelope) and opens the system
   share sheet with it (`navigator.share({ files })`), where the user picks Google Drive, Files →
-  Google Drive, or any other app. The name is the folder's own, `hearth-backup.hearth` (`fileName`;
-  the card lets the user rename it, and every device must then use the same name), so every
-  device reads and writes one file.
+  Google Drive, or any other app. The name is new each time, `hearth-phone-2026-10-29-170512.hearth`
+  (`phoneShareName`), never the folder's own file: Drive's share target adds a file rather than
+  replacing one, so sharing under `hearth-backup.hearth` left several files of that name, and
+  rclone shows only one of them (whichever it lists), so two computers ended up writing different
+  ones. No share title either: Drive saves it as a `.txt` beside the file.
 - **Load backup…** is a file input without `accept` (iOS greys out unknown extensions); the
   system picker browses Drive. Loading is the same union-by-id restore as Import dump.
-- **The round trip with a computer** goes through that one file. A phone saves its snapshot over
-  it (Files → Google Drive → the computer's folder); the computer, at its next sync, sees a header
-  from another device and loads it like any newer snapshot, and its next backup writes the union
-  back. Replacing the file loses nothing that still lives on a device that syncs again, because
-  every load is a union by id and every device writes back after loading; Drive's version history
-  covers the rest. Where the drive keeps both instead (Google Drive allows two files of one name,
-  shown as `hearth-backup (1).hearth`), the computer also loads the copies beside it
-  (`sharedFiles`, with the `hearth-phone.hearth` and timestamped names earlier versions wrote),
+- **The round trip with a computer.** A phone saves its snapshot into the computer's folder (Files
+  → Google Drive); the computer, at its next sync, loads it as a copy beside its own backup and
+  its next backup writes the union into `hearth-backup.hearth`, which only computers and the phone
+  apps (through the provider's API, updating the file in place) write. The computer loads every
+  copy beside the backup (`sharedFiles`: the phone's names, the " (1)" a drive adds when a name is
+  taken, and the names earlier versions wrote),
   remembering by name, device and generation which it has loaded (`sharedKey` in
   `Saved.loadedShared`); the files stay. One the passphrase here does not open is named on the
   card and tried again when the passphrase changes; it never stops the folder's own backups. A

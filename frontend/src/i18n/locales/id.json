@@ -886,7 +886,7 @@
   "quickSymptom.severity": "keparahan",
   "charts.group.symptom": "Gejala",
   "backupCard.titleManual": "Cadangan",
-  "backupCard.introManual": "Browser ini tidak dapat menjaga folder tetap tersinkron, jadi cadangan berupa file. <b>Cadangkan</b> membuat snapshot terenkripsi dan membuka menu bagikan: simpan dengan File atau Google Drive ke folder cadangan yang dipakai komputer Anda. Semua perangkat membaca dan menulis file yang sama, dan komputer menambahkan perubahan dari ponsel pada sinkronisasi berikutnya. <b>Muat cadangan</b> membuka file tersimpan dan menambahkan isinya. Hearth sendiri tidak mengirim apa pun.",
+  "backupCard.introManual": "Browser ini tidak dapat menjaga folder tetap tersinkron, jadi cadangan berupa file. <b>Cadangkan</b> membuat snapshot terenkripsi dan membuka menu bagikan: simpan dengan File atau Google Drive ke folder cadangan yang dipakai komputer Anda. Setiap cadangan mendapat nama baru bertanggal, dan komputer menambahkan perubahan dari ponsel pada sinkronisasi berikutnya. <b>Muat cadangan</b> membuka file tersimpan dan menambahkan isinya. Hearth sendiri tidak mengirim apa pun.",
   "backupCard.downloadOnly": "Browser ini hanya bisa mengunduh file. Unggah ke Google Drive dari aplikasi Drive, atau simpan di tempat yang aman.",
   "backupCard.lastShared": "Cadangan terakhir: {time}.",
   "backupCard.neverShared": "Belum ada cadangan dari perangkat ini.",

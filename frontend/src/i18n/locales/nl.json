@@ -886,7 +886,7 @@
   "quickSymptom.severity": "ernst",
   "charts.group.symptom": "Symptomen",
   "backupCard.titleManual": "Back-up",
-  "backupCard.introManual": "Deze browser kan geen map gesynchroniseerd houden, dus back-ups zijn bestanden. <b>Back-up maken</b> maakt een versleutelde momentopname en opent het deelmenu: bewaar die met Bestanden of Google Drive in de back-upmap van je computer. Alle apparaten lezen en schrijven hetzelfde bestand, en de computer voegt de wijzigingen van de telefoon bij de volgende synchronisatie toe. <b>Back-up laden</b> opent een opgeslagen bestand en voegt de inhoud toe. Hearth zelf verstuurt niets.",
+  "backupCard.introManual": "Deze browser kan geen map gesynchroniseerd houden, dus back-ups zijn bestanden. <b>Back-up maken</b> maakt een versleutelde momentopname en opent het deelmenu: bewaar die met Bestanden of Google Drive in de back-upmap van je computer. Elke back-up krijgt een nieuwe naam met de datum, en de computer voegt de wijzigingen van de telefoon bij de volgende synchronisatie toe. <b>Back-up laden</b> opent een opgeslagen bestand en voegt de inhoud toe. Hearth zelf verstuurt niets.",
   "backupCard.downloadOnly": "Deze browser kan het bestand alleen downloaden. Upload het via de Drive-app naar Google Drive, of bewaar het op een veilige plek.",
   "backupCard.lastShared": "Laatste back-up: {time}.",
   "backupCard.neverShared": "Nog geen back-up vanaf dit apparaat.",

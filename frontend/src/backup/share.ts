@@ -25,7 +25,8 @@ export function canShareFiles(): boolean {
 export async function shareOrDownload(bytes: Uint8Array, name: string): Promise<'shared' | 'downloaded'> {
   const file = asFile(bytes, name)
   if (navigator.canShare?.({ files: [file] })) {
-    await navigator.share({ files: [file], title: name })
+    // No title: Google Drive saves one as a text file beside the backup.
+    await navigator.share({ files: [file] })
     return 'shared'
   }
   downloadBytes(bytes, name)

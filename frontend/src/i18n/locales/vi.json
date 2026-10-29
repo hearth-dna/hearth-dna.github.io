@@ -886,7 +886,7 @@
   "quickSymptom.severity": "mức độ",
   "charts.group.symptom": "Triệu chứng",
   "backupCard.titleManual": "Sao lưu",
-  "backupCard.introManual": "Trình duyệt này không thể giữ một thư mục đồng bộ, nên bản sao lưu là tệp. <b>Sao lưu</b> tạo một bản chụp được mã hóa và mở menu chia sẻ: lưu nó bằng Tệp hoặc Google Drive vào thư mục sao lưu mà máy tính của bạn dùng. Mọi thiết bị đọc và ghi cùng một tệp, và máy tính thêm các thay đổi từ điện thoại ở lần đồng bộ tiếp theo. <b>Tải bản sao lưu</b> mở một tệp đã lưu và thêm nội dung trong đó. Bản thân Hearth không gửi gì cả.",
+  "backupCard.introManual": "Trình duyệt này không thể giữ một thư mục đồng bộ, nên bản sao lưu là tệp. <b>Sao lưu</b> tạo một bản chụp được mã hóa và mở menu chia sẻ: lưu nó bằng Tệp hoặc Google Drive vào thư mục sao lưu mà máy tính của bạn dùng. Mỗi bản sao lưu có một tên mới kèm ngày, và máy tính thêm các thay đổi từ điện thoại ở lần đồng bộ tiếp theo. <b>Tải bản sao lưu</b> mở một tệp đã lưu và thêm nội dung trong đó. Bản thân Hearth không gửi gì cả.",
   "backupCard.downloadOnly": "Trình duyệt này chỉ có thể tải tệp xuống. Hãy tải nó lên Google Drive từ ứng dụng Drive, hoặc cất ở nơi an toàn.",
   "backupCard.lastShared": "Bản sao lưu gần nhất: {time}.",
   "backupCard.neverShared": "Chưa có bản sao lưu nào từ thiết bị này.",

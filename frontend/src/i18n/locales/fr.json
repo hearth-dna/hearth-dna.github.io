@@ -886,7 +886,7 @@
   "quickSymptom.severity": "intensité",
   "charts.group.symptom": "Symptômes",
   "backupCard.titleManual": "Sauvegarde",
-  "backupCard.introManual": "Ce navigateur ne peut pas garder un dossier synchronisé, les sauvegardes sont donc des fichiers. <b>Sauvegarder</b> crée un instantané chiffré et ouvre le menu de partage : enregistrez-le avec Fichiers ou Google Drive dans le dossier de sauvegarde de votre ordinateur. Tous les appareils lisent et écrivent le même fichier, et l’ordinateur ajoute les modifications du téléphone à la prochaine synchronisation. <b>Charger une sauvegarde</b> ouvre un fichier enregistré et ajoute son contenu. Hearth n’envoie rien lui-même.",
+  "backupCard.introManual": "Ce navigateur ne peut pas garder un dossier synchronisé, les sauvegardes sont donc des fichiers. <b>Sauvegarder</b> crée un instantané chiffré et ouvre le menu de partage : enregistrez-le avec Fichiers ou Google Drive dans le dossier de sauvegarde de votre ordinateur. Chaque sauvegarde reçoit un nouveau nom daté, et l’ordinateur ajoute les modifications du téléphone à la prochaine synchronisation. <b>Charger une sauvegarde</b> ouvre un fichier enregistré et ajoute son contenu. Hearth n’envoie rien lui-même.",
   "backupCard.downloadOnly": "Ce navigateur peut seulement télécharger le fichier. Envoyez-le sur Google Drive depuis l'application Drive, ou rangez-le en lieu sûr.",
   "backupCard.lastShared": "Dernière sauvegarde : {time}.",
   "backupCard.neverShared": "Aucune sauvegarde depuis cet appareil pour l'instant.",

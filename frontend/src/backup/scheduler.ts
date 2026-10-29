@@ -22,6 +22,7 @@ import {
   hasNewer,
   phoneCopyDelay,
   phoneCopyName,
+  phoneShareName,
   type Seen,
   sharedAction,
   sharedFiles,
@@ -715,7 +716,7 @@ class Backups {
         const bytes = await snapshotBytes(this.db, this.appVersion, this.plain ? undefined : pass)
         const device = (await getMeta(this.db, 'device')) ?? ''
         const generation = Number((await getMeta(this.db, 'generation')) ?? 0)
-        this.built = { name: this.file, bytes, seen: { device, generation } }
+        this.built = { name: phoneShareName(this.profile, new Date()), bytes, seen: { device, generation } }
       } finally {
         this.busy = false
         this.setStep(null)
