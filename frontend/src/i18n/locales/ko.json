@@ -886,7 +886,7 @@
   "quickSymptom.severity": "심한 정도",
   "charts.group.symptom": "증상",
   "backupCard.titleManual": "백업",
-  "backupCard.introManual": "이 브라우저는 폴더를 동기화할 수 없으므로 백업은 파일로 만들어집니다. <b>백업</b>은 암호화된 스냅샷을 만들고 공유 메뉴를 엽니다. 파일 앱이나 Google Drive로 컴퓨터가 사용하는 백업 폴더에 저장하세요. 모든 기기가 같은 파일을 읽고 쓰며, 컴퓨터가 다음 동기화 때 휴대폰의 변경 사항을 가져옵니다. <b>백업 불러오기</b>는 저장된 파일을 열어 내용을 추가합니다. Hearth 자체는 아무것도 보내지 않습니다.",
+  "backupCard.introManual": "이 브라우저는 폴더를 동기화할 수 없으므로 백업은 파일로 만들어집니다. <b>백업</b>은 암호화된 스냅샷을 만들고 공유 메뉴를 엽니다. 파일 앱이나 Google Drive로 컴퓨터가 사용하는 백업 폴더에 저장하세요. 백업마다 날짜가 들어간 새 이름이 붙으며, 컴퓨터가 다음 동기화 때 휴대폰의 변경 사항을 가져옵니다. <b>백업 불러오기</b>는 저장된 파일을 열어 내용을 추가합니다. Hearth 자체는 아무것도 보내지 않습니다.",
   "backupCard.downloadOnly": "이 브라우저는 파일을 다운로드만 할 수 있습니다. 드라이브 앱에서 Google 드라이브에 업로드하거나 안전한 곳에 보관하세요.",
   "backupCard.lastShared": "마지막 백업: {time}.",
   "backupCard.neverShared": "이 기기에서 만든 백업이 아직 없습니다.",

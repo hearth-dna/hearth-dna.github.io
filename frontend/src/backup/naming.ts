@@ -12,8 +12,9 @@ export function baseName(profile: string): string {
 }
 
 /**
- * The backup file every device of a family reads and writes, phones included: `baseName` unless
- * the user named it (Settings). A name without `.hearth` gets it; a path is not a name.
+ * The backup file the computers and phone apps of a family read and write, and phone browsers
+ * load: `baseName` unless the user named it (Settings). A name without `.hearth` gets it; a path is
+ * not a name. Phone browsers share under `phoneShareName` instead.
  */
 export function fileName(profile: string, chosen?: string): string {
   const n = chosen?.trim() ?? ''
@@ -23,18 +24,32 @@ export function fileName(profile: string, chosen?: string): string {
 
 const literal = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
+const pad = (n: number) => String(n).padStart(2, '0')
+
 /**
- * Backups beside `base` that another device saved instead of replacing it: the " (1)" or " 2" a
- * drive or Files adds when the name is taken, and the names earlier versions gave a phone's copy
- * (`hearth-phone.hearth`, `hearth-backup-2026-09-29-1402.hearth`). Never `base` itself, its
- * rotations, or the phone copy. Sorted by name.
+ * The name a phone browser shares its backup under: `hearth-phone-2026-10-29-170512.hearth`, new
+ * each time. Never the folder's own file: Google Drive's share target adds a file rather than
+ * replacing one, and two files of one name make rclone show either, so two computers could each
+ * write a different one.
+ */
+export function phoneShareName(profile: string, now: Date): string {
+  const day = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`
+  const time = `${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`
+  return `${profile === 'default' ? 'hearth-phone' : `hearth-phone-${profile}`}-${day}-${time}.hearth`
+}
+
+/**
+ * Backups beside `base` that another device saved instead of replacing it: what phone browsers
+ * share (`phoneShareName`, and the `hearth-phone.hearth` earlier versions wrote), the " (1)" or
+ * " 2" a drive or Files adds when a name is taken, and `hearth-backup-2026-09-29-1402.hearth`
+ * from earlier versions. Never `base` itself, its rotations, or the phone copy. Sorted by name.
  */
 export function sharedFiles(existing: string[], base: string, profile: string): string[] {
   const stem = (n: string) => literal(n.replace(/\.hearth$/, ''))
   const copy = new RegExp(`^${stem(base)}( \\(\\d+\\)| ?\\d+)\\.hearth$`)
   const legacy = '( ?\\(?\\d+\\)?)?\\.hearth$'
   const phone = new RegExp(
-    `^${profile === 'default' ? 'hearth-phone' : stem(`hearth-phone-${profile}.hearth`)}${legacy}`,
+    `^${profile === 'default' ? 'hearth-phone' : stem(`hearth-phone-${profile}.hearth`)}(-\\d{4}-\\d{2}-\\d{2}-\\d{6})?${legacy}`,
   )
   const stamped = new RegExp(`^${stem(baseName(profile))}-\\d{4}-\\d{2}-\\d{2}-\\d{4}${legacy}`)
   return existing.filter((n) => n !== base && [copy, phone, stamped].some((r) => r.test(n))).sort()

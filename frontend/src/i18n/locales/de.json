@@ -886,7 +886,7 @@
   "quickSymptom.severity": "Stärke",
   "charts.group.symptom": "Symptome",
   "backupCard.titleManual": "Sicherung",
-  "backupCard.introManual": "Dieser Browser kann keinen Ordner synchron halten, daher sind Sicherungen Dateien. <b>Sichern</b> erstellt einen verschlüsselten Snapshot und öffnet das Teilen-Menü: Speichere ihn mit Dateien oder Google Drive in den Sicherungsordner deines Computers. Alle Geräte lesen und schreiben dieselbe Datei, und der Computer übernimmt die Änderungen des Telefons bei der nächsten Synchronisierung. <b>Sicherung laden</b> öffnet eine gespeicherte Datei und übernimmt ihren Inhalt. Hearth selbst sendet nichts.",
+  "backupCard.introManual": "Dieser Browser kann keinen Ordner synchron halten, daher sind Sicherungen Dateien. <b>Sichern</b> erstellt einen verschlüsselten Snapshot und öffnet das Teilen-Menü: Speichere ihn mit Dateien oder Google Drive in den Sicherungsordner deines Computers. Jede Sicherung erhält einen neuen Namen mit Datum, und der Computer übernimmt die Änderungen des Telefons bei der nächsten Synchronisierung. <b>Sicherung laden</b> öffnet eine gespeicherte Datei und übernimmt ihren Inhalt. Hearth selbst sendet nichts.",
   "backupCard.downloadOnly": "Dieser Browser kann die Datei nur herunterladen. Lade sie in der Drive-App zu Google Drive hoch oder bewahre sie an einem sicheren Ort auf.",
   "backupCard.lastShared": "Letzte Sicherung: {time}.",
   "backupCard.neverShared": "Von diesem Gerät gibt es noch keine Sicherung.",

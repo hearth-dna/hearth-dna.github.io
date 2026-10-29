@@ -886,7 +886,7 @@
   "quickSymptom.severity": "严重程度",
   "charts.group.symptom": "症状",
   "backupCard.titleManual": "备份",
-  "backupCard.introManual": "此浏览器无法保持文件夹同步，因此备份是文件。<b>备份</b>会生成加密快照并打开共享菜单：用“文件”或 Google 云端硬盘把它保存到电脑使用的备份文件夹。所有设备读写同一个文件，电脑会在下次同步时加入手机上的更改。<b>载入备份</b>会打开已保存的文件并添加其中的内容。Hearth 本身不会发送任何内容。",
+  "backupCard.introManual": "此浏览器无法保持文件夹同步，因此备份是文件。<b>备份</b>会生成加密快照并打开共享菜单：用“文件”或 Google 云端硬盘把它保存到电脑使用的备份文件夹。每次备份都会得到一个带日期的新名称，电脑会在下次同步时加入手机上的更改。<b>载入备份</b>会打开已保存的文件并添加其中的内容。Hearth 本身不会发送任何内容。",
   "backupCard.downloadOnly": "此浏览器只能下载该文件。请通过云端硬盘应用将其上传到 Google 云端硬盘，或存放在安全的地方。",
   "backupCard.lastShared": "上次备份：{time}。",
   "backupCard.neverShared": "此设备尚无备份。",

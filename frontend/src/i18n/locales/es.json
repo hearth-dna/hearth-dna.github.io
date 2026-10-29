@@ -886,7 +886,7 @@
   "quickSymptom.severity": "intensidad",
   "charts.group.symptom": "Síntomas",
   "backupCard.titleManual": "Copia de seguridad",
-  "backupCard.introManual": "Este navegador no puede mantener una carpeta sincronizada, así que las copias son archivos. <b>Hacer copia</b> crea una instantánea cifrada y abre el menú de compartir: guárdala con Archivos o Google Drive en la carpeta de copias que usa tu ordenador. Todos los dispositivos leen y escriben el mismo archivo, y el ordenador añade los cambios del teléfono en la siguiente sincronización. <b>Cargar copia</b> abre un archivo guardado y añade lo que contiene. Hearth no envía nada por sí mismo.",
+  "backupCard.introManual": "Este navegador no puede mantener una carpeta sincronizada, así que las copias son archivos. <b>Hacer copia</b> crea una instantánea cifrada y abre el menú de compartir: guárdala con Archivos o Google Drive en la carpeta de copias que usa tu ordenador. Cada copia recibe un nombre nuevo con la fecha, y el ordenador añade los cambios del teléfono en la siguiente sincronización. <b>Cargar copia</b> abre un archivo guardado y añade lo que contiene. Hearth no envía nada por sí mismo.",
   "backupCard.downloadOnly": "Este navegador solo puede descargar el archivo. Súbelo a Google Drive desde la app de Drive o guárdalo en un lugar seguro.",
   "backupCard.lastShared": "Última copia: {time}.",
   "backupCard.neverShared": "Aún no hay copias desde este dispositivo.",

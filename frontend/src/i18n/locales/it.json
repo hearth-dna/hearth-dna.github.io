@@ -886,7 +886,7 @@
   "quickSymptom.severity": "intensità",
   "charts.group.symptom": "Sintomi",
   "backupCard.titleManual": "Backup",
-  "backupCard.introManual": "Questo browser non può mantenere sincronizzata una cartella, quindi i backup sono file. <b>Esegui backup</b> crea uno snapshot cifrato e apre il menu di condivisione: salvalo con File o Google Drive nella cartella di backup usata dal tuo computer. Tutti i dispositivi leggono e scrivono lo stesso file, e il computer aggiunge le modifiche del telefono alla prossima sincronizzazione. <b>Carica backup</b> apre un file salvato e ne aggiunge il contenuto. Hearth di per sé non invia nulla.",
+  "backupCard.introManual": "Questo browser non può mantenere sincronizzata una cartella, quindi i backup sono file. <b>Esegui backup</b> crea uno snapshot cifrato e apre il menu di condivisione: salvalo con File o Google Drive nella cartella di backup usata dal tuo computer. Ogni backup riceve un nuovo nome con la data, e il computer aggiunge le modifiche del telefono alla prossima sincronizzazione. <b>Carica backup</b> apre un file salvato e ne aggiunge il contenuto. Hearth di per sé non invia nulla.",
   "backupCard.downloadOnly": "Questo browser può solo scaricare il file. Caricalo su Google Drive dall'app Drive o conservalo in un posto sicuro.",
   "backupCard.lastShared": "Ultimo backup: {time}.",
   "backupCard.neverShared": "Nessun backup da questo dispositivo finora.",

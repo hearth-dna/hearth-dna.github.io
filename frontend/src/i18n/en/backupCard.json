@@ -27,7 +27,7 @@
   "backupCard.done": "Backed up to {name} at {time}.",
   "backupCard.autoSync": "Sync automatically after every change",
   "backupCard.titleManual": "Backup",
-  "backupCard.introManual": "This browser cannot keep a folder in sync, so backups are files. <b>Back up</b> builds an encrypted snapshot and opens the share sheet: save it with Files or Google Drive into the backup folder your computer uses. Every device reads and writes the same file, and the computer adds the phone's changes at its next sync. <b>Load backup</b> opens a saved file and adds what is in it. Nothing is sent by Hearth itself.",
+  "backupCard.introManual": "This browser cannot keep a folder in sync, so backups are files. <b>Back up</b> builds an encrypted snapshot and opens the share sheet: save it with Files or Google Drive into the backup folder your computer uses. Each backup gets a new name with the date, and the computer adds the phone's changes at its next sync. <b>Load backup</b> opens a saved file and adds what is in it. Nothing is sent by Hearth itself.",
   "backupCard.downloadOnly": "This browser can only download the file. Upload it to Google Drive from the Drive app, or move it somewhere safe.",
   "backupCard.lastShared": "Last backup: {time}.",
   "backupCard.neverShared": "No backup from this device yet.",

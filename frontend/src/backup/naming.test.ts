@@ -9,6 +9,7 @@ import {
   PHONE_COPY_QUIET_MS,
   phoneCopyDelay,
   phoneCopyName,
+  phoneShareName,
   rotationPlan,
   sharedAction,
   sharedFiles,
@@ -70,6 +71,26 @@ describe('backup naming', () => {
     ])
     expect(sharedFiles(['family.hearth', 'family (1).hearth'], 'family.hearth', 'default')).toEqual([
       'family (1).hearth',
+    ])
+  })
+
+  it('gives each phone share a new name that only the computers read', () => {
+    const at = new Date(2026, 9, 29, 17, 5, 12)
+    expect(phoneShareName('default', at)).toBe('hearth-phone-2026-10-29-170512.hearth')
+    expect(phoneShareName('kids', at)).toBe('hearth-phone-kids-2026-10-29-170512.hearth')
+    const names = [
+      'hearth-backup.hearth',
+      phoneShareName('default', at),
+      'hearth-phone-2026-10-29-170512 (1).hearth',
+      phoneShareName('kids', at),
+      'hearth-phone-copy.hearth',
+    ]
+    expect(sharedFiles(names, 'hearth-backup.hearth', 'default')).toEqual([
+      'hearth-phone-2026-10-29-170512 (1).hearth',
+      'hearth-phone-2026-10-29-170512.hearth',
+    ])
+    expect(sharedFiles(names, 'hearth-backup-kids.hearth', 'kids')).toEqual([
+      'hearth-phone-kids-2026-10-29-170512.hearth',
     ])
   })
 

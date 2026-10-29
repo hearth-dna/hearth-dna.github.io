@@ -886,7 +886,7 @@
   "quickSymptom.severity": "şiddet",
   "charts.group.symptom": "Belirtiler",
   "backupCard.titleManual": "Yedek",
-  "backupCard.introManual": "Bu tarayıcı bir klasörü eşitlenmiş tutamaz, bu yüzden yedekler dosyadır. <b>Yedekle</b> şifreli bir anlık görüntü oluşturur ve paylaşım menüsünü açar: Dosyalar veya Google Drive ile bilgisayarınızın kullandığı yedek klasörüne kaydedin. Tüm cihazlar aynı dosyayı okuyup yazar; bilgisayar telefondaki değişiklikleri bir sonraki eşitlemede ekler. <b>Yedeği yükle</b> kayıtlı bir dosyayı açar ve içeriğini ekler. Hearth kendisi hiçbir şey göndermez.",
+  "backupCard.introManual": "Bu tarayıcı bir klasörü eşitlenmiş tutamaz, bu yüzden yedekler dosyadır. <b>Yedekle</b> şifreli bir anlık görüntü oluşturur ve paylaşım menüsünü açar: Dosyalar veya Google Drive ile bilgisayarınızın kullandığı yedek klasörüne kaydedin. Her yedek tarihli yeni bir ad alır; bilgisayar telefondaki değişiklikleri bir sonraki eşitlemede ekler. <b>Yedeği yükle</b> kayıtlı bir dosyayı açar ve içeriğini ekler. Hearth kendisi hiçbir şey göndermez.",
   "backupCard.downloadOnly": "Bu tarayıcı dosyayı yalnızca indirebilir. Drive uygulamasından Google Drive'a yükleyin veya güvenli bir yerde saklayın.",
   "backupCard.lastShared": "Son yedek: {time}.",
   "backupCard.neverShared": "Bu cihazdan henüz yedek yok.",

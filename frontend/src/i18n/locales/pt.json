@@ -886,7 +886,7 @@
   "quickSymptom.severity": "intensidade",
   "charts.group.symptom": "Sintomas",
   "backupCard.titleManual": "Backup",
-  "backupCard.introManual": "Este navegador não consegue manter uma pasta sincronizada, então os backups são arquivos. <b>Fazer backup</b> cria um snapshot criptografado e abre o menu de compartilhamento: salve-o com Arquivos ou Google Drive na pasta de backup que seu computador usa. Todos os dispositivos leem e gravam o mesmo arquivo, e o computador adiciona as alterações do celular na próxima sincronização. <b>Carregar backup</b> abre um arquivo salvo e adiciona o conteúdo. O Hearth não envia nada por conta própria.",
+  "backupCard.introManual": "Este navegador não consegue manter uma pasta sincronizada, então os backups são arquivos. <b>Fazer backup</b> cria um snapshot criptografado e abre o menu de compartilhamento: salve-o com Arquivos ou Google Drive na pasta de backup que seu computador usa. Cada backup recebe um novo nome com a data, e o computador adiciona as alterações do celular na próxima sincronização. <b>Carregar backup</b> abre um arquivo salvo e adiciona o conteúdo. O Hearth não envia nada por conta própria.",
   "backupCard.downloadOnly": "Este navegador só consegue baixar o arquivo. Envie-o ao Google Drive pelo app do Drive ou guarde-o em um lugar seguro.",
   "backupCard.lastShared": "Último backup: {time}.",
   "backupCard.neverShared": "Ainda não há backup deste dispositivo.",
