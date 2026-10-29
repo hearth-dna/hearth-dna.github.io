@@ -225,8 +225,6 @@ button.sync.ok > span:first-child { color: var(--ok); }
 button.sync.warn { border-color: var(--warn); }
 button.sync.warn > span:first-child { color: var(--warn); }
 button.sync.danger { border-color: var(--danger); color: var(--danger); }
-button.sync .sync-label { display: inline-flex; flex-direction: column; align-items: flex-start; line-height: 1.15; }
-button.sync .sync-file { font-size: var(--text-xs); color: var(--muted); font-weight: 400; }
 @media (max-width: 640px) { button.sync .sync-label { display: none; } }
 
 /* ---- Right-to-left ------------------------------------------------------------------------- */

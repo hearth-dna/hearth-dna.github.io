@@ -39,7 +39,7 @@ export function SyncButton({ onOpenSettings }: { onOpenSettings: () => void }) {
 
   const needsPass = !backups.plain && !backups.passphrase()
 
-  // The second line: the backup file, and when any device last wrote it once that is known.
+  // The hint's first line: the backup file, and when any device last wrote it once that is known.
   const detail = ((): string | null => {
     if (status.state === 'ready')
       return status.updatedAt
@@ -98,7 +98,7 @@ export function SyncButton({ onOpenSettings }: { onOpenSettings: () => void }) {
           }
         return {
           icon: '✓',
-          // When is on the second line: the file's time, newer than ours when another device wrote last.
+          // When is in the hint: the file's time, newer than ours when another device wrote last.
           label: t('sync.synced'),
           title: t('sync.syncedHint', { name: status.name }),
           tone: 'ok',
@@ -137,10 +137,7 @@ export function SyncButton({ onOpenSettings }: { onOpenSettings: () => void }) {
       ) : (
         <span aria-hidden="true">{look.icon}</span>
       )}
-      <span className="sync-label">
-        {look.label}
-        {detail && <small className="sync-file">{detail}</small>}
-      </span>
+      <span className="sync-label">{look.label}</span>
     </button>
   )
 }
