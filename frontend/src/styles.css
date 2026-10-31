@@ -332,21 +332,22 @@ fieldset.field > legend { padding: 0; margin-bottom: var(--space-1); }
 .bodymap svg { width: 100%; max-width: 30rem; height: auto; overflow: hidden; user-select: none; -webkit-tap-highlight-color: transparent; }
 .bodymap .scene { transform-origin: 0 0; transform-box: view-box; transition: transform 0.35s ease; }
 .bodymap .region { cursor: pointer; outline: none; }
-.bodymap .region > :not(title) { fill: var(--surface-2); stroke: var(--line-strong); stroke-width: 0.8; transition: fill 0.2s; }
-.bodymap .region:hover > :not(title) { stroke: var(--muted); stroke-width: 1.2; }
-.bodymap .region:focus-visible > :not(title) { stroke: var(--accent); stroke-width: 2; }
-.bodymap .region.on > :not(title) { stroke: var(--fg); stroke-width: 1.6; }
-.bodymap svg.zoomed .region > :not(title) { stroke-width: 0.4; }
-.bodymap svg.zoomed .region.on > :not(title) { stroke-width: 0.8; }
+.bodymap .region path { fill: color-mix(in srgb, var(--fg) 10%, var(--surface)); stroke: var(--surface); stroke-width: 1; stroke-linejoin: round; transition: fill 0.2s; }
+.bodymap .region path.overlay { fill: transparent; stroke: color-mix(in srgb, var(--fg) 35%, var(--surface)); stroke-width: 0.8; }
+.bodymap .region:hover path { stroke: var(--muted); }
+.bodymap .region:focus-visible path { stroke: var(--accent); stroke-width: 2; }
+.bodymap .region.on path { stroke: var(--fg); stroke-width: 1.6; }
+.bodymap svg.zoomed .region path { stroke-width: 0.4; }
+.bodymap svg.zoomed .region.on path { stroke-width: 0.7; }
 .bodymap .figure-label text { font-size: 12px; text-anchor: middle; fill: var(--muted); }
 .bodymap .figure-label text.side { font-weight: 600; }
-.bodymap .heat-1 > :not(title), .swatch.heat-1 { fill: color-mix(in srgb, var(--series-2) 18%, var(--surface)); background: color-mix(in srgb, var(--series-2) 18%, var(--surface)); }
-.bodymap .heat-2 > :not(title), .swatch.heat-2 { fill: color-mix(in srgb, var(--series-2) 36%, var(--surface)); background: color-mix(in srgb, var(--series-2) 36%, var(--surface)); }
-.bodymap .heat-3 > :not(title), .swatch.heat-3 { fill: color-mix(in srgb, var(--series-2) 55%, var(--surface)); background: color-mix(in srgb, var(--series-2) 55%, var(--surface)); }
-.bodymap .heat-4 > :not(title), .swatch.heat-4 { fill: color-mix(in srgb, var(--series-2) 75%, var(--surface)); background: color-mix(in srgb, var(--series-2) 75%, var(--surface)); }
-.bodymap .heat-5 > :not(title), .swatch.heat-5 { fill: var(--series-2); background: var(--series-2); }
+.bodymap .region.heat-1 path, .swatch.heat-1 { fill: color-mix(in srgb, var(--series-2) 18%, var(--surface)); background: color-mix(in srgb, var(--series-2) 18%, var(--surface)); }
+.bodymap .region.heat-2 path, .swatch.heat-2 { fill: color-mix(in srgb, var(--series-2) 36%, var(--surface)); background: color-mix(in srgb, var(--series-2) 36%, var(--surface)); }
+.bodymap .region.heat-3 path, .swatch.heat-3 { fill: color-mix(in srgb, var(--series-2) 55%, var(--surface)); background: color-mix(in srgb, var(--series-2) 55%, var(--surface)); }
+.bodymap .region.heat-4 path, .swatch.heat-4 { fill: color-mix(in srgb, var(--series-2) 75%, var(--surface)); background: color-mix(in srgb, var(--series-2) 75%, var(--surface)); }
+.bodymap .region.heat-5 path, .swatch.heat-5 { fill: var(--series-2); background: var(--series-2); }
 .swatch { display: inline-block; width: 0.9rem; height: 0.9rem; border-radius: var(--radius-sm); border: 1px solid var(--line); vertical-align: -0.1em; }
-.swatch.heat-0 { background: var(--surface-2); }
+.swatch.heat-0 { background: color-mix(in srgb, var(--fg) 10%, var(--surface)); }
 .bodymap .tag .swatch { margin-inline-end: var(--space-1); }
 .bodymap-legend { display: flex; align-items: center; gap: var(--space-1); }
 .bodymap-other { align-items: center; }
