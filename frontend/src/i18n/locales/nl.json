@@ -1103,5 +1103,13 @@
   "bodyMap.more": "Meer ({n})",
   "bodyMap.elsewhere": "Elders",
   "bodyMap.male": "Man",
-  "bodyMap.female": "Vrouw"
+  "bodyMap.female": "Vrouw",
+  "bodyMap.boy": "Jongen",
+  "bodyMap.girl": "Meisje",
+  "bodyMap.age": "Leeftijd",
+  "bodyMap.stage.adult": "Volwassene",
+  "bodyMap.stage.teen": "13–15 jaar",
+  "bodyMap.stage.child": "9–12 jaar",
+  "bodyMap.stage.young": "4–8 jaar",
+  "bodyMap.stage.toddler": "Onder 4"
 }

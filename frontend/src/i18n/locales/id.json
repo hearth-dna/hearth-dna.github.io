@@ -1103,5 +1103,13 @@
   "bodyMap.more": "Lebih banyak ({n})",
   "bodyMap.elsewhere": "Di tempat lain",
   "bodyMap.male": "Pria",
-  "bodyMap.female": "Wanita"
+  "bodyMap.female": "Wanita",
+  "bodyMap.boy": "Laki-laki",
+  "bodyMap.girl": "Perempuan",
+  "bodyMap.age": "Usia",
+  "bodyMap.stage.adult": "Dewasa",
+  "bodyMap.stage.teen": "13–15 tahun",
+  "bodyMap.stage.child": "9–12 tahun",
+  "bodyMap.stage.young": "4–8 tahun",
+  "bodyMap.stage.toddler": "Di bawah 4"
 }

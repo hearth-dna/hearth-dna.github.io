@@ -1103,5 +1103,13 @@
   "bodyMap.more": "ज़्यादा ({n})",
   "bodyMap.elsewhere": "अन्य जगहें",
   "bodyMap.male": "पुरुष",
-  "bodyMap.female": "महिला"
+  "bodyMap.female": "महिला",
+  "bodyMap.boy": "लड़का",
+  "bodyMap.girl": "लड़की",
+  "bodyMap.age": "उम्र",
+  "bodyMap.stage.adult": "वयस्क",
+  "bodyMap.stage.teen": "13–15 वर्ष",
+  "bodyMap.stage.child": "9–12 वर्ष",
+  "bodyMap.stage.young": "4–8 वर्ष",
+  "bodyMap.stage.toddler": "4 से कम"
 }

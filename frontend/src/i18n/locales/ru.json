@@ -1103,5 +1103,13 @@
   "bodyMap.more": "Больше ({n})",
   "bodyMap.elsewhere": "В других местах",
   "bodyMap.male": "Мужское",
-  "bodyMap.female": "Женское"
+  "bodyMap.female": "Женское",
+  "bodyMap.boy": "Мальчик",
+  "bodyMap.girl": "Девочка",
+  "bodyMap.age": "Возраст",
+  "bodyMap.stage.adult": "Взрослый",
+  "bodyMap.stage.teen": "13–15 лет",
+  "bodyMap.stage.child": "9–12 лет",
+  "bodyMap.stage.young": "4–8 лет",
+  "bodyMap.stage.toddler": "До 4 лет"
 }

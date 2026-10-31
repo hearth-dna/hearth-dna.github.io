@@ -1103,5 +1103,13 @@
   "bodyMap.more": "Daha çok ({n})",
   "bodyMap.elsewhere": "Diğer yerler",
   "bodyMap.male": "Erkek",
-  "bodyMap.female": "Kadın"
+  "bodyMap.female": "Kadın",
+  "bodyMap.boy": "Erkek çocuk",
+  "bodyMap.girl": "Kız çocuk",
+  "bodyMap.age": "Yaş",
+  "bodyMap.stage.adult": "Yetişkin",
+  "bodyMap.stage.teen": "13–15 yaş",
+  "bodyMap.stage.child": "9–12 yaş",
+  "bodyMap.stage.young": "4–8 yaş",
+  "bodyMap.stage.toddler": "4 yaş altı"
 }

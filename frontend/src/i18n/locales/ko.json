@@ -1103,5 +1103,13 @@
   "bodyMap.more": "많음 ({n})",
   "bodyMap.elsewhere": "기타 부위",
   "bodyMap.male": "남성",
-  "bodyMap.female": "여성"
+  "bodyMap.female": "여성",
+  "bodyMap.boy": "남자아이",
+  "bodyMap.girl": "여자아이",
+  "bodyMap.age": "나이",
+  "bodyMap.stage.adult": "성인",
+  "bodyMap.stage.teen": "13–15세",
+  "bodyMap.stage.child": "9–12세",
+  "bodyMap.stage.young": "4–8세",
+  "bodyMap.stage.toddler": "4세 미만"
 }

@@ -1103,5 +1103,13 @@
   "bodyMap.more": "Mehr ({n})",
   "bodyMap.elsewhere": "Anderswo",
   "bodyMap.male": "Männlich",
-  "bodyMap.female": "Weiblich"
+  "bodyMap.female": "Weiblich",
+  "bodyMap.boy": "Junge",
+  "bodyMap.girl": "Mädchen",
+  "bodyMap.age": "Alter",
+  "bodyMap.stage.adult": "Erwachsen",
+  "bodyMap.stage.teen": "13–15 Jahre",
+  "bodyMap.stage.child": "9–12 Jahre",
+  "bodyMap.stage.young": "4–8 Jahre",
+  "bodyMap.stage.toddler": "Unter 4"
 }

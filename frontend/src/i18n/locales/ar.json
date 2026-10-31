@@ -1103,5 +1103,13 @@
   "bodyMap.more": "أكثر ({n})",
   "bodyMap.elsewhere": "أماكن أخرى",
   "bodyMap.male": "ذكر",
-  "bodyMap.female": "أنثى"
+  "bodyMap.female": "أنثى",
+  "bodyMap.boy": "ولد",
+  "bodyMap.girl": "بنت",
+  "bodyMap.age": "العمر",
+  "bodyMap.stage.adult": "بالغ",
+  "bodyMap.stage.teen": "13–15 سنة",
+  "bodyMap.stage.child": "9–12 سنة",
+  "bodyMap.stage.young": "4–8 سنوات",
+  "bodyMap.stage.toddler": "أقل من 4"
 }
