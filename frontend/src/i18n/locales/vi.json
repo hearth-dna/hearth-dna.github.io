@@ -154,6 +154,7 @@
   "bodyPart.lower back": "thắt lưng",
   "bodyPart.hips": "hông",
   "bodyPart.shoulders": "vai",
+  "bodyPart.armpit": "nách",
   "bodyPart.arms": "cánh tay",
   "bodyPart.elbows": "khuỷu tay",
   "bodyPart.wrists": "cổ tay",
@@ -314,7 +315,7 @@
   "healthLog.unit": "Đơn vị",
   "healthLog.unitPlaceholder": "ví dụ cm",
   "healthLog.bodyPart": "Bộ phận cơ thể",
-  "healthLog.bodyPartPlaceholder": "ví dụ bàn tay",
+  "healthLog.bodyPartPlaceholder": "Ở đâu trên cơ thể",
   "healthLog.side": "Bên",
   "healthLog.sideNone": "không ghi rõ",
   "healthLog.severity": "Mức độ",
@@ -1111,5 +1112,8 @@
   "bodyMap.stage.teen": "13–15 tuổi",
   "bodyMap.stage.child": "9–12 tuổi",
   "bodyMap.stage.young": "4–8 tuổi",
-  "bodyMap.stage.toddler": "Dưới 4 tuổi"
+  "bodyMap.stage.toddler": "Dưới 4 tuổi",
+  "bodyMap.tooth": "răng {n}",
+  "bodyMap.teethHint": "Chạm vào một răng để chỉ hiện các mục của nó.",
+  "bodyMap.noTeeth": "Chưa có mục nào ghi răng: triệu chứng và điều trị răng có thể ghi."
 }

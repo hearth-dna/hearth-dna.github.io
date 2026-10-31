@@ -154,6 +154,7 @@
   "bodyPart.lower back": "कमर",
   "bodyPart.hips": "कूल्हे",
   "bodyPart.shoulders": "कंधे",
+  "bodyPart.armpit": "बगल",
   "bodyPart.arms": "बाँहें",
   "bodyPart.elbows": "कोहनियाँ",
   "bodyPart.wrists": "कलाइयाँ",
@@ -314,7 +315,7 @@
   "healthLog.unit": "इकाई",
   "healthLog.unitPlaceholder": "जैसे cm",
   "healthLog.bodyPart": "शरीर का अंग",
-  "healthLog.bodyPartPlaceholder": "जैसे हाथ",
+  "healthLog.bodyPartPlaceholder": "शरीर में कहाँ",
   "healthLog.side": "तरफ़",
   "healthLog.sideNone": "नहीं बताया",
   "healthLog.severity": "गंभीरता",
@@ -1111,5 +1112,8 @@
   "bodyMap.stage.teen": "13–15 वर्ष",
   "bodyMap.stage.child": "9–12 वर्ष",
   "bodyMap.stage.young": "4–8 वर्ष",
-  "bodyMap.stage.toddler": "4 से कम"
+  "bodyMap.stage.toddler": "4 से कम",
+  "bodyMap.tooth": "दाँत {n}",
+  "bodyMap.teethHint": "सिर्फ़ उसकी प्रविष्टियाँ देखने के लिए किसी दाँत पर टैप करें।",
+  "bodyMap.noTeeth": "अभी किसी प्रविष्टि में दाँत नहीं है: दाँत के लक्षण और इलाज में यह दिया जा सकता है।"
 }

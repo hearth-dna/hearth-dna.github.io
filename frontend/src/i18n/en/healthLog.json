@@ -20,7 +20,7 @@
   "healthLog.unit": "Unit",
   "healthLog.unitPlaceholder": "e.g. cm",
   "healthLog.bodyPart": "Body part",
-  "healthLog.bodyPartPlaceholder": "e.g. hands",
+  "healthLog.bodyPartPlaceholder": "Where on the body",
   "healthLog.side": "Side",
   "healthLog.sideNone": "not specified",
   "healthLog.severity": "Severity",

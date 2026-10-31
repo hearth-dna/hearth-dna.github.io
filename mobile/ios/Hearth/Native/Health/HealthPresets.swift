@@ -20,7 +20,7 @@ struct HealthPreset: Identifiable, Equatable {
 
 enum HealthPresets {
     static let measurements: [HealthPreset] = [
-        measurement("temperature", "Body temperature", "°C", synonyms: ["temperature", "temp", "body temp", "температура", "t°"]),
+        measurement("temperature", "Body temperature", "°C", bodyPart: "armpit", synonyms: ["temperature", "temp", "body temp", "температура", "t°"]),
         measurement("blood-pressure", "Blood pressure", "mmHg", pair: ("systolic", "diastolic"), bodyPart: "heart", synonyms: ["bp", "давление", "артериальное давление"]),
         measurement("heart-rate", "Heart rate", "bpm", bodyPart: "heart", synonyms: ["pulse", "hr", "resting heart rate", "пульс", "чсс"]),
         measurement("spo2", "Blood oxygen (SpO₂)", "%", bodyPart: "lungs", synonyms: ["spo2", "oxygen saturation", "blood oxygen", "сатурация"]),

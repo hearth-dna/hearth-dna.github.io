@@ -99,6 +99,7 @@ const MALE_OVERLAYS: Overlays = {
     mouth: [364, 230, 16, 6],
     throat: [364, 272, 12, 14],
     lungs: [318, 400, 38, 66],
+    armpit: [254, 384, 10, 16],
     // The person's left, the viewer's right from the front.
     heart: [390, 410, 24, 28],
     stomach: [396, 478, 30, 22],
@@ -122,6 +123,7 @@ const FEMALE_OVERLAYS: Overlays = {
     mouth: [320.5, 210, 14, 5],
     throat: [320.5, 275, 10, 13],
     lungs: [278, 398, 32, 58],
+    armpit: [224, 372, 9, 14],
     heart: [344, 408, 21, 25],
     stomach: [350, 470, 27, 19],
     elbows: [176, 482, 19, 13],

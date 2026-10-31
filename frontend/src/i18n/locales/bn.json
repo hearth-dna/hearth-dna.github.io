@@ -154,6 +154,7 @@
   "bodyPart.lower back": "কোমর",
   "bodyPart.hips": "নিতম্ব",
   "bodyPart.shoulders": "কাঁধ",
+  "bodyPart.armpit": "বগল",
   "bodyPart.arms": "বাহু",
   "bodyPart.elbows": "কনুই",
   "bodyPart.wrists": "কবজি",
@@ -314,7 +315,7 @@
   "healthLog.unit": "একক",
   "healthLog.unitPlaceholder": "যেমন সেমি",
   "healthLog.bodyPart": "শরীরের অংশ",
-  "healthLog.bodyPartPlaceholder": "যেমন হাত",
+  "healthLog.bodyPartPlaceholder": "শরীরের কোথায়",
   "healthLog.side": "পাশ",
   "healthLog.sideNone": "উল্লেখ নেই",
   "healthLog.severity": "তীব্রতা",
@@ -1111,5 +1112,8 @@
   "bodyMap.stage.teen": "১৩–১৫ বছর",
   "bodyMap.stage.child": "৯–১২ বছর",
   "bodyMap.stage.young": "৪–৮ বছর",
-  "bodyMap.stage.toddler": "৪ বছরের কম"
+  "bodyMap.stage.toddler": "৪ বছরের কম",
+  "bodyMap.tooth": "দাঁত {n}",
+  "bodyMap.teethHint": "শুধু তার এন্ট্রি দেখাতে একটি দাঁতে ট্যাপ করুন।",
+  "bodyMap.noTeeth": "এখনও কোনো এন্ট্রিতে দাঁত উল্লেখ নেই: দাঁতের উপসর্গ ও চিকিৎসায় তা দেওয়া যায়।"
 }

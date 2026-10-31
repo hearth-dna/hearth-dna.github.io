@@ -3,7 +3,7 @@ import { useApp } from '../app/context'
 import { ageYears } from '../charts/reference'
 import { deleteHealthEntries, setHealthConditions, setHealthWhen } from '../db/repo'
 import { exportHealthEntries } from '../export/openFormats'
-import { bodyHeat } from '../health/body'
+import { bodyHeat, teethHeat } from '../health/body'
 import {
   daysBefore,
   facets,
@@ -148,10 +148,10 @@ export function HealthTable({
   )
   // The body map's colours: what every filter but the body part leaves.
   // biome-ignore lint/correctness/useExhaustiveDependencies: title derives from t
-  const heat = useMemo(
-    () => bodyHeat(filterHealthLog(entries, { ...filter, bodyPart: '', side: '' }, title)),
-    [entries, filter, t],
-  )
+  const heat = useMemo(() => {
+    const counted = filterHealthLog(entries, { ...filter, bodyPart: '', side: '', tooth: null }, title)
+    return { parts: bodyHeat(counted), teeth: teethHeat(counted) }
+  }, [entries, filter, t])
   // The body map draws the shown person's sex and age: the one filtered to, or the only one.
   const one = persons.find((p) => p.id === filter.person) ?? (persons.length === 1 ? persons[0] : undefined)
   const figure = one?.sex === 'female' ? 'female' : 'male'
@@ -269,8 +269,10 @@ export function HealthTable({
     chips.push({
       key: 'bodyPart',
       label: filter.side ? `${filter.bodyPart} · ${t(`side.${filter.side}`)}` : filter.bodyPart,
-      clear: { bodyPart: '', side: '' },
+      clear: { bodyPart: '', side: '', tooth: null },
     })
+  if (filter.tooth !== null)
+    chips.push({ key: 'tooth', label: t('bodyMap.tooth', { n: filter.tooth }), clear: { tooth: null } })
   if (filter.tag) chips.push({ key: 'tag', label: `#${filter.tag}`, clear: { tag: '' } })
   if (filter.condition)
     chips.push({ key: 'condition', label: conditionLabel(filter.condition), clear: { condition: '' } })
@@ -520,7 +522,7 @@ export function HealthTable({
               <select
                 value={filter.bodyPart}
                 disabled={bodyParts.length === 0}
-                onChange={(e) => set({ bodyPart: e.target.value, side: '' })}
+                onChange={(e) => set({ bodyPart: e.target.value, side: '', tooth: null })}
               >
                 <option value="">{t('healthLog.anyBodyPart')}</option>
                 {bodyParts.map((b) => (
@@ -619,6 +621,7 @@ export function HealthTable({
                   person: '',
                   bodyPart: '',
                   side: '',
+                  tooth: null,
                   tag: '',
                   condition: '',
                   minSeverity: null,
@@ -689,12 +692,15 @@ export function HealthTable({
       {view === 'body' && (
         <Suspense fallback={null}>
           <BodyMap
-            heat={heat}
+            heat={heat.parts}
+            teeth={heat.teeth}
+            tooth={filter.tooth}
+            onTooth={(tooth) => set({ tooth })}
             figure={figure}
             stage={stage}
             part={filter.bodyPart}
             side={filter.side}
-            onPick={(bodyPart, side) => set({ bodyPart, side })}
+            onPick={(bodyPart, side) => set({ bodyPart, side, tooth: null })}
           />
         </Suspense>
       )}

@@ -144,6 +144,7 @@ export function ImportPage({ source, person: personId }: { source: ImportSource;
           persons={[person]}
           personId={person.id}
           draft={doc}
+          entries={entries}
           tagSuggestions={facets(entries).tags}
           onCancel={() => setDoc(null)}
           onSaved={async () => {

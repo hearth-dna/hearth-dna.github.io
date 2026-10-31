@@ -28,7 +28,7 @@ data class HealthPreset(
 )
 
 val MEASUREMENT_PRESETS = listOf(
-    HealthPreset("temperature", "Body temperature", HealthKind.MEASUREMENT, unit = "°C", step = 0.1, synonyms = listOf("temperature", "temp", "body temp", "температура", "t°")),
+    HealthPreset("temperature", "Body temperature", HealthKind.MEASUREMENT, unit = "°C", step = 0.1, bodyPart = "armpit", synonyms = listOf("temperature", "temp", "body temp", "температура", "t°")),
     HealthPreset("blood-pressure", "Blood pressure", HealthKind.MEASUREMENT, bodyPart = "heart", unit = "mmHg", pair = "systolic" to "diastolic", step = 1.0, synonyms = listOf("bp", "давление", "артериальное давление")),
     HealthPreset("heart-rate", "Heart rate", HealthKind.MEASUREMENT, bodyPart = "heart", unit = "bpm", step = 1.0, synonyms = listOf("pulse", "hr", "resting heart rate", "пульс", "чсс")),
     HealthPreset("spo2", "Blood oxygen (SpO₂)", HealthKind.MEASUREMENT, bodyPart = "lungs", unit = "%", step = 1.0, synonyms = listOf("spo2", "oxygen saturation", "blood oxygen", "сатурация")),
@@ -186,7 +186,7 @@ fun presetsFor(kind: HealthKind): List<HealthPreset> = ALL_PRESETS.filter { it.k
 /** Suggestions for the body-part field (`BODY_PARTS` in frontend/src/types.ts); free text is accepted too. */
 val BODY_PARTS = listOf(
     "head", "eyes", "ears", "nose", "mouth", "throat", "neck", "chest", "heart", "lungs", "abdomen",
-    "stomach", "back", "lower back", "hips", "shoulders", "arms", "elbows", "wrists", "hands",
+    "stomach", "back", "lower back", "hips", "shoulders", "armpit", "arms", "elbows", "wrists", "hands",
     "fingers", "legs", "knees", "ankles", "feet", "skin", "joints", "muscles", "whole body",
 )
 

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   formatTeeth,
   isMilkTooth,
@@ -57,6 +57,101 @@ const LAYOUT = {
   milk: [...arch(MILK_TEETH[0], true, true), ...arch(MILK_TEETH[1], false, true)],
 }
 
+/** How one tooth looks and acts on a chart. */
+interface ToothLook {
+  className: string
+  pressed: boolean
+  onPick: () => void
+}
+
+/**
+ * Both jaws, the person's right on the viewer's left, permanent or milk teeth; each tooth a button
+ * whose look and action the caller gives.
+ */
+function Jaws({ milk, label, look }: { milk: boolean; label: string; look: (n: number) => ToothLook }) {
+  const t = useT()
+  const name = (n: number) =>
+    t(isMilkTooth(n) ? 'detail.teeth.milkTooth' : 'detail.teeth.tooth', {
+      n,
+      type: t(`detail.teeth.${toothType(n)}`),
+    })
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`}>
+      <title>{label}</title>
+      <text x={W / 2} y={H / 2 - 30} className="jaw">
+        {t('detail.teeth.upper')}
+      </text>
+      <text x={W / 2} y={H / 2 + 40} className="jaw">
+        {t('detail.teeth.lower')}
+      </text>
+      <text x={W / 2 - 70} y={H / 2 + 5} className="jaw side start">
+        ← {t('detail.teeth.right')}
+      </text>
+      <text x={W / 2 + 70} y={H / 2 + 5} className="jaw side end">
+        {t('detail.teeth.left')} →
+      </text>
+      {LAYOUT[milk ? 'milk' : 'permanent'].map((s) => {
+        const l = look(s.n)
+        return (
+          // biome-ignore lint/a11y/useSemanticElements: an HTML button cannot sit inside the SVG chart.
+          <g
+            key={s.n}
+            role="button"
+            tabIndex={0}
+            aria-pressed={l.pressed}
+            aria-label={name(s.n)}
+            className={l.className}
+            onClick={l.onPick}
+            onKeyDown={(e) => {
+              if (e.key !== 'Enter' && e.key !== ' ') return
+              e.preventDefault()
+              l.onPick()
+            }}
+          >
+            <title>{name(s.n)}</title>
+            <rect
+              x={s.x - s.size}
+              y={s.y - s.size * 0.95}
+              width={s.size * 2}
+              height={s.size * 1.9}
+              rx={s.size * 0.6}
+              transform={`rotate(${s.angle} ${s.x} ${s.y})`}
+            />
+            <text x={s.x} y={s.y + 3.5}>
+              {s.n}
+            </text>
+          </g>
+        )
+      })}
+    </svg>
+  )
+}
+
+/** The permanent / milk teeth switch. */
+function MilkSwitch({ milk, onChange }: { milk: boolean; onChange: (milk: boolean) => void }) {
+  const t = useT()
+  return (
+    <div className="segmented">
+      <button
+        type="button"
+        className={milk ? '' : 'active'}
+        aria-pressed={!milk}
+        onClick={() => onChange(false)}
+      >
+        {t('detail.teeth.permanent')}
+      </button>
+      <button
+        type="button"
+        className={milk ? 'active' : ''}
+        aria-pressed={milk}
+        onClick={() => onChange(true)}
+      >
+        {t('detail.teeth.milk')}
+      </button>
+    </div>
+  )
+}
+
 /**
  * Pick the teeth an entry is about on a chart of both jaws, numbered the FDI way. Permanent and
  * milk teeth are separate charts with their own numbers, so a child's mixed teeth can be told
@@ -81,87 +176,25 @@ export function ToothChart({
     milk.length > 0 ? permanent.length === 0 || !!milkFirst : !!milkFirst && permanent.length === 0,
   )
   const toggle = (n: number) => onChange(formatTeeth(toggleTooth(picked, n)))
-  const name = (n: number) =>
-    t(isMilkTooth(n) ? 'detail.teeth.milkTooth' : 'detail.teeth.tooth', {
-      n,
-      type: t(`detail.teeth.${toothType(n)}`),
-    })
   return (
     <fieldset className="field toothchart">
       <legend>{label}</legend>
       <div className="row inline">
-        <div className="segmented">
-          <button
-            type="button"
-            className={showMilk ? '' : 'active'}
-            aria-pressed={!showMilk}
-            onClick={() => setShowMilk(false)}
-          >
-            {t('detail.teeth.permanent')}
-          </button>
-          <button
-            type="button"
-            className={showMilk ? 'active' : ''}
-            aria-pressed={showMilk}
-            onClick={() => setShowMilk(true)}
-          >
-            {t('detail.teeth.milk')}
-          </button>
-        </div>
+        <MilkSwitch milk={showMilk} onChange={setShowMilk} />
         {picked.length > 0 && (
           <button type="button" className="small" onClick={() => onChange(undefined)}>
             {t('detail.teeth.clear')}
           </button>
         )}
       </div>
-      <svg viewBox={`0 0 ${W} ${H}`}>
-        <title>{label}</title>
-        <text x={W / 2} y={H / 2 - 30} className="jaw">
-          {t('detail.teeth.upper')}
-        </text>
-        <text x={W / 2} y={H / 2 + 40} className="jaw">
-          {t('detail.teeth.lower')}
-        </text>
-        <text x={W / 2 - 70} y={H / 2 + 5} className="jaw side start">
-          ← {t('detail.teeth.right')}
-        </text>
-        <text x={W / 2 + 70} y={H / 2 + 5} className="jaw side end">
-          {t('detail.teeth.left')} →
-        </text>
-        {LAYOUT[showMilk ? 'milk' : 'permanent'].map((s) => {
-          const on = picked.includes(s.n)
-          return (
-            // biome-ignore lint/a11y/useSemanticElements: an HTML button cannot sit inside the SVG chart.
-            <g
-              key={s.n}
-              role="button"
-              tabIndex={0}
-              aria-pressed={on}
-              aria-label={name(s.n)}
-              className={`tooth${on ? ' on' : ''}`}
-              onClick={() => toggle(s.n)}
-              onKeyDown={(e) => {
-                if (e.key !== 'Enter' && e.key !== ' ') return
-                e.preventDefault()
-                toggle(s.n)
-              }}
-            >
-              <title>{name(s.n)}</title>
-              <rect
-                x={s.x - s.size}
-                y={s.y - s.size * 0.95}
-                width={s.size * 2}
-                height={s.size * 1.9}
-                rx={s.size * 0.6}
-                transform={`rotate(${s.angle} ${s.x} ${s.y})`}
-              />
-              <text x={s.x} y={s.y + 3.5}>
-                {s.n}
-              </text>
-            </g>
-          )
-        })}
-      </svg>
+      <Jaws
+        milk={showMilk}
+        label={label}
+        look={(n) => {
+          const on = picked.includes(n)
+          return { className: `tooth${on ? ' on' : ''}`, pressed: on, onPick: () => toggle(n) }
+        }}
+      />
       <span className="muted">
         {picked.length
           ? [
@@ -173,5 +206,49 @@ export function ToothChart({
           : t('detail.teeth.hint')}
       </span>
     </fieldset>
+  )
+}
+
+/**
+ * The teeth on the body map's mouth: each coloured by how many entries name it (`heat` gives the
+ * step), the picked one outlined; picking one filters the log to it, picking it again lets go.
+ */
+export function ToothHeat({
+  counts,
+  picked,
+  milkFirst,
+  heat,
+  onPick,
+}: {
+  counts: Map<number, number>
+  picked: number | null
+  /** Open on the milk teeth: a young child, or only milk teeth recorded. */
+  milkFirst: boolean
+  heat: (n: number) => number
+  onPick: (tooth: number | null) => void
+}) {
+  const t = useT()
+  const [showMilk, setShowMilk] = useState(milkFirst)
+  useEffect(() => setShowMilk(milkFirst), [milkFirst])
+  return (
+    <div className="toothchart toothheat">
+      <div className="row inline">
+        <strong>{t('detail.teeth')}</strong>
+        <MilkSwitch milk={showMilk} onChange={setShowMilk} />
+      </div>
+      <Jaws
+        milk={showMilk}
+        label={t('detail.teeth')}
+        look={(n) => {
+          const on = picked === n
+          return {
+            className: `tooth heat-${heat(counts.get(n) ?? 0)}${on ? ' on' : ''}`,
+            pressed: on,
+            onPick: () => onPick(on ? null : n),
+          }
+        }}
+      />
+      <span className="muted">{counts.size ? t('bodyMap.teethHint') : t('bodyMap.noTeeth')}</span>
+    </div>
   )
 }

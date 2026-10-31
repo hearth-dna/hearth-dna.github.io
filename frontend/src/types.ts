@@ -87,6 +87,7 @@ export const BODY_PARTS = [
   'lower back',
   'hips',
   'shoulders',
+  'armpit',
   'arms',
   'elbows',
   'wrists',

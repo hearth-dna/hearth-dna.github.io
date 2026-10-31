@@ -3,7 +3,13 @@ import { useApp } from '../app/context'
 import { grantConsent, hasConsent } from '../consent/consent'
 import { addHealthEntry } from '../db/repo'
 import { nowTime, today } from '../health/now'
-import { type DetailValue, type HealthPreset, presetNamed, presetOrder } from '../health/presets'
+import {
+  type DetailValue,
+  defaultBodyPart,
+  type HealthPreset,
+  presetNamed,
+  presetOrder,
+} from '../health/presets'
 import { useT } from '../i18n/context'
 import type { HealthEntry, Person } from '../types'
 import { ConsentForm } from './ConsentForm'
@@ -77,7 +83,12 @@ export function QuickSymptom({
       kind,
       title: preset ? preset.title : name,
       body: note.trim(),
-      bodyPart: preset?.bodyPart ?? '',
+      bodyPart: preset
+        ? defaultBodyPart(
+            preset,
+            entries.filter((e) => e.personId === personId),
+          )
+        : '',
       severity: kind === 'symptom' && severity !== '' ? Number(severity) : null,
       tags: preset?.tags ?? [],
       details: preset?.details ? details : {},

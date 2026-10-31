@@ -257,7 +257,9 @@ kb fields at tier 0, so the user gets a decision frame even without any LLM.
   carry them in words. The log's **Body** view lays the entries on a front and back figure, each
   part (each side of a paired one) coloured by how many of the entries the other filters leave name
   it (`health/body.ts`, `BodyMap.tsx`, `bodyFigure.ts`; the drawn body is react-native-body-highlighter's, MIT, its notice in `bodyOutline.ts`; a male or female body by the person's sex, and for a child the adult drawing reshaped for their age group by `bodyWarp.ts`: a larger head, shorter legs, a narrower build); picking a part zooms in on it and filters the log to it and
-  that side. Parts with no place on the figure (skin, whole body, typed ones) are buttons beside it.
+  that side. Parts with no place on the figure (skin, whole body, typed ones) are buttons beside it. Zoomed into the mouth, the teeth dental entries name (`details.teeth`) get the same heat on the
+  tooth chart, and picking a tooth filters to it. A preset starts at the body part the person used
+  most for it before, else its own (`defaultBodyPart`): body temperature at the armpit.
   Gated by the `import_document` consent; part of the dump; offered entry-by-entry to the Ask
   context pack under "Health log". The steps below build on it.
 - **Shipped second (BYOK document reader):** "Read a document" sends the photo/scan/PDF straight

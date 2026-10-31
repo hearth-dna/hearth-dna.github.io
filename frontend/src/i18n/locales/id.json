@@ -154,6 +154,7 @@
   "bodyPart.lower back": "punggung bawah",
   "bodyPart.hips": "panggul",
   "bodyPart.shoulders": "bahu",
+  "bodyPart.armpit": "ketiak",
   "bodyPart.arms": "lengan",
   "bodyPart.elbows": "siku",
   "bodyPart.wrists": "pergelangan tangan",
@@ -314,7 +315,7 @@
   "healthLog.unit": "Satuan",
   "healthLog.unitPlaceholder": "misalnya cm",
   "healthLog.bodyPart": "Bagian tubuh",
-  "healthLog.bodyPartPlaceholder": "misalnya tangan",
+  "healthLog.bodyPartPlaceholder": "Di bagian tubuh mana",
   "healthLog.side": "Sisi",
   "healthLog.sideNone": "tidak disebutkan",
   "healthLog.severity": "Tingkat keparahan",
@@ -1111,5 +1112,8 @@
   "bodyMap.stage.teen": "13–15 tahun",
   "bodyMap.stage.child": "9–12 tahun",
   "bodyMap.stage.young": "4–8 tahun",
-  "bodyMap.stage.toddler": "Di bawah 4"
+  "bodyMap.stage.toddler": "Di bawah 4",
+  "bodyMap.tooth": "gigi {n}",
+  "bodyMap.teethHint": "Ketuk gigi untuk hanya menampilkan catatannya.",
+  "bodyMap.noTeeth": "Belum ada catatan yang menyebut gigi: gejala dan perawatan gigi bisa."
 }

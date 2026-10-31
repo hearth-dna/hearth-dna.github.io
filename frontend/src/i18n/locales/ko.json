@@ -154,6 +154,7 @@
   "bodyPart.lower back": "허리",
   "bodyPart.hips": "엉덩이",
   "bodyPart.shoulders": "어깨",
+  "bodyPart.armpit": "겨드랑이",
   "bodyPart.arms": "팔",
   "bodyPart.elbows": "팔꿈치",
   "bodyPart.wrists": "손목",
@@ -314,7 +315,7 @@
   "healthLog.unit": "단위",
   "healthLog.unitPlaceholder": "예: cm",
   "healthLog.bodyPart": "신체 부위",
-  "healthLog.bodyPartPlaceholder": "예: 손",
+  "healthLog.bodyPartPlaceholder": "몸의 어느 곳",
   "healthLog.side": "방향",
   "healthLog.sideNone": "지정 안 함",
   "healthLog.severity": "정도",
@@ -1111,5 +1112,8 @@
   "bodyMap.stage.teen": "13–15세",
   "bodyMap.stage.child": "9–12세",
   "bodyMap.stage.young": "4–8세",
-  "bodyMap.stage.toddler": "4세 미만"
+  "bodyMap.stage.toddler": "4세 미만",
+  "bodyMap.tooth": "치아 {n}",
+  "bodyMap.teethHint": "치아를 누르면 그 치아의 기록만 보입니다.",
+  "bodyMap.noTeeth": "아직 치아를 지정한 기록이 없습니다. 치아 증상과 치료에서 지정할 수 있습니다."
 }

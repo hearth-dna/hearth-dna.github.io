@@ -154,6 +154,7 @@
   "bodyPart.lower back": "поперек",
   "bodyPart.hips": "стегна",
   "bodyPart.shoulders": "плечі",
+  "bodyPart.armpit": "пахва",
   "bodyPart.arms": "руки",
   "bodyPart.elbows": "лікті",
   "bodyPart.wrists": "зап'ястя",
@@ -314,7 +315,7 @@
   "healthLog.unit": "Одиниця",
   "healthLog.unitPlaceholder": "напр. см",
   "healthLog.bodyPart": "Частина тіла",
-  "healthLog.bodyPartPlaceholder": "напр. кисті",
+  "healthLog.bodyPartPlaceholder": "Де на тілі",
   "healthLog.side": "Сторона",
   "healthLog.sideNone": "не вказано",
   "healthLog.severity": "Тяжкість",
@@ -1111,5 +1112,8 @@
   "bodyMap.stage.teen": "13–15 років",
   "bodyMap.stage.child": "9–12 років",
   "bodyMap.stage.young": "4–8 років",
-  "bodyMap.stage.toddler": "До 4 років"
+  "bodyMap.stage.toddler": "До 4 років",
+  "bodyMap.tooth": "зуб {n}",
+  "bodyMap.teethHint": "Торкніться зуба, щоб показати лише його записи.",
+  "bodyMap.noTeeth": "Поки жоден запис не вказує зуб: це можна зробити в зубних симптомах і процедурах."
 }

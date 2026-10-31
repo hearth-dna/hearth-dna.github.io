@@ -154,6 +154,7 @@
   "bodyPart.lower back": "lombar",
   "bodyPart.hips": "quadris",
   "bodyPart.shoulders": "ombros",
+  "bodyPart.armpit": "axila",
   "bodyPart.arms": "braços",
   "bodyPart.elbows": "cotovelos",
   "bodyPart.wrists": "punhos",
@@ -314,7 +315,7 @@
   "healthLog.unit": "Unidade",
   "healthLog.unitPlaceholder": "ex.: cm",
   "healthLog.bodyPart": "Parte do corpo",
-  "healthLog.bodyPartPlaceholder": "ex.: mãos",
+  "healthLog.bodyPartPlaceholder": "Onde no corpo",
   "healthLog.side": "Lado",
   "healthLog.sideNone": "não especificado",
   "healthLog.severity": "Intensidade",
@@ -1111,5 +1112,8 @@
   "bodyMap.stage.teen": "13–15 anos",
   "bodyMap.stage.child": "9–12 anos",
   "bodyMap.stage.young": "4–8 anos",
-  "bodyMap.stage.toddler": "Menos de 4"
+  "bodyMap.stage.toddler": "Menos de 4",
+  "bodyMap.tooth": "dente {n}",
+  "bodyMap.teethHint": "Toque num dente para mostrar só os registros dele.",
+  "bodyMap.noTeeth": "Nenhum registro indica um dente ainda: sintomas e tratamentos dentários podem."
 }

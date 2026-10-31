@@ -4,7 +4,7 @@ import { grantConsent, hasConsent } from '../consent/consent'
 import { addHealthEntry } from '../db/repo'
 import { formatValue } from '../health/log'
 import { nowTime, today } from '../health/now'
-import { type HealthPreset, presetNamed, presetOrder } from '../health/presets'
+import { defaultBodyPart, type HealthPreset, presetNamed, presetOrder } from '../health/presets'
 import { useT } from '../i18n/context'
 import type { HealthEntry, Person } from '../types'
 import { ConsentForm } from './ConsentForm'
@@ -70,7 +70,12 @@ export function QuickMeasurement({
       title: finalTitle,
       body: note.trim(),
       source: '',
-      bodyPart: preset?.bodyPart ?? '',
+      bodyPart: preset
+        ? defaultBodyPart(
+            preset,
+            entries.filter((e) => e.personId === personId),
+          )
+        : '',
       severity: null,
       tags: preset?.tags ?? [],
       value: Number(value),

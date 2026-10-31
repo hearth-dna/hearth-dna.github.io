@@ -154,6 +154,7 @@
   "bodyPart.lower back": "поясница",
   "bodyPart.hips": "бёдра",
   "bodyPart.shoulders": "плечи",
+  "bodyPart.armpit": "подмышка",
   "bodyPart.arms": "руки",
   "bodyPart.elbows": "локти",
   "bodyPart.wrists": "запястья",
@@ -314,7 +315,7 @@
   "healthLog.unit": "Единица",
   "healthLog.unitPlaceholder": "напр. см",
   "healthLog.bodyPart": "Часть тела",
-  "healthLog.bodyPartPlaceholder": "напр. кисти",
+  "healthLog.bodyPartPlaceholder": "Где на теле",
   "healthLog.side": "Сторона",
   "healthLog.sideNone": "не указано",
   "healthLog.severity": "Тяжесть",
@@ -1111,5 +1112,8 @@
   "bodyMap.stage.teen": "13–15 лет",
   "bodyMap.stage.child": "9–12 лет",
   "bodyMap.stage.young": "4–8 лет",
-  "bodyMap.stage.toddler": "До 4 лет"
+  "bodyMap.stage.toddler": "До 4 лет",
+  "bodyMap.tooth": "зуб {n}",
+  "bodyMap.teethHint": "Нажмите на зуб, чтобы показать только его записи.",
+  "bodyMap.noTeeth": "Пока ни одна запись не указывает зуб: это можно сделать в зубных симптомах и процедурах."
 }

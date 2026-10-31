@@ -154,6 +154,7 @@
   "bodyPart.lower back": "unterer rücken",
   "bodyPart.hips": "hüften",
   "bodyPart.shoulders": "schultern",
+  "bodyPart.armpit": "achselhöhle",
   "bodyPart.arms": "arme",
   "bodyPart.elbows": "ellbogen",
   "bodyPart.wrists": "handgelenke",
@@ -314,7 +315,7 @@
   "healthLog.unit": "Einheit",
   "healthLog.unitPlaceholder": "z. B. cm",
   "healthLog.bodyPart": "Körperteil",
-  "healthLog.bodyPartPlaceholder": "z. B. Hände",
+  "healthLog.bodyPartPlaceholder": "Wo am Körper",
   "healthLog.side": "Seite",
   "healthLog.sideNone": "nicht angegeben",
   "healthLog.severity": "Schweregrad",
@@ -1111,5 +1112,8 @@
   "bodyMap.stage.teen": "13–15 Jahre",
   "bodyMap.stage.child": "9–12 Jahre",
   "bodyMap.stage.young": "4–8 Jahre",
-  "bodyMap.stage.toddler": "Unter 4"
+  "bodyMap.stage.toddler": "Unter 4",
+  "bodyMap.tooth": "Zahn {n}",
+  "bodyMap.teethHint": "Tippen Sie auf einen Zahn, um nur seine Einträge zu zeigen.",
+  "bodyMap.noTeeth": "Noch kein Eintrag nennt einen Zahn: Zahnsymptome und -behandlungen können das."
 }
