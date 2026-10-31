@@ -1,5 +1,6 @@
 import { Fragment, lazy, type ReactNode, Suspense, useEffect, useMemo, useState } from 'react'
 import { useApp } from '../app/context'
+import { ageYears } from '../charts/reference'
 import { deleteHealthEntries, setHealthConditions, setHealthWhen } from '../db/repo'
 import { exportHealthEntries } from '../export/openFormats'
 import { bodyHeat } from '../health/body'
@@ -25,6 +26,7 @@ import { useI18n, useT } from '../i18n/context'
 import { conditionById, conditionName, suggestConditions } from '../kb/conditions'
 import { type Attachment, HEALTH_KIND_LABELS, type HealthEntry, type HealthKind, type Person } from '../types'
 import { AttachmentList } from './AttachmentList'
+import { stageOf } from './bodyWarp'
 import { ConditionPicker } from './ConditionPicker'
 import { useDetailsText } from './DetailFields'
 import { EditWhen } from './WhenInputs'
@@ -150,9 +152,10 @@ export function HealthTable({
     () => bodyHeat(filterHealthLog(entries, { ...filter, bodyPart: '', side: '' }, title)),
     [entries, filter, t],
   )
-  // The body map draws the shown person's sex: the one filtered to, or the only one.
+  // The body map draws the shown person's sex and age: the one filtered to, or the only one.
   const one = persons.find((p) => p.id === filter.person) ?? (persons.length === 1 ? persons[0] : undefined)
   const figure = one?.sex === 'female' ? 'female' : 'male'
+  const stage = stageOf(one ? ageYears(one, Date.now()) : null)
   const set = (patch: Partial<HealthFilter>) => onFilter({ ...filter, ...patch })
   // A deleted or reloaded entry leaves the selection.
   useEffect(() => {
@@ -688,6 +691,7 @@ export function HealthTable({
           <BodyMap
             heat={heat}
             figure={figure}
+            stage={stage}
             part={filter.bodyPart}
             side={filter.side}
             onPick={(bodyPart, side) => set({ bodyPart, side })}

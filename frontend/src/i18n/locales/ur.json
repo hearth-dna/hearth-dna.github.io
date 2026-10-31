@@ -1103,5 +1103,13 @@
   "bodyMap.more": "زیادہ ({n})",
   "bodyMap.elsewhere": "دیگر جگہیں",
   "bodyMap.male": "مرد",
-  "bodyMap.female": "عورت"
+  "bodyMap.female": "عورت",
+  "bodyMap.boy": "لڑکا",
+  "bodyMap.girl": "لڑکی",
+  "bodyMap.age": "عمر",
+  "bodyMap.stage.adult": "بالغ",
+  "bodyMap.stage.teen": "13–15 سال",
+  "bodyMap.stage.child": "9–12 سال",
+  "bodyMap.stage.young": "4–8 سال",
+  "bodyMap.stage.toddler": "4 سے کم"
 }

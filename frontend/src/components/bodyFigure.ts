@@ -1,14 +1,18 @@
 import { PAIRED } from '../health/body'
 import type { BodySide } from '../types'
 import { FEMALE_BACK, FEMALE_FRONT, MALE_BACK, MALE_FRONT, type Outline } from './bodyOutline'
+import { type Anchors, childWarp, type Stage, type Warp, warpPath } from './bodyWarp'
 
 /**
  * The body map's figures: a drawn front and back body, male or female (bodyOutline.ts), whose
  * muscle groups are gathered into the parts of `BODY_PARTS`, and the parts the drawing has no
- * piece for (the face, the organs, the small joints) drawn over it as ovals.
+ * piece for (the face, the organs, the small joints) drawn over it as ovals. Children are the
+ * adult drawings reshaped by age (bodyWarp.ts).
  */
 
 export type Figure = 'male' | 'female'
+export type { Stage }
+
 type View = 'front' | 'back'
 
 export interface Piece {
@@ -131,50 +135,36 @@ const FEMALE_OVERLAYS: Overlays = {
   },
 }
 
-/**
- * Where each drawing goes in the scene: scale `k` then shift by `dx`, `dy`, so both figures stand
- * on the same midlines and about the same height. `mid` is the drawing's own midline.
- */
-interface Placement {
+/** One view of a drawing: its outline, overlays, and where its proportions are read from. */
+interface Drawing {
   outline: Outline[]
   overlays: Record<string, Oval>
-  mid: number
-  k: number
-  dx: number
-  dy: number
+  anchors: Anchors
 }
 
-const FEMALE_K = 0.9
-const PLACEMENTS: Record<Figure, Record<View, Placement>> = {
+const MALE_Y = { top: 96, chin: 254, crotch: 660, sole: 1342, shoulders: 2.7 }
+const FEMALE_Y = { top: 85, chin: 243, crotch: 620, sole: 1428, shoulders: 2.1 }
+const DRAWINGS: Record<Figure, Record<View, Drawing>> = {
   male: {
-    front: { outline: MALE_FRONT, overlays: MALE_OVERLAYS.front ?? {}, mid: 364, k: 1, dx: 0, dy: 0 },
-    back: { outline: MALE_BACK, overlays: MALE_OVERLAYS.back ?? {}, mid: 1084, k: 1, dx: 0, dy: 0 },
+    front: { outline: MALE_FRONT, overlays: MALE_OVERLAYS.front ?? {}, anchors: { mid: 364, ...MALE_Y } },
+    back: { outline: MALE_BACK, overlays: MALE_OVERLAYS.back ?? {}, anchors: { mid: 1084, ...MALE_Y } },
   },
   female: {
     front: {
       outline: FEMALE_FRONT,
       overlays: FEMALE_OVERLAYS.front ?? {},
-      mid: 320.5,
-      k: FEMALE_K,
-      dx: MID.front - 320.5 * FEMALE_K,
-      dy: 60,
+      anchors: { mid: 320.5, ...FEMALE_Y },
     },
     back: {
       outline: FEMALE_BACK,
       overlays: FEMALE_OVERLAYS.back ?? {},
-      mid: 1142.5,
-      k: FEMALE_K,
-      dx: MID.back - 1142.5 * FEMALE_K,
-      dy: 60,
+      anchors: { mid: 1142.5, ...FEMALE_Y },
     },
   },
 }
 
-/** The SVG transform that places a view's drawing in the scene. */
-export const placement = (figure: Figure, view: View) => {
-  const p = PLACEMENTS[figure][view]
-  return `translate(${p.dx} ${p.dy}) scale(${p.k})`
-}
+/** What moves with the head when a child's head is enlarged; the rest moves with the body. */
+const HEAD = new Set(['head', 'hair', 'ears', 'eyes', 'nose', 'mouth'])
 
 type Side = 'common' | 'left' | 'right'
 
@@ -192,19 +182,47 @@ const union = (boxes: number[][]) => [
 const personSide = (view: View, side: Side): BodySide =>
   side === 'common' ? '' : view === 'back' ? side : side === 'left' ? 'right' : 'left'
 
-/** A box in the drawing's coordinates, in the scene's. */
-const place = (p: Placement, b: number[]) => [
-  b[0] * p.k + p.dx,
-  b[1] * p.k + p.dy,
-  b[2] * p.k + p.dx,
-  b[3] * p.k + p.dy,
-]
+const IDENTITY: Warp = { at: (p) => p, scale: () => [1, 1] }
+const warpBox = (w: Warp, b: number[]) => {
+  const [x0, y0] = w.at([b[0], b[1]])
+  const [x1, y1] = w.at([b[2], b[3]])
+  return [Math.min(x0, x1), Math.min(y0, y1), Math.max(x0, x1), Math.max(y0, y1)]
+}
 
-function fromOutline(view: View, p: Placement): Region[] {
+/** A warp that fits box `from` onto box `to`. */
+const boxWarp = (from: number[], to: number[]): Warp => {
+  const sx = (to[2] - to[0]) / (from[2] - from[0])
+  const sy = (to[3] - to[1]) / (from[3] - from[1])
+  return { at: ([x, y]) => [to[0] + (x - from[0]) * sx, to[1] + (y - from[1]) * sy], scale: () => [sx, sy] }
+}
+
+/**
+ * A girl younger than a teenager gets a flat chest: the male drawing's, fitted into the female
+ * chest's place.
+ */
+function flatChest(o: Outline): Outline {
+  const male = MALE_FRONT.find((m) => m.slug === 'chest')
+  if (!male) return o
+  const paths: Outline['paths'] = {}
+  for (const side of ['left', 'right'] as const) {
+    const from = male.box[side]
+    const to = o.box[side]
+    const ds = male.paths[side]
+    if (from && to && ds) paths[side] = ds.map((d) => warpPath(d, boxWarp(from, to)))
+  }
+  return { ...o, paths }
+}
+
+/** One view's regions in the drawing's coordinates, reshaped for the age group. */
+function draw(view: View, d: Drawing, figure: Figure, stage: Stage): Region[] {
+  const warp = stage === 'adult' ? { head: IDENTITY, body: IDENTITY } : childWarp(d.anchors, stage)
+  const flat = figure === 'female' && view === 'front' && stage !== 'adult' && stage !== 'teen'
   const byKey = new Map<string, Region>()
-  for (const o of p.outline) {
-    const part = PART_OF[view][o.slug]
+  for (const raw of d.outline) {
+    const part = PART_OF[view][raw.slug]
     if (!part) continue
+    const o = flat && raw.slug === 'chest' ? flatChest(raw) : raw
+    const w = HEAD.has(raw.slug) ? warp.head : warp.body
     for (const side of ['common', 'left', 'right'] as Side[]) {
       const ds = o.paths[side]
       const box = o.box[side]
@@ -212,46 +230,71 @@ function fromOutline(view: View, p: Placement): Region[] {
       // A paired part keeps its sides apart; any other part is one region however it is drawn.
       const s = PAIRED.has(part) ? personSide(view, side) : ''
       const key = `${part}|${s}`
-      const r = byKey.get(key) ?? { part, side: s, view, pieces: [], box: place(p, box) }
-      r.pieces.push(...ds.map((d) => ({ d })))
-      r.box = union([r.box, place(p, box)])
+      const r = byKey.get(key) ?? { part, side: s, view, pieces: [], box: warpBox(w, box) }
+      r.pieces.push(...ds.map((x) => ({ d: w === IDENTITY ? x : warpPath(x, w) })))
+      r.box = union([r.box, warpBox(w, box)])
       byKey.set(key, r)
     }
   }
-  return [...byKey.values()]
-}
-
-function overlays(view: View, p: Placement): Region[] {
-  const out: Region[] = []
-  for (const [part, [cx, cy, rx, ry]] of Object.entries(p.overlays)) {
-    const region = (side: BodySide, x: number): Region => ({
-      part,
-      side,
-      view,
-      pieces: [{ d: oval(x, cy, rx, ry), overlay: true }],
-      box: place(p, [x - rx, cy - ry, x + rx, cy + ry]),
-    })
+  const out = [...byKey.values()]
+  for (const [part, [cx, cy, rx, ry]] of Object.entries(d.overlays)) {
+    const w = HEAD.has(part) ? warp.head : warp.body
+    const region = (side: BodySide, x: number): Region => {
+      const [px, py] = w.at([x, cy])
+      const [sx, sy] = w.scale([x, cy])
+      return {
+        part,
+        side,
+        view,
+        pieces: [{ d: oval(px, py, rx * sx, ry * sy), overlay: true }],
+        box: [px - rx * sx, py - ry * sy, px + rx * sx, py + ry * sy],
+      }
+    }
     if (!PAIRED.has(part)) out.push(region('', cx))
     else {
       out.push(region(personSide(view, 'left'), cx))
-      out.push(region(personSide(view, 'right'), 2 * p.mid - cx))
+      out.push(region(personSide(view, 'right'), 2 * d.anchors.mid - cx))
     }
   }
   return out
 }
 
-/** Every region of a figure, per view: the drawing's pieces first, the overlays over them. */
-export const REGIONS: Record<Figure, Region[]> = {
-  male: [
-    ...fromOutline('front', PLACEMENTS.male.front),
-    ...overlays('front', PLACEMENTS.male.front),
-    ...fromOutline('back', PLACEMENTS.male.back),
-    ...overlays('back', PLACEMENTS.male.back),
-  ],
-  female: [
-    ...fromOutline('front', PLACEMENTS.female.front),
-    ...overlays('front', PLACEMENTS.female.front),
-    ...fromOutline('back', PLACEMENTS.female.back),
-    ...overlays('back', PLACEMENTS.female.back),
-  ],
+/** How big a figure may be drawn: its half of the scene less a margin, and above the labels. */
+const ROOM = { w: 660, h: 1290, sole: 1345 }
+
+export interface Body {
+  regions: Region[]
+  /** The SVG transform placing each view's drawing in the scene. */
+  transform: Record<View, string>
+}
+
+const built = new Map<string, Body>()
+
+/**
+ * A figure's regions with their boxes in the scene, and the transforms that place its drawings:
+ * each view scaled to fit its half, on its midline, standing on the same ground. Built once.
+ */
+export function bodyOf(figure: Figure, stage: Stage): Body {
+  const key = `${figure}|${stage}`
+  const done = built.get(key)
+  if (done) return done
+  const regions: Region[] = []
+  const transform = {} as Record<View, string>
+  for (const view of ['front', 'back'] as const) {
+    const d = DRAWINGS[figure][view]
+    const rs = draw(view, d, figure, stage)
+    const [x0, y0, x1, y1] = union(rs.map((r) => r.box))
+    const k = Math.min(ROOM.w / (x1 - x0), ROOM.h / (y1 - y0))
+    const dx = MID[view] - d.anchors.mid * k
+    const dy = ROOM.sole - y1 * k
+    transform[view] = `translate(${dx} ${dy}) scale(${k})`
+    for (const r of rs)
+      regions.push({
+        ...r,
+        box: [r.box[0] * k + dx, r.box[1] * k + dy, r.box[2] * k + dx, r.box[3] * k + dy],
+      })
+  }
+  const body = { regions, transform }
+  built.set(key, body)
+  return body
 }

@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { type BodyHeat, bodyKey, HEAT_STEPS, heatLevel, regionCount } from '../health/body'
 import { useT } from '../i18n/context'
 import { BODY_PARTS, type BodySide } from '../types'
-import { type Figure, H, MID, placement, REGIONS, W } from './bodyFigure'
+import { bodyOf, type Figure, H, MID, W } from './bodyFigure'
+import { STAGES, type Stage } from './bodyWarp'
 
 const FIGURES: Figure[] = ['male', 'female']
 const VIEWS = ['front', 'back'] as const
@@ -10,7 +11,7 @@ const VIEWS = ['front', 'back'] as const
 /** The legend's colour steps, 1 to HEAT_STEPS. */
 const STEPS = Array.from({ length: HEAT_STEPS }, (_, i) => i + 1)
 
-const DRAWN = new Set([...REGIONS.male, ...REGIONS.female].map((x) => x.part))
+const DRAWN = new Set(bodyOf('male', 'adult').regions.map((x) => x.part))
 
 /** Parts the log names that have no place on the figure: skin, joints, whole body, typed ones. */
 export const elsewhere = (heat: BodyHeat) => [...heat.parts.keys()].filter((k) => !DRAWN.has(k)).sort()
@@ -20,8 +21,8 @@ export const elsewhere = (heat: BodyHeat) => [...heat.parts.keys()].filter((k) =
  * only for the back), one side only when a side is picked. A small part is shown with what is
  * around it, at most five times larger.
  */
-function zoomOn(figure: Figure, part: string, side: BodySide): string | undefined {
-  const all = REGIONS[figure].filter((x) => x.part === part && (!side || x.side === side))
+function zoomOn(figure: Figure, stage: Stage, part: string, side: BodySide): string | undefined {
+  const all = bodyOf(figure, stage).regions.filter((x) => x.part === part && (!side || x.side === side))
   const view = all.some((x) => x.view === 'front') ? 'front' : 'back'
   const boxes = all.filter((x) => x.view === view).map((x) => x.box)
   if (!boxes.length) return undefined
@@ -47,10 +48,13 @@ export function BodyMap({
   part,
   side,
   figure: initialFigure,
+  stage: initialStage,
   onPick,
 }: {
   heat: BodyHeat
+  /** Male or female, and the age group, of the person shown; either can be switched. */
   figure: Figure
+  stage: Stage
   /** The picked part (`bodyKey`) and side; '' for none. */
   part: string
   side: BodySide
@@ -58,12 +62,16 @@ export function BodyMap({
 }) {
   const t = useT()
   const [figure, setFigure] = useState(initialFigure)
+  const [stage, setStage] = useState(initialStage)
   useEffect(() => setFigure(initialFigure), [initialFigure])
+  useEffect(() => setStage(initialStage), [initialStage])
+  const body = bodyOf(figure, stage)
+  const child = stage !== 'adult'
   const picked = bodyKey(part)
   const name = (p: string) => ((BODY_PARTS as readonly string[]).includes(p) ? t(`bodyPart.${p}`) : p)
   const label = (p: string, s: BodySide, n: number) =>
     t('bodyMap.region', { part: s ? `${name(p)} · ${t(`side.${s}`)}` : name(p), n })
-  const zoom = picked ? zoomOn(figure, picked, side) : undefined
+  const zoom = picked ? zoomOn(figure, stage, picked, side) : undefined
   const pick = (p: string, s: BodySide) => (p === picked && s === side ? onPick('', '') : onPick(p, s))
   const other = elsewhere(heat)
   const level = (n: number) => heatLevel(n, heat.max)
@@ -87,10 +95,21 @@ export function BodyMap({
               aria-pressed={figure === f}
               onClick={() => setFigure(f)}
             >
-              {t(`bodyMap.${f}`)}
+              {t(child ? `bodyMap.${f === 'male' ? 'boy' : 'girl'}` : `bodyMap.${f}`)}
             </button>
           ))}
         </div>
+        <select
+          aria-label={t('bodyMap.age')}
+          value={stage}
+          onChange={(e) => setStage(e.target.value as Stage)}
+        >
+          {STAGES.map((s) => (
+            <option key={s} value={s}>
+              {t(`bodyMap.stage.${s}`)}
+            </option>
+          ))}
+        </select>
       </div>
       <svg viewBox={`0 0 ${W} ${H}`} className={zoom ? 'zoomed' : ''}>
         <title>{t('bodyMap.title')}</title>
@@ -109,8 +128,8 @@ export function BodyMap({
             </g>
           ))}
           {VIEWS.map((v) => (
-            <g key={v} transform={placement(figure, v)}>
-              {REGIONS[figure]
+            <g key={v} transform={body.transform[v]}>
+              {body.regions
                 .filter((x) => x.view === v)
                 .map((x) => {
                   const n = regionCount(heat, x.part, x.side)

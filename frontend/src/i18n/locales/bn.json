@@ -1103,5 +1103,13 @@
   "bodyMap.more": "বেশি ({n})",
   "bodyMap.elsewhere": "অন্যত্র",
   "bodyMap.male": "পুরুষ",
-  "bodyMap.female": "নারী"
+  "bodyMap.female": "নারী",
+  "bodyMap.boy": "ছেলে",
+  "bodyMap.girl": "মেয়ে",
+  "bodyMap.age": "বয়স",
+  "bodyMap.stage.adult": "প্রাপ্তবয়স্ক",
+  "bodyMap.stage.teen": "১৩–১৫ বছর",
+  "bodyMap.stage.child": "৯–১২ বছর",
+  "bodyMap.stage.young": "৪–৮ বছর",
+  "bodyMap.stage.toddler": "৪ বছরের কম"
 }
