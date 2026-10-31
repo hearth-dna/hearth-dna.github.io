@@ -247,9 +247,12 @@ kb fields at tier 0, so the user gets a decision frame even without any LLM.
   `hypertension`) the user linked the entry to: the form and each table row suggest them from the
   entry's words, its lab test and its measurement preset (`suggestConditions`), and nothing is
   linked without a click. It is the key the condition view, Ask and the per-condition export join
-  DNA findings and health records on. `details` (JSON) holds a symptom's structured details, defined
-  per preset in `health/presets.ts`: stool form on the Bristol scale, colour, blood; cough type
-  and sputum colour; nasal discharge; times a day for vomiting and diarrhoea. The log's Quick
+  DNA findings and health records on. `details` (JSON) holds a symptom's or procedure's structured
+  details, defined per preset in `health/presets.ts`: stool form on the Bristol scale, colour, blood;
+  cough type and sputum colour; nasal discharge; times a day for vomiting and diarrhoea; for dental
+  symptoms and treatments (toothache, bleeding gums, teething, a filling, an extraction…) the teeth,
+  picked on a tooth chart of both jaws and stored as FDI numbers (`teeth: "16 26 55"`), where milk
+  teeth have their own numbers (51–85, `health/teeth.ts`). The log's Quick
   symptom bar records one in a tap. Severity and the numeric details are chartable, and Ask packs
   carry them in words.
   Gated by the `import_document` consent; part of the dump; offered entry-by-entry to the Ask

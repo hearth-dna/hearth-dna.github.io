@@ -80,5 +80,17 @@
   "colonoscopy": ["колоноскопия", "колоноскопія", "darmspiegelung", "koloskopie", "colonoscopia", "coloscopie"],
   "physiotherapy": ["physio", "physiotherapy", "physical therapy", "физиотерапия", "лфк", "фізіотерапія", "physiotherapie", "krankengymnastik", "fisioterapia", "kinésithérapie", "kiné"],
   "massage": ["massage therapy", "массаж", "масаж", "masaje"],
-  "blood-donation": ["donated blood", "донорство крови", "сдача крови", "донорство крові", "здача крові", "blutspende", "donación de sangre", "don du sang"]
+  "blood-donation": ["donated blood", "донорство крови", "сдача крови", "донорство крові", "здача крові", "blutspende", "donación de sangre", "don du sang"],
+  "tooth-sensitivity": ["sensitive tooth", "tooth sensitivity", "чувствительность зубов", "чувствительные зубы", "чутливість зубів", "empfindliche zähne", "schmerzempfindliche zähne", "sensibilidad dental", "dientes sensibles", "sensibilité dentaire", "dents sensibles"],
+  "bleeding-gums": ["gum bleeding", "кровоточивость десен", "кровоточат десны", "кровоточивість ясен", "zahnfleischbluten", "sangrado de encías", "encías sangrantes", "saignement des gencives", "gencives qui saignent"],
+  "swollen-gums": ["gum swelling", "sore gums", "отек десны", "опухла десна", "набряк ясен", "zahnfleischschwellung", "geschwollenes zahnfleisch", "encías inflamadas", "gencives gonflées"],
+  "loose-tooth": ["wobbly tooth", "шатается зуб", "шатающийся зуб", "хитається зуб", "wackelzahn", "lockerer zahn", "diente flojo", "dent qui bouge"],
+  "broken-tooth": ["chipped tooth", "broken tooth", "cracked tooth", "скол зуба", "сломался зуб", "відколовся зуб", "abgebrochener zahn", "diente roto", "diente astillado", "dent cassée", "dent ébréchée"],
+  "tooth-came-out": ["lost a tooth", "tooth fell out", "lost tooth", "выпал зуб", "випав зуб", "zahn ausgefallen", "se cayó un diente", "dent tombée"],
+  "teething": ["cutting teeth", "прорезывание зубов", "режутся зубы", "прорізування зубів", "zahnen", "dentición", "poussée dentaire"],
+  "tooth-extraction": ["extraction", "tooth removal", "удаление зуба", "видалення зуба", "zahnextraktion", "zahn gezogen", "extracción dental", "extraction dentaire"],
+  "root-canal": ["root canal", "endodontic treatment", "лечение каналов", "депульпирование", "лікування каналів", "wurzelbehandlung", "endodoncia", "tratamiento de conducto", "dévitalisation", "traitement de canal"],
+  "dental-crown": ["crown", "коронка", "зубная коронка", "зубна коронка", "zahnkrone", "krone", "corona dental", "couronne dentaire"],
+  "dental-xray": ["dental x-ray", "tooth x-ray", "рентген зуба", "снимок зуба", "zahnröntgen", "radiografía dental", "radio dentaire"],
+  "fissure-sealant": ["sealant", "dental sealant", "герметизация фиссур", "герметизація фісур", "fissurenversiegelung", "sellador de fosas y fisuras", "scellement des sillons"]
 }

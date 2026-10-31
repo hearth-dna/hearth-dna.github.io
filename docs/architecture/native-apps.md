@@ -173,7 +173,8 @@ not show or edit it.
   the blood-test reader (`labs/`), the CSV timeline import with its column picker, and the analyte
   catalogue (`kb.analytes`, `kb.panels`, `kb.units`). A lab entry restored from a backup shows as a
   plain entry; its reference range, flag and printed value are kept.
-- **Symptom details and sides**: the structured details of a symptom (stool form, cough type…), the
+- **Symptom details and sides**: the structured details of a symptom or procedure (stool form, cough
+  type, the teeth on the tooth chart…), the
   left/right/both side of a body part, and the links from an entry to the kb's
   conditions (`HealthEntry.side`, `details`, `conditions`). The Ask context pack line for such an
   entry therefore omits them where the web's includes them (`describeEntry`).

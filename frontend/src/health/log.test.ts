@@ -23,6 +23,7 @@ import {
 } from './log'
 import { today } from './now'
 import {
+  detailFieldsOf,
   entryTitle,
   findPreset,
   MEASUREMENT_PRESETS,
@@ -318,6 +319,15 @@ describe('symptom details', () => {
     expect(filterHealthLog([stool], { ...NO_FILTER, text: 'blood' }).map((e) => e.id)).toEqual(['s'])
     const cough = entry({ kind: 'symptom', title: 'Eye irritation', details: { discharge: 'sticky' } })
     expect(formatDetails(cough)).toBe('discharge sticky')
+  })
+
+  it('describes the teeth of a dental symptom or treatment, milk teeth apart', () => {
+    const ache = entry({ kind: 'symptom', title: 'Toothache', details: { trigger: 'cold', teeth: '16 55' } })
+    expect(formatDetails(ache)).toBe('teeth 16 (FDI); milk teeth 55 (FDI), trigger cold')
+    const filling = entry({ kind: 'procedure', title: 'Dental filling', details: { teeth: '36' } })
+    expect(describeEntry(filling)).toContain('Dental filling (teeth 36 (FDI)')
+    expect(detailFieldsOf(filling).map((f) => f.kind)).toEqual(['teeth'])
+    expect(detailFieldsOf({ kind: 'symptom', title: 'Dental filling' })).toEqual([])
   })
 
   it('gives every new symptom a known body part and consistent detail fields', () => {

@@ -1,5 +1,6 @@
 import { HEALTH_KIND_LABELS, type HealthEntry, type HealthKind } from '../types'
-import { type DetailValue, symptomPreset } from './presets'
+import { type DetailValue, detailFieldsOf } from './presets'
+import { describeTeeth } from './teeth'
 
 /** Pure helpers for the health log: tag encoding, one-line descriptions and filtering. */
 
@@ -46,12 +47,13 @@ export const detailsCell = (d: Record<string, DetailValue>) =>
     .join('; ')
 
 /**
- * Details in plain English, in the preset's field order: "Bristol type 6, yellow, blood". Used
- * where the app writes text for itself and for Ask (the UI shows translated labels instead).
+ * Details in plain English, in the preset's field order: "Bristol type 6, yellow, blood",
+ * "teeth 16, 26 (FDI); milk teeth 55 (FDI), cold". Used where the app writes text for itself and
+ * for Ask (the UI shows translated labels instead).
  */
-export function formatDetails(e: Pick<HealthEntry, 'title' | 'details'>): string {
+export function formatDetails(e: Pick<HealthEntry, 'kind' | 'title' | 'details'>): string {
   const d = e.details ?? {}
-  const fields = symptomPreset(e.title)?.details ?? []
+  const fields = detailFieldsOf(e)
   const order = [...fields.map((f) => f.id), ...Object.keys(d).filter((k) => !fields.some((f) => f.id === k))]
   return order
     .filter((k) => d[k] !== undefined)
@@ -59,6 +61,7 @@ export function formatDetails(e: Pick<HealthEntry, 'title' | 'details'>): string
       const v = d[k]
       if (k === 'bristol') return `Bristol type ${v}`
       if (k === 'times') return `${v}× a day`
+      if (k === 'teeth') return describeTeeth(v)
       return v === true ? k : `${k} ${v}`
     })
     .join(', ')
