@@ -19,5 +19,8 @@
   "bodyMap.stage.teen": "13–15 years",
   "bodyMap.stage.child": "9–12 years",
   "bodyMap.stage.young": "4–8 years",
-  "bodyMap.stage.toddler": "Under 4"
+  "bodyMap.stage.toddler": "Under 4",
+  "bodyMap.tooth": "tooth {n}",
+  "bodyMap.teethHint": "Tap a tooth to show only its entries.",
+  "bodyMap.noTeeth": "No entry names a tooth yet: dental symptoms and treatments can."
 }

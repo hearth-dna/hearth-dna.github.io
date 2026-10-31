@@ -154,6 +154,7 @@
   "bodyPart.lower back": "zona lumbar",
   "bodyPart.hips": "caderas",
   "bodyPart.shoulders": "hombros",
+  "bodyPart.armpit": "axila",
   "bodyPart.arms": "brazos",
   "bodyPart.elbows": "codos",
   "bodyPart.wrists": "muñecas",
@@ -314,7 +315,7 @@
   "healthLog.unit": "Unidad",
   "healthLog.unitPlaceholder": "p. ej. cm",
   "healthLog.bodyPart": "Parte del cuerpo",
-  "healthLog.bodyPartPlaceholder": "p. ej. manos",
+  "healthLog.bodyPartPlaceholder": "Dónde en el cuerpo",
   "healthLog.side": "Lado",
   "healthLog.sideNone": "sin especificar",
   "healthLog.severity": "Gravedad",
@@ -1111,5 +1112,8 @@
   "bodyMap.stage.teen": "13–15 años",
   "bodyMap.stage.child": "9–12 años",
   "bodyMap.stage.young": "4–8 años",
-  "bodyMap.stage.toddler": "Menos de 4"
+  "bodyMap.stage.toddler": "Menos de 4",
+  "bodyMap.tooth": "diente {n}",
+  "bodyMap.teethHint": "Toque un diente para ver solo sus entradas.",
+  "bodyMap.noTeeth": "Aún ninguna entrada indica un diente: los síntomas y tratamientos dentales pueden hacerlo."
 }

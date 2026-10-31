@@ -4,6 +4,7 @@ import { useT } from '../i18n/context'
 import { BODY_PARTS, type BodySide } from '../types'
 import { bodyOf, type Figure, H, MID, W } from './bodyFigure'
 import { STAGES, type Stage } from './bodyWarp'
+import { ToothHeat } from './ToothChart'
 
 const FIGURES: Figure[] = ['male', 'female']
 const VIEWS = ['front', 'back'] as const
@@ -49,7 +50,10 @@ export function BodyMap({
   side,
   figure: initialFigure,
   stage: initialStage,
+  teeth,
+  tooth,
   onPick,
+  onTooth,
 }: {
   heat: BodyHeat
   /** Male or female, and the age group, of the person shown; either can be switched. */
@@ -59,6 +63,10 @@ export function BodyMap({
   part: string
   side: BodySide
   onPick: (part: string, side: BodySide) => void
+  /** Entries per tooth, shown on the mouth; the tooth picked there, null for none. */
+  teeth: Map<number, number>
+  tooth: number | null
+  onTooth: (tooth: number | null) => void
 }) {
   const t = useT()
   const [figure, setFigure] = useState(initialFigure)
@@ -75,6 +83,8 @@ export function BodyMap({
   const pick = (p: string, s: BodySide) => (p === picked && s === side ? onPick('', '') : onPick(p, s))
   const other = elsewhere(heat)
   const level = (n: number) => heatLevel(n, heat.max)
+  // The teeth share the body's scale, unless one tooth has more entries than any part.
+  const teethMax = Math.max(heat.max, ...teeth.values())
   return (
     <div className="bodymap">
       <div className="bodymap-head">
@@ -163,12 +173,21 @@ export function BodyMap({
           ))}
         </g>
       </svg>
+      {picked === 'mouth' && (
+        <ToothHeat
+          counts={teeth}
+          picked={tooth}
+          milkFirst={stage === 'toddler' || stage === 'young' || [...teeth.keys()].every((n) => n > 50)}
+          heat={(n) => heatLevel(n, teethMax)}
+          onPick={onTooth}
+        />
+      )}
       <div className="bodymap-legend muted">
         <span>{t('bodyMap.fewer')}</span>
         {STEPS.map((n) => (
           <span key={n} className={`swatch heat-${n}`} />
         ))}
-        <span>{t('bodyMap.more', { n: heat.max })}</span>
+        <span>{t('bodyMap.more', { n: picked === 'mouth' ? teethMax : heat.max })}</span>
       </div>
       {other.length > 0 && (
         <div className="row bodymap-other">

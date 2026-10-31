@@ -30,7 +30,7 @@ enum HealthKind: String, CaseIterable, Identifiable {
 /// Suggestions for the body-part field (`BODY_PARTS`); free text is accepted too.
 let BODY_PARTS = [
     "head", "eyes", "ears", "nose", "mouth", "throat", "neck", "chest", "heart", "lungs", "abdomen",
-    "stomach", "back", "lower back", "hips", "shoulders", "arms", "elbows", "wrists", "hands",
+    "stomach", "back", "lower back", "hips", "shoulders", "armpit", "arms", "elbows", "wrists", "hands",
     "fingers", "legs", "knees", "ankles", "feet", "skin", "joints", "muscles", "whole body",
 ]
 

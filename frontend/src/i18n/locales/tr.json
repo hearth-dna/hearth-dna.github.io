@@ -154,6 +154,7 @@
   "bodyPart.lower back": "bel",
   "bodyPart.hips": "kalçalar",
   "bodyPart.shoulders": "omuzlar",
+  "bodyPart.armpit": "koltuk altı",
   "bodyPart.arms": "kollar",
   "bodyPart.elbows": "dirsekler",
   "bodyPart.wrists": "bilekler",
@@ -314,7 +315,7 @@
   "healthLog.unit": "Birim",
   "healthLog.unitPlaceholder": "örn. cm",
   "healthLog.bodyPart": "Vücut bölgesi",
-  "healthLog.bodyPartPlaceholder": "örn. eller",
+  "healthLog.bodyPartPlaceholder": "Vücudun neresinde",
   "healthLog.side": "Taraf",
   "healthLog.sideNone": "belirtilmedi",
   "healthLog.severity": "Şiddet",
@@ -1111,5 +1112,8 @@
   "bodyMap.stage.teen": "13–15 yaş",
   "bodyMap.stage.child": "9–12 yaş",
   "bodyMap.stage.young": "4–8 yaş",
-  "bodyMap.stage.toddler": "4 yaş altı"
+  "bodyMap.stage.toddler": "4 yaş altı",
+  "bodyMap.tooth": "diş {n}",
+  "bodyMap.teethHint": "Yalnızca kayıtlarını göstermek için bir dişe dokunun.",
+  "bodyMap.noTeeth": "Henüz hiçbir kayıt bir diş belirtmiyor: diş belirtileri ve tedavileri bunu yapabilir."
 }

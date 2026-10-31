@@ -6,7 +6,7 @@ import { addHealthEntry } from '../db/repo'
 import type { HealthDraft } from '../documents/draft'
 import { parseTags } from '../health/log'
 import { nowTime, today } from '../health/now'
-import { type DetailValue, detailFieldsOf, findPreset, presetsFor } from '../health/presets'
+import { type DetailValue, defaultBodyPart, detailFieldsOf, findPreset, presetsFor } from '../health/presets'
 import { useT } from '../i18n/context'
 import { suggestConditions } from '../kb/conditions'
 import {
@@ -14,6 +14,7 @@ import {
   BODY_SIDES,
   type BodySide,
   HEALTH_KIND_LABELS,
+  type HealthEntry,
   type HealthKind,
   type Person,
 } from '../types'
@@ -68,6 +69,7 @@ export function HealthEntryForm({
   persons,
   personId: initialPerson,
   draft,
+  entries = [],
   tagSuggestions,
   onSaved,
   onCancel,
@@ -76,6 +78,8 @@ export function HealthEntryForm({
   personId: string
   /** Prefill from a document reader; skips the type picker. `files` are its pages, to keep. */
   draft?: { draft: HealthDraft; source: string; files?: File[] }
+  /** The log, newest first: a preset starts where this person usually puts it (`defaultBodyPart`). */
+  entries?: HealthEntry[]
   tagSuggestions: string[]
   onSaved: () => void
   onCancel: () => void
@@ -128,7 +132,10 @@ export function HealthEntryForm({
       preset: id,
       kind: p.kind,
       title: p.title,
-      bodyPart: p.bodyPart ?? form.bodyPart,
+      bodyPart: defaultBodyPart(
+        p,
+        entries.filter((e) => e.personId === personId),
+      ),
       tags: p.tags?.join(', ') ?? form.tags,
       unit: p.unit ?? '',
       value: '',

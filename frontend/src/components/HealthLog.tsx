@@ -66,6 +66,7 @@ export function HealthLog({ person }: { person: Person }) {
         <HealthEntryForm
           persons={[person]}
           personId={person.id}
+          entries={entries}
           tagSuggestions={tags}
           onCancel={() => setAdding(false)}
           onSaved={async () => {

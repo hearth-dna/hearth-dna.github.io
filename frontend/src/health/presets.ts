@@ -122,7 +122,9 @@ const TEETH: DetailField = { id: 'teeth', kind: 'teeth' }
 const TOOTH_TRIGGER = choice('trigger', ['cold', 'hot', 'sweet', 'biting', 'none'])
 
 export const MEASUREMENT_PRESETS: HealthPreset[] = [
+  // Where it is taken at home most often; a person who uses another place gets theirs (defaultBodyPart).
   m('temperature', 'Body temperature', '°C', 0.1, {
+    bodyPart: 'armpit',
     synonyms: ['temperature', 'temp', 'body temp', 'температура', 't°'],
     unitAliases: ['c', '°с', 'с', 'celsius', 'degc', 'градусы'],
     units: {
@@ -483,6 +485,23 @@ export function presetOf(e: { kind: string; title: string }): HealthPreset | und
   return PRESET_GROUPS.flatMap((g) => g.presets).find(
     (p) => p.kind === e.kind && [p.title, ...(p.synonyms ?? [])].some((x) => loose(x) === n),
   )
+}
+
+/**
+ * The body part a new entry from this preset starts with: where this person put most of their
+ * earlier entries of it (the latest of equally used places), else the preset's own; '' for none.
+ * `entries` must be the person's log, newest first.
+ */
+export function defaultBodyPart(
+  p: HealthPreset,
+  entries: { kind: string; title: string; bodyPart: string }[],
+): string {
+  const counts = new Map<string, number>()
+  for (const e of entries)
+    if (e.bodyPart && presetOf(e) === p) counts.set(e.bodyPart, (counts.get(e.bodyPart) ?? 0) + 1)
+  let best = ''
+  for (const [part, n] of counts) if (n > (counts.get(best) ?? 0)) best = part
+  return best || (p.bodyPart ?? '')
 }
 
 /** An entry's title as the UI shows it: the preset's name in the UI language, else as saved. */

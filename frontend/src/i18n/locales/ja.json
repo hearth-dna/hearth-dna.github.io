@@ -154,6 +154,7 @@
   "bodyPart.lower back": "腰",
   "bodyPart.hips": "股関節",
   "bodyPart.shoulders": "肩",
+  "bodyPart.armpit": "わきの下",
   "bodyPart.arms": "腕",
   "bodyPart.elbows": "ひじ",
   "bodyPart.wrists": "手首",
@@ -314,7 +315,7 @@
   "healthLog.unit": "単位",
   "healthLog.unitPlaceholder": "例: cm",
   "healthLog.bodyPart": "部位",
-  "healthLog.bodyPartPlaceholder": "例: 手",
+  "healthLog.bodyPartPlaceholder": "からだのどこか",
   "healthLog.side": "左右",
   "healthLog.sideNone": "指定なし",
   "healthLog.severity": "程度",
@@ -1111,5 +1112,8 @@
   "bodyMap.stage.teen": "13〜15歳",
   "bodyMap.stage.child": "9〜12歳",
   "bodyMap.stage.young": "4〜8歳",
-  "bodyMap.stage.toddler": "4歳未満"
+  "bodyMap.stage.toddler": "4歳未満",
+  "bodyMap.tooth": "歯 {n}",
+  "bodyMap.teethHint": "歯をタップすると、その歯の記録だけを表示します。",
+  "bodyMap.noTeeth": "まだ歯を指定した記録はありません。歯の症状と治療で指定できます。"
 }

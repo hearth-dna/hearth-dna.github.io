@@ -1,4 +1,5 @@
 import { BODY_PARTS, type BodySide, type HealthEntry } from '../types'
+import { parseTeeth } from './teeth'
 
 /**
  * The health log laid on a body: which part each entry names, and how many entries each part (and
@@ -12,6 +13,7 @@ export const PAIRED: ReadonlySet<string> = new Set([
   'ears',
   'lungs',
   'shoulders',
+  'armpit',
   'hips',
   'arms',
   'elbows',
@@ -89,3 +91,10 @@ export const HEAT_STEPS = 5
 /** 0 for none, else 1–HEAT_STEPS in proportion to the busiest part. */
 export const heatLevel = (n: number, max: number) =>
   n <= 0 ? 0 : Math.max(1, Math.ceil((n / Math.max(max, 1)) * HEAT_STEPS))
+
+/** Entries per tooth (FDI number), from the teeth a dental entry names; teeth with none are absent. */
+export function teethHeat(entries: Pick<HealthEntry, 'details'>[]): Map<number, number> {
+  const out = new Map<number, number>()
+  for (const e of entries) for (const n of parseTeeth(e.details?.teeth)) out.set(n, (out.get(n) ?? 0) + 1)
+  return out
+}

@@ -1,7 +1,7 @@
 import { type BodySide, HEALTH_KIND_LABELS, type HealthEntry, type HealthKind } from '../types'
 import { bodyKey, onSide } from './body'
 import { type DetailValue, detailFieldsOf } from './presets'
-import { describeTeeth } from './teeth'
+import { describeTeeth, parseTeeth } from './teeth'
 
 /** Pure helpers for the health log: tag encoding, one-line descriptions and filtering. */
 
@@ -127,6 +127,8 @@ export interface HealthFilter {
   bodyPart: string
   /** One side of a paired body part (the body map): that side, both sides, or unrecorded. */
   side: BodySide
+  /** One tooth (FDI number) a dental entry names, picked on the body map's mouth; null for any. */
+  tooth: number | null
   tag: string
   /** A condition id the entry is linked to. */
   condition: string
@@ -144,6 +146,7 @@ export const NO_FILTER: HealthFilter = {
   kind: '',
   bodyPart: '',
   side: '',
+  tooth: null,
   tag: '',
   condition: '',
   from: '',
@@ -175,6 +178,7 @@ export function filterHealthLog(
       (!f.kind || e.kind === f.kind) &&
       (!f.bodyPart || bodyKey(e.bodyPart) === bodyKey(f.bodyPart)) &&
       (!f.bodyPart || onSide(e.side, f.side)) &&
+      (f.tooth === null || parseTeeth(e.details?.teeth).includes(f.tooth)) &&
       (!f.tag || e.tags.includes(f.tag)) &&
       (!f.condition || e.conditions.includes(f.condition)) &&
       (!f.from || e.date >= f.from) &&

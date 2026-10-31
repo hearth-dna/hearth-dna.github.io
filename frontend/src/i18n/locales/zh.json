@@ -154,6 +154,7 @@
   "bodyPart.lower back": "腰部",
   "bodyPart.hips": "髋部",
   "bodyPart.shoulders": "肩部",
+  "bodyPart.armpit": "腋下",
   "bodyPart.arms": "手臂",
   "bodyPart.elbows": "肘部",
   "bodyPart.wrists": "手腕",
@@ -314,7 +315,7 @@
   "healthLog.unit": "单位",
   "healthLog.unitPlaceholder": "例如：cm",
   "healthLog.bodyPart": "身体部位",
-  "healthLog.bodyPartPlaceholder": "例如：手",
+  "healthLog.bodyPartPlaceholder": "身体的哪个部位",
   "healthLog.side": "左右侧",
   "healthLog.sideNone": "未指定",
   "healthLog.severity": "严重程度",
@@ -1111,5 +1112,8 @@
   "bodyMap.stage.teen": "13–15岁",
   "bodyMap.stage.child": "9–12岁",
   "bodyMap.stage.young": "4–8岁",
-  "bodyMap.stage.toddler": "4岁以下"
+  "bodyMap.stage.toddler": "4岁以下",
+  "bodyMap.tooth": "牙齿 {n}",
+  "bodyMap.teethHint": "点按牙齿即可只显示该牙齿的记录。",
+  "bodyMap.noTeeth": "还没有记录指明牙齿：牙齿症状和治疗可以指明。"
 }

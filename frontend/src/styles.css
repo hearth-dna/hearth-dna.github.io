@@ -351,6 +351,16 @@ fieldset.field > legend { padding: 0; margin-bottom: var(--space-1); }
 .bodymap .tag .swatch { margin-inline-end: var(--space-1); }
 .bodymap-legend { display: flex; align-items: center; gap: var(--space-1); }
 .bodymap-other { align-items: center; }
+/* The teeth on the body map's mouth: the same colour steps as the body. */
+.toothheat { margin-top: var(--space-2); }
+.toothchart .tooth.heat-1 rect { fill: color-mix(in srgb, var(--series-2) 18%, var(--surface)); }
+.toothchart .tooth.heat-2 rect { fill: color-mix(in srgb, var(--series-2) 36%, var(--surface)); }
+.toothchart .tooth.heat-3 rect { fill: color-mix(in srgb, var(--series-2) 55%, var(--surface)); }
+.toothchart .tooth.heat-4 rect { fill: color-mix(in srgb, var(--series-2) 75%, var(--surface)); }
+.toothchart .tooth.heat-5 rect { fill: var(--series-2); }
+.toothheat .tooth.heat-0 rect { fill: var(--surface); }
+.toothheat .tooth.on rect { stroke: var(--fg); stroke-width: 2.5; }
+.toothheat .tooth.on text { fill: var(--fg); }
 
 /* ---- Health log: a colour per kind, toolbar, filter panel, cards ------------------------------ */
 .kind-symptom { --k: #b4432f; } .kind-measurement { --k: #2f6fa8; } .kind-lab { --k: #7a4fb0; } .kind-imaging { --k: #1f7f7a; }

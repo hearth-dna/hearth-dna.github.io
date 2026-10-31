@@ -154,6 +154,7 @@
   "bodyPart.lower back": "نچلی کمر",
   "bodyPart.hips": "کولہے",
   "bodyPart.shoulders": "کندھے",
+  "bodyPart.armpit": "بغل",
   "bodyPart.arms": "بازو",
   "bodyPart.elbows": "کہنیاں",
   "bodyPart.wrists": "کلائیاں",
@@ -314,7 +315,7 @@
   "healthLog.unit": "اکائی",
   "healthLog.unitPlaceholder": "مثلاً سینٹی میٹر",
   "healthLog.bodyPart": "جسم کا حصہ",
-  "healthLog.bodyPartPlaceholder": "مثلاً ہاتھ",
+  "healthLog.bodyPartPlaceholder": "جسم میں کہاں",
   "healthLog.side": "طرف",
   "healthLog.sideNone": "واضح نہیں",
   "healthLog.severity": "شدت",
@@ -1111,5 +1112,8 @@
   "bodyMap.stage.teen": "13–15 سال",
   "bodyMap.stage.child": "9–12 سال",
   "bodyMap.stage.young": "4–8 سال",
-  "bodyMap.stage.toddler": "4 سے کم"
+  "bodyMap.stage.toddler": "4 سے کم",
+  "bodyMap.tooth": "دانت {n}",
+  "bodyMap.teethHint": "صرف اس کے اندراجات دیکھنے کے لیے کسی دانت پر ٹیپ کریں۔",
+  "bodyMap.noTeeth": "ابھی کسی اندراج میں دانت نہیں: دانتوں کی علامات اور علاج میں یہ دیا جا سکتا ہے۔"
 }

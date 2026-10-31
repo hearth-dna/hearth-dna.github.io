@@ -93,6 +93,7 @@ export function HealthPage({ person: who, onPerson }: { person: string; onPerson
             <HealthEntryForm
               persons={persons}
               personId={filter.person || (persons.length === 1 ? persons[0].id : '')}
+              entries={entries}
               tagSuggestions={tags}
               onCancel={() => setAdding(false)}
               onSaved={async () => {

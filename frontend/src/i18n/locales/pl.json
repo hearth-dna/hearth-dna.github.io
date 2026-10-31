@@ -154,6 +154,7 @@
   "bodyPart.lower back": "dolna część pleców",
   "bodyPart.hips": "biodra",
   "bodyPart.shoulders": "barki",
+  "bodyPart.armpit": "pacha",
   "bodyPart.arms": "ramiona",
   "bodyPart.elbows": "łokcie",
   "bodyPart.wrists": "nadgarstki",
@@ -314,7 +315,7 @@
   "healthLog.unit": "Jednostka",
   "healthLog.unitPlaceholder": "np. cm",
   "healthLog.bodyPart": "Część ciała",
-  "healthLog.bodyPartPlaceholder": "np. dłonie",
+  "healthLog.bodyPartPlaceholder": "Gdzie na ciele",
   "healthLog.side": "Strona",
   "healthLog.sideNone": "nie podano",
   "healthLog.severity": "Nasilenie",
@@ -1111,5 +1112,8 @@
   "bodyMap.stage.teen": "13–15 lat",
   "bodyMap.stage.child": "9–12 lat",
   "bodyMap.stage.young": "4–8 lat",
-  "bodyMap.stage.toddler": "Poniżej 4"
+  "bodyMap.stage.toddler": "Poniżej 4",
+  "bodyMap.tooth": "ząb {n}",
+  "bodyMap.teethHint": "Dotknij zęba, aby pokazać tylko jego wpisy.",
+  "bodyMap.noTeeth": "Żaden wpis nie wskazuje jeszcze zęba: mogą to zrobić objawy i zabiegi stomatologiczne."
 }

@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import type { BodySide } from '../types'
-import { bodyHeat, bodyKey, heatLevel, onSide, regionCount } from './body'
+import { bodyHeat, bodyKey, heatLevel, onSide, regionCount, teethHeat } from './body'
 import { filterHealthLog, NO_FILTER } from './log'
+import { defaultBodyPart, findPreset } from './presets'
 
 const at = (bodyPart: string, side: BodySide = '') => ({ bodyPart, side })
 
@@ -74,5 +75,32 @@ describe('body map', () => {
     expect(ids({ bodyPart: 'knees' })).toEqual(['l', 'r', 'n'])
     expect(ids({ bodyPart: 'knees', side: 'left' })).toEqual(['l', 'n'])
     expect(ids({ bodyPart: 'knees', side: 'left' }).length).toBe(regionCount(bodyHeat(log), 'knees', 'left'))
+    const dental = [{ ...log[0], id: 'd', details: { teeth: '16 26' } }, ...log]
+    expect(filterHealthLog(dental, { ...NO_FILTER, tooth: 26 }).map((e) => e.id)).toEqual(['d'])
+  })
+
+  it('counts entries per tooth, and filters the log to one', () => {
+    const teeth: { details: Record<string, string> }[] = [
+      { details: { teeth: '16 26' } },
+      { details: { teeth: '16 55' } },
+      { details: {} },
+    ]
+    expect([...teethHeat(teeth)].sort()).toEqual([
+      [16, 2],
+      [26, 1],
+      [55, 1],
+    ])
+  })
+
+  it('starts a preset where the person usually puts it, else where the preset says', () => {
+    const temp = findPreset('temperature')!
+    const t = (bodyPart: string) => ({ kind: 'measurement', title: 'Body temperature', bodyPart })
+    expect(defaultBodyPart(temp, [])).toBe('armpit')
+    expect(defaultBodyPart(temp, [t('mouth'), t('armpit'), t('mouth'), t('')])).toBe('mouth')
+    // A tie goes to the latest (the log is newest first).
+    expect(defaultBodyPart(temp, [t('ears'), t('mouth')])).toBe('ears')
+    // Other presets' places do not count.
+    expect(defaultBodyPart(temp, [{ kind: 'symptom', title: 'Headache', bodyPart: 'head' }])).toBe('armpit')
+    expect(defaultBodyPart(findPreset('weight')!, [])).toBe('')
   })
 })
