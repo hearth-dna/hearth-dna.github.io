@@ -79,6 +79,10 @@ import com.hearth.backup.Backups
 import com.hearth.data.Repo
 import com.hearth.documents.HealthDraft
 import com.hearth.health.HealthFilter
+import com.hearth.health.ageFromYear
+import com.hearth.health.bodyHeat
+import com.hearth.health.stageOf
+import com.hearth.health.teethHeat
 import com.hearth.health.SortDir
 import com.hearth.health.SortKey
 import com.hearth.health.defaultDir
@@ -90,7 +94,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-enum class LogView { CARDS, TABLE }
+enum class LogView { CARDS, TABLE, BODY }
 
 
 private const val PREFS = "hearth.native"
@@ -159,6 +163,13 @@ fun HealthScreen(repo: Repo, backups: Backups, onlyPerson: String = "") {
     // The person row is the scope; the sheet's badge counts what is set inside the sheet.
     val sheetCount = filter.copy(person = "").panelCount
     val set = { f: HealthFilter -> filter = f }
+    // The body map's colours: what every filter but the body part leaves.
+    val heat = remember(entries, filter, t) {
+        val counted = filterHealthLog(entries, filter.copy(bodyPart = "", side = "", tooth = null), title)
+        bodyHeat(counted) to teethHeat(counted)
+    }
+    // The figure is the shown person's sex and age: the one filtered to, or the only one.
+    val one = persons.firstOrNull { it.id == filter.person } ?: persons.singleOrNull()
 
     val topBar = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val list = rememberLazyListState()
@@ -269,6 +280,21 @@ fun HealthScreen(repo: Repo, backups: Backups, onlyPerson: String = "") {
             }
             item(key = "status") {
                 ActiveFilters(filter, shown.size, entries.size, onChange = set)
+            }
+            if (view == LogView.BODY) {
+                item(key = "body") {
+                    BodyMap(
+                        heat = heat.first,
+                        teeth = heat.second,
+                        sex = if (one?.sex == "female") "female" else "male",
+                        stage = stageOf(ageFromYear(one?.birthYear)),
+                        part = filter.bodyPart,
+                        side = filter.side,
+                        tooth = filter.tooth,
+                        onPick = { p, s -> set(filter.copy(bodyPart = p, side = s, tooth = null)) },
+                        onTooth = { set(filter.copy(tooth = it)) },
+                    )
+                }
             }
             if (shown.isEmpty()) {
                 item(key = "none") {
@@ -466,8 +492,18 @@ private fun Toolbar(
                     icon = {},
                 ) {
                     Icon(
-                        if (v == LogView.CARDS) HearthIcons.ViewAgenda else HearthIcons.TableRows,
-                        contentDescription = t(if (v == LogView.CARDS) "healthTable.viewCards" else "healthTable.viewTable"),
+                        when (v) {
+                            LogView.CARDS -> HearthIcons.ViewAgenda
+                            LogView.TABLE -> HearthIcons.TableRows
+                            LogView.BODY -> HearthIcons.Body
+                        },
+                        contentDescription = t(
+                            when (v) {
+                                LogView.CARDS -> "healthTable.viewCards"
+                                LogView.TABLE -> "healthTable.viewTable"
+                                LogView.BODY -> "healthTable.viewBody"
+                            },
+                        ),
                         modifier = Modifier.size(18.dp),
                     )
                 }
@@ -482,7 +518,9 @@ private fun Toolbar(
 private fun ActiveFilters(filter: HealthFilter, shown: Int, total: Int, onChange: (HealthFilter) -> Unit) {
     val t = LocalStrings.current
     val chips = buildList {
-        if (filter.bodyPart.isNotEmpty()) add(filter.bodyPart to filter.copy(bodyPart = ""))
+        if (filter.bodyPart.isNotEmpty())
+            add((if (filter.side.isEmpty()) filter.bodyPart else "${filter.bodyPart} · ${t("side.${filter.side}")}") to filter.copy(bodyPart = "", side = "", tooth = null))
+        filter.tooth?.let { add(t("bodyMap.tooth", "n" to it) to filter.copy(tooth = null)) }
         if (filter.tag.isNotEmpty()) add("#${filter.tag}" to filter.copy(tag = ""))
         filter.minSeverity?.let { add(t("healthTable.severityAtLeast", "n" to it) to filter.copy(minSeverity = null)) }
         if (filter.from.isNotEmpty() || filter.to.isNotEmpty())

@@ -268,6 +268,8 @@ export interface Body {
   regions: Region[]
   /** The SVG transform placing each view's drawing in the scene. */
   transform: Record<View, string>
+  /** The same as numbers: scale `k`, then shift by `dx`, `dy`. */
+  place: Record<View, { k: number; dx: number; dy: number }>
 }
 
 const built = new Map<string, Body>()
@@ -282,6 +284,7 @@ export function bodyOf(figure: Figure, stage: Stage): Body {
   if (done) return done
   const regions: Region[] = []
   const transform = {} as Record<View, string>
+  const place = {} as Body['place']
   for (const view of ['front', 'back'] as const) {
     const d = DRAWINGS[figure][view]
     const rs = draw(view, d, figure, stage)
@@ -290,13 +293,14 @@ export function bodyOf(figure: Figure, stage: Stage): Body {
     const dx = MID[view] - d.anchors.mid * k
     const dy = ROOM.sole - y1 * k
     transform[view] = `translate(${dx} ${dy}) scale(${k})`
+    place[view] = { k, dx, dy }
     for (const r of rs)
       regions.push({
         ...r,
         box: [r.box[0] * k + dx, r.box[1] * k + dy, r.box[2] * k + dx, r.box[3] * k + dy],
       })
   }
-  const body = { regions, transform }
+  const body = { regions, transform, place }
   built.set(key, body)
   return body
 }

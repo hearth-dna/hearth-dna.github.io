@@ -49,6 +49,10 @@ data class HealthEntry(
     val value2: Double?,
     val unit: String,
     val createdAt: String,
+    /** "left", "right" or "both" for a paired body part; "" otherwise (the web's `side`). */
+    val side: String = "",
+    /** The `details` column as stored: a JSON object, "" for none (health/presets.ts `details`). */
+    val details: String = "",
 )
 
 data class Attachment(

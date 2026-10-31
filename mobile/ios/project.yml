@@ -63,6 +63,10 @@ targets:
       - path: Hearth/Resources/kb.json
         buildPhase: resources
         optional: true
+      # The body map's figures, copied from mobile/body-figures.json by `make mobile-body`.
+      - path: Hearth/Resources/body-figures.json
+        buildPhase: resources
+        optional: true
     dependencies:
       # The system zlib, for gzip in the native genome import and restore (Native/Genome/Gzip.swift):
       # `import zlib` finds the header module, and this links the library whatever autolinking does.

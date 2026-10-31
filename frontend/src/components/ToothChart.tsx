@@ -15,8 +15,8 @@ import { useT } from '../i18n/context'
 const WIDTH = [0, 1, 0.95, 1, 1, 1, 1.3, 1.25, 1.2]
 const MILK_WIDTH = [0, 1, 0.95, 1, 1.15, 1.3]
 
-const W = 320
-const H = 350
+export const W = 320
+export const H = 350
 
 interface Spot {
   n: number
@@ -52,7 +52,8 @@ function arch(teeth: number[], up: boolean, milk: boolean): Spot[] {
   })
 }
 
-const LAYOUT = {
+/** Where each tooth sits on the chart (also drawn by the phone apps, mobileFigures.ts). */
+export const LAYOUT = {
   permanent: [...arch(PERMANENT_TEETH[0], true, false), ...arch(PERMANENT_TEETH[1], false, false)],
   milk: [...arch(MILK_TEETH[0], true, true), ...arch(MILK_TEETH[1], false, true)],
 }

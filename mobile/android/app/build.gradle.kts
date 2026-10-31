@@ -24,8 +24,8 @@ val releaseKeystoreFile: File? = buildProp("RELEASE_KEYSTORE_PATH")?.let { path 
 
 // The strings and the knowledge base are copied in by `make mobile-i18n mobile-kb` and are not
 // tracked in git (see .gitignore). Warn rather than fail: a clean checkout must still run tests.
-if (!file("src/main/assets/kb.json").exists() || !file("src/main/assets/i18n/en.json").exists()) {
-    logger.warn("mobile/android: assets missing - run `make mobile-i18n mobile-kb` before building an APK")
+if (!file("src/main/assets/kb.json").exists() || !file("src/main/assets/i18n/en.json").exists() || !file("src/main/assets/body-figures.json").exists()) {
+    logger.warn("mobile/android: assets missing - run `make mobile-assets` before building an APK")
 }
 
 android {

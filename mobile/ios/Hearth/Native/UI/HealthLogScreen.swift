@@ -1,8 +1,9 @@
 import SwiftUI
 
-/// Cards or the table; the choice is remembered, under the key the web uses for the same thing.
+/// Cards, the table, or the body map over cards; the choice is remembered, under the key the web
+/// uses for the same thing.
 enum HealthLayout: String {
-    case cards, table
+    case cards, table, body
 }
 
 /// The Health log (docs/architecture/native-apps.md, "Health log screen"), the native twin of the
@@ -131,6 +132,32 @@ struct HealthLogScreen: View {
         Binding(get: { notice != nil }, set: { if !$0 { notice = nil } })
     }
 
+    /// The body map, coloured by what every filter but the body part leaves, drawn for the shown
+    /// person's sex and age: the one filtered to, or the only one.
+    private var bodyMap: some View {
+        var rest = filter
+        rest.bodyPart = ""
+        rest.side = ""
+        rest.tooth = nil
+        let counted = HealthLog.filter(store.entries, rest, title: { (e: HealthEntry) in HealthPresets.entryTitle(e) { t($0) } })
+        let one = store.persons.first { $0.id == filter.person } ?? (store.persons.count == 1 ? store.persons[0] : nil)
+        return BodyMapView(
+            heat: Anatomy.heat(counted),
+            teeth: Anatomy.teethHeat(counted),
+            sex: one?.sex == "female" ? "female" : "male",
+            stage: Anatomy.stage(Anatomy.age(birthYear: one?.birthYear)),
+            part: filter.bodyPart,
+            side: filter.side,
+            tooth: filter.tooth,
+            onPick: { part, side in
+                filter.bodyPart = part
+                filter.side = side
+                filter.tooth = nil
+            },
+            onTooth: { filter.tooth = $0 }
+        )
+    }
+
     private var sortKeys: [HealthSortKey] {
         HealthSortKey.allCases.filter { showPerson || $0 != .person }
     }
@@ -191,6 +218,7 @@ struct HealthLogScreen: View {
             Picker(t("healthTable.viewCards"), selection: $layout) {
                 Label(t("healthTable.viewCards"), systemImage: "rectangle.grid.1x2").tag(HealthLayout.cards)
                 Label(t("healthTable.viewTable"), systemImage: "tablecells").tag(HealthLayout.table)
+                Label(t("healthTable.viewBody"), systemImage: "figure.stand").tag(HealthLayout.body)
             }
             Section {
                 Button {
@@ -222,6 +250,7 @@ struct HealthLogScreen: View {
                 } else {
                     kindChips
                     statusRow(shownCount: shown.count)
+                    if layout == .body { bodyMap }
                     if shown.isEmpty {
                         Text(t("healthLog.nothingMatches"))
                             .foregroundStyle(.secondary)
@@ -308,7 +337,14 @@ struct HealthLogScreen: View {
                     removable(store.personName(filter.person)) { filter.person = "" }
                 }
                 if !filter.bodyPart.isEmpty {
-                    removable(filter.bodyPart) { filter.bodyPart = "" }
+                    removable(filter.side.isEmpty ? filter.bodyPart : "\(filter.bodyPart) · \(t("side.\(filter.side)"))") {
+                        filter.bodyPart = ""
+                        filter.side = ""
+                        filter.tooth = nil
+                    }
+                }
+                if let tooth = filter.tooth {
+                    removable(t("bodyMap.tooth", ["n": tooth])) { filter.tooth = nil }
                 }
                 if !filter.tag.isEmpty {
                     removable("#" + filter.tag) { filter.tag = "" }
@@ -429,6 +465,12 @@ struct EntryCard: View {
     let activeTag: String
     let onTag: (String) -> Void
 
+    /// Body part, side and teeth: "knees · left", "mouth · Teeth 16, 26".
+    private var place: String {
+        let side = entry.bodyPart.isEmpty || entry.side.isEmpty ? "" : t("side.\(entry.side)")
+        return [entry.bodyPart, side, Teeth.text(Teeth.of(entry.details))].filter { !$0.isEmpty }.joined(separator: " · ")
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(alignment: .firstTextBaseline, spacing: 8) {
@@ -451,10 +493,10 @@ struct EntryCard: View {
                         .monospacedDigit()
                 }
             }
-            if !entry.bodyPart.isEmpty || entry.severity != nil || !entry.body.isEmpty || attachmentCount > 0 {
+            if !place.isEmpty || entry.severity != nil || !entry.body.isEmpty || attachmentCount > 0 {
                 HStack(spacing: 12) {
-                    if !entry.bodyPart.isEmpty {
-                        Text(entry.bodyPart)
+                    if !place.isEmpty {
+                        Text(place)
                     }
                     if let severity = entry.severity {
                         HStack(spacing: 4) {

@@ -43,8 +43,12 @@ in People (genome files) and Health (documents); Charts are not built yet (see "
   every person's genotype at it, and who inherited which allele (the pedigree with the allele on each
   line, risk alleles marked, ambiguous lines dashed, impossible ones red).
 - **Health**: the log below, plus a quick measurement row and a quick symptom row (a symptom or
-  a procedure such as teeth cleaning, an optional 1–10 rating for a symptom and an optional note; no structured details, see below),
-  both folded to their label until tapped, attachments (kept in the app, viewed in
+  a procedure such as teeth cleaning, an optional 1–10 rating for a symptom and an optional note; of
+  the structured details only the teeth of a dental entry, on the tooth chart, see below),
+  both folded to their label until tapped; the log as cards, a table, or the **body map** over
+  cards (BodyMap.tsx: the same figures, male or female and by age group, read from
+  `mobile/body-figures.json`, which `mobileFigures.test.ts` keeps equal to what the web draws; a tap
+  zooms in on a part and filters to it and its side, the mouth shows the teeth); attachments (kept in the app, viewed in
   the app, never handed to another app) and **Read a document** with the user's own Gemini key
   (key in the Keystore / Keychain, the `read_document_byok` consent, a confirmation per send, a
   sharing-log row with metadata only; the reply is a draft for the add form).
@@ -173,13 +177,11 @@ not show or edit it.
   the blood-test reader (`labs/`), the CSV timeline import with its column picker, and the analyte
   catalogue (`kb.analytes`, `kb.panels`, `kb.units`). A lab entry restored from a backup shows as a
   plain entry; its reference range, flag and printed value are kept.
-- **Symptom details and sides**: the structured details of a symptom or procedure (stool form, cough
-  type, the teeth on the tooth chart…), the
-  left/right/both side of a body part, and the links from an entry to the kb's
-  conditions (`HealthEntry.side`, `details`, `conditions`). The Ask context pack line for such an
-  entry therefore omits them where the web's includes them (`describeEntry`).
-  The quick symptom row is here without the details the web's offers for a runny nose, a cough or a
-  stool, for the same reason: no native model for them yet.
+- **Symptom details and sides**: of the structured details only the teeth are read and written
+  (`details`, Teeth.kt / Teeth.swift); the others (stool form, cough type…) are kept as stored but
+  not shown or asked for. The side is read (the body map counts and filters by it) but not asked
+  for, and an entry's links to the kb's conditions are not shown (`conditions`). The Ask context
+  pack line therefore omits details and side where the web's includes them (`describeEntry`).
 - **The health-log CSV export** has fewer columns than the web's (`export/table.ts`).
 - **Backup folder repair from older copies** (`backup/repair.ts`): filling a missing genome from a
   rotated copy or a conflict file when loading from the backup place.
