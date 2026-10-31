@@ -1103,5 +1103,13 @@
   "bodyMap.more": "Nhiều hơn ({n})",
   "bodyMap.elsewhere": "Chỗ khác",
   "bodyMap.male": "Nam",
-  "bodyMap.female": "Nữ"
+  "bodyMap.female": "Nữ",
+  "bodyMap.boy": "Bé trai",
+  "bodyMap.girl": "Bé gái",
+  "bodyMap.age": "Tuổi",
+  "bodyMap.stage.adult": "Người lớn",
+  "bodyMap.stage.teen": "13–15 tuổi",
+  "bodyMap.stage.child": "9–12 tuổi",
+  "bodyMap.stage.young": "4–8 tuổi",
+  "bodyMap.stage.toddler": "Dưới 4 tuổi"
 }

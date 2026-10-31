@@ -1103,5 +1103,13 @@
   "bodyMap.more": "多い（{n}）",
   "bodyMap.elsewhere": "その他の部位",
   "bodyMap.male": "男性",
-  "bodyMap.female": "女性"
+  "bodyMap.female": "女性",
+  "bodyMap.boy": "男の子",
+  "bodyMap.girl": "女の子",
+  "bodyMap.age": "年齢",
+  "bodyMap.stage.adult": "大人",
+  "bodyMap.stage.teen": "13〜15歳",
+  "bodyMap.stage.child": "9〜12歳",
+  "bodyMap.stage.young": "4〜8歳",
+  "bodyMap.stage.toddler": "4歳未満"
 }
