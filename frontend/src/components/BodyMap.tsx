@@ -1,9 +1,7 @@
 import { type BodyHeat, bodyKey, HEAT_STEPS, heatLevel, regionCount } from '../health/body'
 import { useT } from '../i18n/context'
 import { BODY_PARTS, type BodySide } from '../types'
-import { bbox, FW, H, pathOf, REGIONS, W } from './bodyFigure'
-
-const GAP = W - FW * 2
+import { H, MID, REGIONS, W } from './bodyFigure'
 
 /** The legend's colour steps, 1 to HEAT_STEPS. */
 const STEPS = Array.from({ length: HEAT_STEPS }, (_, i) => i + 1)
@@ -16,16 +14,21 @@ export const elsewhere = (heat: BodyHeat) => [...heat.parts.keys()].filter((k) =
 /**
  * Where to look for a picked part: its regions on the front figure where it has any (on the back
  * only for the back), one side only when a side is picked. A small part is shown with what is
- * around it, at most four times larger.
+ * around it, at most five times larger.
  */
 function zoomOn(part: string, side: BodySide): string | undefined {
   const all = REGIONS.filter((x) => x.part === part && (!side || x.side === side))
   const view = all.some((x) => x.view === 'front') ? 'front' : 'back'
-  const shapes = all.filter((x) => x.view === view).flatMap((x) => x.shapes)
-  if (!shapes.length) return undefined
-  const b = bbox(shapes)
-  const s = Math.min(4, W / (b.x1 - b.x0 + 60), H / (b.y1 - b.y0 + 60))
-  return `translate(${W / 2}px, ${H / 2}px) scale(${s}) translate(${-(b.x0 + b.x1) / 2}px, ${-(b.y0 + b.y1) / 2}px)`
+  const boxes = all.filter((x) => x.view === view).map((x) => x.box)
+  if (!boxes.length) return undefined
+  const [x0, y0, x1, y1] = [
+    Math.min(...boxes.map((b) => b[0])),
+    Math.min(...boxes.map((b) => b[1])),
+    Math.max(...boxes.map((b) => b[2])),
+    Math.max(...boxes.map((b) => b[3])),
+  ]
+  const s = Math.min(5, W / (x1 - x0 + 240), H / (y1 - y0 + 240))
+  return `translate(${W / 2}px, ${H / 2}px) scale(${s}) translate(${-(x0 + x1) / 2}px, ${-(y0 + y1) / 2}px)`
 }
 
 /**
@@ -70,15 +73,15 @@ export function BodyMap({
       <svg viewBox={`0 0 ${W} ${H}`} className={zoom ? 'zoomed' : ''}>
         <title>{t('bodyMap.title')}</title>
         <g className="scene" style={zoom ? { transform: zoom } : undefined}>
-          {(['front', 'back'] as const).map((v, i) => (
+          {(['front', 'back'] as const).map((v) => (
             <g key={v} className="figure-label">
-              <text x={i * (FW + GAP) + FW / 2} y={H - 4}>
+              <text x={MID[v]} y={H - 30}>
                 {t(`bodyMap.${v}`)}
               </text>
-              <text x={i * (FW + GAP) + 24} y={H - 4} className="side">
+              <text x={MID[v] - 250} y={H - 30} className="side">
                 {t(v === 'front' ? 'bodyMap.r' : 'bodyMap.l')}
               </text>
-              <text x={i * (FW + GAP) + FW - 24} y={H - 4} className="side">
+              <text x={MID[v] + 250} y={H - 30} className="side">
                 {t(v === 'front' ? 'bodyMap.l' : 'bodyMap.r')}
               </text>
             </g>
@@ -104,9 +107,9 @@ export function BodyMap({
                 }}
               >
                 <title>{text}</title>
-                {x.shapes.map((sh, i) => (
-                  // biome-ignore lint/suspicious/noArrayIndexKey: a region's shapes are fixed.
-                  <path key={i} d={pathOf(sh)} className={sh.overlay ? 'overlay' : undefined} />
+                {x.pieces.map((p, i) => (
+                  // biome-ignore lint/suspicious/noArrayIndexKey: a region's pieces are fixed.
+                  <path key={i} d={p.d} className={p.overlay ? 'overlay' : undefined} />
                 ))}
               </g>
             )

@@ -11,7 +11,9 @@ Hosting: GitHub Pages, and nothing else — see
 (`landing/`); the app lives under `/app/` ([ADR 0011](docs/decisions/0011-landing-at-root-app-under-app.md)).
 
 Licence: [GNU AGPL-3.0](LICENSE). The WHO growth tables in `kb/reviewed/growth/` are © World
-Health Organization, reproduced with attribution for non-commercial use (`kb/README.md`).
+Health Organization, reproduced with attribution for non-commercial use (`kb/README.md`). The body
+drawing behind the health log's body map is from react-native-body-highlighter, © 2022 ELABBASSI
+Hicham, MIT licence (notice in `frontend/src/components/bodyOutline.ts`).
 
 ## Repository layout
 
