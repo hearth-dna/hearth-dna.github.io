@@ -19,7 +19,7 @@ import {
   when,
 } from '../health/log'
 import { today } from '../health/now'
-import { entryTitle, presetOf, symptomPreset } from '../health/presets'
+import { detailFieldsOf, entryTitle, presetOf } from '../health/presets'
 import { useI18n, useT } from '../i18n/context'
 import { conditionById, conditionName, suggestConditions } from '../kb/conditions'
 import { type Attachment, HEALTH_KIND_LABELS, type HealthEntry, type HealthKind, type Person } from '../types'
@@ -361,9 +361,7 @@ export function HealthTable({
                 {e.side && ` · ${t(`side.${e.side}`)}`}
               </span>
             )}
-            {Object.keys(e.details).length > 0 && (
-              <span>{detailsText(symptomPreset(e.title)?.details, e.details)}</span>
-            )}
+            {Object.keys(e.details).length > 0 && <span>{detailsText(detailFieldsOf(e), e.details)}</span>}
             {e.severity !== null && (
               <span>
                 {t('healthLog.severity')} <span className={severityClass(e.severity)}>{e.severity}/10</span>
@@ -701,9 +699,7 @@ export function HealthTable({
                     <td className="nowrap">
                       {formatValue(e)}
                       {Object.keys(e.details).length > 0 && (
-                        <span className="muted">
-                          {detailsText(symptomPreset(e.title)?.details, e.details)}
-                        </span>
+                        <span className="muted">{detailsText(detailFieldsOf(e), e.details)}</span>
                       )}
                       {flag(e)}
                     </td>

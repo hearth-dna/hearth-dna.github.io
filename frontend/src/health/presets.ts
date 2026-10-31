@@ -32,7 +32,7 @@ export interface HealthPreset {
   unitAliases?: string[]
   /** Other units → conversion into `unit`, keyed by lower-case spelling (CSV import). */
   units?: Record<string, (v: number) => number>
-  /** Symptoms only: the structured details worth recording (stool form, cough type…). */
+  /** Symptoms and procedures: the structured details worth recording (stool form, which teeth…). */
   details?: DetailField[]
 }
 
@@ -48,6 +48,11 @@ export type DetailField =
   | { id: string; kind: 'choice'; options: string[] }
   /** Present or not; stored only when present. */
   | { id: string; kind: 'flag' }
+  /**
+   * Which teeth, picked on a tooth chart and stored as FDI numbers (health/teeth.ts); milk teeth
+   * have their own numbers. `milk`: the chart opens on the milk teeth (teething).
+   */
+  | { id: string; kind: 'teeth'; milk?: true }
 
 export type DetailValue = number | string | true
 
@@ -95,17 +100,26 @@ const s = (
   synonyms: SYNONYMS[id],
   ...(details ? { details } : {}),
 })
-const proc = (id: string, title: string, bodyPart = '', tags: string[] = []): HealthPreset => ({
+const proc = (
+  id: string,
+  title: string,
+  bodyPart = '',
+  tags: string[] = [],
+  details?: DetailField[],
+): HealthPreset => ({
   id,
   title,
   kind: 'procedure',
   bodyPart,
   tags,
   synonyms: SYNONYMS[id],
+  ...(details ? { details } : {}),
 })
 const choice = (id: string, options: string[]): DetailField => ({ id, kind: 'choice', options })
 const flag = (id: string): DetailField => ({ id, kind: 'flag' })
 const TIMES: DetailField = { id: 'times', kind: 'count' }
+const TEETH: DetailField = { id: 'teeth', kind: 'teeth' }
+const TOOTH_TRIGGER = choice('trigger', ['cold', 'hot', 'sweet', 'biting', 'none'])
 
 export const MEASUREMENT_PRESETS: HealthPreset[] = [
   m('temperature', 'Body temperature', '°C', 0.1, {
@@ -296,7 +310,14 @@ export const SYMPTOM_PRESETS: HealthPreset[] = [
   s('watery-eyes', 'Watery eyes', 'eyes'),
   s('earache', 'Earache', 'ears'),
   s('blocked-ears', 'Blocked ears', 'ears'),
-  s('toothache', 'Toothache', 'mouth'),
+  s('toothache', 'Toothache', 'mouth', ['dental'], [TEETH, TOOTH_TRIGGER]),
+  s('tooth-sensitivity', 'Sensitive teeth', 'mouth', ['dental'], [TEETH, TOOTH_TRIGGER]),
+  s('bleeding-gums', 'Bleeding gums', 'mouth', ['dental'], [TEETH]),
+  s('swollen-gums', 'Swollen gums', 'mouth', ['dental'], [TEETH]),
+  s('loose-tooth', 'Loose tooth', 'mouth', ['dental'], [TEETH]),
+  s('broken-tooth', 'Chipped or broken tooth', 'mouth', ['dental'], [TEETH]),
+  s('tooth-came-out', 'Tooth came out', 'mouth', ['dental'], [TEETH]),
+  s('teething', 'Teething', 'mouth', ['dental'], [{ id: 'teeth', kind: 'teeth', milk: true }]),
   s('insomnia', 'Trouble sleeping', ''),
   s('anxiety', 'Anxiety', ''),
   s('low-mood', 'Low mood', ''),
@@ -320,7 +341,12 @@ export const SYMPTOM_PRESETS: HealthPreset[] = [
 export const PROCEDURE_PRESETS: HealthPreset[] = [
   proc('teeth-cleaning', 'Teeth cleaning', 'mouth', ['dental']),
   proc('dental-checkup', 'Dental checkup', 'mouth', ['dental']),
-  proc('dental-filling', 'Dental filling', 'mouth', ['dental']),
+  proc('dental-filling', 'Dental filling', 'mouth', ['dental'], [TEETH]),
+  proc('tooth-extraction', 'Tooth extraction', 'mouth', ['dental'], [TEETH]),
+  proc('root-canal', 'Root canal treatment', 'mouth', ['dental'], [TEETH]),
+  proc('dental-crown', 'Dental crown', 'mouth', ['dental'], [TEETH]),
+  proc('dental-xray', 'Dental X-ray', 'mouth', ['dental'], [TEETH]),
+  proc('fissure-sealant', 'Fissure sealant', 'mouth', ['dental'], [TEETH]),
   proc('checkup', 'General checkup'),
   proc('eye-exam', 'Eye exam', 'eyes'),
   proc('hearing-test', 'Hearing test', 'ears'),
@@ -371,6 +397,11 @@ export const symptomPreset = (title: string): HealthPreset | undefined => {
   const p = presetOf({ kind: 'symptom', title })
   return p && SYMPTOM_PRESETS.includes(p) ? p : undefined
 }
+
+/** The structured details a saved symptom or procedure has, from the preset it names; [] for none. */
+export const detailFieldsOf = (e: { kind: string; title: string }): DetailField[] =>
+  (e.kind === 'symptom' ? symptomPreset(e.title) : e.kind === 'procedure' ? presetOf(e) : undefined)
+    ?.details ?? []
 
 /** The lists a quick bar offers, by the kind of entry it saves. */
 const QUICK: Record<'measurement' | 'symptom' | 'procedure', HealthPreset[]> = {

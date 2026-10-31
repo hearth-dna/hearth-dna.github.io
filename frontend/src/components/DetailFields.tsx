@@ -1,12 +1,14 @@
 import type { DetailField, DetailValue } from '../health/presets'
+import { splitTeeth } from '../health/teeth'
 import { useT } from '../i18n/context'
+import { ToothChart } from './ToothChart'
 
 type Details = Record<string, DetailValue>
 
 /**
- * The structured details of one symptom (health/presets.ts `details`): a 1–N scale as buttons,
- * a choice as a select, a yes/no as a checkbox, a count as a number. Everything is optional; an
- * unset field is simply not stored.
+ * The structured details of one symptom or procedure (health/presets.ts `details`): a 1–N scale as
+ * buttons, a choice as a select, a yes/no as a checkbox, a count as a number, teeth on a tooth
+ * chart. Everything is optional; an unset field is simply not stored.
  */
 export function DetailFields({
   fields,
@@ -28,6 +30,16 @@ export function DetailFields({
     <>
       {fields.map((f) => {
         const label = t(`detail.${f.id}`)
+        if (f.kind === 'teeth')
+          return (
+            <ToothChart
+              key={f.id}
+              label={label}
+              value={typeof value[f.id] === 'string' ? (value[f.id] as string) : undefined}
+              milkFirst={f.milk}
+              onChange={(v) => set(f.id, v)}
+            />
+          )
         if (f.kind === 'scale')
           return (
             <fieldset key={f.id} className="field">
@@ -100,7 +112,7 @@ export function DetailFields({
   )
 }
 
-/** Details as a short translated line for the table: "Type 6 · yellow · blood". */
+/** Details as a short translated line for the table: "Type 6 · yellow · blood", "Teeth 16, 26 · cold". */
 export function useDetailsText(): (fields: DetailField[] | undefined, d: Details) => string {
   const t = useT()
   return (fields, d) => {
@@ -111,6 +123,15 @@ export function useDetailsText(): (fields: DetailField[] | undefined, d: Details
         const v = d[k]
         if (k === 'bristol') return t('detail.bristolShort', { n: v as number })
         if (k === 'times') return t('detail.timesShort', { n: v as number })
+        if (k === 'teeth') {
+          const { permanent, milk } = splitTeeth(v)
+          return [
+            permanent.length ? t('detail.teethShort', { list: permanent.join(', ') }) : '',
+            milk.length ? t('detail.milkShort', { list: milk.join(', ') }) : '',
+          ]
+            .filter(Boolean)
+            .join(' · ')
+        }
         if (v === true) return t(`detail.${k}`)
         return typeof v === 'string' ? t(`detail.${k}.${v}`) : `${t(`detail.${k}`)} ${v}`
       })

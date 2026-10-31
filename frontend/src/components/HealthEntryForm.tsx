@@ -6,7 +6,7 @@ import { addHealthEntry } from '../db/repo'
 import type { HealthDraft } from '../documents/draft'
 import { parseTags } from '../health/log'
 import { nowTime, today } from '../health/now'
-import { type DetailValue, findPreset, presetsFor, symptomPreset } from '../health/presets'
+import { type DetailValue, detailFieldsOf, findPreset, presetsFor } from '../health/presets'
 import { useT } from '../i18n/context'
 import { suggestConditions } from '../kb/conditions'
 import {
@@ -96,9 +96,10 @@ export function HealthEntryForm({
   }, [db, personId])
 
   const kind = form.kind
-  // The symptom's detail fields: from the chosen preset, or a typed title that matches one.
-  const detailFields =
-    kind === 'symptom' ? (findPreset(form.preset) ?? symptomPreset(form.title))?.details : undefined
+  // The symptom's or procedure's detail fields: from the chosen preset, or a typed title that
+  // matches one.
+  const typed = kind ? detailFieldsOf({ kind, title: form.title }) : []
+  const detailFields = findPreset(form.preset)?.details ?? (typed.length ? typed : undefined)
   const suggested = useMemo(
     () =>
       suggestConditions(kb, {
