@@ -9,5 +9,7 @@
   "bodyMap.l": "L",
   "bodyMap.fewer": "Fewer",
   "bodyMap.more": "More ({n})",
-  "bodyMap.elsewhere": "Elsewhere"
+  "bodyMap.elsewhere": "Elsewhere",
+  "bodyMap.male": "Male",
+  "bodyMap.female": "Female"
 }

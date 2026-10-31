@@ -1101,5 +1101,7 @@
   "bodyMap.l": "বা",
   "bodyMap.fewer": "কম",
   "bodyMap.more": "বেশি ({n})",
-  "bodyMap.elsewhere": "অন্যত্র"
+  "bodyMap.elsewhere": "অন্যত্র",
+  "bodyMap.male": "পুরুষ",
+  "bodyMap.female": "নারী"
 }

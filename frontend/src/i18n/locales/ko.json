@@ -1101,5 +1101,7 @@
   "bodyMap.l": "왼",
   "bodyMap.fewer": "적음",
   "bodyMap.more": "많음 ({n})",
-  "bodyMap.elsewhere": "기타 부위"
+  "bodyMap.elsewhere": "기타 부위",
+  "bodyMap.male": "남성",
+  "bodyMap.female": "여성"
 }

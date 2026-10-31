@@ -1,4 +1,4 @@
-import { Fragment, type ReactNode, useEffect, useMemo, useState } from 'react'
+import { Fragment, lazy, type ReactNode, Suspense, useEffect, useMemo, useState } from 'react'
 import { useApp } from '../app/context'
 import { deleteHealthEntries, setHealthConditions, setHealthWhen } from '../db/repo'
 import { exportHealthEntries } from '../export/openFormats'
@@ -25,12 +25,14 @@ import { useI18n, useT } from '../i18n/context'
 import { conditionById, conditionName, suggestConditions } from '../kb/conditions'
 import { type Attachment, HEALTH_KIND_LABELS, type HealthEntry, type HealthKind, type Person } from '../types'
 import { AttachmentList } from './AttachmentList'
-import { BodyMap } from './BodyMap'
 import { ConditionPicker } from './ConditionPicker'
 import { useDetailsText } from './DetailFields'
 import { EditWhen } from './WhenInputs'
 
 const KINDS = Object.keys(HEALTH_KIND_LABELS) as HealthKind[]
+
+// The body drawing is large, so it loads when the Body view is first opened.
+const BodyMap = lazy(() => import('./BodyMap').then((m) => ({ default: m.BodyMap })))
 
 type View = 'cards' | 'table' | 'body'
 const VIEWS: View[] = ['cards', 'table', 'body']
@@ -148,6 +150,9 @@ export function HealthTable({
     () => bodyHeat(filterHealthLog(entries, { ...filter, bodyPart: '', side: '' }, title)),
     [entries, filter, t],
   )
+  // The body map draws the shown person's sex: the one filtered to, or the only one.
+  const one = persons.find((p) => p.id === filter.person) ?? (persons.length === 1 ? persons[0] : undefined)
+  const figure = one?.sex === 'female' ? 'female' : 'male'
   const set = (patch: Partial<HealthFilter>) => onFilter({ ...filter, ...patch })
   // A deleted or reloaded entry leaves the selection.
   useEffect(() => {
@@ -679,12 +684,15 @@ export function HealthTable({
       </div>
 
       {view === 'body' && (
-        <BodyMap
-          heat={heat}
-          part={filter.bodyPart}
-          side={filter.side}
-          onPick={(bodyPart, side) => set({ bodyPart, side })}
-        />
+        <Suspense fallback={null}>
+          <BodyMap
+            heat={heat}
+            figure={figure}
+            part={filter.bodyPart}
+            side={filter.side}
+            onPick={(bodyPart, side) => set({ bodyPart, side })}
+          />
+        </Suspense>
       )}
       {shown.length === 0 ? (
         <p className="muted">{t('healthLog.nothingMatches')}</p>

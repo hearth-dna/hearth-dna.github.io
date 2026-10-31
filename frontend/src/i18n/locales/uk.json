@@ -1101,5 +1101,7 @@
   "bodyMap.l": "Л",
   "bodyMap.fewer": "Менше",
   "bodyMap.more": "Більше ({n})",
-  "bodyMap.elsewhere": "В інших місцях"
+  "bodyMap.elsewhere": "В інших місцях",
+  "bodyMap.male": "Чоловіче",
+  "bodyMap.female": "Жіноче"
 }

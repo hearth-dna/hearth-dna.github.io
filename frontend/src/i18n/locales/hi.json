@@ -1101,5 +1101,7 @@
   "bodyMap.l": "बा",
   "bodyMap.fewer": "कम",
   "bodyMap.more": "ज़्यादा ({n})",
-  "bodyMap.elsewhere": "अन्य जगहें"
+  "bodyMap.elsewhere": "अन्य जगहें",
+  "bodyMap.male": "पुरुष",
+  "bodyMap.female": "महिला"
 }

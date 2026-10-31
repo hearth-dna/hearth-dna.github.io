@@ -1101,5 +1101,7 @@
   "bodyMap.l": "T",
   "bodyMap.fewer": "Ít hơn",
   "bodyMap.more": "Nhiều hơn ({n})",
-  "bodyMap.elsewhere": "Chỗ khác"
+  "bodyMap.elsewhere": "Chỗ khác",
+  "bodyMap.male": "Nam",
+  "bodyMap.female": "Nữ"
 }

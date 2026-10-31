@@ -1,12 +1,16 @@
+import { useEffect, useState } from 'react'
 import { type BodyHeat, bodyKey, HEAT_STEPS, heatLevel, regionCount } from '../health/body'
 import { useT } from '../i18n/context'
 import { BODY_PARTS, type BodySide } from '../types'
-import { H, MID, REGIONS, W } from './bodyFigure'
+import { type Figure, H, MID, placement, REGIONS, W } from './bodyFigure'
+
+const FIGURES: Figure[] = ['male', 'female']
+const VIEWS = ['front', 'back'] as const
 
 /** The legend's colour steps, 1 to HEAT_STEPS. */
 const STEPS = Array.from({ length: HEAT_STEPS }, (_, i) => i + 1)
 
-const DRAWN = new Set(REGIONS.map((x) => x.part))
+const DRAWN = new Set([...REGIONS.male, ...REGIONS.female].map((x) => x.part))
 
 /** Parts the log names that have no place on the figure: skin, joints, whole body, typed ones. */
 export const elsewhere = (heat: BodyHeat) => [...heat.parts.keys()].filter((k) => !DRAWN.has(k)).sort()
@@ -16,8 +20,8 @@ export const elsewhere = (heat: BodyHeat) => [...heat.parts.keys()].filter((k) =
  * only for the back), one side only when a side is picked. A small part is shown with what is
  * around it, at most five times larger.
  */
-function zoomOn(part: string, side: BodySide): string | undefined {
-  const all = REGIONS.filter((x) => x.part === part && (!side || x.side === side))
+function zoomOn(figure: Figure, part: string, side: BodySide): string | undefined {
+  const all = REGIONS[figure].filter((x) => x.part === part && (!side || x.side === side))
   const view = all.some((x) => x.view === 'front') ? 'front' : 'back'
   const boxes = all.filter((x) => x.view === view).map((x) => x.box)
   if (!boxes.length) return undefined
@@ -35,26 +39,31 @@ function zoomOn(part: string, side: BodySide): string | undefined {
  * The health log on a body, front and back: each part (each side of a paired one) coloured by how
  * many of the shown entries name it. Picking a part zooms in on it and filters the log to it;
  * picking it again, or zooming out, shows the whole body. Parts with no place on the figure (skin,
- * whole body, anything typed) are buttons below it.
+ * whole body, anything typed) are buttons below it. A male or a female body, starting from the
+ * person's recorded sex.
  */
 export function BodyMap({
   heat,
   part,
   side,
+  figure: initialFigure,
   onPick,
 }: {
   heat: BodyHeat
+  figure: Figure
   /** The picked part (`bodyKey`) and side; '' for none. */
   part: string
   side: BodySide
   onPick: (part: string, side: BodySide) => void
 }) {
   const t = useT()
+  const [figure, setFigure] = useState(initialFigure)
+  useEffect(() => setFigure(initialFigure), [initialFigure])
   const picked = bodyKey(part)
   const name = (p: string) => ((BODY_PARTS as readonly string[]).includes(p) ? t(`bodyPart.${p}`) : p)
   const label = (p: string, s: BodySide, n: number) =>
     t('bodyMap.region', { part: s ? `${name(p)} · ${t(`side.${s}`)}` : name(p), n })
-  const zoom = picked ? zoomOn(picked, side) : undefined
+  const zoom = picked ? zoomOn(figure, picked, side) : undefined
   const pick = (p: string, s: BodySide) => (p === picked && s === side ? onPick('', '') : onPick(p, s))
   const other = elsewhere(heat)
   const level = (n: number) => heatLevel(n, heat.max)
@@ -69,6 +78,19 @@ export function BodyMap({
             {t('bodyMap.zoomOut')}
           </button>
         )}
+        <div className="segmented">
+          {FIGURES.map((f) => (
+            <button
+              key={f}
+              type="button"
+              className={figure === f ? 'active' : ''}
+              aria-pressed={figure === f}
+              onClick={() => setFigure(f)}
+            >
+              {t(`bodyMap.${f}`)}
+            </button>
+          ))}
+        </div>
       </div>
       <svg viewBox={`0 0 ${W} ${H}`} className={zoom ? 'zoomed' : ''}>
         <title>{t('bodyMap.title')}</title>
@@ -86,34 +108,40 @@ export function BodyMap({
               </text>
             </g>
           ))}
-          {REGIONS.map((x) => {
-            const n = regionCount(heat, x.part, x.side)
-            const on = x.part === picked && (!side || !x.side || x.side === side)
-            const text = label(x.part, x.side, n)
-            return (
-              // biome-ignore lint/a11y/useSemanticElements: an HTML button cannot sit inside the SVG figure.
-              <g
-                key={`${x.view}-${x.part}-${x.side}`}
-                role="button"
-                tabIndex={0}
-                aria-pressed={on}
-                aria-label={text}
-                className={`region heat-${level(n)}${on ? ' on' : ''}`}
-                onClick={() => pick(x.part, x.side)}
-                onKeyDown={(ev) => {
-                  if (ev.key !== 'Enter' && ev.key !== ' ') return
-                  ev.preventDefault()
-                  pick(x.part, x.side)
-                }}
-              >
-                <title>{text}</title>
-                {x.pieces.map((p, i) => (
-                  // biome-ignore lint/suspicious/noArrayIndexKey: a region's pieces are fixed.
-                  <path key={i} d={p.d} className={p.overlay ? 'overlay' : undefined} />
-                ))}
-              </g>
-            )
-          })}
+          {VIEWS.map((v) => (
+            <g key={v} transform={placement(figure, v)}>
+              {REGIONS[figure]
+                .filter((x) => x.view === v)
+                .map((x) => {
+                  const n = regionCount(heat, x.part, x.side)
+                  const on = x.part === picked && (!side || !x.side || x.side === side)
+                  const text = label(x.part, x.side, n)
+                  return (
+                    // biome-ignore lint/a11y/useSemanticElements: an HTML button cannot sit inside the SVG figure.
+                    <g
+                      key={`${x.view}-${x.part}-${x.side}`}
+                      role="button"
+                      tabIndex={0}
+                      aria-pressed={on}
+                      aria-label={text}
+                      className={`region heat-${level(n)}${on ? ' on' : ''}`}
+                      onClick={() => pick(x.part, x.side)}
+                      onKeyDown={(ev) => {
+                        if (ev.key !== 'Enter' && ev.key !== ' ') return
+                        ev.preventDefault()
+                        pick(x.part, x.side)
+                      }}
+                    >
+                      <title>{text}</title>
+                      {x.pieces.map((p, i) => (
+                        // biome-ignore lint/suspicious/noArrayIndexKey: a region's pieces are fixed.
+                        <path key={i} d={p.d} className={p.overlay ? 'overlay' : undefined} />
+                      ))}
+                    </g>
+                  )
+                })}
+            </g>
+          ))}
         </g>
       </svg>
       <div className="bodymap-legend muted">

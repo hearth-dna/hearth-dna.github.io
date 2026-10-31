@@ -1101,5 +1101,7 @@
   "bodyMap.l": "ش",
   "bodyMap.fewer": "أقل",
   "bodyMap.more": "أكثر ({n})",
-  "bodyMap.elsewhere": "أماكن أخرى"
+  "bodyMap.elsewhere": "أماكن أخرى",
+  "bodyMap.male": "ذكر",
+  "bodyMap.female": "أنثى"
 }

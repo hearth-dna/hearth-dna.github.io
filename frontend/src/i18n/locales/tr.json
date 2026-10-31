@@ -1101,5 +1101,7 @@
   "bodyMap.l": "Sol",
   "bodyMap.fewer": "Daha az",
   "bodyMap.more": "Daha çok ({n})",
-  "bodyMap.elsewhere": "Diğer yerler"
+  "bodyMap.elsewhere": "Diğer yerler",
+  "bodyMap.male": "Erkek",
+  "bodyMap.female": "Kadın"
 }

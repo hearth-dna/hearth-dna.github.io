@@ -1101,5 +1101,7 @@
   "bodyMap.l": "S",
   "bodyMap.fewer": "Meno",
   "bodyMap.more": "Di più ({n})",
-  "bodyMap.elsewhere": "Altrove"
+  "bodyMap.elsewhere": "Altrove",
+  "bodyMap.male": "Uomo",
+  "bodyMap.female": "Donna"
 }

@@ -1101,5 +1101,7 @@
   "bodyMap.l": "左",
   "bodyMap.fewer": "较少",
   "bodyMap.more": "较多（{n}）",
-  "bodyMap.elsewhere": "其他部位"
+  "bodyMap.elsewhere": "其他部位",
+  "bodyMap.male": "男性",
+  "bodyMap.female": "女性"
 }

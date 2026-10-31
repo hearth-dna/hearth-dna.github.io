@@ -1101,5 +1101,7 @@
   "bodyMap.l": "Ki",
   "bodyMap.fewer": "Lebih sedikit",
   "bodyMap.more": "Lebih banyak ({n})",
-  "bodyMap.elsewhere": "Di tempat lain"
+  "bodyMap.elsewhere": "Di tempat lain",
+  "bodyMap.male": "Pria",
+  "bodyMap.female": "Wanita"
 }
