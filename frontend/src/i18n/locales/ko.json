@@ -966,6 +966,7 @@
   "healthTable.sortDesc": "내림차순",
   "healthTable.viewCards": "카드",
   "healthTable.viewTable": "표",
+  "healthTable.viewBody": "신체",
   "healthTable.period": "기간",
   "healthTable.periodDays": "{n}일",
   "healthTable.periodYear": "12개월",
@@ -1089,5 +1090,18 @@
   "native.notUsed": "사용되지 않음: {files}. 이 휴대폰에는 이 DNA를 가진 사람이 없습니다. 이 파일들을 백업 파일과 함께 「백업 복원…」에서 선택하세요.",
   "native.repairTitle": "이 휴대폰의 데이터가 손상되었습니다",
   "backupCard.fileName": "백업 파일 이름",
-  "backupCard.fileNameHint": "이 폴더를 함께 쓰는 모든 기기에서 같아야 합니다. 모두 이 파일 하나를 읽고 씁니다."
+  "backupCard.fileNameHint": "이 폴더를 함께 쓰는 모든 기기에서 같아야 합니다. 모두 이 파일 하나를 읽고 씁니다.",
+  "bodyMap.title": "신체로 보는 건강 기록",
+  "bodyMap.hint": "신체 부위를 누르면 확대되고 그 부위의 기록만 보입니다.",
+  "bodyMap.region": "{part}: {n}",
+  "bodyMap.zoomOut": "축소",
+  "bodyMap.front": "앞",
+  "bodyMap.back": "뒤",
+  "bodyMap.r": "오",
+  "bodyMap.l": "왼",
+  "bodyMap.fewer": "적음",
+  "bodyMap.more": "많음 ({n})",
+  "bodyMap.elsewhere": "기타 부위",
+  "bodyMap.male": "남성",
+  "bodyMap.female": "여성"
 }

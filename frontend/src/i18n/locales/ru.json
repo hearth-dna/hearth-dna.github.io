@@ -966,6 +966,7 @@
   "healthTable.sortDesc": "По убыванию",
   "healthTable.viewCards": "Карточки",
   "healthTable.viewTable": "Таблица",
+  "healthTable.viewBody": "Тело",
   "healthTable.period": "Период",
   "healthTable.periodDays": "{n} дней",
   "healthTable.periodYear": "12 месяцев",
@@ -1089,5 +1090,18 @@
   "native.notUsed": "Не использованы: {files}. Ни у кого на этом телефоне нет этой ДНК: выберите эти файлы вместе с файлом копии в «Восстановить резервную копию…».",
   "native.repairTitle": "Данные на этом телефоне повреждены",
   "backupCard.fileName": "Имя файла резервной копии",
-  "backupCard.fileNameHint": "Одинаковое на всех устройствах, которые пользуются этой папкой: все они читают и записывают этот один файл."
+  "backupCard.fileNameHint": "Одинаковое на всех устройствах, которые пользуются этой папкой: все они читают и записывают этот один файл.",
+  "bodyMap.title": "Записи на схеме тела",
+  "bodyMap.hint": "Нажмите на часть тела, чтобы приблизить её и показать только её записи.",
+  "bodyMap.region": "{part}: {n}",
+  "bodyMap.zoomOut": "Отдалить",
+  "bodyMap.front": "Спереди",
+  "bodyMap.back": "Сзади",
+  "bodyMap.r": "П",
+  "bodyMap.l": "Л",
+  "bodyMap.fewer": "Меньше",
+  "bodyMap.more": "Больше ({n})",
+  "bodyMap.elsewhere": "В других местах",
+  "bodyMap.male": "Мужское",
+  "bodyMap.female": "Женское"
 }

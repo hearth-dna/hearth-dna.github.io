@@ -966,6 +966,7 @@
   "healthTable.sortDesc": "Aflopend",
   "healthTable.viewCards": "Kaarten",
   "healthTable.viewTable": "Tabel",
+  "healthTable.viewBody": "Lichaam",
   "healthTable.period": "Periode",
   "healthTable.periodDays": "{n} dagen",
   "healthTable.periodYear": "12 maanden",
@@ -1089,5 +1090,18 @@
   "native.notUsed": "Niet gebruikt: {files}. Niemand op deze telefoon heeft dit DNA: kies deze bestanden samen met het back-upbestand bij ‘Back-up terugzetten…’.",
   "native.repairTitle": "De gegevens op deze telefoon zijn beschadigd",
   "backupCard.fileName": "Naam van het back-upbestand",
-  "backupCard.fileNameHint": "Op elk apparaat dat deze map deelt dezelfde: ze lezen en schrijven allemaal dit ene bestand."
+  "backupCard.fileNameHint": "Op elk apparaat dat deze map deelt dezelfde: ze lezen en schrijven allemaal dit ene bestand.",
+  "bodyMap.title": "Gezondheidslog op het lichaam",
+  "bodyMap.hint": "Tik op een lichaamsdeel om in te zoomen en alleen de bijbehorende items te tonen.",
+  "bodyMap.region": "{part}: {n}",
+  "bodyMap.zoomOut": "Uitzoomen",
+  "bodyMap.front": "Voorkant",
+  "bodyMap.back": "Achterkant",
+  "bodyMap.r": "R",
+  "bodyMap.l": "L",
+  "bodyMap.fewer": "Minder",
+  "bodyMap.more": "Meer ({n})",
+  "bodyMap.elsewhere": "Elders",
+  "bodyMap.male": "Man",
+  "bodyMap.female": "Vrouw"
 }

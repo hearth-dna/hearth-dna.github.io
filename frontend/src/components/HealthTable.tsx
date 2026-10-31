@@ -1,7 +1,8 @@
-import { Fragment, type ReactNode, useEffect, useMemo, useState } from 'react'
+import { Fragment, lazy, type ReactNode, Suspense, useEffect, useMemo, useState } from 'react'
 import { useApp } from '../app/context'
 import { deleteHealthEntries, setHealthConditions, setHealthWhen } from '../db/repo'
 import { exportHealthEntries } from '../export/openFormats'
+import { bodyHeat } from '../health/body'
 import {
   daysBefore,
   facets,
@@ -30,8 +31,16 @@ import { EditWhen } from './WhenInputs'
 
 const KINDS = Object.keys(HEALTH_KIND_LABELS) as HealthKind[]
 
-type View = 'cards' | 'table'
-const VIEWS: View[] = ['cards', 'table']
+// The body drawing is large, so it loads when the Body view is first opened.
+const BodyMap = lazy(() => import('./BodyMap').then((m) => ({ default: m.BodyMap })))
+
+type View = 'cards' | 'table' | 'body'
+const VIEWS: View[] = ['cards', 'table', 'body']
+const VIEW_LABEL: Record<View, string> = {
+  cards: 'healthTable.viewCards',
+  table: 'healthTable.viewTable',
+  body: 'healthTable.viewBody',
+}
 const VIEW_KEY = 'hearth.healthView'
 
 /** The stored choice, else cards on a phone and the table on anything wider. */
@@ -50,10 +59,16 @@ const icon = (d: string) => (
     <path d={d} />
   </svg>
 )
-/** Stacked cards and a ruled table for the view switch (whose labels hide on phones), a lens, a funnel. */
+/**
+ * Stacked cards, a ruled table and a figure for the view switch (whose labels hide on phones), a
+ * lens, a funnel.
+ */
 const ICONS = {
   cards: icon('M2.5 2.5h11v4.5h-11zM2.5 9h11v4.5h-11z'),
   table: icon('M2 3h12M2 6.5h12M2 10h12M2 13.5h12M6 3v10.5'),
+  body: icon(
+    'M8 1.5a1.6 1.6 0 1 0 0 3.2a1.6 1.6 0 1 0 0-3.2zM8 6v4.5M3.5 6.5h9M8 10.5L5.5 14.5M8 10.5l2.5 4',
+  ),
   search: icon('M7 2.5a4.5 4.5 0 1 0 0 9a4.5 4.5 0 1 0 0-9zM10.3 10.3L14 14'),
   filters: icon('M2 3.5h12M4.5 8h7M7 12.5h2'),
 }
@@ -129,6 +144,15 @@ export function HealthTable({
     () => sortHealthLog(filterHealthLog(entries, filter, title), sort.key, sort.dir, name, title),
     [entries, filter, sort, persons, t],
   )
+  // The body map's colours: what every filter but the body part leaves.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: title derives from t
+  const heat = useMemo(
+    () => bodyHeat(filterHealthLog(entries, { ...filter, bodyPart: '', side: '' }, title)),
+    [entries, filter, t],
+  )
+  // The body map draws the shown person's sex: the one filtered to, or the only one.
+  const one = persons.find((p) => p.id === filter.person) ?? (persons.length === 1 ? persons[0] : undefined)
+  const figure = one?.sex === 'female' ? 'female' : 'male'
   const set = (patch: Partial<HealthFilter>) => onFilter({ ...filter, ...patch })
   // A deleted or reloaded entry leaves the selection.
   useEffect(() => {
@@ -238,7 +262,12 @@ export function HealthTable({
   // The active panel filters as removable chips, so a closed panel still says what is hidden.
   const chips: { key: string; label: string; clear: Partial<HealthFilter> }[] = []
   if (filter.person) chips.push({ key: 'person', label: name(filter.person), clear: { person: '' } })
-  if (filter.bodyPart) chips.push({ key: 'bodyPart', label: filter.bodyPart, clear: { bodyPart: '' } })
+  if (filter.bodyPart)
+    chips.push({
+      key: 'bodyPart',
+      label: filter.side ? `${filter.bodyPart} · ${t(`side.${filter.side}`)}` : filter.bodyPart,
+      clear: { bodyPart: '', side: '' },
+    })
   if (filter.tag) chips.push({ key: 'tag', label: `#${filter.tag}`, clear: { tag: '' } })
   if (filter.condition)
     chips.push({ key: 'condition', label: conditionLabel(filter.condition), clear: { condition: '' } })
@@ -457,13 +486,11 @@ export function HealthTable({
               key={v}
               className={view === v ? 'active' : ''}
               aria-pressed={view === v}
-              aria-label={t(v === 'cards' ? 'healthTable.viewCards' : 'healthTable.viewTable')}
+              aria-label={t(VIEW_LABEL[v])}
               onClick={() => pickView(v)}
             >
               {ICONS[v]}
-              <span className="hl-viewlabel">
-                {t(v === 'cards' ? 'healthTable.viewCards' : 'healthTable.viewTable')}
-              </span>
+              <span className="hl-viewlabel">{t(VIEW_LABEL[v])}</span>
             </button>
           ))}
         </div>
@@ -490,7 +517,7 @@ export function HealthTable({
               <select
                 value={filter.bodyPart}
                 disabled={bodyParts.length === 0}
-                onChange={(e) => set({ bodyPart: e.target.value })}
+                onChange={(e) => set({ bodyPart: e.target.value, side: '' })}
               >
                 <option value="">{t('healthLog.anyBodyPart')}</option>
                 {bodyParts.map((b) => (
@@ -585,7 +612,16 @@ export function HealthTable({
               type="button"
               disabled={panelCount === 0}
               onClick={() =>
-                set({ person: '', bodyPart: '', tag: '', condition: '', minSeverity: null, from: '', to: '' })
+                set({
+                  person: '',
+                  bodyPart: '',
+                  side: '',
+                  tag: '',
+                  condition: '',
+                  minSeverity: null,
+                  from: '',
+                  to: '',
+                })
               }
             >
               {t('common.clear')}
@@ -647,9 +683,20 @@ export function HealthTable({
         )}
       </div>
 
+      {view === 'body' && (
+        <Suspense fallback={null}>
+          <BodyMap
+            heat={heat}
+            figure={figure}
+            part={filter.bodyPart}
+            side={filter.side}
+            onPick={(bodyPart, side) => set({ bodyPart, side })}
+          />
+        </Suspense>
+      )}
       {shown.length === 0 ? (
         <p className="muted">{t('healthLog.nothingMatches')}</p>
-      ) : view === 'cards' ? (
+      ) : view !== 'table' ? (
         sort.key === 'date' ? (
           groupByDate(shown).map((g) => (
             <section key={g.date} className="hl-day">

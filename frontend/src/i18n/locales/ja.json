@@ -966,6 +966,7 @@
   "healthTable.sortDesc": "降順",
   "healthTable.viewCards": "カード",
   "healthTable.viewTable": "表",
+  "healthTable.viewBody": "からだ",
   "healthTable.period": "期間",
   "healthTable.periodDays": "{n}日間",
   "healthTable.periodYear": "12か月",
@@ -1089,5 +1090,18 @@
   "native.notUsed": "使われませんでした: {files}。この電話にはこの DNA を持つ人がいません。これらのファイルをバックアップファイルと一緒に「バックアップを復元…」で選んでください。",
   "native.repairTitle": "この電話のデータが破損しています",
   "backupCard.fileName": "バックアップファイル名",
-  "backupCard.fileNameHint": "このフォルダーを共有するすべての端末で同じ名前にします。すべての端末がこの 1 つのファイルを読み書きします。"
+  "backupCard.fileNameHint": "このフォルダーを共有するすべての端末で同じ名前にします。すべての端末がこの 1 つのファイルを読み書きします。",
+  "bodyMap.title": "からだで見る健康記録",
+  "bodyMap.hint": "からだの部位をタップすると拡大し、その部位の記録だけを表示します。",
+  "bodyMap.region": "{part}：{n}",
+  "bodyMap.zoomOut": "縮小",
+  "bodyMap.front": "前",
+  "bodyMap.back": "後ろ",
+  "bodyMap.r": "右",
+  "bodyMap.l": "左",
+  "bodyMap.fewer": "少ない",
+  "bodyMap.more": "多い（{n}）",
+  "bodyMap.elsewhere": "その他の部位",
+  "bodyMap.male": "男性",
+  "bodyMap.female": "女性"
 }

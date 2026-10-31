@@ -966,6 +966,7 @@
   "healthTable.sortDesc": "Turun",
   "healthTable.viewCards": "Kartu",
   "healthTable.viewTable": "Tabel",
+  "healthTable.viewBody": "Tubuh",
   "healthTable.period": "Periode",
   "healthTable.periodDays": "{n} hari",
   "healthTable.periodYear": "12 bulan",
@@ -1089,5 +1090,18 @@
   "native.notUsed": "Tidak dipakai: {files}. Tidak ada yang punya DNA ini di ponsel ini: pilih file ini bersama file cadangan di «Pulihkan cadangan…».",
   "native.repairTitle": "Data di ponsel ini rusak",
   "backupCard.fileName": "Nama file cadangan",
-  "backupCard.fileNameHint": "Sama di setiap perangkat yang berbagi folder ini: semuanya membaca dan menulis satu file ini."
+  "backupCard.fileNameHint": "Sama di setiap perangkat yang berbagi folder ini: semuanya membaca dan menulis satu file ini.",
+  "bodyMap.title": "Catatan kesehatan pada tubuh",
+  "bodyMap.hint": "Ketuk bagian tubuh untuk memperbesar dan hanya menampilkan catatannya.",
+  "bodyMap.region": "{part}: {n}",
+  "bodyMap.zoomOut": "Perkecil",
+  "bodyMap.front": "Depan",
+  "bodyMap.back": "Belakang",
+  "bodyMap.r": "Ka",
+  "bodyMap.l": "Ki",
+  "bodyMap.fewer": "Lebih sedikit",
+  "bodyMap.more": "Lebih banyak ({n})",
+  "bodyMap.elsewhere": "Di tempat lain",
+  "bodyMap.male": "Pria",
+  "bodyMap.female": "Wanita"
 }

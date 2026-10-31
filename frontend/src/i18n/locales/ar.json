@@ -966,6 +966,7 @@
   "healthTable.sortDesc": "تنازلي",
   "healthTable.viewCards": "بطاقات",
   "healthTable.viewTable": "جدول",
+  "healthTable.viewBody": "الجسم",
   "healthTable.period": "الفترة",
   "healthTable.periodDays": "{n} يومًا",
   "healthTable.periodYear": "12 شهرًا",
@@ -1089,5 +1090,18 @@
   "native.notUsed": "غير مستخدمة: {files}. لا أحد على هذا الهاتف لديه هذا الحمض النووي: اختر هذه الملفات مع ملف النسخة الاحتياطية في «استعادة نسخة احتياطية…».",
   "native.repairTitle": "البيانات على هذا الهاتف تالفة",
   "backupCard.fileName": "اسم ملف النسخة الاحتياطية",
-  "backupCard.fileNameHint": "الاسم نفسه على كل جهاز يشارك هذا المجلد: كلها تقرأ هذا الملف الواحد وتكتب فيه."
+  "backupCard.fileNameHint": "الاسم نفسه على كل جهاز يشارك هذا المجلد: كلها تقرأ هذا الملف الواحد وتكتب فيه.",
+  "bodyMap.title": "السجل الصحي على الجسم",
+  "bodyMap.hint": "اضغط على جزء من الجسم لتكبيره وعرض سجلاته فقط.",
+  "bodyMap.region": "{part}: {n}",
+  "bodyMap.zoomOut": "تصغير",
+  "bodyMap.front": "أمام",
+  "bodyMap.back": "خلف",
+  "bodyMap.r": "ي",
+  "bodyMap.l": "ش",
+  "bodyMap.fewer": "أقل",
+  "bodyMap.more": "أكثر ({n})",
+  "bodyMap.elsewhere": "أماكن أخرى",
+  "bodyMap.male": "ذكر",
+  "bodyMap.female": "أنثى"
 }

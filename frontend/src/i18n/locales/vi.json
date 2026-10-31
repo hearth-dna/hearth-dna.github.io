@@ -966,6 +966,7 @@
   "healthTable.sortDesc": "Giảm dần",
   "healthTable.viewCards": "Thẻ",
   "healthTable.viewTable": "Bảng",
+  "healthTable.viewBody": "Cơ thể",
   "healthTable.period": "Khoảng thời gian",
   "healthTable.periodDays": "{n} ngày",
   "healthTable.periodYear": "12 tháng",
@@ -1089,5 +1090,18 @@
   "native.notUsed": "Chưa dùng: {files}. Không ai trên điện thoại này có DNA này: hãy chọn các tệp này cùng với tệp sao lưu trong «Khôi phục bản sao lưu…».",
   "native.repairTitle": "Dữ liệu trên điện thoại này bị hỏng",
   "backupCard.fileName": "Tên tệp sao lưu",
-  "backupCard.fileNameHint": "Giống nhau trên mọi thiết bị dùng chung thư mục này: tất cả đều đọc và ghi đúng một tệp này."
+  "backupCard.fileNameHint": "Giống nhau trên mọi thiết bị dùng chung thư mục này: tất cả đều đọc và ghi đúng một tệp này.",
+  "bodyMap.title": "Nhật ký sức khỏe trên cơ thể",
+  "bodyMap.hint": "Chạm vào một bộ phận để phóng to và chỉ hiện các mục của nó.",
+  "bodyMap.region": "{part}: {n}",
+  "bodyMap.zoomOut": "Thu nhỏ",
+  "bodyMap.front": "Trước",
+  "bodyMap.back": "Sau",
+  "bodyMap.r": "P",
+  "bodyMap.l": "T",
+  "bodyMap.fewer": "Ít hơn",
+  "bodyMap.more": "Nhiều hơn ({n})",
+  "bodyMap.elsewhere": "Chỗ khác",
+  "bodyMap.male": "Nam",
+  "bodyMap.female": "Nữ"
 }

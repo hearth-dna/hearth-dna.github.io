@@ -966,6 +966,7 @@
   "healthTable.sortDesc": "Absteigend",
   "healthTable.viewCards": "Karten",
   "healthTable.viewTable": "Tabelle",
+  "healthTable.viewBody": "Körper",
   "healthTable.period": "Zeitraum",
   "healthTable.periodDays": "{n} Tage",
   "healthTable.periodYear": "12 Monate",
@@ -1089,5 +1090,18 @@
   "native.notUsed": "Nicht verwendet: {files}. Niemand auf diesem Telefon hat diese DNA: Wähle diese Dateien zusammen mit der Sicherungsdatei unter „Backup wiederherstellen…“ aus.",
   "native.repairTitle": "Die Daten auf diesem Telefon sind beschädigt",
   "backupCard.fileName": "Name der Sicherungsdatei",
-  "backupCard.fileNameHint": "Auf jedem Gerät, das diesen Ordner nutzt, derselbe: Alle lesen und schreiben diese eine Datei."
+  "backupCard.fileNameHint": "Auf jedem Gerät, das diesen Ordner nutzt, derselbe: Alle lesen und schreiben diese eine Datei.",
+  "bodyMap.title": "Gesundheitsprotokoll am Körper",
+  "bodyMap.hint": "Tippen Sie auf einen Körperteil, um ihn zu vergrößern und nur seine Einträge zu zeigen.",
+  "bodyMap.region": "{part}: {n}",
+  "bodyMap.zoomOut": "Herauszoomen",
+  "bodyMap.front": "Vorne",
+  "bodyMap.back": "Hinten",
+  "bodyMap.r": "R",
+  "bodyMap.l": "L",
+  "bodyMap.fewer": "Weniger",
+  "bodyMap.more": "Mehr ({n})",
+  "bodyMap.elsewhere": "Anderswo",
+  "bodyMap.male": "Männlich",
+  "bodyMap.female": "Weiblich"
 }

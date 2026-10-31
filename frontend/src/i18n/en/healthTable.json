@@ -16,6 +16,7 @@
   "healthTable.sortDesc": "Descending",
   "healthTable.viewCards": "Cards",
   "healthTable.viewTable": "Table",
+  "healthTable.viewBody": "Body",
   "healthTable.period": "Period",
   "healthTable.periodDays": "{n} days",
   "healthTable.periodYear": "12 months",
