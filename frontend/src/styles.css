@@ -326,6 +326,30 @@ fieldset.field > legend { padding: 0; margin-bottom: var(--space-1); }
 .toothchart .tooth:focus-visible rect { stroke: var(--accent); stroke-width: 2.5; }
 .toothchart .tooth.on rect { fill: var(--accent); stroke: var(--accent); }
 .toothchart .tooth.on text { fill: var(--accent-fg); font-weight: 600; }
+/* Body map (BodyMap.tsx): one sequential hue, more entries darker on light and brighter on dark. */
+.bodymap { margin: var(--space-3) 0 var(--space-4); display: flex; flex-direction: column; gap: var(--space-2); }
+.bodymap-head { display: flex; align-items: center; gap: var(--space-3); min-height: var(--control-h-sm); }
+.bodymap svg { width: 100%; max-width: 30rem; height: auto; overflow: hidden; user-select: none; -webkit-tap-highlight-color: transparent; }
+.bodymap .scene { transform-origin: 0 0; transform-box: view-box; transition: transform 0.35s ease; }
+.bodymap .region { cursor: pointer; outline: none; }
+.bodymap .region > :not(title) { fill: var(--surface-2); stroke: var(--line-strong); stroke-width: 0.8; transition: fill 0.2s; }
+.bodymap .region:hover > :not(title) { stroke: var(--muted); stroke-width: 1.2; }
+.bodymap .region:focus-visible > :not(title) { stroke: var(--accent); stroke-width: 2; }
+.bodymap .region.on > :not(title) { stroke: var(--fg); stroke-width: 1.6; }
+.bodymap svg.zoomed .region > :not(title) { stroke-width: 0.4; }
+.bodymap svg.zoomed .region.on > :not(title) { stroke-width: 0.8; }
+.bodymap .figure-label text { font-size: 12px; text-anchor: middle; fill: var(--muted); }
+.bodymap .figure-label text.side { font-weight: 600; }
+.bodymap .heat-1 > :not(title), .swatch.heat-1 { fill: color-mix(in srgb, var(--series-2) 18%, var(--surface)); background: color-mix(in srgb, var(--series-2) 18%, var(--surface)); }
+.bodymap .heat-2 > :not(title), .swatch.heat-2 { fill: color-mix(in srgb, var(--series-2) 36%, var(--surface)); background: color-mix(in srgb, var(--series-2) 36%, var(--surface)); }
+.bodymap .heat-3 > :not(title), .swatch.heat-3 { fill: color-mix(in srgb, var(--series-2) 55%, var(--surface)); background: color-mix(in srgb, var(--series-2) 55%, var(--surface)); }
+.bodymap .heat-4 > :not(title), .swatch.heat-4 { fill: color-mix(in srgb, var(--series-2) 75%, var(--surface)); background: color-mix(in srgb, var(--series-2) 75%, var(--surface)); }
+.bodymap .heat-5 > :not(title), .swatch.heat-5 { fill: var(--series-2); background: var(--series-2); }
+.swatch { display: inline-block; width: 0.9rem; height: 0.9rem; border-radius: var(--radius-sm); border: 1px solid var(--line); vertical-align: -0.1em; }
+.swatch.heat-0 { background: var(--surface-2); }
+.bodymap .tag .swatch { margin-inline-end: var(--space-1); }
+.bodymap-legend { display: flex; align-items: center; gap: var(--space-1); }
+.bodymap-other { align-items: center; }
 
 /* ---- Health log: a colour per kind, toolbar, filter panel, cards ------------------------------ */
 .kind-symptom { --k: #b4432f; } .kind-measurement { --k: #2f6fa8; } .kind-lab { --k: #7a4fb0; } .kind-imaging { --k: #1f7f7a; }

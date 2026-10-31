@@ -966,6 +966,7 @@
   "healthTable.sortDesc": "अवरोही",
   "healthTable.viewCards": "कार्ड",
   "healthTable.viewTable": "तालिका",
+  "healthTable.viewBody": "शरीर",
   "healthTable.period": "अवधि",
   "healthTable.periodDays": "{n} दिन",
   "healthTable.periodYear": "12 महीने",
@@ -1089,5 +1090,16 @@
   "native.notUsed": "उपयोग नहीं हुईं: {files}। इस फ़ोन पर किसी के पास यह डीएनए नहीं है: इन फ़ाइलों को बैकअप फ़ाइल के साथ «बैकअप पुनर्स्थापित करें…» में चुनें।",
   "native.repairTitle": "इस फ़ोन का डेटा खराब हो गया है",
   "backupCard.fileName": "बैकअप फ़ाइल का नाम",
-  "backupCard.fileNameHint": "इस फ़ोल्डर को साझा करने वाले हर डिवाइस पर एक ही: सभी इसी एक फ़ाइल को पढ़ते और लिखते हैं।"
+  "backupCard.fileNameHint": "इस फ़ोल्डर को साझा करने वाले हर डिवाइस पर एक ही: सभी इसी एक फ़ाइल को पढ़ते और लिखते हैं।",
+  "bodyMap.title": "शरीर पर स्वास्थ्य लॉग",
+  "bodyMap.hint": "शरीर के किसी हिस्से पर टैप करें ताकि वह बड़ा हो और सिर्फ़ उसकी प्रविष्टियाँ दिखें।",
+  "bodyMap.region": "{part}: {n}",
+  "bodyMap.zoomOut": "ज़ूम आउट",
+  "bodyMap.front": "सामने",
+  "bodyMap.back": "पीछे",
+  "bodyMap.r": "दा",
+  "bodyMap.l": "बा",
+  "bodyMap.fewer": "कम",
+  "bodyMap.more": "ज़्यादा ({n})",
+  "bodyMap.elsewhere": "अन्य जगहें"
 }

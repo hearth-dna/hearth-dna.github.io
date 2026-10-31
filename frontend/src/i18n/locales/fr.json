@@ -966,6 +966,7 @@
   "healthTable.sortDesc": "Décroissant",
   "healthTable.viewCards": "Cartes",
   "healthTable.viewTable": "Tableau",
+  "healthTable.viewBody": "Corps",
   "healthTable.period": "Période",
   "healthTable.periodDays": "{n} jours",
   "healthTable.periodYear": "12 mois",
@@ -1089,5 +1090,16 @@
   "native.notUsed": "Non utilisés : {files}. Personne sur ce téléphone n’a cet ADN : choisissez ces fichiers avec le fichier de sauvegarde dans « Restaurer une sauvegarde… ».",
   "native.repairTitle": "Les données de ce téléphone sont endommagées",
   "backupCard.fileName": "Nom du fichier de sauvegarde",
-  "backupCard.fileNameHint": "Le même sur chaque appareil qui partage ce dossier : tous lisent et écrivent ce seul fichier."
+  "backupCard.fileNameHint": "Le même sur chaque appareil qui partage ce dossier : tous lisent et écrivent ce seul fichier.",
+  "bodyMap.title": "Journal de santé sur le corps",
+  "bodyMap.hint": "Touchez une partie du corps pour l’agrandir et n’afficher que ses entrées.",
+  "bodyMap.region": "{part} : {n}",
+  "bodyMap.zoomOut": "Dézoomer",
+  "bodyMap.front": "Face",
+  "bodyMap.back": "Dos",
+  "bodyMap.r": "D",
+  "bodyMap.l": "G",
+  "bodyMap.fewer": "Moins",
+  "bodyMap.more": "Plus ({n})",
+  "bodyMap.elsewhere": "Ailleurs"
 }

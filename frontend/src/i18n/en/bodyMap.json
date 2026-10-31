@@ -1,0 +1,13 @@
+{
+  "bodyMap.title": "Health log on the body",
+  "bodyMap.hint": "Tap a part of the body to zoom in and show only its entries.",
+  "bodyMap.region": "{part}: {n}",
+  "bodyMap.zoomOut": "Zoom out",
+  "bodyMap.front": "Front",
+  "bodyMap.back": "Back",
+  "bodyMap.r": "R",
+  "bodyMap.l": "L",
+  "bodyMap.fewer": "Fewer",
+  "bodyMap.more": "More ({n})",
+  "bodyMap.elsewhere": "Elsewhere"
+}

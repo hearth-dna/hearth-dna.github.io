@@ -966,6 +966,7 @@
   "healthTable.sortDesc": "অধঃক্রম",
   "healthTable.viewCards": "কার্ড",
   "healthTable.viewTable": "টেবিল",
+  "healthTable.viewBody": "শরীর",
   "healthTable.period": "সময়কাল",
   "healthTable.periodDays": "{n} দিন",
   "healthTable.periodYear": "১২ মাস",
@@ -1089,5 +1090,16 @@
   "native.notUsed": "ব্যবহৃত হয়নি: {files}। এই ফোনে কারও কাছে এই ডিএনএ নেই: ফাইলগুলো ব্যাকআপ ফাইলের সঙ্গে «ব্যাকআপ পুনরুদ্ধার করুন…»-এ বেছে নিন।",
   "native.repairTitle": "এই ফোনের ডেটা ক্ষতিগ্রস্ত",
   "backupCard.fileName": "ব্যাকআপ ফাইলের নাম",
-  "backupCard.fileNameHint": "এই ফোল্ডার ব্যবহার করা প্রতিটি ডিভাইসে একই নাম: সবাই এই একটি ফাইলই পড়ে ও লেখে।"
+  "backupCard.fileNameHint": "এই ফোল্ডার ব্যবহার করা প্রতিটি ডিভাইসে একই নাম: সবাই এই একটি ফাইলই পড়ে ও লেখে।",
+  "bodyMap.title": "শরীরের উপর স্বাস্থ্য লগ",
+  "bodyMap.hint": "শরীরের কোনো অংশে ট্যাপ করুন, সেটি বড় করে শুধু তার এন্ট্রি দেখাতে।",
+  "bodyMap.region": "{part}: {n}",
+  "bodyMap.zoomOut": "ছোট করুন",
+  "bodyMap.front": "সামনে",
+  "bodyMap.back": "পিছনে",
+  "bodyMap.r": "ডা",
+  "bodyMap.l": "বা",
+  "bodyMap.fewer": "কম",
+  "bodyMap.more": "বেশি ({n})",
+  "bodyMap.elsewhere": "অন্যত্র"
 }

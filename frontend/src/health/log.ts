@@ -1,4 +1,5 @@
-import { HEALTH_KIND_LABELS, type HealthEntry, type HealthKind } from '../types'
+import { type BodySide, HEALTH_KIND_LABELS, type HealthEntry, type HealthKind } from '../types'
+import { bodyKey, onSide } from './body'
 import { type DetailValue, detailFieldsOf } from './presets'
 import { describeTeeth } from './teeth'
 
@@ -122,7 +123,10 @@ export interface HealthFilter {
   /** Person id; '' for everyone. */
   person: string
   kind: HealthKind | ''
+  /** A body part; 'Knee' and 'knees' are the same (`bodyKey`). */
   bodyPart: string
+  /** One side of a paired body part (the body map): that side, both sides, or unrecorded. */
+  side: BodySide
   tag: string
   /** A condition id the entry is linked to. */
   condition: string
@@ -139,6 +143,7 @@ export const NO_FILTER: HealthFilter = {
   person: '',
   kind: '',
   bodyPart: '',
+  side: '',
   tag: '',
   condition: '',
   from: '',
@@ -168,7 +173,8 @@ export function filterHealthLog(
     (e) =>
       (!f.person || e.personId === f.person) &&
       (!f.kind || e.kind === f.kind) &&
-      (!f.bodyPart || e.bodyPart === f.bodyPart) &&
+      (!f.bodyPart || bodyKey(e.bodyPart) === bodyKey(f.bodyPart)) &&
+      (!f.bodyPart || onSide(e.side, f.side)) &&
       (!f.tag || e.tags.includes(f.tag)) &&
       (!f.condition || e.conditions.includes(f.condition)) &&
       (!f.from || e.date >= f.from) &&

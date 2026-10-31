@@ -966,6 +966,7 @@
   "healthTable.sortDesc": "降序",
   "healthTable.viewCards": "卡片",
   "healthTable.viewTable": "表格",
+  "healthTable.viewBody": "身体",
   "healthTable.period": "时间段",
   "healthTable.periodDays": "{n} 天",
   "healthTable.periodYear": "12 个月",
@@ -1089,5 +1090,16 @@
   "native.notUsed": "未使用：{files}。这部手机上没有人拥有这份 DNA：请在“恢复备份…”中同时选择这些文件和备份文件。",
   "native.repairTitle": "这部手机上的数据已损坏",
   "backupCard.fileName": "备份文件名",
-  "backupCard.fileNameHint": "共享此文件夹的每台设备上都相同：它们都读写这一个文件。"
+  "backupCard.fileNameHint": "共享此文件夹的每台设备上都相同：它们都读写这一个文件。",
+  "bodyMap.title": "身体上的健康记录",
+  "bodyMap.hint": "点按身体部位即可放大并只显示该部位的记录。",
+  "bodyMap.region": "{part}：{n}",
+  "bodyMap.zoomOut": "缩小",
+  "bodyMap.front": "正面",
+  "bodyMap.back": "背面",
+  "bodyMap.r": "右",
+  "bodyMap.l": "左",
+  "bodyMap.fewer": "较少",
+  "bodyMap.more": "较多（{n}）",
+  "bodyMap.elsewhere": "其他部位"
 }

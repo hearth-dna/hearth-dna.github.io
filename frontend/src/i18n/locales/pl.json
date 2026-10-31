@@ -966,6 +966,7 @@
   "healthTable.sortDesc": "Malejąco",
   "healthTable.viewCards": "Karty",
   "healthTable.viewTable": "Tabela",
+  "healthTable.viewBody": "Ciało",
   "healthTable.period": "Okres",
   "healthTable.periodDays": "{n} dni",
   "healthTable.periodYear": "12 miesięcy",
@@ -1089,5 +1090,16 @@
   "native.notUsed": "Nieużyte: {files}. Nikt na tym telefonie nie ma tego DNA: wybierz te pliki razem z plikiem kopii w „Przywróć kopię zapasową…”.",
   "native.repairTitle": "Dane na tym telefonie są uszkodzone",
   "backupCard.fileName": "Nazwa pliku kopii",
-  "backupCard.fileNameHint": "Taka sama na każdym urządzeniu, które korzysta z tego folderu: wszystkie czytają i zapisują ten jeden plik."
+  "backupCard.fileNameHint": "Taka sama na każdym urządzeniu, które korzysta z tego folderu: wszystkie czytają i zapisują ten jeden plik.",
+  "bodyMap.title": "Dziennik zdrowia na ciele",
+  "bodyMap.hint": "Dotknij części ciała, aby ją powiększyć i pokazać tylko jej wpisy.",
+  "bodyMap.region": "{part}: {n}",
+  "bodyMap.zoomOut": "Oddal",
+  "bodyMap.front": "Przód",
+  "bodyMap.back": "Tył",
+  "bodyMap.r": "P",
+  "bodyMap.l": "L",
+  "bodyMap.fewer": "Mniej",
+  "bodyMap.more": "Więcej ({n})",
+  "bodyMap.elsewhere": "Gdzie indziej"
 }

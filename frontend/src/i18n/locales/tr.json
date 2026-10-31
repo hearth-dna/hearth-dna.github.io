@@ -966,6 +966,7 @@
   "healthTable.sortDesc": "Azalan",
   "healthTable.viewCards": "Kartlar",
   "healthTable.viewTable": "Tablo",
+  "healthTable.viewBody": "Vücut",
   "healthTable.period": "Dönem",
   "healthTable.periodDays": "{n} gün",
   "healthTable.periodYear": "12 ay",
@@ -1089,5 +1090,16 @@
   "native.notUsed": "Kullanılmadı: {files}. Bu telefonda kimsede bu DNA yok: bu dosyaları yedek dosyasıyla birlikte «Yedeği geri yükle…» içinde seçin.",
   "native.repairTitle": "Bu telefondaki veriler bozuk",
   "backupCard.fileName": "Yedek dosyasının adı",
-  "backupCard.fileNameHint": "Bu klasörü paylaşan her cihazda aynı: hepsi bu tek dosyayı okuyup yazar."
+  "backupCard.fileNameHint": "Bu klasörü paylaşan her cihazda aynı: hepsi bu tek dosyayı okuyup yazar.",
+  "bodyMap.title": "Vücut üzerinde sağlık kaydı",
+  "bodyMap.hint": "Yakınlaştırmak ve yalnızca kayıtlarını göstermek için bir vücut bölgesine dokunun.",
+  "bodyMap.region": "{part}: {n}",
+  "bodyMap.zoomOut": "Uzaklaştır",
+  "bodyMap.front": "Ön",
+  "bodyMap.back": "Arka",
+  "bodyMap.r": "S",
+  "bodyMap.l": "Sol",
+  "bodyMap.fewer": "Daha az",
+  "bodyMap.more": "Daha çok ({n})",
+  "bodyMap.elsewhere": "Diğer yerler"
 }

@@ -254,7 +254,10 @@ kb fields at tier 0, so the user gets a decision frame even without any LLM.
   picked on a tooth chart of both jaws and stored as FDI numbers (`teeth: "16 26 55"`), where milk
   teeth have their own numbers (51–85, `health/teeth.ts`). The log's Quick
   symptom bar records one in a tap. Severity and the numeric details are chartable, and Ask packs
-  carry them in words.
+  carry them in words. The log's **Body** view lays the entries on a front and back figure, each
+  part (each side of a paired one) coloured by how many of the entries the other filters leave name
+  it (`health/body.ts`, `BodyMap.tsx`); picking a part zooms in on it and filters the log to it and
+  that side. Parts with no place on the figure (skin, whole body, typed ones) are buttons beside it.
   Gated by the `import_document` consent; part of the dump; offered entry-by-entry to the Ask
   context pack under "Health log". The steps below build on it.
 - **Shipped second (BYOK document reader):** "Read a document" sends the photo/scan/PDF straight

@@ -966,6 +966,7 @@
   "healthTable.sortDesc": "نزولی",
   "healthTable.viewCards": "کارڈز",
   "healthTable.viewTable": "جدول",
+  "healthTable.viewBody": "جسم",
   "healthTable.period": "مدت",
   "healthTable.periodDays": "{n} دن",
   "healthTable.periodYear": "12 ماہ",
@@ -1089,5 +1090,16 @@
   "native.notUsed": "استعمال نہیں ہوئیں: {files}۔ اس فون پر کسی کے پاس یہ ڈی این اے نہیں ہے: ان فائلوں کو بیک اپ فائل کے ساتھ «بیک اپ بحال کریں…» میں چنیں۔",
   "native.repairTitle": "اس فون کا ڈیٹا خراب ہو گیا ہے",
   "backupCard.fileName": "بیک اپ فائل کا نام",
-  "backupCard.fileNameHint": "اس فولڈر کو استعمال کرنے والے ہر آلے پر ایک ہی: سب اسی ایک فائل کو پڑھتے اور لکھتے ہیں۔"
+  "backupCard.fileNameHint": "اس فولڈر کو استعمال کرنے والے ہر آلے پر ایک ہی: سب اسی ایک فائل کو پڑھتے اور لکھتے ہیں۔",
+  "bodyMap.title": "جسم پر صحت کا ریکارڈ",
+  "bodyMap.hint": "جسم کے کسی حصے پر ٹیپ کریں تاکہ وہ بڑا ہو اور صرف اسی کے اندراجات دکھیں۔",
+  "bodyMap.region": "{part}: {n}",
+  "bodyMap.zoomOut": "زوم آؤٹ",
+  "bodyMap.front": "سامنے",
+  "bodyMap.back": "پیچھے",
+  "bodyMap.r": "د",
+  "bodyMap.l": "ب",
+  "bodyMap.fewer": "کم",
+  "bodyMap.more": "زیادہ ({n})",
+  "bodyMap.elsewhere": "دیگر جگہیں"
 }

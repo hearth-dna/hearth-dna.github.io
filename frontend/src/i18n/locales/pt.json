@@ -966,6 +966,7 @@
   "healthTable.sortDesc": "Decrescente",
   "healthTable.viewCards": "Cartões",
   "healthTable.viewTable": "Tabela",
+  "healthTable.viewBody": "Corpo",
   "healthTable.period": "Período",
   "healthTable.periodDays": "{n} dias",
   "healthTable.periodYear": "12 meses",
@@ -1089,5 +1090,16 @@
   "native.notUsed": "Não usados: {files}. Ninguém neste telefone tem este DNA: escolha estes arquivos junto com o arquivo da cópia em «Restaurar uma cópia de segurança…».",
   "native.repairTitle": "Os dados deste telefone estão danificados",
   "backupCard.fileName": "Nome do arquivo de backup",
-  "backupCard.fileNameHint": "O mesmo em todos os dispositivos que compartilham esta pasta: todos leem e gravam este único arquivo."
+  "backupCard.fileNameHint": "O mesmo em todos os dispositivos que compartilham esta pasta: todos leem e gravam este único arquivo.",
+  "bodyMap.title": "Registro de saúde no corpo",
+  "bodyMap.hint": "Toque numa parte do corpo para ampliá-la e mostrar só os registros dela.",
+  "bodyMap.region": "{part}: {n}",
+  "bodyMap.zoomOut": "Afastar",
+  "bodyMap.front": "Frente",
+  "bodyMap.back": "Costas",
+  "bodyMap.r": "D",
+  "bodyMap.l": "E",
+  "bodyMap.fewer": "Menos",
+  "bodyMap.more": "Mais ({n})",
+  "bodyMap.elsewhere": "Em outros lugares"
 }
