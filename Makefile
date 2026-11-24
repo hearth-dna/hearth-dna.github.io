@@ -5,7 +5,7 @@
 	mobile-assets mobile-i18n mobile-kb mobile-body android android-build android-install android-test android-lint android-logs android-clean \
 	android-keystore android-bundle android-verify android-publish _android-release-ready \
 	ios ios-generate ios-build ios-test ios-clean ios-archive ios-ipa ios-verify ios-testflight \
-	ios-testflight-status _ios-release-ready \
+	ios-testflight-status ios-submit _ios-release-ready \
 	mobile-secrets
 
 .DEFAULT_GOAL := help
@@ -365,6 +365,18 @@ ios-testflight: ## Upload the verified .ipa to TestFlight (macOS)
 	@$(MAKE) ios-verify
 	cd $(MOBILE_DIR) && $(IOS_ASC_ENV) \
 		bundle exec fastlane ios upload_build ipa:../$(IOS_IPA) $(if $(NOTES),changelog:"$(NOTES)",)
+
+# The version of record, from the checkout: the build submitted is the one this commit uploaded.
+IOS_PROJECT_VERSION = $(shell sed -n 's/^ *$(1): *"\{0,1\}\([^"]*\)"\{0,1\}$$/\1/p' $(IOS_DIR)/project.yml | head -1)
+
+# RELEASE=auto releases as soon as Apple approves; the default waits for a click in the Console.
+ios-submit: ## Submit the uploaded build for App Store review (RELEASE=manual|auto)
+	$(call require_var,ASC_KEY_ID,$(ASC_KEY_ID))
+	$(call require_var,ASC_ISSUER_ID,$(ASC_ISSUER_ID))
+	$(call require_var,ASC_KEY_PATH,$(ASC_KEY_PATH))
+	cd $(MOBILE_DIR) && $(IOS_ASC_ENV) bundle exec fastlane ios submit \
+		version:$(call IOS_PROJECT_VERSION,MARKETING_VERSION) \
+		build:$(call IOS_PROJECT_VERSION,CURRENT_PROJECT_VERSION) release:$(or $(RELEASE),manual)
 
 ios-testflight-status: ## Show the newest build App Store Connect has for this app
 	$(call require_var,ASC_KEY_ID,$(ASC_KEY_ID))

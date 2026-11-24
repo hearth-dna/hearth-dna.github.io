@@ -96,4 +96,33 @@ platform :ios do
       distribute_external: false,
     )
   end
+
+  desc "Submit an uploaded build for App Store review. Params: version, build, release (manual|auto)"
+  lane :submit do |options|
+    version = options[:version].to_s
+    build = options[:build].to_s
+    UI.user_error!("version: and build: are required — `make ios-submit` reads them from project.yml") if version.empty? || build.empty?
+    release = options[:release] || "manual"
+    UI.user_error!("release: must be manual or auto, not #{release}") unless %w[manual auto].include?(release)
+
+    deliver(
+      app_identifier: app_identifier,
+      # Creates the App Store version in the Console if it does not exist yet.
+      app_version: version,
+      build_number: build,
+      # Waits for Apple to finish processing the build before attaching it.
+      submit_for_review: true,
+      # Approved builds wait for a click in the Console unless release:auto.
+      automatic_release: release == "auto",
+      # The binary went up through TestFlight, and the listing (description, screenshots, privacy
+      # answers) is edited in the Console: a build push must not be able to overwrite it.
+      skip_binary_upload: true,
+      skip_metadata: true,
+      skip_screenshots: true,
+      run_precheck_before_submit: false,
+      # No HTML preview to confirm: this runs unattended in CI.
+      force: true,
+      submission_information: { add_id_info_uses_idfa: false },
+    )
+  end
 end
