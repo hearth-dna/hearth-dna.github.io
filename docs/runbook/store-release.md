@@ -2,7 +2,7 @@
 
 Both apps can be published to Google Play and the App Store under your own developer account
 without a single credential entering this repository. Everything a release needs arrives from the
-environment: the gitignored root `.env` locally, GitHub secrets in CI. A reader with the full
+environment: the gitignored root `.env.local` locally, GitHub secrets in CI. A reader with the full
 source and none of your secrets can build and run the apps, and can publish nothing.
 
 `make mobile-secrets` prints which inputs are set, by name and status only — never a value.
@@ -11,13 +11,13 @@ source and none of your secrets can build and run the apps, and can publish noth
 
 | Input | What it is | Where it lives | Never |
 | --- | --- | --- | --- |
-| `HEARTH_APPLICATION_ID` | the published id, reverse-DNS of a domain you own | `.env` / CI secret | in git — the committed default is `example.hearth.app` |
+| `HEARTH_APPLICATION_ID` | the published id, reverse-DNS of a domain you own | `.env.local` / CI secret | in git — the committed default is `example.hearth.app` |
 | Upload keystore | the Play signing key | `~/.hearth/hearth-upload.jks` + an offline backup | in git; `*.jks` is gitignored as a backstop |
-| `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD` | keystore credentials | `.env` / CI secrets | on a command line (`ps` is world-readable; `make` passes them through the environment) |
+| `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD` | keystore credentials | `.env.local` / CI secrets | on a command line (`ps` is world-readable; `make` passes them through the environment) |
 | `PLAY_SERVICE_ACCOUNT_JSON` | Play Developer API credentials | a file outside the repo | in git |
-| `APPLE_TEAM_ID` | your Apple developer team | `.env` / CI secret | in git — `ExportOptions.plist` is generated from the `.example` at export time |
-| `ASC_KEY_ID`, `ASC_ISSUER_ID`, `ASC_KEY_PATH` | App Store Connect API key (`.p8`) | `.env` + a file outside the repo | in git |
-| `HEARTH_SOURCE_URL` | where the source is published; Settings links to it, as the AGPL-3.0 asks of whoever distributes the app | `.env`; CI uses the repository it runs in | in git. Store builds refuse to build without it |
+| `APPLE_TEAM_ID` | your Apple developer team | `.env.local` / CI secret | in git — `ExportOptions.plist` is generated from the `.example` at export time |
+| `ASC_KEY_ID`, `ASC_ISSUER_ID`, `ASC_KEY_PATH` | App Store Connect API key (`.p8`) | `.env.local` + a file outside the repo | in git |
+| `HEARTH_SOURCE_URL` | where the source is published; Settings links to it, as the AGPL-3.0 asks of whoever distributes the app | `.env.local`; CI uses the repository it runs in | in git. Store builds refuse to build without it |
 
 ## Before the first upload
 
@@ -34,7 +34,7 @@ the published app can never be updated again.
 ## Android
 
 ```bash
-cp .env.example .env            # fill in HEARTH_APPLICATION_ID and the ANDROID_* values
+cp .env.example .env.local      # fill in HEARTH_APPLICATION_ID and the ANDROID_* values
 make android-keystore           # once, ever
 make android-bundle             # copies the strings and kb, builds the signed AAB, verifies it
 make android-publish            # → Play internal track
@@ -68,6 +68,21 @@ Needs macOS with Xcode, plus `xcodegen` and `bundle install` in `mobile/`.
    Distribution. `make ios-ipa` passes `-allowProvisioningUpdates` with the API key, so the
    provisioning profile is created for you on first use — no profile to download or commit.
 
+   Without a Mac the same certificate is made with `openssl`, which is all CI needs: generate a
+   key and a signing request, upload the request under Certificates → + → Apple Distribution (or
+   `POST /v1/certificates` with the API key), download the `.cer`, and pack both into a `.p12`.
+   The explicit algorithms matter: the `security` tool on the runner cannot read OpenSSL 3's
+   default encryption.
+
+   ```bash
+   openssl genrsa -out dist.key 2048
+   openssl req -new -key dist.key -subj "/CN=Hearth Distribution" -out dist.csr
+   # ...upload dist.csr, download distribution.cer...
+   openssl x509 -inform DER -in distribution.cer -out dist.pem
+   openssl pkcs12 -export -inkey dist.key -in dist.pem -out dist.p12 \
+     -certpbe PBE-SHA1-3DES -keypbe PBE-SHA1-3DES -macalg sha1
+   ```
+
 ### Every release
 
 ```bash
@@ -93,7 +108,7 @@ marketing version, and a build already uploaded cannot be replaced — only supe
 ## CI
 
 `.github/workflows/android-release.yml` builds and optionally uploads the AAB on a tag or a manual
-run. It reads the same names as `.env`, from repository secrets:
+run. It reads the same names as `.env.local`, from repository secrets:
 
 | Secret | Value |
 | --- | --- |
@@ -111,10 +126,10 @@ explicit input, so a tag can build and verify without publishing anything.
 
 | Secret | Value |
 | --- | --- |
-| `HEARTH_APPLICATION_ID`, `APPLE_TEAM_ID` | as in `.env` |
+| `HEARTH_APPLICATION_ID`, `APPLE_TEAM_ID` | as in `.env.local` |
 | `IOS_DIST_CERT_BASE64` | the Apple Distribution certificate and private key, exported from Keychain Access as `.p12`, then `base64 -i cert.p12 \| pbcopy` |
 | `IOS_DIST_CERT_PASSWORD` | the password you set on that `.p12` |
-| `ASC_KEY_ID`, `ASC_ISSUER_ID` | as in `.env` |
+| `ASC_KEY_ID`, `ASC_ISSUER_ID` | as in `.env.local` |
 | `ASC_KEY_BASE64` | `base64 -i AuthKey_XXXX.p8 \| pbcopy` |
 
 The certificate is imported into a **throwaway keychain** created for the job and deleted in an

@@ -17,7 +17,9 @@ help: ## Show this help message
 
 # Shared
 # ======
-# Values resolve in order: an already-exported shell var, then root .env (same idiom as ../sentio).
+# Values resolve in order: an already-exported shell var, then root .env.local, then root .env.
+# Both files are gitignored. .env.local is where the publishing secrets go.
+dotenv = $(shell grep -hs '^$(1)=' .env.local .env | head -n 1 | cut -d= -f2-)
 
 test: frontend-test ## Run every test suite (Vitest)
 
@@ -95,27 +97,27 @@ ANDROID_SDK_HOME ?= $(HOME)/Android/Sdk
 GRADLE = JAVA_HOME=$(ANDROID_JAVA_HOME) ANDROID_HOME=$(ANDROID_SDK_HOME) ./gradlew
 
 # Publishing inputs. Every one of them resolves from an exported shell variable first, then the
-# gitignored root .env — never from a committed file (docs/runbook/store-release.md). The apps
+# gitignored root .env.local or .env — never from a committed file (docs/runbook/store-release.md). The apps
 # build and run without any of them; only the store targets require them, and they say which one
 # is missing rather than failing inside Gradle or fastlane.
-HEARTH_APPLICATION_ID ?= $(shell grep -s '^HEARTH_APPLICATION_ID=' .env | cut -d= -f2-)
+HEARTH_APPLICATION_ID ?= $(call dotenv,HEARTH_APPLICATION_ID)
 # The committed placeholder, used for every debug build. `.example` is the reserved TLD.
 ANDROID_APP_ID := $(or $(HEARTH_APPLICATION_ID),example.hearth.app)
-ANDROID_KEYSTORE_PATH ?= $(or $(shell grep -s '^ANDROID_KEYSTORE_PATH=' .env | cut -d= -f2-),$(HOME)/.hearth/hearth-upload.jks)
-ANDROID_KEYSTORE_PASSWORD ?= $(shell grep -s '^ANDROID_KEYSTORE_PASSWORD=' .env | cut -d= -f2-)
-ANDROID_KEY_ALIAS ?= $(or $(shell grep -s '^ANDROID_KEY_ALIAS=' .env | cut -d= -f2-),upload)
-ANDROID_KEY_PASSWORD ?= $(or $(shell grep -s '^ANDROID_KEY_PASSWORD=' .env | cut -d= -f2-),$(ANDROID_KEYSTORE_PASSWORD))
-PLAY_SERVICE_ACCOUNT_JSON ?= $(shell grep -s '^PLAY_SERVICE_ACCOUNT_JSON=' .env | cut -d= -f2-)
-APPLE_TEAM_ID ?= $(shell grep -s '^APPLE_TEAM_ID=' .env | cut -d= -f2-)
-ASC_KEY_ID ?= $(shell grep -s '^ASC_KEY_ID=' .env | cut -d= -f2-)
-ASC_ISSUER_ID ?= $(shell grep -s '^ASC_ISSUER_ID=' .env | cut -d= -f2-)
-ASC_KEY_PATH ?= $(shell grep -s '^ASC_KEY_PATH=' .env | cut -d= -f2-)
+ANDROID_KEYSTORE_PATH ?= $(or $(call dotenv,ANDROID_KEYSTORE_PATH),$(HOME)/.hearth/hearth-upload.jks)
+ANDROID_KEYSTORE_PASSWORD ?= $(call dotenv,ANDROID_KEYSTORE_PASSWORD)
+ANDROID_KEY_ALIAS ?= $(or $(call dotenv,ANDROID_KEY_ALIAS),upload)
+ANDROID_KEY_PASSWORD ?= $(or $(call dotenv,ANDROID_KEY_PASSWORD),$(ANDROID_KEYSTORE_PASSWORD))
+PLAY_SERVICE_ACCOUNT_JSON ?= $(call dotenv,PLAY_SERVICE_ACCOUNT_JSON)
+APPLE_TEAM_ID ?= $(call dotenv,APPLE_TEAM_ID)
+ASC_KEY_ID ?= $(call dotenv,ASC_KEY_ID)
+ASC_ISSUER_ID ?= $(call dotenv,ASC_ISSUER_ID)
+ASC_KEY_PATH ?= $(call dotenv,ASC_KEY_PATH)
 # Cloud backup buttons (docs/runbook/cloud-backups.md). Unset means the button is not offered.
-HEARTH_GOOGLE_DRIVE ?= $(shell grep -s '^HEARTH_GOOGLE_DRIVE=' .env | cut -d= -f2-)
-HEARTH_DROPBOX_APP_KEY ?= $(shell grep -s '^HEARTH_DROPBOX_APP_KEY=' .env | cut -d= -f2-)
+HEARTH_GOOGLE_DRIVE ?= $(call dotenv,HEARTH_GOOGLE_DRIVE)
+HEARTH_DROPBOX_APP_KEY ?= $(call dotenv,HEARTH_DROPBOX_APP_KEY)
 # Where the source code is published, shown in Settings (AGPL-3.0). Required to publish.
-HEARTH_SOURCE_URL ?= $(shell grep -s '^HEARTH_SOURCE_URL=' .env | cut -d= -f2-)
-HEARTH_GOOGLE_IOS_CLIENT_ID ?= $(shell grep -s '^HEARTH_GOOGLE_IOS_CLIENT_ID=' .env | cut -d= -f2-)
+HEARTH_SOURCE_URL ?= $(call dotenv,HEARTH_SOURCE_URL)
+HEARTH_GOOGLE_IOS_CLIENT_ID ?= $(call dotenv,HEARTH_GOOGLE_IOS_CLIENT_ID)
 CLOUD_ENV = HEARTH_GOOGLE_DRIVE=$(HEARTH_GOOGLE_DRIVE) HEARTH_DROPBOX_APP_KEY=$(HEARTH_DROPBOX_APP_KEY) HEARTH_SOURCE_URL=$(HEARTH_SOURCE_URL)
 # The same two for xcodebuild, as build settings that Info.plist reads.
 IOS_CLOUD_SETTINGS = HEARTH_GOOGLE_IOS_CLIENT_ID=$(HEARTH_GOOGLE_IOS_CLIENT_ID) HEARTH_DROPBOX_APP_KEY=$(HEARTH_DROPBOX_APP_KEY) \
@@ -366,7 +368,7 @@ ios-testflight-status: ## Show the newest build App Store Connect has for this a
 	cd $(MOBILE_DIR) && $(IOS_ASC_ENV) bundle exec fastlane ios status
 
 mobile-secrets: ## Show which publishing inputs are set (names and status only, never values)
-	@echo "Publishing inputs (docs/runbook/store-release.md). Values live in .env, never in git."
+	@echo "Publishing inputs (docs/runbook/store-release.md). Values live in .env.local, never in git."
 	@printf '  %-28s %s\n' "HEARTH_APPLICATION_ID" "$(if $(HEARTH_APPLICATION_ID),set,MISSING - using placeholder $(ANDROID_APP_ID))"
 	@printf '  %-28s %s\n' "ANDROID_KEYSTORE_PATH" "$(if $(wildcard $(ANDROID_KEYSTORE_PATH)),found at $(ANDROID_KEYSTORE_PATH),MISSING - run make android-keystore)"
 	@printf '  %-28s %s\n' "ANDROID_KEYSTORE_PASSWORD" "$(if $(ANDROID_KEYSTORE_PASSWORD),set,MISSING)"

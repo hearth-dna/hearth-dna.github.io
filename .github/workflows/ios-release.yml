@@ -79,7 +79,8 @@ jobs:
           cert="$(mktemp)"
           trap 'rm -f "$cert"' EXIT
           printf '%s' "$IOS_DIST_CERT_BASE64" | base64 -d > "$cert"
-          security import "$cert" -k "$keychain" -P "$IOS_DIST_CERT_PASSWORD" \
+          # -f pkcs12: the temp file has no extension to guess the format from.
+          security import "$cert" -f pkcs12 -k "$keychain" -P "$IOS_DIST_CERT_PASSWORD" \
             -T /usr/bin/codesign -T /usr/bin/security
           # Without this, codesign stops for a GUI prompt nobody is there to answer and the job
           # hangs until the timeout.
