@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
     inputs:
       upload:
-        description: 'Upload the build to TestFlight (otherwise build and keep the .ipa only)'
+        description: 'Upload the build to TestFlight (otherwise build and verify only)'
         required: false
         default: false
         type: boolean
@@ -144,10 +144,5 @@ jobs:
           security delete-keychain "$RUNNER_TEMP/hearth-signing.keychain-db" 2>/dev/null || true
           rm -rf "$RUNNER_TEMP/asc"
 
-      # What a human inspects before promoting the build in App Store Connect. It is signed for
-      # distribution and holds no secret of its own.
-      - uses: actions/upload-artifact@v4
-        with:
-          name: hearth-ipa
-          path: mobile/ios/build/ipa/Hearth.ipa
-          retention-days: 14
+      # No artifact is kept, unlike the Android workflow: the .ipa embeds the provisioning profile,
+      # which names the Apple team, and artifacts of a public repository are public.

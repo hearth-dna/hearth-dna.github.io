@@ -156,7 +156,8 @@ the key stays at App Manager. Both expire after a year and are replaced together
 
 The certificate is imported into a **throwaway keychain** created for the job and deleted in an
 `always()` step, and the `.p8` is written to `$RUNNER_TEMP` and removed with it — neither touches
-the runner's login keychain, the workspace, or the uploaded artifact.
+the runner's login keychain or the workspace. The `.ipa` is not kept as an artifact: it embeds the
+provisioning profile, which names the Apple team, and a public repository's artifacts are public.
 
 ## Version numbers
 
