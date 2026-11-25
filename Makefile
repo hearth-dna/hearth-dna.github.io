@@ -195,6 +195,9 @@ endef
 
 ios: ios-build ## Alias for ios-build
 
+# The simulator the build and the tests run on. CI picks one its Xcode has.
+IOS_SIMULATOR ?= iPhone 16
+
 ios-generate: ## Regenerate mobile/ios/Hearth.xcodeproj from project.yml (macOS)
 	$(call require_macos,ios-generate)
 	@command -v xcodegen >/dev/null 2>&1 || { echo "Error: xcodegen not found (brew install xcodegen)"; exit 1; }
@@ -203,13 +206,13 @@ ios-generate: ## Regenerate mobile/ios/Hearth.xcodeproj from project.yml (macOS)
 ios-build: mobile-assets ios-generate ## Build and run the app on a simulator (macOS)
 	$(call require_macos,ios-build)
 	xcodebuild build -project $(IOS_DIR)/Hearth.xcodeproj -scheme Hearth \
-		-destination "platform=iOS Simulator,name=iPhone 16" -quiet \
+		-destination "platform=iOS Simulator,name=$(IOS_SIMULATOR)" -quiet \
 		$(IOS_CLOUD_SETTINGS)
 
 ios-test: ios-generate ## Run the iOS unit tests on a simulator (macOS)
 	$(call require_macos,ios-test)
 	xcodebuild test -project $(IOS_DIR)/Hearth.xcodeproj -scheme Hearth \
-		-destination "platform=iOS Simulator,name=iPhone 16" -quiet \
+		-destination "platform=iOS Simulator,name=$(IOS_SIMULATOR)" -quiet \
 		$(IOS_CLOUD_SETTINGS)
 
 ios-clean: ## Clean iOS build artifacts and the copied assets

@@ -49,6 +49,8 @@ targets:
           - "Resources/**"
       - path: Hearth/PrivacyInfo.xcprivacy
         buildPhase: resources
+      # The app icon and the launch colour. Listed here because Resources/ is excluded above.
+      - path: Hearth/Resources/Assets.xcassets
       # The web app's string catalogue for the native screens (ADR 0010), copied in by
       # `make mobile-i18n` as one <code>.json per language. A folder reference, not a group:
       # Strings.swift looks for the files under I18n/ in the bundle, and lists that folder to learn

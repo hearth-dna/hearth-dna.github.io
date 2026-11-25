@@ -135,7 +135,7 @@ run. It reads the same names as `.env.local`, from repository secrets:
 The keystore is written to a temporary file that exists for the length of the job. Without the
 secrets the workflow builds nothing and says which one is missing, so a fork can never run it.
 
-`.github/workflows/ios-release.yml` is the App Store counterpart, on a `macos-15` runner. It runs
+`.github/workflows/ios-release.yml` is the App Store counterpart, on a `macos-26` runner. It runs
 only on a tag or by hand — a macOS minute costs about ten of an ubuntu one — and `upload` is an
 explicit input, so a tag can build and verify without publishing anything.
 
