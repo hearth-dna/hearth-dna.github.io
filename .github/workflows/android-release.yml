@@ -89,6 +89,12 @@ jobs:
             ANDROID_SDK_HOME="$ANDROID_HOME" \
             ANDROID_KEYSTORE_PATH="$HOME/.hearth/hearth-upload.jks"
 
+      # fastlane, for the upload alone; the ubuntu image ships no bundler.
+      - uses: ruby/setup-ruby@v1
+        if: inputs.track != ''
+        with:
+          ruby-version: '3.3'
+
       - name: Upload to Play
         if: inputs.track != ''
         env:
