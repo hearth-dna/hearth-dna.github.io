@@ -45,9 +45,24 @@ make android-publish TRACK=production ROLLOUT=0.1
 the placeholder id. `android-publish` uploads the binary only: the store listing, screenshots and
 description are never touched by a build push, so a routine release cannot overwrite them.
 
-Play publishing needs a service account: Play Console → Users and permissions → API access → create
-a service account in the linked Google Cloud project, grant it release permissions, download the
-JSON, and point `PLAY_SERVICE_ACCOUNT_JSON` at it. Keep that file outside the repository.
+Play publishing needs the app to exist and a service account that may release it:
+
+1. **App.** Play Console → Create app, with `HEARTH_APPLICATION_ID` as the package name. Once it
+   exists, the first bundle can go up through the API like every later one.
+2. **Service account.** In a Google Cloud project of your own, enable the Android Publisher API,
+   create a service account and download a JSON key for it:
+
+   ```bash
+   gcloud services enable androidpublisher.googleapis.com --project <project>
+   gcloud iam service-accounts create android-play-publisher --project <project>
+   gcloud iam service-accounts keys create ~/.hearth/play-service-account.json \
+     --iam-account android-play-publisher@<project>.iam.gserviceaccount.com
+   ```
+
+3. **Access.** Play Console → Users and permissions → Invite new users: the service account's
+   email, this app only, with the two *Releases* permissions. It needs no Google Cloud role.
+
+Point `PLAY_SERVICE_ACCOUNT_JSON` at the key file and keep it outside the repository.
 
 ## App Store
 

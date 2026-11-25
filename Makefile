@@ -280,7 +280,7 @@ android-publish: ## Upload the AAB to Play (TRACK=internal by default)
 	cd $(MOBILE_DIR) && HEARTH_APPLICATION_ID=$(ANDROID_APP_ID) \
 		SUPPLY_JSON_KEY=$(PLAY_SERVICE_ACCOUNT_JSON) \
 		bundle exec fastlane android upload \
-		aab:../$(ANDROID_AAB) track:$(or $(TRACK),internal) $(if $(ROLLOUT),rollout:$(ROLLOUT),)
+		aab:$(abspath $(ANDROID_AAB)) track:$(or $(TRACK),internal) $(if $(ROLLOUT),rollout:$(ROLLOUT),)
 
 IOS_ARCHIVE := $(IOS_DIR)/build/Hearth.xcarchive
 IOS_IPA_DIR := $(IOS_DIR)/build/ipa
@@ -359,7 +359,7 @@ ios-testflight: ## Upload the verified .ipa to TestFlight (macOS)
 	$(call require_var,ASC_KEY_PATH,$(ASC_KEY_PATH))
 	@$(MAKE) ios-verify
 	cd $(MOBILE_DIR) && $(IOS_ASC_ENV) \
-		bundle exec fastlane ios upload_build ipa:../$(IOS_IPA) $(if $(NOTES),changelog:"$(NOTES)",)
+		bundle exec fastlane ios upload_build ipa:$(abspath $(IOS_IPA)) $(if $(NOTES),changelog:"$(NOTES)",)
 
 ios-testflight-status: ## Show the newest build App Store Connect has for this app
 	$(call require_var,ASC_KEY_ID,$(ASC_KEY_ID))
