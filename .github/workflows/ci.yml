@@ -1,7 +1,8 @@
 name: CI
 
 # Tests only. Deployment lives in pages.yml (ADR 0005); nothing here ships bytes anywhere.
-#   - one job on one runner, so checkout/setup happen once;
+#   - the web checks are one job on one runner, so checkout/setup happen once; the phone apps
+#     get a job each (a JDK and a macOS runner), started only when their inputs change;
 #   - a cheap `git diff` decides which areas to test, so a landing-only push does not install npm,
 #     and docs-only PRs never start a runner (paths-ignore below);
 #   - hard timeout so a hung step cannot burn hours;
@@ -37,6 +38,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     if: github.actor != 'dependabot[bot]'
+    outputs:
+      android: ${{ steps.changes.outputs.android }}
+      ios: ${{ steps.changes.outputs.ios }}
     steps:
       - uses: actions/checkout@v7
 
@@ -58,8 +62,13 @@ jobs:
           frontend=false; landing=false
           changed '^(frontend/|kb/|\.github/workflows/)' && frontend=true
           changed '^(landing/|\.github/workflows/)' && landing=true
-          printf 'frontend=%s\nlanding=%s\n' \
-            "$frontend" "$landing" | tee -a "$GITHUB_OUTPUT"
+          # The phone apps take their strings, knowledge base and schema from frontend/, and their
+          # tests open mobile/fixtures/, so a change in any of those re-runs them.
+          android=false; ios=false
+          changed '^(mobile/(android|fixtures)/|frontend/|kb/|Makefile|\.github/workflows/)' && android=true
+          changed '^(mobile/(ios|fixtures)/|frontend/|kb/|Makefile|\.github/workflows/)' && ios=true
+          printf 'frontend=%s\nlanding=%s\nandroid=%s\nios=%s\n' \
+            "$frontend" "$landing" "$android" "$ios" | tee -a "$GITHUB_OUTPUT"
 
       # Frontend tests ------------------------------------------------------------------------
       - uses: actions/setup-node@v7
@@ -86,3 +95,44 @@ jobs:
       - name: Landing pages present
         if: steps.changes.outputs.landing == 'true'
         run: for f in landing/index.html landing/privacy.html landing/terms.html landing/landing.css landing/landing.js landing/sw.js landing/i18n/ru.json; do [ -s "$f" ] || { echo "::error::$f missing"; exit 1; }; done
+
+  # Phone apps. Unit tests only: no signing, no secrets, so they run on pull requests from forks
+  # too. Releases live in android-release.yml and ios-release.yml.
+  android:
+    name: Android tests
+    needs: ci
+    if: needs.ci.outputs.android == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v5
+      - name: Unit tests
+        run: make android-test ANDROID_JAVA_HOME="$JAVA_HOME" ANDROID_SDK_HOME="$ANDROID_HOME"
+
+  ios:
+    name: iOS tests
+    needs: ci
+    if: needs.ci.outputs.ios == 'true'
+    runs-on: macos-26
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      # Node copies the web's strings into the app (frontend/scripts/mobile-i18n.mjs, built-ins only).
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Install xcodegen
+        run: brew install xcodegen
+      - name: Unit tests
+        run: |
+          simulator="$(xcrun simctl list devices available | grep -oE 'iPhone [0-9]+' | sort -u | tail -n 1)"
+          # Not -quiet: a failing assertion's message is the part worth reading. The filter keeps
+          # the log to test results rather than every compiler invocation.
+          set -o pipefail
+          make ios-test IOS_SIMULATOR="$simulator" IOS_TEST_FLAGS= \
+            | grep -E "error|Test Case|Test Suite|Executed|\*\* TEST|Failing tests|^\s+[A-Za-z]+Tests\."

@@ -2,7 +2,7 @@
 
 The phone apps show **Google Drive**, **Dropbox** and (iPhone) **iCloud Drive** buttons in
 Settings → Backup only when the build was configured for them (ADR 0009). Everything below is
-per deployment and lives in the gitignored root `.env`; nothing here is committed. `make
+per deployment and lives in the gitignored root `.env.local`; nothing here is committed. `make
 mobile-secrets` shows which are set.
 
 ## Google Drive

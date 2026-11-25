@@ -1,7 +1,7 @@
 # Local development
 
 ```bash
-cp .env.example .env         # only needed for store uploads; nothing required locally
+cp .env.example .env.local   # only needed for store uploads; nothing required locally
 make frontend-install
 make dev                     # Vite in the background, opens the app
 make dev-stop
