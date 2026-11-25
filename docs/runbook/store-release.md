@@ -80,8 +80,10 @@ Needs macOS with Xcode, plus `xcodegen` and `bundle install` in `mobile/`.
    `ASC_ISSUER_ID`. Never an Apple ID: 2FA makes that path unscriptable, and a key can be revoked
    without touching the account password.
 4. **Distribution certificate.** Xcode → Settings → Accounts → Manage Certificates → Apple
-   Distribution. `make ios-ipa` passes `-allowProvisioningUpdates` with the API key, so the
-   provisioning profile is created for you on first use — no profile to download or commit.
+   Distribution. On a Mac signed in to Xcode, `make ios-ipa` then signs automatically. With only
+   an API key that works for an *Admin* key alone, because the export asks Apple for a
+   cloud-managed certificate; with an App Manager key, create an *App Store* provisioning
+   profile for the app id and set `IOS_EXPORT_PROFILE` to its name, which is what CI does.
 
    Without a Mac the same certificate is made with `openssl`, which is all CI needs: generate a
    key and a signing request, upload the request under Certificates → + → Apple Distribution (or

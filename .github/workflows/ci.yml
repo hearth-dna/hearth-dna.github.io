@@ -131,4 +131,8 @@ jobs:
       - name: Unit tests
         run: |
           simulator="$(xcrun simctl list devices available | grep -oE 'iPhone [0-9]+' | sort -u | tail -n 1)"
-          make ios-test IOS_SIMULATOR="$simulator"
+          # Not -quiet: a failing assertion's message is the part worth reading. The filter keeps
+          # the log to test results rather than every compiler invocation.
+          set -o pipefail
+          make ios-test IOS_SIMULATOR="$simulator" IOS_TEST_FLAGS= \
+            | grep -E "error|Test Case|Test Suite|Executed|\*\* TEST|Failing tests|^\s+[A-Za-z]+Tests\."
