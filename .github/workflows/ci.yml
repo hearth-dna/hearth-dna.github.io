@@ -122,6 +122,10 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7
+      # Node copies the web's strings into the app (frontend/scripts/mobile-i18n.mjs, built-ins only).
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
       - name: Install xcodegen
         run: brew install xcodegen
       - name: Unit tests

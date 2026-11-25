@@ -209,7 +209,7 @@ ios-build: mobile-assets ios-generate ## Build and run the app on a simulator (m
 		-destination "platform=iOS Simulator,name=$(IOS_SIMULATOR)" -quiet \
 		$(IOS_CLOUD_SETTINGS)
 
-ios-test: ios-generate ## Run the iOS unit tests on a simulator (macOS)
+ios-test: mobile-assets ios-generate ## Run the iOS unit tests on a simulator (macOS)
 	$(call require_macos,ios-test)
 	xcodebuild test -project $(IOS_DIR)/Hearth.xcodeproj -scheme Hearth \
 		-destination "platform=iOS Simulator,name=$(IOS_SIMULATOR)" -quiet \
