@@ -130,10 +130,10 @@ IOS_CLOUD_SETTINGS = HEARTH_GOOGLE_IOS_CLIENT_ID=$(HEARTH_GOOGLE_IOS_CLIENT_ID) 
 # visible to every process on the machine in `ps`, while /proc/<pid>/environ is readable only by
 # its owner.
 ANDROID_RELEASE_ENV = HEARTH_APPLICATION_ID=$(ANDROID_APP_ID) $(CLOUD_ENV) \
-	RELEASE_KEYSTORE_PATH=$(ANDROID_KEYSTORE_PATH) \
-	RELEASE_KEYSTORE_PASSWORD=$(ANDROID_KEYSTORE_PASSWORD) \
-	RELEASE_KEY_ALIAS=$(ANDROID_KEY_ALIAS) \
-	RELEASE_KEY_PASSWORD=$(ANDROID_KEY_PASSWORD)
+	HEARTH_RELEASE_KEYSTORE_PATH=$(ANDROID_KEYSTORE_PATH) \
+	HEARTH_RELEASE_KEYSTORE_PASSWORD=$(ANDROID_KEYSTORE_PASSWORD) \
+	HEARTH_RELEASE_KEY_ALIAS=$(ANDROID_KEY_ALIAS) \
+	HEARTH_RELEASE_KEY_PASSWORD=$(ANDROID_KEY_PASSWORD)
 
 # adb refuses to guess when more than one transport is attached, and an emulator that died leaves an
 # `offline` one behind that still counts. Pick the single device that is actually online, or the one
