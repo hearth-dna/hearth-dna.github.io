@@ -112,6 +112,9 @@ APPLE_TEAM_ID ?= $(call dotenv,APPLE_TEAM_ID)
 ASC_KEY_ID ?= $(call dotenv,ASC_KEY_ID)
 ASC_ISSUER_ID ?= $(call dotenv,ASC_ISSUER_ID)
 ASC_KEY_PATH ?= $(call dotenv,ASC_KEY_PATH)
+# Name of an installed App Store provisioning profile. Set, the export signs manually with it and
+# the Apple Distribution certificate in the keychain (CI); unset, Xcode signs automatically.
+IOS_EXPORT_PROFILE ?= $(call dotenv,IOS_EXPORT_PROFILE)
 # Cloud backup buttons (docs/runbook/cloud-backups.md). Unset means the button is not offered.
 HEARTH_GOOGLE_DRIVE ?= $(call dotenv,HEARTH_GOOGLE_DRIVE)
 HEARTH_DROPBOX_APP_KEY ?= $(call dotenv,HEARTH_DROPBOX_APP_KEY)
@@ -314,9 +317,17 @@ ios-archive: _ios-release-ready mobile-assets ios-generate ## Archive the app fo
 # ExportOptions.plist is written here, not committed: its teamID is an account identifier.
 ios-ipa: ios-archive ## Export a signed .ipa from the archive, then verify it (macOS)
 	@sed 's/__TEAM_ID__/$(APPLE_TEAM_ID)/' $(IOS_DIR)/ExportOptions.plist.example > $(IOS_DIR)/ExportOptions.plist
+	@# Automatic export signing asks Apple for a cloud-managed certificate, which only an Admin API
+	@# key may use. A named profile keeps the key at App Manager.
+	@if [ -n "$(IOS_EXPORT_PROFILE)" ]; then \
+		pb() { /usr/libexec/PlistBuddy -c "$$1" $(IOS_DIR)/ExportOptions.plist; }; \
+		pb "Set :signingStyle manual" && pb "Add :signingCertificate string Apple Distribution" && \
+		pb "Add :provisioningProfiles dict" && \
+		pb "Add :provisioningProfiles:$(HEARTH_APPLICATION_ID) string $(IOS_EXPORT_PROFILE)"; \
+	fi
 	xcodebuild -exportArchive -archivePath $(IOS_ARCHIVE) \
 		-exportOptionsPlist $(IOS_DIR)/ExportOptions.plist -exportPath $(IOS_IPA_DIR) \
-		$(IOS_AUTH_ARGS) -allowProvisioningUpdates
+		$(if $(IOS_EXPORT_PROFILE),,$(IOS_AUTH_ARGS) -allowProvisioningUpdates)
 	@$(MAKE) ios-verify
 
 ios-verify: ## Check the built .ipa before it goes anywhere near App Store Connect (macOS)

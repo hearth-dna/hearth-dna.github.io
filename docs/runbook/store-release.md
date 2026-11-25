@@ -144,8 +144,13 @@ explicit input, so a tag can build and verify without publishing anything.
 | `HEARTH_APPLICATION_ID`, `APPLE_TEAM_ID` | as in `.env.local` |
 | `IOS_DIST_CERT_BASE64` | the Apple Distribution certificate and private key, exported from Keychain Access as `.p12`, then `base64 -i cert.p12 \| pbcopy` |
 | `IOS_DIST_CERT_PASSWORD` | the password you set on that `.p12` |
+| `IOS_PROFILE_BASE64` | an *App Store* provisioning profile for the app id and that certificate (Profiles → +, or `POST /v1/profiles`), base64 of the `.mobileprovision` |
 | `ASC_KEY_ID`, `ASC_ISSUER_ID` | as in `.env.local` |
 | `ASC_KEY_BASE64` | `base64 -i AuthKey_XXXX.p8 \| pbcopy` |
+
+The export signs manually with that certificate and profile. Xcode's automatic export signing
+would ask Apple for a cloud-managed certificate instead, which needs an *Admin* API key; this way
+the key stays at App Manager. Both expire after a year and are replaced together.
 
 The certificate is imported into a **throwaway keychain** created for the job and deleted in an
 `always()` step, and the `.p8` is written to `$RUNNER_TEMP` and removed with it — neither touches

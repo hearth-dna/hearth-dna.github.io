@@ -38,13 +38,14 @@ jobs:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           IOS_DIST_CERT_BASE64: ${{ secrets.IOS_DIST_CERT_BASE64 }}
           IOS_DIST_CERT_PASSWORD: ${{ secrets.IOS_DIST_CERT_PASSWORD }}
+          IOS_PROFILE_BASE64: ${{ secrets.IOS_PROFILE_BASE64 }}
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
           ASC_KEY_BASE64: ${{ secrets.ASC_KEY_BASE64 }}
         run: |
           missing=""
-          for name in HEARTH_APPLICATION_ID APPLE_TEAM_ID IOS_DIST_CERT_BASE64 \
-                      IOS_DIST_CERT_PASSWORD ASC_KEY_ID ASC_ISSUER_ID ASC_KEY_BASE64; do
+          for name in HEARTH_APPLICATION_ID APPLE_TEAM_ID IOS_DIST_CERT_BASE64 IOS_DIST_CERT_PASSWORD \
+                      IOS_PROFILE_BASE64 ASC_KEY_ID ASC_ISSUER_ID ASC_KEY_BASE64; do
             eval "value=\$$name"
             [ -n "$value" ] || missing="$missing $name"
           done
@@ -86,6 +87,24 @@ jobs:
           # hangs until the timeout.
           security set-key-partition-list -S apple-tool:,apple: -s -k "$password" "$keychain" >/dev/null
           security list-keychains -d user -s "$keychain" $(security list-keychains -d user | tr -d '"')
+
+      # The App Store profile the export signs with. Its name goes to `make ios-ipa` through the
+      # environment; both come out of the profile itself, so there is nothing else to configure.
+      - name: Install the provisioning profile
+        env:
+          IOS_PROFILE_BASE64: ${{ secrets.IOS_PROFILE_BASE64 }}
+        run: |
+          profile="$RUNNER_TEMP/hearth.mobileprovision"
+          printf '%s' "$IOS_PROFILE_BASE64" | base64 -d > "$profile"
+          security cms -D -i "$profile" > "$RUNNER_TEMP/profile.plist"
+          uuid="$(/usr/libexec/PlistBuddy -c 'Print :UUID' "$RUNNER_TEMP/profile.plist")"
+          name="$(/usr/libexec/PlistBuddy -c 'Print :Name' "$RUNNER_TEMP/profile.plist")"
+          for dir in "$HOME/Library/MobileDevice/Provisioning Profiles" \
+                     "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles"; do
+            mkdir -p "$dir" && cp "$profile" "$dir/$uuid.mobileprovision"
+          done
+          rm -f "$profile" "$RUNNER_TEMP/profile.plist"
+          echo "IOS_EXPORT_PROFILE=$name" >> "$GITHUB_ENV"
 
       - name: Write the App Store Connect API key
         env:
