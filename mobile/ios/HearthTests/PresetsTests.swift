@@ -39,17 +39,17 @@ final class PresetsTests: XCTestCase {
         )
     }
 
-    private let name = { (key: String) in "T(\(key))" }
+    private let translated = { (key: String) in "T(\(key))" }
 
     func testNamesAnEntryByItsPresetInTheUILanguageWhateverNameItWasSavedUnder() {
-        XCTAssertEqual(HealthPresets.entryTitle(entry(.symptom, "Headache"), name), "T(preset.headache)")
-        XCTAssertEqual(HealthPresets.entryTitle(entry(.symptom, "  ГОЛОВНАЯ боль "), name), "T(preset.headache)")
-        XCTAssertEqual(HealthPresets.entryTitle(entry(.symptom, "Eye irritation"), name), "T(preset.eye-irritation)")
-        XCTAssertEqual(HealthPresets.entryTitle(entry(.measurement, "вес"), name), "T(preset.weight)")
-        XCTAssertEqual(HealthPresets.entryTitle(entry(.symptom, "Injury"), name), "T(preset.injury)")
+        XCTAssertEqual(HealthPresets.entryTitle(entry(.symptom, "Headache"), translated), "T(preset.headache)")
+        XCTAssertEqual(HealthPresets.entryTitle(entry(.symptom, "  ГОЛОВНАЯ боль "), translated), "T(preset.headache)")
+        XCTAssertEqual(HealthPresets.entryTitle(entry(.symptom, "Eye irritation"), translated), "T(preset.eye-irritation)")
+        XCTAssertEqual(HealthPresets.entryTitle(entry(.measurement, "вес"), translated), "T(preset.weight)")
+        XCTAssertEqual(HealthPresets.entryTitle(entry(.symptom, "Injury"), translated), "T(preset.injury)")
         // Another kind's preset does not claim the entry, and an unknown title stays as typed.
-        XCTAssertEqual(HealthPresets.entryTitle(entry(.other, "Headache"), name), "Headache")
-        XCTAssertEqual(HealthPresets.entryTitle(entry(.symptom, "Knee clicks"), name), "Knee clicks")
+        XCTAssertEqual(HealthPresets.entryTitle(entry(.other, "Headache"), translated), "Headache")
+        XCTAssertEqual(HealthPresets.entryTitle(entry(.symptom, "Knee clicks"), translated), "Knee clicks")
         XCTAssertNil(HealthPresets.presetOf(kind: .symptom, title: ""))
     }
 
