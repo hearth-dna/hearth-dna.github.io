@@ -242,16 +242,22 @@ final class RestoreTests: XCTestCase {
         try assertTables(repo.db, match: journal(), file: file, line: line)
     }
 
-    /// Every table the journal fills, row for row and column for column. Health rows the file wrote
-    /// without some columns (an older export) are expected with the web's defaults.
+    /// Every table the journal fills, row for row and column for column. Rows the file wrote without
+    /// the later columns (an older export) are expected with the web's defaults.
     private func assertTables(
         _ db: Db, match journal: [String: JSONValue], file: StaticString = #filePath, line: UInt = #line
     ) throws {
         let healthDefaults: [String: JSONValue] = [
             "time": .string(""), "source": .string(""), "body_part": .string(""), "severity": .null,
             "tags": .string(""), "value": .null, "value2": .null, "unit": .string(""),
+            "side": .string(""), "analyte": .string(""), "ref_low": .null, "ref_high": .null,
+            "flag": .string(""), "value_text": .string(""), "conditions": .string(""), "details": .string(""),
         ]
-        XCTAssertEqual(try rows(db, "SELECT * FROM person ORDER BY id"), expected(journal, "persons"), file: file, line: line)
+        XCTAssertEqual(
+            try rows(db, "SELECT * FROM person ORDER BY id"),
+            expected(journal, "persons").map { $0.merging(["birth_date": .string("")]) { present, _ in present } },
+            file: file, line: line
+        )
         XCTAssertEqual(
             try rows(db, "SELECT parent_id AS parentId, child_id AS childId FROM relationship ORDER BY parent_id, child_id"),
             expected(journal, "relationships"),

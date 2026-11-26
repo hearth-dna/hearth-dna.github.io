@@ -17,7 +17,9 @@ help: ## Show this help message
 
 # Shared
 # ======
-# Values resolve in order: an already-exported shell var, then root .env (same idiom as ../sentio).
+# Values resolve in order: an already-exported shell var, then root .env.local, then root .env.
+# Both files are gitignored. .env.local is where the publishing secrets go.
+dotenv = $(shell grep -hs '^$(1)=' .env.local .env | head -n 1 | cut -d= -f2-)
 
 test: frontend-test ## Run every test suite (Vitest)
 
@@ -97,27 +99,30 @@ ANDROID_SDK_HOME ?= $(HOME)/Android/Sdk
 GRADLE = JAVA_HOME=$(ANDROID_JAVA_HOME) ANDROID_HOME=$(ANDROID_SDK_HOME) ./gradlew
 
 # Publishing inputs. Every one of them resolves from an exported shell variable first, then the
-# gitignored root .env — never from a committed file (docs/runbook/store-release.md). The apps
+# gitignored root .env.local or .env — never from a committed file (docs/runbook/store-release.md). The apps
 # build and run without any of them; only the store targets require them, and they say which one
 # is missing rather than failing inside Gradle or fastlane.
-HEARTH_APPLICATION_ID ?= $(shell grep -s '^HEARTH_APPLICATION_ID=' .env | cut -d= -f2-)
+HEARTH_APPLICATION_ID ?= $(call dotenv,HEARTH_APPLICATION_ID)
 # The committed placeholder, used for every debug build. `.example` is the reserved TLD.
 ANDROID_APP_ID := $(or $(HEARTH_APPLICATION_ID),example.hearth.app)
-ANDROID_KEYSTORE_PATH ?= $(or $(shell grep -s '^ANDROID_KEYSTORE_PATH=' .env | cut -d= -f2-),$(HOME)/.hearth/hearth-upload.jks)
-ANDROID_KEYSTORE_PASSWORD ?= $(shell grep -s '^ANDROID_KEYSTORE_PASSWORD=' .env | cut -d= -f2-)
-ANDROID_KEY_ALIAS ?= $(or $(shell grep -s '^ANDROID_KEY_ALIAS=' .env | cut -d= -f2-),upload)
-ANDROID_KEY_PASSWORD ?= $(or $(shell grep -s '^ANDROID_KEY_PASSWORD=' .env | cut -d= -f2-),$(ANDROID_KEYSTORE_PASSWORD))
-PLAY_SERVICE_ACCOUNT_JSON ?= $(shell grep -s '^PLAY_SERVICE_ACCOUNT_JSON=' .env | cut -d= -f2-)
-APPLE_TEAM_ID ?= $(shell grep -s '^APPLE_TEAM_ID=' .env | cut -d= -f2-)
-ASC_KEY_ID ?= $(shell grep -s '^ASC_KEY_ID=' .env | cut -d= -f2-)
-ASC_ISSUER_ID ?= $(shell grep -s '^ASC_ISSUER_ID=' .env | cut -d= -f2-)
-ASC_KEY_PATH ?= $(shell grep -s '^ASC_KEY_PATH=' .env | cut -d= -f2-)
+ANDROID_KEYSTORE_PATH ?= $(or $(call dotenv,ANDROID_KEYSTORE_PATH),$(HOME)/.hearth/hearth-upload.jks)
+ANDROID_KEYSTORE_PASSWORD ?= $(call dotenv,ANDROID_KEYSTORE_PASSWORD)
+ANDROID_KEY_ALIAS ?= $(or $(call dotenv,ANDROID_KEY_ALIAS),upload)
+ANDROID_KEY_PASSWORD ?= $(or $(call dotenv,ANDROID_KEY_PASSWORD),$(ANDROID_KEYSTORE_PASSWORD))
+PLAY_SERVICE_ACCOUNT_JSON ?= $(call dotenv,PLAY_SERVICE_ACCOUNT_JSON)
+APPLE_TEAM_ID ?= $(call dotenv,APPLE_TEAM_ID)
+ASC_KEY_ID ?= $(call dotenv,ASC_KEY_ID)
+ASC_ISSUER_ID ?= $(call dotenv,ASC_ISSUER_ID)
+ASC_KEY_PATH ?= $(call dotenv,ASC_KEY_PATH)
+# Name of an installed App Store provisioning profile. Set, the export signs manually with it and
+# the Apple Distribution certificate in the keychain (CI); unset, Xcode signs automatically.
+IOS_EXPORT_PROFILE ?= $(call dotenv,IOS_EXPORT_PROFILE)
 # Cloud backup buttons (docs/runbook/cloud-backups.md). Unset means the button is not offered.
-HEARTH_GOOGLE_DRIVE ?= $(shell grep -s '^HEARTH_GOOGLE_DRIVE=' .env | cut -d= -f2-)
-HEARTH_DROPBOX_APP_KEY ?= $(shell grep -s '^HEARTH_DROPBOX_APP_KEY=' .env | cut -d= -f2-)
+HEARTH_GOOGLE_DRIVE ?= $(call dotenv,HEARTH_GOOGLE_DRIVE)
+HEARTH_DROPBOX_APP_KEY ?= $(call dotenv,HEARTH_DROPBOX_APP_KEY)
 # Where the source code is published, shown in Settings (AGPL-3.0). Required to publish.
-HEARTH_SOURCE_URL ?= $(shell grep -s '^HEARTH_SOURCE_URL=' .env | cut -d= -f2-)
-HEARTH_GOOGLE_IOS_CLIENT_ID ?= $(shell grep -s '^HEARTH_GOOGLE_IOS_CLIENT_ID=' .env | cut -d= -f2-)
+HEARTH_SOURCE_URL ?= $(call dotenv,HEARTH_SOURCE_URL)
+HEARTH_GOOGLE_IOS_CLIENT_ID ?= $(call dotenv,HEARTH_GOOGLE_IOS_CLIENT_ID)
 CLOUD_ENV = HEARTH_GOOGLE_DRIVE=$(HEARTH_GOOGLE_DRIVE) HEARTH_DROPBOX_APP_KEY=$(HEARTH_DROPBOX_APP_KEY) HEARTH_SOURCE_URL=$(HEARTH_SOURCE_URL)
 # The same two for xcodebuild, as build settings that Info.plist reads.
 IOS_CLOUD_SETTINGS = HEARTH_GOOGLE_IOS_CLIENT_ID=$(HEARTH_GOOGLE_IOS_CLIENT_ID) HEARTH_DROPBOX_APP_KEY=$(HEARTH_DROPBOX_APP_KEY) \
@@ -127,10 +132,10 @@ IOS_CLOUD_SETTINGS = HEARTH_GOOGLE_IOS_CLIENT_ID=$(HEARTH_GOOGLE_IOS_CLIENT_ID) 
 # visible to every process on the machine in `ps`, while /proc/<pid>/environ is readable only by
 # its owner.
 ANDROID_RELEASE_ENV = HEARTH_APPLICATION_ID=$(ANDROID_APP_ID) $(CLOUD_ENV) \
-	RELEASE_KEYSTORE_PATH=$(ANDROID_KEYSTORE_PATH) \
-	RELEASE_KEYSTORE_PASSWORD=$(ANDROID_KEYSTORE_PASSWORD) \
-	RELEASE_KEY_ALIAS=$(ANDROID_KEY_ALIAS) \
-	RELEASE_KEY_PASSWORD=$(ANDROID_KEY_PASSWORD)
+	HEARTH_RELEASE_KEYSTORE_PATH=$(ANDROID_KEYSTORE_PATH) \
+	HEARTH_RELEASE_KEYSTORE_PASSWORD=$(ANDROID_KEYSTORE_PASSWORD) \
+	HEARTH_RELEASE_KEY_ALIAS=$(ANDROID_KEY_ALIAS) \
+	HEARTH_RELEASE_KEY_PASSWORD=$(ANDROID_KEY_PASSWORD)
 
 # adb refuses to guess when more than one transport is attached, and an emulator that died leaves an
 # `offline` one behind that still counts. Pick the single device that is actually online, or the one
@@ -197,6 +202,11 @@ endef
 
 ios: ios-build ## Alias for ios-build
 
+# The simulator the build and the tests run on. CI picks one its Xcode has.
+IOS_SIMULATOR ?= iPhone 16
+# -quiet hides the assertion text of a failing test; CI clears it.
+IOS_TEST_FLAGS ?= -quiet
+
 ios-generate: ## Regenerate mobile/ios/Hearth.xcodeproj from project.yml (macOS)
 	$(call require_macos,ios-generate)
 	@command -v xcodegen >/dev/null 2>&1 || { echo "Error: xcodegen not found (brew install xcodegen)"; exit 1; }
@@ -205,13 +215,13 @@ ios-generate: ## Regenerate mobile/ios/Hearth.xcodeproj from project.yml (macOS)
 ios-build: mobile-assets ios-generate ## Build and run the app on a simulator (macOS)
 	$(call require_macos,ios-build)
 	xcodebuild build -project $(IOS_DIR)/Hearth.xcodeproj -scheme Hearth \
-		-destination "platform=iOS Simulator,name=iPhone 16" -quiet \
+		-destination "platform=iOS Simulator,name=$(IOS_SIMULATOR)" -quiet \
 		$(IOS_CLOUD_SETTINGS)
 
-ios-test: ios-generate ## Run the iOS unit tests on a simulator (macOS)
+ios-test: mobile-assets ios-generate ## Run the iOS unit tests on a simulator (macOS)
 	$(call require_macos,ios-test)
 	xcodebuild test -project $(IOS_DIR)/Hearth.xcodeproj -scheme Hearth \
-		-destination "platform=iOS Simulator,name=iPhone 16" -quiet \
+		-destination "platform=iOS Simulator,name=$(IOS_SIMULATOR)" $(IOS_TEST_FLAGS) \
 		$(IOS_CLOUD_SETTINGS)
 
 ios-clean: ## Clean iOS build artifacts and the copied assets
@@ -285,7 +295,7 @@ android-publish: ## Upload the AAB to Play (TRACK=internal by default)
 	cd $(MOBILE_DIR) && HEARTH_APPLICATION_ID=$(ANDROID_APP_ID) \
 		SUPPLY_JSON_KEY=$(PLAY_SERVICE_ACCOUNT_JSON) \
 		bundle exec fastlane android upload \
-		aab:../$(ANDROID_AAB) track:$(or $(TRACK),internal) $(if $(ROLLOUT),rollout:$(ROLLOUT),)
+		aab:$(abspath $(ANDROID_AAB)) track:$(or $(TRACK),internal) $(if $(ROLLOUT),rollout:$(ROLLOUT),)
 
 IOS_ARCHIVE := $(IOS_DIR)/build/Hearth.xcarchive
 IOS_IPA_DIR := $(IOS_DIR)/build/ipa
@@ -319,9 +329,17 @@ ios-archive: _ios-release-ready mobile-assets ios-generate ## Archive the app fo
 # ExportOptions.plist is written here, not committed: its teamID is an account identifier.
 ios-ipa: ios-archive ## Export a signed .ipa from the archive, then verify it (macOS)
 	@sed 's/__TEAM_ID__/$(APPLE_TEAM_ID)/' $(IOS_DIR)/ExportOptions.plist.example > $(IOS_DIR)/ExportOptions.plist
+	@# Automatic export signing asks Apple for a cloud-managed certificate, which only an Admin API
+	@# key may use. A named profile keeps the key at App Manager.
+	@if [ -n "$(IOS_EXPORT_PROFILE)" ]; then \
+		pb() { /usr/libexec/PlistBuddy -c "$$1" $(IOS_DIR)/ExportOptions.plist; }; \
+		pb "Set :signingStyle manual" && pb "Add :signingCertificate string Apple Distribution" && \
+		pb "Add :provisioningProfiles dict" && \
+		pb "Add :provisioningProfiles:$(HEARTH_APPLICATION_ID) string $(IOS_EXPORT_PROFILE)"; \
+	fi
 	xcodebuild -exportArchive -archivePath $(IOS_ARCHIVE) \
 		-exportOptionsPlist $(IOS_DIR)/ExportOptions.plist -exportPath $(IOS_IPA_DIR) \
-		$(IOS_AUTH_ARGS) -allowProvisioningUpdates
+		$(if $(IOS_EXPORT_PROFILE),,$(IOS_AUTH_ARGS) -allowProvisioningUpdates)
 	@$(MAKE) ios-verify
 
 ios-verify: ## Check the built .ipa before it goes anywhere near App Store Connect (macOS)
@@ -364,7 +382,7 @@ ios-testflight: ## Upload the verified .ipa to TestFlight (macOS)
 	$(call require_var,ASC_KEY_PATH,$(ASC_KEY_PATH))
 	@$(MAKE) ios-verify
 	cd $(MOBILE_DIR) && $(IOS_ASC_ENV) \
-		bundle exec fastlane ios upload_build ipa:../$(IOS_IPA) $(if $(NOTES),changelog:"$(NOTES)",)
+		bundle exec fastlane ios upload_build ipa:$(abspath $(IOS_IPA)) $(if $(NOTES),changelog:"$(NOTES)",)
 
 # The version of record, from the checkout: the build submitted is the one this commit uploaded.
 IOS_PROJECT_VERSION = $(shell sed -n 's/^ *$(1): *"\{0,1\}\([^"]*\)"\{0,1\}$$/\1/p' $(IOS_DIR)/project.yml | head -1)
@@ -385,7 +403,7 @@ ios-testflight-status: ## Show the newest build App Store Connect has for this a
 	cd $(MOBILE_DIR) && $(IOS_ASC_ENV) bundle exec fastlane ios status
 
 mobile-secrets: ## Show which publishing inputs are set (names and status only, never values)
-	@echo "Publishing inputs (docs/runbook/store-release.md). Values live in .env, never in git."
+	@echo "Publishing inputs (docs/runbook/store-release.md). Values live in .env.local, never in git."
 	@printf '  %-28s %s\n' "HEARTH_APPLICATION_ID" "$(if $(HEARTH_APPLICATION_ID),set,MISSING - using placeholder $(ANDROID_APP_ID))"
 	@printf '  %-28s %s\n' "ANDROID_KEYSTORE_PATH" "$(if $(wildcard $(ANDROID_KEYSTORE_PATH)),found at $(ANDROID_KEYSTORE_PATH),MISSING - run make android-keystore)"
 	@printf '  %-28s %s\n' "ANDROID_KEYSTORE_PASSWORD" "$(if $(ANDROID_KEYSTORE_PASSWORD),set,MISSING)"

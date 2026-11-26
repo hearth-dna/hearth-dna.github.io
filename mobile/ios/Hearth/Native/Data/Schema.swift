@@ -63,6 +63,7 @@ CREATE TABLE IF NOT EXISTS chat (
 CREATE TABLE IF NOT EXISTS sharing_log (
   id INTEGER PRIMARY KEY, kind TEXT NOT NULL, destination TEXT NOT NULL, payload TEXT NOT NULL, created_at TEXT NOT NULL
 );
+
 """
 
 /// person columns added after the native apps first shipped; db.ts adds the same ones.

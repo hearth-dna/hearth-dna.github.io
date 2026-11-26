@@ -1090,6 +1090,7 @@
   "native.pickGenomes": "请在“恢复备份…”中同时选择 genomes 文件夹里的所有文件和备份文件，或在“加载 DNA 文件…”中单独选择这些文件。",
   "native.notUsed": "未使用：{files}。这部手机上没有人拥有这份 DNA：请在“恢复备份…”中同时选择这些文件和备份文件。",
   "native.repairTitle": "这部手机上的数据已损坏",
+  "native.version": "Hearth {version} ({build})",
   "backupCard.fileName": "备份文件名",
   "backupCard.fileNameHint": "共享此文件夹的每台设备上都相同：它们都读写这一个文件。",
   "bodyMap.title": "身体上的健康记录",

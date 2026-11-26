@@ -14,11 +14,13 @@ val versionProps = Properties().apply {
 // credentials. A -P property wins over an environment variable, and nothing is ever read from a
 // committed gradle.properties — this repository is public, so a keystore password has no file here
 // it could live in. `make` fills these from the gitignored root .env; CI fills them from secrets.
+// Every name carries the HEARTH_ prefix: a generic one would also match another project's signing
+// settings in the machine-wide ~/.gradle/gradle.properties, and sign this app with that key.
 fun buildProp(name: String): String? =
     (project.findProperty(name) as String?)?.takeIf { it.isNotBlank() }
         ?: System.getenv(name)?.takeIf { it.isNotBlank() }
 
-val releaseKeystoreFile: File? = buildProp("RELEASE_KEYSTORE_PATH")?.let { path ->
+val releaseKeystoreFile: File? = buildProp("HEARTH_RELEASE_KEYSTORE_PATH")?.let { path ->
     listOf(file(path), rootProject.file(path)).firstOrNull { it.exists() }
 }
 
@@ -73,9 +75,9 @@ android {
         if (releaseKeystoreFile != null) {
             create("release") {
                 storeFile = releaseKeystoreFile
-                storePassword = buildProp("RELEASE_KEYSTORE_PASSWORD")
-                keyAlias = buildProp("RELEASE_KEY_ALIAS")
-                keyPassword = buildProp("RELEASE_KEY_PASSWORD")
+                storePassword = buildProp("HEARTH_RELEASE_KEYSTORE_PASSWORD")
+                keyAlias = buildProp("HEARTH_RELEASE_KEY_ALIAS")
+                keyPassword = buildProp("HEARTH_RELEASE_KEY_PASSWORD")
             }
         }
     }

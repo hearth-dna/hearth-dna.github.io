@@ -4,8 +4,7 @@ name: Android release
 # repository secrets (docs/runbook/store-release.md); none of them exists in the repository, so a
 # fork running this workflow builds nothing and uploads nothing.
 #
-# iOS has no counterpart here on purpose: it needs a macOS runner holding a signing certificate,
-# which is a larger trust decision than this project has made. Run `make ios-testflight` from a Mac.
+# The App Store counterpart is ios-release.yml.
 on:
   push:
     tags: ['v*']
@@ -89,6 +88,12 @@ jobs:
             ANDROID_JAVA_HOME="$JAVA_HOME" \
             ANDROID_SDK_HOME="$ANDROID_HOME" \
             ANDROID_KEYSTORE_PATH="$HOME/.hearth/hearth-upload.jks"
+
+      # fastlane, for the upload alone; the ubuntu image ships no bundler.
+      - uses: ruby/setup-ruby@v1
+        if: inputs.track != ''
+        with:
+          ruby-version: '3.3'
 
       - name: Upload to Play
         if: inputs.track != ''

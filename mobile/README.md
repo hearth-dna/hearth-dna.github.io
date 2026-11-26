@@ -60,7 +60,7 @@ make ios-testflight   # upload; make ios-testflight-status asks Apple how it is 
 Nothing in this directory holds a key, a password, a team identifier, an account id or even the
 published app id. `example.hearth.app` is a placeholder — `.example` is the reserved TLD, so it can
 never collide with a real listing — and the real identity arrives in `HEARTH_APPLICATION_ID` from
-the gitignored root `.env` or a CI secret, like every other publishing input. Every publish target
+the gitignored root `.env.local` or a CI secret, like every other publishing input. Every publish target
 refuses the placeholder.
 
 Set the real id **before the first upload to either store**: Play and App Store Connect fix the

@@ -42,7 +42,7 @@ func stampTime(_ iso: String) -> String {
 }
 
 /// Runs `work` on a background queue and hands its result back on the main one.
-private func background<T>(_ work: @escaping () throws -> T, done: @escaping (Result<T, Error>) -> Void) {
+private func inBackground<T>(_ work: @escaping () throws -> T, done: @escaping (Result<T, Error>) -> Void) {
     DispatchQueue.global(qos: .userInitiated).async {
         let result = Result { try work() }
         DispatchQueue.main.async { done(result) }
@@ -132,12 +132,13 @@ struct SettingsScreen: View {
                 consentsSection
                 sharingSection
                 eraseSection
-                if let link = sourceLink {
-                    Section {
+                Section {
+                    Text(version).foregroundStyle(.secondary)
+                    if let link = sourceLink {
                         Link(t("settingsPage.source"), destination: link)
-                    } header: {
-                        Text(t("settingsPage.about"))
                     }
+                } header: {
+                    Text(t("settingsPage.about"))
                 }
             }
             .navigationTitle(t("settingsPage.title"))
@@ -248,7 +249,7 @@ struct SettingsScreen: View {
         busy = t("settingsPage.buildingDump")
         let pass = dumpPass.isEmpty ? nil : dumpPass
         let repo = self.repo
-        background({ try SnapshotWriter.bytes(repo, appVersion: Backups.appVersion, passphrase: pass) }) { result in
+        inBackground({ try SnapshotWriter.bytes(repo, appVersion: Backups.appVersion, passphrase: pass) }) { result in
             busy = nil
             switch result {
             case .success(let data):
@@ -587,7 +588,7 @@ struct SettingsScreen: View {
         let kb = self.kb
         let format = self.format
         let shared = sharedOnly
-        background({ () throws -> (Data, Int) in
+        inBackground({ () throws -> (Data, Int) in
             let persons = try repo.persons()
             let table: Table
             switch what {
@@ -725,9 +726,15 @@ struct SettingsScreen: View {
     private func checkDatabase() {
         dbCheck = .checking
         let db = repo.db
-        background({ db.check() }) { ok in
+        inBackground({ db.check() }) { ok in
             if case .success(true) = ok { dbCheck = .intact } else { dbCheck = nil }
         }
+    }
+
+    /// The version and build this is (MARKETING_VERSION and CURRENT_PROJECT_VERSION in project.yml).
+    private var version: String {
+        let info = { (key: String) in Bundle.main.object(forInfoDictionaryKey: key) as? String ?? "" }
+        return t("native.version", ["version": info("CFBundleShortVersionString"), "build": info("CFBundleVersion")])
     }
 
     /// The source code link (AGPL-3.0): its address comes from the build (HEARTH_SOURCE_URL), none in a local build.
@@ -808,7 +815,7 @@ private struct DriveFolderSheet: View {
         }
         .onAppear {
             let folders = self.folders
-            background({ try folders.withBackup() }) { result in
+            inBackground({ try folders.withBackup() }) { result in
                 switch result {
                 case .success(let list): withBackup = list
                 case .failure(let error):
@@ -823,7 +830,7 @@ private struct DriveFolderSheet: View {
         let text = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !text.isEmpty else { return }
         let folders = self.folders
-        background({ try folders.search(text) }) { result in
+        inBackground({ try folders.search(text) }) { result in
             switch result {
             case .success(let list): found = list
             case .failure(let error): failure = error.localizedDescription
@@ -833,7 +840,7 @@ private struct DriveFolderSheet: View {
 
     private func pick(_ f: DriveFolder) {
         let folders = self.folders
-        background({ folders.path(f.id) }) { result in
+        inBackground({ folders.path(f.id) }) { result in
             onDone((f.id, (try? result.get()) ?? f.name))
         }
     }
@@ -901,7 +908,7 @@ private struct EraseSheet: View {
     private func export() {
         let repo = self.repo
         let passphrase = pass.isEmpty ? nil : pass
-        background({ try SnapshotWriter.bytes(repo, appVersion: Backups.appVersion, passphrase: passphrase) }) { result in
+        inBackground({ try SnapshotWriter.bytes(repo, appVersion: Backups.appVersion, passphrase: passphrase) }) { result in
             switch result {
             case .success(let data):
                 document = DataDocument(data: data)

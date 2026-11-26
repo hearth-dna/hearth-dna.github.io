@@ -1090,6 +1090,7 @@
   "native.pickGenomes": "Elige todos los archivos de esa carpeta genomes junto con el archivo de la copia en «Restaurar una copia de seguridad…», o solos en «Cargar archivos de ADN…».",
   "native.notUsed": "Sin usar: {files}. Nadie en este teléfono tiene este ADN: elige estos archivos junto con el archivo de la copia en «Restaurar una copia de seguridad…».",
   "native.repairTitle": "Los datos de este teléfono están dañados",
+  "native.version": "Hearth {version} ({build})",
   "backupCard.fileName": "Nombre del archivo de copia",
   "backupCard.fileNameHint": "El mismo en todos los dispositivos que comparten esta carpeta: todos leen y escriben este único archivo.",
   "bodyMap.title": "Historial de salud en el cuerpo",

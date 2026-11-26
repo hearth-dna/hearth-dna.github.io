@@ -24,5 +24,6 @@
   "native.eraseIntro": "Deletes all people, genotypes, consents, notes and logs from this phone. Hearth keeps no copy anywhere, so there is nothing to recover afterwards unless you exported a dump.",
   "native.pickGenomes": "Pick every file from that genomes folder together with the backup file in “Restore a backup…”, or on their own with “Load DNA files…”.",
   "native.notUsed": "Not used: {files}. No one on this phone has this DNA: pick these files together with the backup file in “Restore a backup…”.",
-  "native.repairTitle": "The data on this phone is damaged"
+  "native.repairTitle": "The data on this phone is damaged",
+  "native.version": "Hearth {version} ({build})"
 }

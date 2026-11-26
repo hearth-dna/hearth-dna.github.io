@@ -62,8 +62,9 @@ in People (genome files) and Health (documents); Charts are not built yet (see "
 - **Settings** (SettingsPage.tsx): language; full dump export and import (several files at once, see
   below); the backup place; open formats (CSV, JSON Lines); the Gemini key; consents with revoke
   (revoking deletes what the consent covered); the sharing log; erase everything; **check the
-  database** (`PRAGMA quick_check`); and the link to the source code (AGPL-3.0), whose address comes
-  from `HEARTH_SOURCE_URL` at build time. A sync status sits in the top bars.
+  database** (`PRAGMA quick_check`); and, under About, the version and build number of the app and
+  the link to the source code (AGPL-3.0), whose address comes from `HEARTH_SOURCE_URL` at build
+  time. A sync status sits in the top bars.
 
 ### A damaged database
 

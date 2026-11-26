@@ -2,7 +2,7 @@
 
 Both apps can be published to Google Play and the App Store under your own developer account
 without a single credential entering this repository. Everything a release needs arrives from the
-environment: the gitignored root `.env` locally, GitHub secrets in CI. A reader with the full
+environment: the gitignored root `.env.local` locally, GitHub secrets in CI. A reader with the full
 source and none of your secrets can build and run the apps, and can publish nothing.
 
 `make mobile-secrets` prints which inputs are set, by name and status only — never a value.
@@ -11,13 +11,13 @@ source and none of your secrets can build and run the apps, and can publish noth
 
 | Input | What it is | Where it lives | Never |
 | --- | --- | --- | --- |
-| `HEARTH_APPLICATION_ID` | the published id, reverse-DNS of a domain you own | `.env` / CI secret | in git — the committed default is `example.hearth.app` |
+| `HEARTH_APPLICATION_ID` | the published id, reverse-DNS of a domain you own | `.env.local` / CI secret | in git — the committed default is `example.hearth.app` |
 | Upload keystore | the Play signing key | `~/.hearth/hearth-upload.jks` + an offline backup | in git; `*.jks` is gitignored as a backstop |
-| `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD` | keystore credentials | `.env` / CI secrets | on a command line (`ps` is world-readable; `make` passes them through the environment) |
+| `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD` | keystore credentials | `.env.local` / CI secrets | on a command line (`ps` is world-readable; `make` passes them through the environment) |
 | `PLAY_SERVICE_ACCOUNT_JSON` | Play Developer API credentials | a file outside the repo | in git |
-| `APPLE_TEAM_ID` | your Apple developer team | `.env` / CI secret | in git — `ExportOptions.plist` is generated from the `.example` at export time |
-| `ASC_KEY_ID`, `ASC_ISSUER_ID`, `ASC_KEY_PATH` | App Store Connect API key (`.p8`) | `.env` + a file outside the repo | in git |
-| `HEARTH_SOURCE_URL` | where the source is published; Settings links to it, as the AGPL-3.0 asks of whoever distributes the app | `.env`; CI uses the repository it runs in | in git. Store builds refuse to build without it |
+| `APPLE_TEAM_ID` | your Apple developer team | `.env.local` / CI secret | in git — `ExportOptions.plist` is generated from the `.example` at export time |
+| `ASC_KEY_ID`, `ASC_ISSUER_ID`, `ASC_KEY_PATH` | App Store Connect API key (`.p8`) | `.env.local` + a file outside the repo | in git |
+| `HEARTH_SOURCE_URL` | where the source is published; Settings links to it, as the AGPL-3.0 asks of whoever distributes the app | `.env.local`; CI uses the repository it runs in | in git. Store builds refuse to build without it |
 
 ## Before the first upload
 
@@ -34,7 +34,7 @@ the published app can never be updated again.
 ## Android
 
 ```bash
-cp .env.example .env            # fill in HEARTH_APPLICATION_ID and the ANDROID_* values
+cp .env.example .env.local      # fill in HEARTH_APPLICATION_ID and the ANDROID_* values
 make android-keystore           # once, ever
 make android-bundle             # copies the strings and kb, builds the signed AAB, verifies it
 make android-publish            # → Play internal track
@@ -45,9 +45,24 @@ make android-publish TRACK=production ROLLOUT=0.1
 the placeholder id. `android-publish` uploads the binary only: the store listing, screenshots and
 description are never touched by a build push, so a routine release cannot overwrite them.
 
-Play publishing needs a service account: Play Console → Users and permissions → API access → create
-a service account in the linked Google Cloud project, grant it release permissions, download the
-JSON, and point `PLAY_SERVICE_ACCOUNT_JSON` at it. Keep that file outside the repository.
+Play publishing needs the app to exist and a service account that may release it:
+
+1. **App.** Play Console → Create app, with `HEARTH_APPLICATION_ID` as the package name. Once it
+   exists, the first bundle can go up through the API like every later one.
+2. **Service account.** In a Google Cloud project of your own, enable the Android Publisher API,
+   create a service account and download a JSON key for it:
+
+   ```bash
+   gcloud services enable androidpublisher.googleapis.com --project <project>
+   gcloud iam service-accounts create android-play-publisher --project <project>
+   gcloud iam service-accounts keys create ~/.hearth/play-service-account.json \
+     --iam-account android-play-publisher@<project>.iam.gserviceaccount.com
+   ```
+
+3. **Access.** Play Console → Users and permissions → Invite new users: the service account's
+   email, this app only, with the two *Releases* permissions. It needs no Google Cloud role.
+
+Point `PLAY_SERVICE_ACCOUNT_JSON` at the key file and keep it outside the repository.
 
 ## App Store
 
@@ -65,8 +80,25 @@ Needs macOS with Xcode, plus `xcodegen` and `bundle install` in `mobile/`.
    `ASC_ISSUER_ID`. Never an Apple ID: 2FA makes that path unscriptable, and a key can be revoked
    without touching the account password.
 4. **Distribution certificate.** Xcode → Settings → Accounts → Manage Certificates → Apple
-   Distribution. `make ios-ipa` passes `-allowProvisioningUpdates` with the API key, so the
-   provisioning profile is created for you on first use — no profile to download or commit.
+   Distribution. On a Mac signed in to Xcode, `make ios-ipa` then signs automatically. With only
+   an API key that works for an *Admin* key alone, because the export asks Apple for a
+   cloud-managed certificate; with an App Manager key, create an *App Store* provisioning
+   profile for the app id and set `IOS_EXPORT_PROFILE` to its name, which is what CI does.
+
+   Without a Mac the same certificate is made with `openssl`, which is all CI needs: generate a
+   key and a signing request, upload the request under Certificates → + → Apple Distribution (or
+   `POST /v1/certificates` with the API key), download the `.cer`, and pack both into a `.p12`.
+   The explicit algorithms matter: the `security` tool on the runner cannot read OpenSSL 3's
+   default encryption.
+
+   ```bash
+   openssl genrsa -out dist.key 2048
+   openssl req -new -key dist.key -subj "/CN=Hearth Distribution" -out dist.csr
+   # ...upload dist.csr, download distribution.cer...
+   openssl x509 -inform DER -in distribution.cer -out dist.pem
+   openssl pkcs12 -export -inkey dist.key -in dist.pem -out dist.p12 \
+     -certpbe PBE-SHA1-3DES -keypbe PBE-SHA1-3DES -macalg sha1
+   ```
 
 ### Every release
 
@@ -104,7 +136,7 @@ marketing version, and a build already uploaded cannot be replaced — only supe
 ## CI
 
 `.github/workflows/android-release.yml` builds and optionally uploads the AAB on a tag or a manual
-run. It reads the same names as `.env`, from repository secrets:
+run. It reads the same names as `.env.local`, from repository secrets:
 
 | Secret | Value |
 | --- | --- |
@@ -116,7 +148,7 @@ run. It reads the same names as `.env`, from repository secrets:
 The keystore is written to a temporary file that exists for the length of the job. Without the
 secrets the workflow builds nothing and says which one is missing, so a fork can never run it.
 
-`.github/workflows/ios-release.yml` is the App Store counterpart, on a `macos-15` runner. It runs
+`.github/workflows/ios-release.yml` is the App Store counterpart, on a `macos-26` runner. It runs
 only on a tag or by hand. Standard runners are free for a public repository; on a private one a
 macOS minute is billed at ten times an ubuntu minute. The `publish` input picks how far a run goes:
 `none` (build and verify, keep the `.ipa`), `testflight` (`make ios-testflight`) or `app-store`
@@ -126,16 +158,22 @@ never receive the secrets.
 
 | Secret | Value |
 | --- | --- |
-| `HEARTH_APPLICATION_ID`, `APPLE_TEAM_ID` | as in `.env` |
+| `HEARTH_APPLICATION_ID`, `APPLE_TEAM_ID` | as in `.env.local` |
 | `IOS_DIST_CERT_BASE64` | the Apple Distribution certificate and private key, exported from Keychain Access as `.p12`, then `base64 -i cert.p12 \| pbcopy` |
 | `IOS_DIST_CERT_PASSWORD` | the password you set on that `.p12` |
-| `ASC_KEY_ID`, `ASC_ISSUER_ID` | as in `.env` |
+| `IOS_PROFILE_BASE64` | an *App Store* provisioning profile for the app id and that certificate (Profiles → +, or `POST /v1/profiles`), base64 of the `.mobileprovision` |
+| `ASC_KEY_ID`, `ASC_ISSUER_ID` | as in `.env.local` |
 | `ASC_KEY_BASE64` | `base64 -i AuthKey_XXXX.p8 \| pbcopy` |
 | `HEARTH_GOOGLE_IOS_CLIENT_ID`, `HEARTH_DROPBOX_APP_KEY` | optional; unset leaves that cloud backup button out |
 
+The export signs manually with that certificate and profile. Xcode's automatic export signing
+would ask Apple for a cloud-managed certificate instead, which needs an *Admin* API key; this way
+the key stays at App Manager. Both expire after a year and are replaced together.
+
 The certificate is imported into a **throwaway keychain** created for the job and deleted in an
 `always()` step, and the `.p8` is written to `$RUNNER_TEMP` and removed with it — neither touches
-the runner's login keychain, the workspace, or the uploaded artifact.
+the runner's login keychain or the workspace. The `.ipa` is not kept as an artifact: it embeds the
+provisioning profile, which names the Apple team, and a public repository's artifacts are public.
 
 ## Version numbers
 
