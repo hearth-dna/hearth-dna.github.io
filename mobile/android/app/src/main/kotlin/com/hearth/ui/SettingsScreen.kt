@@ -784,7 +784,10 @@ fun SyncAction(backups: Backups) {
     }
 }
 
-/** The source code link (AGPL-3.0): its address comes from the build (HEARTH_SOURCE_URL), none in a local build. */
+/**
+ * The version and build this is (version.properties), and the source code link (AGPL-3.0): its
+ * address comes from the build (HEARTH_SOURCE_URL), none in a local build.
+ */
 @Composable
 private fun AboutRow() {
     val t = LocalStrings.current
@@ -792,6 +795,7 @@ private fun AboutRow() {
     val url = BuildConfig.SOURCE_URL
     Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Text(t("settingsPage.about"), style = MaterialTheme.typography.titleMedium)
+        Muted(t("native.version", "version" to BuildConfig.VERSION_NAME, "build" to BuildConfig.VERSION_CODE))
         if (url.isNotEmpty()) {
             Text(
                 t("settingsPage.source"),

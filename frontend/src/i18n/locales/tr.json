@@ -1090,6 +1090,7 @@
   "native.pickGenomes": "genomes klasöründeki tüm dosyaları yedek dosyasıyla birlikte «Yedeği geri yükle…» içinde seçin ya da tek başına «DNA dosyalarını yükle…» içinde seçin.",
   "native.notUsed": "Kullanılmadı: {files}. Bu telefonda kimsede bu DNA yok: bu dosyaları yedek dosyasıyla birlikte «Yedeği geri yükle…» içinde seçin.",
   "native.repairTitle": "Bu telefondaki veriler bozuk",
+  "native.version": "Hearth {version} ({build})",
   "backupCard.fileName": "Yedek dosyasının adı",
   "backupCard.fileNameHint": "Bu klasörü paylaşan her cihazda aynı: hepsi bu tek dosyayı okuyup yazar.",
   "bodyMap.title": "Vücut üzerinde sağlık kaydı",

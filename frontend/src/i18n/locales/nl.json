@@ -1090,6 +1090,7 @@
   "native.pickGenomes": "Kies alle bestanden uit die map genomes samen met het back-upbestand bij ‘Back-up terugzetten…’, of los bij ‘DNA-bestanden laden…’.",
   "native.notUsed": "Niet gebruikt: {files}. Niemand op deze telefoon heeft dit DNA: kies deze bestanden samen met het back-upbestand bij ‘Back-up terugzetten…’.",
   "native.repairTitle": "De gegevens op deze telefoon zijn beschadigd",
+  "native.version": "Hearth {version} ({build})",
   "backupCard.fileName": "Naam van het back-upbestand",
   "backupCard.fileNameHint": "Op elk apparaat dat deze map deelt dezelfde: ze lezen en schrijven allemaal dit ene bestand.",
   "bodyMap.title": "Gezondheidslog op het lichaam",

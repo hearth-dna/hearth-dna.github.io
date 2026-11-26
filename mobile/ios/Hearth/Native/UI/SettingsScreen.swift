@@ -132,12 +132,13 @@ struct SettingsScreen: View {
                 consentsSection
                 sharingSection
                 eraseSection
-                if let link = sourceLink {
-                    Section {
+                Section {
+                    Text(version).foregroundStyle(.secondary)
+                    if let link = sourceLink {
                         Link(t("settingsPage.source"), destination: link)
-                    } header: {
-                        Text(t("settingsPage.about"))
                     }
+                } header: {
+                    Text(t("settingsPage.about"))
                 }
             }
             .navigationTitle(t("settingsPage.title"))
@@ -728,6 +729,12 @@ struct SettingsScreen: View {
         inBackground({ db.check() }) { ok in
             if case .success(true) = ok { dbCheck = .intact } else { dbCheck = nil }
         }
+    }
+
+    /// The version and build this is (MARKETING_VERSION and CURRENT_PROJECT_VERSION in project.yml).
+    private var version: String {
+        let info = { (key: String) in Bundle.main.object(forInfoDictionaryKey: key) as? String ?? "" }
+        return t("native.version", ["version": info("CFBundleShortVersionString"), "build": info("CFBundleVersion")])
     }
 
     /// The source code link (AGPL-3.0): its address comes from the build (HEARTH_SOURCE_URL), none in a local build.

@@ -1090,6 +1090,7 @@
   "native.pickGenomes": "Wähle jede Datei aus dem Ordner genomes zusammen mit der Sicherungsdatei unter „Backup wiederherstellen…“ aus, oder allein unter „DNA-Dateien laden…“.",
   "native.notUsed": "Nicht verwendet: {files}. Niemand auf diesem Telefon hat diese DNA: Wähle diese Dateien zusammen mit der Sicherungsdatei unter „Backup wiederherstellen…“ aus.",
   "native.repairTitle": "Die Daten auf diesem Telefon sind beschädigt",
+  "native.version": "Hearth {version} ({build})",
   "backupCard.fileName": "Name der Sicherungsdatei",
   "backupCard.fileNameHint": "Auf jedem Gerät, das diesen Ordner nutzt, derselbe: Alle lesen und schreiben diese eine Datei.",
   "bodyMap.title": "Gesundheitsprotokoll am Körper",

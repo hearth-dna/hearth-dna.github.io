@@ -1090,6 +1090,7 @@
   "native.pickGenomes": "genomes フォルダーのすべてのファイルを、バックアップファイルと一緒に「バックアップを復元…」で選ぶか、ファイルだけを「DNA ファイルを読み込む…」で選んでください。",
   "native.notUsed": "使われませんでした: {files}。この電話にはこの DNA を持つ人がいません。これらのファイルをバックアップファイルと一緒に「バックアップを復元…」で選んでください。",
   "native.repairTitle": "この電話のデータが破損しています",
+  "native.version": "Hearth {version} ({build})",
   "backupCard.fileName": "バックアップファイル名",
   "backupCard.fileNameHint": "このフォルダーを共有するすべての端末で同じ名前にします。すべての端末がこの 1 つのファイルを読み書きします。",
   "bodyMap.title": "からだで見る健康記録",

@@ -1090,6 +1090,7 @@
   "native.pickGenomes": "Pilih setiap file dari folder genomes itu bersama file cadangan di «Pulihkan cadangan…», atau sendiri di «Muat file DNA…».",
   "native.notUsed": "Tidak dipakai: {files}. Tidak ada yang punya DNA ini di ponsel ini: pilih file ini bersama file cadangan di «Pulihkan cadangan…».",
   "native.repairTitle": "Data di ponsel ini rusak",
+  "native.version": "Hearth {version} ({build})",
   "backupCard.fileName": "Nama file cadangan",
   "backupCard.fileNameHint": "Sama di setiap perangkat yang berbagi folder ini: semuanya membaca dan menulis satu file ini.",
   "bodyMap.title": "Catatan kesehatan pada tubuh",
