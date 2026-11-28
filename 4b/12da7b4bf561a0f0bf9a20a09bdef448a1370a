@@ -1,0 +1,22 @@
+mobile/ios/Hearth/Native/Data/Db.swift
+  s_4826d66ac22c0c::t_5d10360d8f8cc8 56-62,66-69,123-133,144-150,159,163-167,264-265,267-276,279-283,289,346-347,357-359,361-362
+mobile/ios/HearthTests/SchemaTests.swift
+  s_4826d66ac22c0c::t_5d10360d8f8cc8 35-41,43-47,49-60
+  s_4826d66ac22c0c::t_b8f15120445332 42,48
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "4b12da7b4bf561a0f0bf9a20a09bdef448a1370a",
+  "prompts": {},
+  "sessions": {
+    "s_4826d66ac22c0c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fa19c9b4-ecef-4469-9151-738bd8c332aa",
+        "model": "claude-fable-5-2"
+      },
+      "human_author": "Vladimir Bloshchitcyn <vladimir.bloshchitcyn@deliveryhero.com>"
+    }
+  }
+}
