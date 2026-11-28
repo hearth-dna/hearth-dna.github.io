@@ -2,10 +2,10 @@
 	frontend-install frontend-run frontend-build frontend-build-archive frontend-build-pages \
 	frontend-preview-pages pages-site frontend-test frontend-fixtures frontend-lint pages-deploy \
 	kb-build \
-	mobile-assets mobile-i18n mobile-kb android android-build android-install android-test android-lint android-logs android-clean \
+	mobile-assets mobile-i18n mobile-kb mobile-body android android-build android-install android-test android-lint android-logs android-clean \
 	android-keystore android-bundle android-verify android-publish _android-release-ready \
 	ios ios-generate ios-build ios-test ios-clean ios-archive ios-ipa ios-verify ios-testflight \
-	ios-testflight-status _ios-release-ready \
+	ios-testflight-status ios-submit _ios-release-ready \
 	mobile-secrets
 
 .DEFAULT_GOAL := help
@@ -88,6 +88,8 @@ ANDROID_I18N := $(ANDROID_DIR)/app/src/main/assets/i18n
 IOS_I18N := $(IOS_DIR)/Hearth/I18n
 ANDROID_KB := $(ANDROID_DIR)/app/src/main/assets/kb.json
 IOS_KB := $(IOS_DIR)/Hearth/Resources/kb.json
+ANDROID_BODY := $(ANDROID_DIR)/app/src/main/assets/body-figures.json
+IOS_BODY := $(IOS_DIR)/Hearth/Resources/body-figures.json
 # Android Studio's bundled JDK, the same default as ../sentio. Override on a machine that keeps
 # its JDK elsewhere: `make android ANDROID_JAVA_HOME=/path/to/jdk`.
 ANDROID_JAVA_HOME ?= $(HOME)/tools/mobile/android-studio/jbr
@@ -159,7 +161,12 @@ mobile-kb: ## Copy the knowledge base (frontend/public/kb.json) into both native
 	@cp $(FRONTEND_DIR)/public/kb.json $(ANDROID_KB)
 	@cp $(FRONTEND_DIR)/public/kb.json $(IOS_KB)
 
-mobile-assets: mobile-i18n mobile-kb ## Copy the strings and the knowledge base into both apps
+mobile-body: ## Copy the body map's figures (mobile/body-figures.json, built from the web's) into both apps
+	@mkdir -p $(dir $(ANDROID_BODY)) $(dir $(IOS_BODY))
+	@cp $(MOBILE_DIR)/body-figures.json $(ANDROID_BODY)
+	@cp $(MOBILE_DIR)/body-figures.json $(IOS_BODY)
+
+mobile-assets: mobile-i18n mobile-kb mobile-body ## Copy the strings, the knowledge base and the body figures into both apps
 
 android: android-install ## Alias for android-install
 
@@ -186,7 +193,7 @@ android-logs: ## Follow the app's logs (requires a connected device)
 
 android-clean: ## Clean Android build artifacts and the copied assets
 	cd $(ANDROID_DIR) && $(GRADLE) clean
-	rm -rf $(ANDROID_I18N) $(ANDROID_KB)
+	rm -rf $(ANDROID_I18N) $(ANDROID_KB) $(ANDROID_BODY)
 
 # The iOS targets need macOS and Xcode; on Linux they say so instead of failing obscurely.
 define require_macos
@@ -218,7 +225,7 @@ ios-test: mobile-assets ios-generate ## Run the iOS unit tests on a simulator (m
 		$(IOS_CLOUD_SETTINGS)
 
 ios-clean: ## Clean iOS build artifacts and the copied assets
-	rm -rf $(IOS_DIR)/Hearth.xcodeproj $(IOS_DIR)/build $(IOS_I18N) $(IOS_KB)
+	rm -rf $(IOS_DIR)/Hearth.xcodeproj $(IOS_DIR)/build $(IOS_I18N) $(IOS_KB) $(IOS_BODY)
 
 # Store releases
 # --------------
@@ -380,6 +387,18 @@ ios-testflight: ## Upload the verified .ipa to TestFlight (macOS)
 	@$(MAKE) ios-verify
 	cd $(MOBILE_DIR) && $(IOS_ASC_ENV) \
 		bundle exec fastlane ios upload_build ipa:$(abspath $(IOS_IPA)) $(if $(NOTES),changelog:"$(NOTES)",)
+
+# The version of record, from the checkout: the build submitted is the one this commit uploaded.
+IOS_PROJECT_VERSION = $(shell sed -n 's/^ *$(1): *"\{0,1\}\([^"]*\)"\{0,1\}$$/\1/p' $(IOS_DIR)/project.yml | head -1)
+
+# RELEASE=auto releases as soon as Apple approves; the default waits for a click in the Console.
+ios-submit: ## Submit the uploaded build for App Store review (RELEASE=manual|auto)
+	$(call require_var,ASC_KEY_ID,$(ASC_KEY_ID))
+	$(call require_var,ASC_ISSUER_ID,$(ASC_ISSUER_ID))
+	$(call require_var,ASC_KEY_PATH,$(ASC_KEY_PATH))
+	cd $(MOBILE_DIR) && $(IOS_ASC_ENV) bundle exec fastlane ios submit \
+		version:$(call IOS_PROJECT_VERSION,MARKETING_VERSION) \
+		build:$(call IOS_PROJECT_VERSION,CURRENT_PROJECT_VERSION) release:$(or $(RELEASE),manual)
 
 ios-testflight-status: ## Show the newest build App Store Connect has for this app
 	$(call require_var,ASC_KEY_ID,$(ASC_KEY_ID))

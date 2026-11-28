@@ -56,6 +56,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.hearth.health.teethOf
+import com.hearth.health.teethText
 import com.hearth.data.Attachment
 import com.hearth.data.HealthEntry
 import com.hearth.data.HealthKind
@@ -145,12 +147,15 @@ fun EntryCard(
                     Text(entryTitle(entry) { t(it) }, Modifier.weight(1f), style = MaterialTheme.typography.titleMedium)
                     if (value.isNotEmpty()) Text(value, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 }
-                val meta = entry.bodyPart.isNotEmpty() || entry.severity != null || entry.body.isNotEmpty() || attachments > 0
+                val teeth = teethText(teethOf(entry.details), t)
+                val where = listOf(entry.bodyPart, entry.side.takeIf { entry.bodyPart.isNotEmpty() && it.isNotEmpty() }?.let { t("side.$it") } ?: "", teeth)
+                    .filter { it.isNotEmpty() }.joinToString(" · ")
+                val meta = where.isNotEmpty() || entry.severity != null || entry.body.isNotEmpty() || attachments > 0
                 if (meta) {
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                         val muted = MaterialTheme.colorScheme.onSurfaceVariant
                         val small = MaterialTheme.typography.bodySmall
-                        if (entry.bodyPart.isNotEmpty()) Text(entry.bodyPart, style = small, color = muted)
+                        if (where.isNotEmpty()) Text(where, style = small, color = muted)
                         entry.severity?.let { s ->
                             Row {
                                 Text("${t("healthLog.severity")} ", style = small, color = muted)
@@ -278,7 +283,9 @@ fun EntrySheet(
                 Text(it, style = MaterialTheme.typography.displaySmall, fontWeight = FontWeight.SemiBold)
             }
             val facts = buildList {
-                if (entry.bodyPart.isNotEmpty()) add(t("healthLog.bodyPart") to entry.bodyPart)
+                if (entry.bodyPart.isNotEmpty())
+                    add(t("healthLog.bodyPart") to (if (entry.side.isEmpty()) entry.bodyPart else "${entry.bodyPart} · ${t("side.${entry.side}")}"))
+                teethText(teethOf(entry.details), t).takeIf { it.isNotEmpty() }?.let { add(t("detail.teeth") to it) }
                 entry.severity?.let { add(t("healthLog.severity") to t("healthLog.outOfTen", "n" to it)) }
             }
             if (facts.isNotEmpty()) {

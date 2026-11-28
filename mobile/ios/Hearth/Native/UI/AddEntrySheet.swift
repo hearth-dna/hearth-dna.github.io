@@ -28,6 +28,7 @@ struct AddEntrySheet: View {
     @State private var value2 = ""
     @State private var unit = ""
     @State private var bodyPart = ""
+    @State private var teeth: [Int] = []
     @State private var severity: Int?
     @State private var tags = ""
     @State private var text = ""
@@ -261,6 +262,11 @@ struct AddEntrySheet: View {
                 Text(t("healthLog.value"))
             }
         }
+        if let p = HealthPresets.find(preset), p.teeth {
+            Section {
+                ToothPicker(teeth: $teeth, milkFirst: p.milkFirst).id(p.id)
+            }
+        }
         if fields.bodyPart || fields.severity {
             Section {
                 if fields.bodyPart {
@@ -344,7 +350,9 @@ struct AddEntrySheet: View {
         preset = p.id
         kind = p.kind
         title = p.title
-        bodyPart = p.bodyPart ?? bodyPart
+        // Not the previous preset's body part: this one's own, or none (HealthEntryForm.tsx).
+        bodyPart = p.bodyPart ?? ""
+        teeth = []
         tags = p.tags.map { $0.joined(separator: ", ") } ?? tags
         unit = p.unit ?? ""
         value = ""
@@ -360,6 +368,7 @@ struct AddEntrySheet: View {
         value2 = ""
         unit = ""
         bodyPart = ""
+        teeth = []
         severity = nil
         tags = ""
         text = ""
@@ -409,7 +418,8 @@ struct AddEntrySheet: View {
             value: fields.value ? AddEntrySheet.number(value) : nil,
             value2: pair != nil ? AddEntrySheet.number(value2) : nil,
             unit: fields.value ? unit.trimmingCharacters(in: .whitespacesAndNewlines) : "",
-            createdAt: ""
+            createdAt: "",
+            details: HealthPresets.find(preset)?.teeth == true ? Teeth.details(teeth) : ""
         )
         do {
             let saved = try store.add(entry)

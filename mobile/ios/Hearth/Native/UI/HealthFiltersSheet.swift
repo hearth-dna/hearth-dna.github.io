@@ -22,7 +22,14 @@ struct HealthFiltersSheet: View {
                             Text(person.displayName).tag(person.id)
                         }
                     }
-                    Picker(t("healthLog.filterBodyPart"), selection: $filter.bodyPart) {
+                    Picker(t("healthLog.filterBodyPart"), selection: Binding(
+                        get: { filter.bodyPart },
+                        set: { part in
+                            filter.bodyPart = part
+                            filter.side = ""
+                            filter.tooth = nil
+                        }
+                    )) {
                         Text(t("healthLog.anyBodyPart")).tag("")
                         ForEach(facets.bodyParts, id: \.self) { part in
                             Text(part).tag(part)
@@ -72,6 +79,8 @@ struct HealthFiltersSheet: View {
                     Button(t("common.clear")) {
                         filter.person = ""
                         filter.bodyPart = ""
+                        filter.side = ""
+                        filter.tooth = nil
                         filter.tag = ""
                         filter.minSeverity = nil
                         filter.from = ""

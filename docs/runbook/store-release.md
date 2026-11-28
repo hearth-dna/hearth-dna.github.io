@@ -106,7 +106,18 @@ Needs macOS with Xcode, plus `xcodegen` and `bundle install` in `mobile/`.
 make ios-ipa          # assets → archive → export → verify
 make ios-testflight   # upload (NOTES="what changed" sets the TestFlight note)
 make ios-testflight-status   # has Apple finished processing it?
+make ios-submit       # submit that build for App Store review (RELEASE=auto releases on approval)
 ```
+
+`ios-submit` reads `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` from `project.yml`, so it
+submits the build this checkout uploaded. It creates the App Store version in the Console if it is
+missing, waits for Apple to finish processing the build, attaches it and submits. By default an
+approved build waits for *Release* in the Console; `RELEASE=auto` releases it at once.
+
+The **first** submission needs the listing filled in by hand in the Console: description,
+screenshots, support and privacy policy URLs, the App Privacy answers, age rating, category and
+price. `ios-submit` never uploads metadata, so until those exist Apple rejects the submission and
+the error names what is missing. Later releases reuse them.
 
 `ios-verify` runs inside `ios-ipa` and reads the *artifact*, not the variables: it refuses an
 `.ipa` whose `CFBundleIdentifier` is not `HEARTH_APPLICATION_ID` (a stale build would otherwise be
@@ -138,8 +149,12 @@ The keystore is written to a temporary file that exists for the length of the jo
 secrets the workflow builds nothing and says which one is missing, so a fork can never run it.
 
 `.github/workflows/ios-release.yml` is the App Store counterpart, on a `macos-26` runner. It runs
-only on a tag or by hand — a macOS minute costs about ten of an ubuntu one — and `upload` is an
-explicit input, so a tag can build and verify without publishing anything.
+only on a tag or by hand. Standard runners are free for a public repository; on a private one a
+macOS minute is billed at ten times an ubuntu minute. The `publish` input picks how far a run goes:
+`none` (build and verify, keep the `.ipa`), `testflight` (`make ios-testflight`) or `app-store`
+(also `make ios-submit`, with the `release` input as `RELEASE`). A tag push has no inputs and
+publishes nothing. Running the workflow by hand needs write access to the repository, and forks
+never receive the secrets.
 
 | Secret | Value |
 | --- | --- |
@@ -149,7 +164,7 @@ explicit input, so a tag can build and verify without publishing anything.
 | `IOS_PROFILE_BASE64` | an *App Store* provisioning profile for the app id and that certificate (Profiles → +, or `POST /v1/profiles`), base64 of the `.mobileprovision` |
 | `ASC_KEY_ID`, `ASC_ISSUER_ID` | as in `.env.local` |
 | `ASC_KEY_BASE64` | `base64 -i AuthKey_XXXX.p8 \| pbcopy` |
-| `HEARTH_GOOGLE_IOS_CLIENT_ID` | optional: the iOS OAuth client id for the Google Drive backup button ([cloud-backups.md](cloud-backups.md)); unset, the build has no such button |
+| `HEARTH_GOOGLE_IOS_CLIENT_ID`, `HEARTH_DROPBOX_APP_KEY` | optional; unset leaves that cloud backup button out |
 
 The export signs manually with that certificate and profile. Xcode's automatic export signing
 would ask Apple for a cloud-managed certificate instead, which needs an *Admin* API key; this way

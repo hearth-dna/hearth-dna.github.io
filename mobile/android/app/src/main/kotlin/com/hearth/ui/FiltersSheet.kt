@@ -70,7 +70,7 @@ fun FiltersSheet(entries: List<HealthEntry>, filter: HealthFilter, shown: Int, o
                 value = filter.bodyPart,
                 options = listOf("" to t("healthLog.anyBodyPart")) + bodyParts.map { it to it },
                 enabled = bodyParts.isNotEmpty(),
-            ) { onChange(filter.copy(bodyPart = it)) }
+            ) { onChange(filter.copy(bodyPart = it, side = "", tooth = null)) }
             Picker(
                 label = t("healthLog.filterTag"),
                 value = filter.tag,
@@ -101,7 +101,7 @@ fun FiltersSheet(entries: List<HealthEntry>, filter: HealthFilter, shown: Int, o
             }
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 OutlinedButton(
-                    onClick = { onChange(filter.copy(bodyPart = "", tag = "", minSeverity = null, from = "", to = "")) },
+                    onClick = { onChange(filter.copy(bodyPart = "", side = "", tooth = null, tag = "", minSeverity = null, from = "", to = "")) },
                     modifier = Modifier.weight(1f),
                 ) { Text(t("common.clear").cap()) }
                 Button(onClick = onDismiss, modifier = Modifier.weight(1f)) { Text(t("healthTable.showResults", "n" to shown)) }

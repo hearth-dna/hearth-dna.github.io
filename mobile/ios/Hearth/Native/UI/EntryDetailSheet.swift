@@ -33,7 +33,13 @@ struct EntryDetailSheet: View {
                         LabeledContent(t("healthLog.value"), value: HealthLog.formatValue(entry))
                     }
                     if !entry.bodyPart.isEmpty {
-                        LabeledContent(t("healthLog.bodyPart"), value: entry.bodyPart)
+                        LabeledContent(
+                            t("healthLog.bodyPart"),
+                            value: entry.side.isEmpty ? entry.bodyPart : "\(entry.bodyPart) · \(t("side.\(entry.side)"))"
+                        )
+                    }
+                    if !Teeth.of(entry.details).isEmpty {
+                        LabeledContent(t("detail.teeth"), value: Teeth.text(Teeth.of(entry.details)))
                     }
                     if let severity = entry.severity {
                         LabeledContent(t("healthLog.severity")) {

@@ -66,6 +66,10 @@ struct HealthEntry: Identifiable, Equatable {
     var value2: Double?
     var unit: String
     var createdAt: String
+    /// "left", "right" or "both" for a paired body part; "" otherwise (the web's `side`).
+    var side: String = ""
+    /// The `details` column as stored: a JSON object, "" for none (`{"teeth":"16 26"}`, Teeth.swift).
+    var details: String = ""
 }
 
 /// An original document kept with an entry. Only the metadata is here; the bytes live beside the
@@ -86,7 +90,12 @@ struct HealthFilter: Equatable {
     /// Person id; '' for everyone.
     var person = ""
     var kind: HealthKind?
+    /// A body part; "Knee" and "knees" are the same (`Anatomy.key`).
     var bodyPart = ""
+    /// One side of a paired body part (the body map): that side, both sides, or unrecorded.
+    var side = ""
+    /// One tooth (FDI number) a dental entry names, picked on the body map's mouth; nil for any.
+    var tooth: Int?
     var tag = ""
     /// Inclusive YYYY-MM-DD bounds; '' for open-ended.
     var from = ""
@@ -232,7 +241,8 @@ enum HealthLog {
         return entries.filter { e in
             if !f.person.isEmpty && e.personId != f.person { return false }
             if let kind = f.kind, e.kind != kind { return false }
-            if !f.bodyPart.isEmpty && e.bodyPart != f.bodyPart { return false }
+            if !f.bodyPart.isEmpty && (Anatomy.key(e.bodyPart) != Anatomy.key(f.bodyPart) || !Anatomy.onSide(e.side, f.side)) { return false }
+            if let tooth = f.tooth, !Teeth.of(e.details).contains(tooth) { return false }
             if !f.tag.isEmpty && !e.tags.contains(f.tag) { return false }
             if !f.from.isEmpty && e.date < f.from { return false }
             if !f.to.isEmpty && e.date > f.to { return false }

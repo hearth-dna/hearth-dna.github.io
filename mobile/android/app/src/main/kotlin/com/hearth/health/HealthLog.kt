@@ -52,7 +52,12 @@ data class HealthFilter(
     /** Person id; "" for everyone. */
     val person: String = "",
     val kind: HealthKind? = null,
+    /** A body part; "Knee" and "knees" are the same ([bodyKey]). */
     val bodyPart: String = "",
+    /** One side of a paired body part (the body map): that side, both sides, or unrecorded. */
+    val side: String = "",
+    /** One tooth (FDI number) a dental entry names, picked on the body map's mouth; null for any. */
+    val tooth: Int? = null,
     val tag: String = "",
     /** Inclusive YYYY-MM-DD bounds; "" for open-ended. */
     val from: String = "",
@@ -81,7 +86,8 @@ fun filterHealthLog(entries: List<HealthEntry>, f: HealthFilter, title: (HealthE
     return entries.filter { e ->
         (f.person.isEmpty() || e.personId == f.person) &&
             (f.kind == null || e.kind == f.kind) &&
-            (f.bodyPart.isEmpty() || e.bodyPart == f.bodyPart) &&
+            (f.bodyPart.isEmpty() || (bodyKey(e.bodyPart) == bodyKey(f.bodyPart) && onSide(e.side, f.side))) &&
+            (f.tooth == null || f.tooth in teethOf(e.details)) &&
             (f.tag.isEmpty() || f.tag in e.tags) &&
             (f.from.isEmpty() || e.date >= f.from) &&
             (f.to.isEmpty() || e.date <= f.to) &&

@@ -1,6 +1,6 @@
 name: iOS release
 
-# Archives, exports and optionally uploads the app to TestFlight. Every credential comes from
+# Archives, exports and optionally uploads the app to TestFlight and submits it for App Store review. Every credential comes from
 # repository secrets (docs/runbook/store-release.md); nothing signing-related exists in the
 # repository, so a fork running this workflow fails on the first check and uploads nothing.
 #
@@ -11,11 +11,18 @@ on:
     tags: ['v*']
   workflow_dispatch:
     inputs:
-      upload:
-        description: 'Upload the build to TestFlight (otherwise build and verify only)'
+      publish:
+        description: 'none keeps the .ipa only; testflight uploads it; app-store uploads it and submits it for review'
         required: false
-        default: false
-        type: boolean
+        default: none
+        type: choice
+        options: [none, testflight, app-store]
+      release:
+        description: 'After Apple approves (app-store only): manual waits for a click in the Console, auto releases at once'
+        required: false
+        default: manual
+        type: choice
+        options: [manual, auto]
 
 concurrency:
   group: ios-release-${{ github.ref }}
@@ -27,7 +34,7 @@ permissions:
 jobs:
   release:
     runs-on: macos-26
-    timeout-minutes: 60
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v5
 
@@ -123,12 +130,14 @@ jobs:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
-          # Optional (docs/runbook/cloud-backups.md): unset, the build has no Google Drive button.
+          # Optional: unset leaves the cloud backup button out (docs/runbook/cloud-backups.md).
           HEARTH_GOOGLE_IOS_CLIENT_ID: ${{ secrets.HEARTH_GOOGLE_IOS_CLIENT_ID }}
+          HEARTH_DROPBOX_APP_KEY: ${{ secrets.HEARTH_DROPBOX_APP_KEY }}
         run: make ios-ipa ASC_KEY_PATH="$RUNNER_TEMP/asc/AuthKey_$ASC_KEY_ID.p8"
 
+      # A tag push has no inputs, so it builds and publishes nothing.
       - name: Upload to TestFlight
-        if: inputs.upload
+        if: inputs.publish == 'testflight' || inputs.publish == 'app-store'
         env:
           HEARTH_APPLICATION_ID: ${{ secrets.HEARTH_APPLICATION_ID }}
           HEARTH_SOURCE_URL: ${{ github.server_url }}/${{ github.repository }}
@@ -139,6 +148,16 @@ jobs:
           cd mobile && bundle install --quiet && cd ..
           make ios-testflight ASC_KEY_PATH="$RUNNER_TEMP/asc/AuthKey_$ASC_KEY_ID.p8" \
             NOTES="${{ github.ref_name }}"
+
+      # Waits for Apple to process the upload (5-30 minutes), then submits that build. The listing
+      # itself is edited in the Console; this step never touches it.
+      - name: Submit for App Store review
+        if: inputs.publish == 'app-store'
+        env:
+          HEARTH_APPLICATION_ID: ${{ secrets.HEARTH_APPLICATION_ID }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: make ios-submit ASC_KEY_PATH="$RUNNER_TEMP/asc/AuthKey_$ASC_KEY_ID.p8" RELEASE="${{ inputs.release }}"
 
       - name: Remove the signing material
         if: always()

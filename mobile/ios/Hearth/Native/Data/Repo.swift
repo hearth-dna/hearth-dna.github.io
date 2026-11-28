@@ -477,20 +477,22 @@ final class Repo {
         e.tags = HealthLog.parseTags(HealthLog.formatTags(e.tags))
         e.unit = e.unit.trimmingCharacters(in: .whitespacesAndNewlines)
         e.time = HealthLog.normTime(e.time)
+        // As repo.ts: no side without a body part.
+        if e.bodyPart.isEmpty { e.side = "" }
         try db.transaction {
             try db.run(
                 """
-                INSERT INTO health_log(id,person_id,date,time,kind,title,body,source,body_part,severity,tags,value,value2,unit,created_at)
-                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                INSERT INTO health_log(id,person_id,date,time,kind,title,body,source,body_part,side,severity,tags,value,value2,unit,details,created_at)
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
                 """,
                 [
                     .text(e.id), .text(e.personId), .text(e.date), .text(e.time), .text(e.kind.rawValue),
-                    .text(e.title), .text(e.body), .text(e.source), .text(e.bodyPart),
+                    .text(e.title), .text(e.body), .text(e.source), .text(e.bodyPart), .text(e.side),
                     e.severity.map { SQLValue.integer(Int64($0)) } ?? .null,
                     .text(HealthLog.formatTags(e.tags)),
                     e.value.map { SQLValue.real($0) } ?? .null,
                     e.value2.map { SQLValue.real($0) } ?? .null,
-                    .text(e.unit), .text(e.createdAt),
+                    .text(e.unit), .text(e.details), .text(e.createdAt),
                 ]
             )
         }
@@ -573,7 +575,9 @@ final class Repo {
             value: r.double("value"),
             value2: r.double("value2"),
             unit: r.text("unit"),
-            createdAt: r.text("created_at")
+            createdAt: r.text("created_at"),
+            side: r.text("side"),
+            details: r.text("details")
         )
     }
 }

@@ -73,6 +73,7 @@ import com.hearth.data.HealthKind
 import com.hearth.data.NewHealthEntry
 import com.hearth.data.Person
 import com.hearth.data.Repo
+import com.hearth.health.detailsWithTeeth
 import com.hearth.health.BODY_PARTS
 import com.hearth.health.HealthPreset
 import com.hearth.health.localDate
@@ -136,6 +137,7 @@ fun AddEntry(
     var severity by remember { mutableStateOf(0) }
     var tags by remember { mutableStateOf("") }
     var body by remember { mutableStateOf(draft?.body ?: "") }
+    var teeth by remember { mutableStateOf(emptyList<Int>()) }
     var asking by remember { mutableStateOf(false) }
 
     val k = kind
@@ -166,6 +168,7 @@ fun AddEntry(
                     value2 = if (pair != null) numeric(value2) else null,
                     unit = if (k.hasValue()) unit.trim() else "",
                     source = source,
+                    details = if (preset?.teeth == true) detailsWithTeeth(teeth) else "",
                 ),
             )
             // The entry is saved first; a file that cannot be kept is reported, not lost silently.
@@ -192,7 +195,9 @@ fun AddEntry(
         preset = p
         if (p == null) return
         title = p.title
-        if (p.bodyPart.isNotEmpty()) bodyPart = p.bodyPart
+        // Not the previous preset's body part: this one's own, or none (HealthEntryForm.tsx).
+        bodyPart = p.bodyPart
+        teeth = emptyList()
         if (p.tags.isNotEmpty()) tags = p.tags.joinToString(", ")
         unit = p.unit
         value = ""
@@ -269,6 +274,7 @@ fun AddEntry(
                     }
                 }
                 if (k.hasBodyPart()) BodyPartField(bodyPart) { bodyPart = it }
+                preset?.takeIf { it.teeth }?.let { p -> ToothPicker(teeth, p.milkFirst) { teeth = it } }
                 if (k.hasSeverity()) {
                     Column {
                         Row {

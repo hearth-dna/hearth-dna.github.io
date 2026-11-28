@@ -282,14 +282,17 @@ class Repo(val sql: Sql, val blobs: Blobs) {
             value2 = e.value2,
             unit = e.unit.trim(),
             createdAt = now(),
+            // As repo.ts: no side without a body part.
+            side = if (e.bodyPart.isBlank()) "" else e.side,
+            details = e.details,
         )
         sql.transaction {
             sql.exec(
-                "INSERT INTO health_log(id,person_id,date,time,kind,title,body,source,body_part,severity,tags,value,value2,unit,created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                "INSERT INTO health_log(id,person_id,date,time,kind,title,body,source,body_part,side,severity,tags,value,value2,unit,details,created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                 listOf(
                     entry.id, entry.personId, entry.date, entry.time, entry.kind.id, entry.title, entry.body,
-                    entry.source, entry.bodyPart, entry.severity, formatTags(entry.tags), entry.value,
-                    entry.value2, entry.unit, entry.createdAt,
+                    entry.source, entry.bodyPart, entry.side, entry.severity, formatTags(entry.tags), entry.value,
+                    entry.value2, entry.unit, entry.details, entry.createdAt,
                 ),
             )
             touch()
@@ -422,6 +425,8 @@ class Repo(val sql: Sql, val blobs: Blobs) {
         value2 = r.double("value2"),
         unit = r.str("unit"),
         createdAt = r.str("created_at"),
+        side = r.str("side"),
+        details = r.str("details"),
     )
 
     companion object {
@@ -462,6 +467,10 @@ data class NewHealthEntry(
     val unit: String,
     /** "" when typed; `gemini:<model>:<sha256 of the files>` when a model transcribed it. */
     val source: String = "",
+    /** "left", "right" or "both" for a paired body part. */
+    val side: String = "",
+    /** A JSON object of structured details, "" for none: `{"teeth":"16 26"}` (health/Teeth.kt). */
+    val details: String = "",
 )
 
 /**

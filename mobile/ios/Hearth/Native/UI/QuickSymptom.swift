@@ -22,6 +22,7 @@ struct QuickSymptom: View {
     @State private var custom = HealthKind.symptom
     @State private var severity: Int?
     @State private var note = ""
+    @State private var teeth: [Int] = []
     @State private var asking = false
     @State private var ticked = ConsentChecks.unticked(.importDocument)
     @State private var saved: String?
@@ -61,6 +62,7 @@ struct QuickSymptom: View {
                     set: { id in
                         choice = id
                         typed = ""
+                        teeth = []
                     }
                 )) {
                     Text("—").tag(QuickSymptom.unchosen)
@@ -92,6 +94,9 @@ struct QuickSymptom: View {
                 Button(t("quick.save")) { save() }
                     .buttonStyle(.borderedProminent)
                     .disabled(!valid)
+            }
+            if let preset, preset.teeth {
+                ToothPicker(teeth: $teeth, milkFirst: preset.milkFirst).id(preset.id)
             }
             TextField(t("quick.note"), text: $note).textFieldStyle(.roundedBorder)
             if let saved {
@@ -147,13 +152,15 @@ struct QuickSymptom: View {
                 time: String(format: "%02ld:%02ld", clock.hour ?? 0, clock.minute ?? 0),
                 kind: kind, title: finalTitle, body: note.trimmingCharacters(in: .whitespacesAndNewlines), source: "",
                 bodyPart: preset?.bodyPart ?? "", severity: kind == .symptom ? severity : nil, tags: preset?.tags ?? [],
-                value: nil, value2: nil, unit: "", createdAt: ""
+                value: nil, value2: nil, unit: "", createdAt: "",
+                details: preset?.teeth == true ? Teeth.details(teeth) : ""
             ))
             saved = shownName
             choice = QuickSymptom.unchosen
             typed = ""
             severity = nil
             note = ""
+            teeth = []
             failure = nil
         } catch {
             failure = t("native.error", ["error": error.localizedDescription])

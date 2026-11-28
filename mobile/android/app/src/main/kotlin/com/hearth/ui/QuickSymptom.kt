@@ -25,6 +25,7 @@ import com.hearth.data.HealthKind
 import com.hearth.data.NewHealthEntry
 import com.hearth.data.Person
 import com.hearth.data.Repo
+import com.hearth.health.detailsWithTeeth
 import com.hearth.health.findPreset
 import com.hearth.health.localDate
 import com.hearth.health.presetOf
@@ -60,6 +61,7 @@ fun QuickSymptom(repo: Repo, persons: List<Person>, initialPerson: String, entri
     var custom by remember { mutableStateOf(HealthKind.SYMPTOM) }
     var severity by remember { mutableStateOf("") }
     var note by remember { mutableStateOf("") }
+    var teeth by remember { mutableStateOf(emptyList<Int>()) }
     var asking by remember { mutableStateOf(false) }
     var saved by remember { mutableStateOf<String?>(null) }
 
@@ -81,6 +83,7 @@ fun QuickSymptom(repo: Repo, persons: List<Person>, initialPerson: String, entri
                 NewHealthEntry(
                     personId, localDate(), LocalTime.now().let { "%02d:%02d".format(it.hour, it.minute) }, kind,
                     finalTitle, note.trim(), preset?.bodyPart ?: "", severity.toIntOrNull()?.takeIf { kind == HealthKind.SYMPTOM }, preset?.tags ?: emptyList(), null, null, "",
+                    details = if (preset?.teeth == true) detailsWithTeeth(teeth) else "",
                 ),
             )
         }
@@ -89,6 +92,7 @@ fun QuickSymptom(repo: Repo, persons: List<Person>, initialPerson: String, entri
         typed = ""
         severity = ""
         note = ""
+        teeth = emptyList()
         onSaved()
     }
 
@@ -100,6 +104,7 @@ fun QuickSymptom(repo: Repo, persons: List<Person>, initialPerson: String, entri
             Picker(t("quickSymptom.symptom"), choice, listOf(NONE to "—") + order.map { it.id to t("preset.${it.id}") } + (CUSTOM to t("quick.custom")), modifier = Modifier.weight(1f)) {
                 choice = it
                 typed = ""
+                teeth = emptyList()
             }
         }
         if (choice == CUSTOM) {
@@ -117,6 +122,7 @@ fun QuickSymptom(repo: Repo, persons: List<Person>, initialPerson: String, entri
             }
             Button(enabled = valid, onClick = { save() }) { Text(t("quick.save")) }
         }
+        if (preset?.teeth == true) ToothPicker(teeth, preset.milkFirst) { teeth = it }
         OutlinedTextField(note, { note = it }, placeholder = { Text(t("quick.note")) }, singleLine = true, modifier = Modifier.fillMaxWidth())
         saved?.let { Text(t("quick.saved", "what" to it), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary) }
     }
