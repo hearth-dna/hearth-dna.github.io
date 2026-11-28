@@ -25,7 +25,7 @@ settings:
     # The version of record. Info.plist reads these rather than repeating them: a literal there is
     # what would ship when the two disagree, and nothing warns.
     MARKETING_VERSION: "0.2.0"
-    CURRENT_PROJECT_VERSION: "3"
+    CURRENT_PROJECT_VERSION: "4"
 
 configs:
   Debug: debug

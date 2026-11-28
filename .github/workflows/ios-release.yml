@@ -123,6 +123,8 @@ jobs:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          # Optional (docs/runbook/cloud-backups.md): unset, the build has no Google Drive button.
+          HEARTH_GOOGLE_IOS_CLIENT_ID: ${{ secrets.HEARTH_GOOGLE_IOS_CLIENT_ID }}
         run: make ios-ipa ASC_KEY_PATH="$RUNNER_TEMP/asc/AuthKey_$ASC_KEY_ID.p8"
 
       - name: Upload to TestFlight

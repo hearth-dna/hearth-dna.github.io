@@ -346,6 +346,7 @@ ios-verify: ## Check the built .ipa before it goes anywhere near App Store Conne
 		version=$$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$$app/Info.plist"); \
 		build=$$(/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "$$app/Info.plist"); \
 		compliance=$$(/usr/libexec/PlistBuddy -c "Print :ITSAppUsesNonExemptEncryption" "$$app/Info.plist" 2>/dev/null || echo missing); \
+		drive=$$(/usr/libexec/PlistBuddy -c "Print :HearthGoogleClientID" "$$app/Info.plist" 2>/dev/null); \
 		: "read from the artifact, not from the variable: a stale .ipa from an earlier build would"; \
 		: "otherwise pass and be uploaded to the wrong listing"; \
 		test "$$id" = "$(HEARTH_APPLICATION_ID)" \
@@ -366,7 +367,10 @@ ios-verify: ## Check the built .ipa before it goes anywhere near App Store Conne
 		echo "  id:      $$id"; \
 		echo "  version: $$version ($$build)"; \
 		echo "  signed:  yes"; \
-		echo "  web app: bundled"
+		echo "  web app: bundled"; \
+		: "status only: the id is an account identifier and this output lands in a public CI log"; \
+		case "$$drive" in *.apps.googleusercontent.com) echo "  google drive: on";; \
+			*) echo "  google drive: off (HEARTH_GOOGLE_IOS_CLIENT_ID not set)";; esac
 
 ios-testflight: ## Upload the verified .ipa to TestFlight (macOS)
 	$(call require_macos,ios-testflight)

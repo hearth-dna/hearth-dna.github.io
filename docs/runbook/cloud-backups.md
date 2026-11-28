@@ -44,7 +44,9 @@ Google Auth Platform → Clients / Data access / Audience).
    (`keytool -list -v -keystore ~/.android/debug.keystore -storepass android`). No id goes into the
    app; Google matches the package and certificate. Then set `HEARTH_GOOGLE_DRIVE=1`.
 3. **iOS:** create an OAuth client of type *iOS* for the bundle id and set
-   `HEARTH_GOOGLE_IOS_CLIENT_ID=<id>.apps.googleusercontent.com`.
+   `HEARTH_GOOGLE_IOS_CLIENT_ID=<id>.apps.googleusercontent.com`. Store builds come from CI, so
+   set the same name as a repository secret too (`gh secret set HEARTH_GOOGLE_IOS_CLIENT_ID`);
+   `make ios-verify` ends with `google drive: on` when the built app carries it.
 
 Without step 2, the Android button answers "Google sign-in is not set up for this build".
 

@@ -149,6 +149,7 @@ explicit input, so a tag can build and verify without publishing anything.
 | `IOS_PROFILE_BASE64` | an *App Store* provisioning profile for the app id and that certificate (Profiles → +, or `POST /v1/profiles`), base64 of the `.mobileprovision` |
 | `ASC_KEY_ID`, `ASC_ISSUER_ID` | as in `.env.local` |
 | `ASC_KEY_BASE64` | `base64 -i AuthKey_XXXX.p8 \| pbcopy` |
+| `HEARTH_GOOGLE_IOS_CLIENT_ID` | optional: the iOS OAuth client id for the Google Drive backup button ([cloud-backups.md](cloud-backups.md)); unset, the build has no such button |
 
 The export signs manually with that certificate and profile. Xcode's automatic export signing
 would ask Apple for a cloud-managed certificate instead, which needs an *Admin* API key; this way
