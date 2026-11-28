@@ -1,0 +1,21 @@
+mobile/ios/project.yml
+  s_4826d66ac22c0c::t_24871770c0a370 28
+mobile/android/version.properties
+  s_4826d66ac22c0c::t_24871770c0a370 4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.6",
+  "base_commit_sha": "cf7eee5d81a7dfe016a74d969b9df97fc929b4ae",
+  "prompts": {},
+  "sessions": {
+    "s_4826d66ac22c0c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fa19c9b4-ecef-4469-9151-738bd8c332aa",
+        "model": "claude-fable-5-2"
+      },
+      "human_author": "Vladimir Bloshchitcyn <vladimir.bloshchitcyn@deliveryhero.com>"
+    }
+  }
+}
