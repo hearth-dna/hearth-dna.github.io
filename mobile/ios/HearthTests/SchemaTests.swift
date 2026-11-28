@@ -32,4 +32,30 @@ final class SchemaTests: XCTestCase {
         )
         XCTAssertEqual(try db.query("SELECT COUNT(*) AS n FROM meta").first?.int("n"), 3)
     }
+
+    /// A restore holds the database for as long as it takes, and iOS kills an app whose main thread
+    /// waits that long: a query from another thread answers with the last committed rows instead.
+    func testAQueryDoesNotWaitForAnotherThreadsTransaction() throws {
+        let path = FileManager.default.temporaryDirectory.appendingPathComponent("\(UUID().uuidString).db").path
+        defer { for suffix in ["", "-wal", "-shm"] { try? FileManager.default.removeItem(atPath: path + suffix) } }
+        let db = try Db(path: path)
+        try db.run("INSERT INTO note(id, topic, markdown, updated_at) VALUES ('a', 'kept', '', '')")
+        let inside = DispatchSemaphore(value: 0)
+        let release = DispatchSemaphore(value: 0)
+        let finished = DispatchSemaphore(value: 0)
+        DispatchQueue.global().async {
+            try? db.transaction {
+                try db.run("INSERT INTO note(id, topic, markdown, updated_at) VALUES ('b', 'not yet', '', '')")
+                inside.signal()
+                release.wait()
+            }
+            finished.signal()
+        }
+        inside.wait()
+        XCTAssertEqual(try db.query("SELECT id FROM note ORDER BY id").map { $0.text("id") }, ["a"])
+        release.signal()
+        finished.wait()
+        XCTAssertEqual(try db.query("SELECT id FROM note ORDER BY id").map { $0.text("id") }, ["a", "b"])
+        db.close()
+    }
 }

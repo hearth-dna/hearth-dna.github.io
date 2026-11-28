@@ -53,13 +53,20 @@ private let transient = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
 /// Every statement is prepared and every value bound; nothing is ever spliced into SQL text except
 /// table and column names that are constants in the calling code.
 ///
-/// One connection, used from any thread one caller at a time: every call takes a recursive lock,
-/// and a transaction holds it from BEGIN to COMMIT. The slow work (a genome import, a restore that
-/// loads genomes) runs on a background queue behind a sheet the user cannot dismiss, so the main
-/// thread never waits on it in practice; if it did, it would wait rather than interleave.
+/// One connection for everything that writes, used from any thread one caller at a time: every
+/// call takes a recursive lock, and a transaction holds it from BEGIN to COMMIT. That can be long
+/// (a genome import, a restore that loads genomes, and the backup place restores on its own, with
+/// no sheet in front), so a query that finds the lock taken by another thread does not wait for it:
+/// it reads through a second, read-only connection, which in WAL mode sees the last committed state
+/// while the transaction runs. The main thread waiting there for a restore to finish is what iOS
+/// kills an app for. A write still waits its turn rather than interleave.
 final class Db {
     private let handle: OpaquePointer
     private let lock = NSRecursiveLock()
+    /// The read-only connection, for a file opened with `prepare`; an in-memory database cannot
+    /// have a second one, and its queries wait for the lock.
+    private var reader: OpaquePointer?
+    private let readerLock = NSLock()
     /// How many `transaction` calls are open on this connection. Only the outermost begins, commits
     /// or rolls back; an inner one that throws marks the whole transaction failed.
     private var depth = 0
@@ -113,6 +120,17 @@ final class Db {
         try run("INSERT OR IGNORE INTO meta(key, value) VALUES (?, ?)", [.text("schema_version"), .text("1")])
         try run("INSERT OR IGNORE INTO meta(key, value) VALUES (?, ?)", [.text("device"), .text(newId())])
         try run("INSERT OR IGNORE INTO meta(key, value) VALUES (?, ?)", [.text("generation"), .text("0")])
+        guard path != ":memory:" else { return }
+        // The size limit trims the log after a checkpoint: a restored genome would otherwise leave
+        // its tens of megabytes of log on disk for good.
+        try execScript("PRAGMA journal_mode = WAL; PRAGMA journal_size_limit = 8388608")
+        var second: OpaquePointer?
+        guard sqlite3_open_v2(path, &second, SQLITE_OPEN_READONLY, nil) == SQLITE_OK else {
+            let message = second.map { String(cString: sqlite3_errmsg($0)) } ?? "cannot open the database"
+            sqlite3_close(second)
+            throw failure(message)
+        }
+        reader = second
     }
 
     deinit {
@@ -123,7 +141,13 @@ final class Db {
     func close() {
         lock.lock()
         defer { lock.unlock() }
-        if !closed { sqlite3_close(handle) }
+        readerLock.lock()
+        defer { readerLock.unlock() }
+        if !closed {
+            sqlite3_close(reader)
+            sqlite3_close(handle)
+        }
+        reader = nil
         closed = true
     }
 
@@ -132,11 +156,15 @@ final class Db {
     /// without the user choosing it, which is what Android's `allowBackup=false` prevents too; the
     /// user's own backup is the Hearth file, which they place themselves.
     static func openDefault() throws -> Db {
-        var file = try defaultFile()
+        let file = try defaultFile()
         let db = try Db(path: file.path)
         var values = URLResourceValues()
         values.isExcludedFromBackup = true
-        try file.setResourceValues(values)
+        // The write-ahead log and its index hold the same rows as the file, and exist by now.
+        for suffix in ["", "-wal", "-shm"] {
+            var part = URL(fileURLWithPath: file.path + suffix)
+            try part.setResourceValues(values)
+        }
         return db
     }
 
@@ -233,17 +261,32 @@ final class Db {
     private static let bump =
         "INSERT INTO meta(key, value) VALUES ('generation', '1') ON CONFLICT(key) DO UPDATE SET value = CAST(value AS INTEGER) + 1"
 
-    /// Runs one query and returns every row.
+    /// Runs one query and returns every row. While another thread holds the lock (a transaction
+    /// under way), the rows are the last committed ones, read through `reader`.
     func query(_ sql: String, _ params: [SQLValue] = []) throws -> [Row] {
+        if lock.try() {
+            defer { lock.unlock() }
+            return try rows(handle, sql, params)
+        }
+        readerLock.lock()
+        if let reader {
+            defer { readerLock.unlock() }
+            return try rows(reader, sql, params)
+        }
+        readerLock.unlock()
         lock.lock()
         defer { lock.unlock() }
-        let statement = try prepare(sql, params)
+        return try rows(handle, sql, params)
+    }
+
+    private func rows(_ connection: OpaquePointer, _ sql: String, _ params: [SQLValue]) throws -> [Row] {
+        let statement = try prepare(sql, params, on: connection)
         defer { sqlite3_finalize(statement) }
         var rows: [Row] = []
         while true {
             let rc = sqlite3_step(statement)
             if rc == SQLITE_DONE { break }
-            guard rc == SQLITE_ROW else { throw failure(lastError) }
+            guard rc == SQLITE_ROW else { throw failure(String(cString: sqlite3_errmsg(connection))) }
             var row: Row = [:]
             for i in 0..<sqlite3_column_count(statement) {
                 row[String(cString: sqlite3_column_name(statement, i))] = column(statement, i)
@@ -300,8 +343,8 @@ final class Db {
         return DbError(message: message)
     }
 
-    private func prepare(_ sql: String, _ params: [SQLValue]) throws -> OpaquePointer {
-        let statement = try prepare(sql)
+    private func prepare(_ sql: String, _ params: [SQLValue], on connection: OpaquePointer? = nil) throws -> OpaquePointer {
+        let statement = try prepare(sql, on: connection)
         do {
             try bind(statement, params)
         } catch {
@@ -311,10 +354,12 @@ final class Db {
         return statement
     }
 
-    private func prepare(_ sql: String) throws -> OpaquePointer {
+    /// On the writing connection unless `connection` names the reader.
+    private func prepare(_ sql: String, on connection: OpaquePointer? = nil) throws -> OpaquePointer {
+        let connection = connection ?? handle
         var prepared: OpaquePointer?
-        guard sqlite3_prepare_v2(handle, sql, -1, &prepared, nil) == SQLITE_OK, let statement = prepared else {
-            throw failure(lastError)
+        guard sqlite3_prepare_v2(connection, sql, -1, &prepared, nil) == SQLITE_OK, let statement = prepared else {
+            throw failure(String(cString: sqlite3_errmsg(connection)))
         }
         return statement
     }
